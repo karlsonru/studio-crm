@@ -5,12 +5,11 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
-    "prebuild": "npm run lint",
     "start": "node .",
     "prestart": "npm run build",
     "server:watch": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "lint:fix": "eslint --cache --ext .ts . --fix",
-    "lint": "eslint --cache --ext .ts ."
+    "lint:fix": "npx eslint --cache --ext .ts . --fix",
+    "lint": "npx eslint --cache --ext .ts ."
   },
   "repository": {
     "type": "git",
@@ -27,10 +26,11 @@
     "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.37.0",
     "eslint": "^8.23.1",
-    "eslint-config-standard-with-typescript": "^23.0.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-n": "^15.2.5",
-    "eslint-plugin-promise": "^6.0.1",
+    "prettier": "2.7.1",
+    "prettier-eslint": "^15.0.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^4.8.3"
   },

@@ -3,6 +3,18 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "outDir": "dist",
-    "baseUrl": "."
-  }
+    "baseUrl": ".",
+    "resolveJsonModule": true,
+
+    "strict": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true 
+
+  },
+  "include": ["src"],
+  "exclude": [
+    "node_modules", 
+    "dist", 
+    "*.d.ts"
+  ]
 }
