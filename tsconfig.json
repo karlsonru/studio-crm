@@ -1,15 +1,19 @@
 {
   "compilerOptions": {
-    "sourceMap": true,
+    "target": "ESNext",
+    "module": "ESNext",
     "esModuleInterop": true,
-    "outDir": "dist",
-    "baseUrl": ".",
+    "sourceMap": true,
+    "moduleResolution": "Node",
     "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
 
+    "baseUrl": ".",
+    "outDir": "dist",
+    
     "strict": true,
     "noImplicitAny": true,
-    "skipLibCheck": true 
-
+    "skipLibCheck": true,
   },
   "include": ["src"],
   "exclude": [
