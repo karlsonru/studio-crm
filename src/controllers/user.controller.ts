@@ -23,29 +23,26 @@ export class UserController {
 
   static async create(req: Request, res: Response) {
     try {
-      const isNotUnique = await User.findOne({ login: req.params.id });
+      const userExists = await User.findOne({ login: req.body.login });
 
-      console.log(isNotUnique);
-      if (isNotUnique) {
+      if (userExists) {
         return res.status(400).json({ message: 'Пользователь с таким логином уже существует' });
       }
 
-      // const salt = process.env.SALT ?? 10;
       const passHash = await bcryptjs.hash(req.body.password, 8);
       const newUser = await User.create({
         ...req.body, password: passHash, birthday: new Date(req.body.birthday)
       });
 
-      return res.json({ message: newUser });
+      return res.status(201).json({ message: newUser });
     } catch (err) {
-      console.log(err)
       return res.status(500).json({ message: err });
     }
   }
 
   static async patch(req: Request, res: Response) {
     try {
-      const updateUser = await User.findOneAndUpdate({ login: req.params.id }, ...req.body, { returnDocument: 'after' });
+      const updateUser = await User.findOneAndUpdate({ login: req.params.id }, req.body, { returnDocument: 'after' });
       return res.json({ message: updateUser });
     } catch (err) {
       return res.status(500).json({ message: err });
@@ -56,8 +53,8 @@ export class UserController {
     try {
       // проверяем, если есть какие-то зависимости - то это patch isActive = false;
       // Если зависимостей нет - то можно rempve;
-      const removeUser = await User.findOneAndRemove({ login: req.params.id }, ...req.body);
-      return res.json({ message: removeUser });
+      const removeUser = await User.findOneAndRemove({ login: req.params.id });
+      return res.status(204);
     } catch (err) {
       return res.status(500).json({ message: err });
     }
