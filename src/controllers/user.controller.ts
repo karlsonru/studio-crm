@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import bcryptjs from 'bcryptjs';
-import { User } from '../models';
+import { Role, User } from '../models';
 
 export class UserController {
   static async getUsers(req: Request, res: Response, next: NextFunction) {
@@ -10,6 +10,7 @@ export class UserController {
     } catch (err) {
       next(err);
     }
+    return null;
   }
 
   static async getOneUser(req: Request, res: Response, next: NextFunction) {
@@ -24,6 +25,7 @@ export class UserController {
     } catch (err) {
       next(err);
     }
+    return null;
   }
 
   static async create(req: Request, res: Response, next: NextFunction) {
@@ -34,15 +36,21 @@ export class UserController {
         return res.status(400).json({ message: 'Пользователь с таким логином уже существует' });
       }
 
+      const role = await Role.findOne({ value: req.body.role });
       const passHash = await bcryptjs.hash(req.body.password, 8);
+
       const newUser = await User.create({
-        ...req.body, password: passHash, birthday: new Date(req.body.birthday)
+        ...req.body,
+        password: passHash,
+        birthday: +req.body.birthday,
+        role: role?.value,
       });
 
       return res.status(201).json({ message: newUser });
     } catch (err) {
       next(err);
     }
+    return null;
   }
 
   static async patch(req: Request, res: Response, next: NextFunction) {
@@ -57,6 +65,7 @@ export class UserController {
     } catch (err) {
       next(err);
     }
+    return null;
   }
 
   static async delete(req: Request, res: Response, next: NextFunction) {
@@ -64,7 +73,7 @@ export class UserController {
       // проверяем, если есть какие-то зависимости - то это patch isActive = false;
       // Если зависимостей нет - то можно rempve;
       const removeUser = await User.findOneAndDelete({ login: req.params.id });
-      
+
       if (!removeUser) {
         return res.status(400).json({ message: 'Пользователь не найден' });
       }
@@ -73,5 +82,6 @@ export class UserController {
     } catch (err) {
       next(err);
     }
+    return null;
   }
 }

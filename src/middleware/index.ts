@@ -1,3 +1,3 @@
-import { errorLogger } from "./errorLogger";
+import { errorLogger } from './errorLogger';
 
 export { errorLogger };

@@ -9,12 +9,16 @@ const schema = new Schema({
     type: String, required: true, minLength: 7, trim: true,
   },
   role: {
-    type: String, required: true, loawercase: true, trim: true,
+    type: String, required: true, loawercase: true, trim: true, ref: 'Role',
   },
-  name: { type: String, required: true, trim: true },
-  surname: { type: String, required: true, trim: true },
-  birthday: { type: Date },
-  isActive: { type: Boolean },
+  name: {
+    type: String, required: true, trim: true, minLength: 2,
+  },
+  surname: {
+    type: String, required: true, trim: true, minLength: 2,
+  },
+  birthday: { type: Number },
+  isActive: { type: Boolean, required: true },
 });
 
 const User = model('User', schema);
