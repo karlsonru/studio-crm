@@ -1,30 +1,38 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import bcryptjs from 'bcryptjs';
+import { User } from '../models';
+import { generateAccessToken } from '../middleware';
 
 export class AuthController {
-  static async register(req: Request, res: Response) {
+  static async login(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log('Hello');
-    } catch (e) {
-      console.log('Hello');
+      const { login, password } = req.body;
+
+      const user = await User.findOne({ login });
+
+      if (!user) {
+        return res.status(400).json({ message: 'Такого пользователя не существут' });
+      }
+
+      const isValid = bcryptjs.compareSync(password, user.password);
+
+      if (!isValid) {
+        return res.status(400).json({ message: 'Неверный пароль' });
+      }
+
+      const token = generateAccessToken(user.id, user.role);
+
+      return res.json({ token });
+    } catch (err) {
+      next(err);
     }
-    return res.json({ message: 'register' });
   }
 
-  static async login(req: Request, res: Response) {
+  static async logout(req: Request, res: Response, next: NextFunction) {
     try {
       console.log(req);
-    } catch (e) {
-      console.log('Hello');
+    } catch (err) {
+      next(err);
     }
-    return res.json({ message: 'login' });
-  }
-
-  static async logout(req: Request, res: Response) {
-    try {
-      console.log(req);
-    } catch (e) {
-      console.log('Hello');
-    }
-    return res.json({ message: 'logout' });
   }
 }

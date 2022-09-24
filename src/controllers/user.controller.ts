@@ -10,7 +10,6 @@ export class UserController {
     } catch (err) {
       next(err);
     }
-    return null;
   }
 
   static async getOneUser(req: Request, res: Response, next: NextFunction) {
@@ -25,7 +24,6 @@ export class UserController {
     } catch (err) {
       next(err);
     }
-    return null;
   }
 
   static async create(req: Request, res: Response, next: NextFunction) {
@@ -50,7 +48,6 @@ export class UserController {
     } catch (err) {
       next(err);
     }
-    return null;
   }
 
   static async patch(req: Request, res: Response, next: NextFunction) {
@@ -65,7 +62,6 @@ export class UserController {
     } catch (err) {
       next(err);
     }
-    return null;
   }
 
   static async delete(req: Request, res: Response, next: NextFunction) {
@@ -82,6 +78,5 @@ export class UserController {
     } catch (err) {
       next(err);
     }
-    return null;
   }
 }
