@@ -1,27 +1,32 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import bcryptjs from 'bcryptjs';
 import { User } from '../models';
 
 export class UserController {
-  static async getUsers(req: Request, res: Response) {
+  static async getUsers(req: Request, res: Response, next: NextFunction) {
     try {
       const users = await User.find({});
       return res.json({ message: users });
     } catch (err) {
-      return res.status(500).json({ message: err });
+      next(err);
     }
   }
 
-  static async getOneUser(req: Request, res: Response) {
+  static async getOneUser(req: Request, res: Response, next: NextFunction) {
     try {
       const user = await User.findOne({ login: req.params.id });
+
+      if (!user) {
+        return res.status(400).json({ message: 'Пользователь не найден' });
+      }
+
       return res.json({ message: user });
     } catch (err) {
-      return res.status(500).json({ message: err });
+      next(err);
     }
   }
 
-  static async create(req: Request, res: Response) {
+  static async create(req: Request, res: Response, next: NextFunction) {
     try {
       const userExists = await User.findOne({ login: req.body.login });
 
@@ -36,27 +41,37 @@ export class UserController {
 
       return res.status(201).json({ message: newUser });
     } catch (err) {
-      return res.status(500).json({ message: err });
+      next(err);
     }
   }
 
-  static async patch(req: Request, res: Response) {
+  static async patch(req: Request, res: Response, next: NextFunction) {
     try {
       const updateUser = await User.findOneAndUpdate({ login: req.params.id }, req.body, { returnDocument: 'after' });
+
+      if (!updateUser) {
+        return res.status(400).json({ message: 'Пользователь не найден' });
+      }
+
       return res.json({ message: updateUser });
     } catch (err) {
-      return res.status(500).json({ message: err });
+      next(err);
     }
   }
 
-  static async delete(req: Request, res: Response) {
+  static async delete(req: Request, res: Response, next: NextFunction) {
     try {
       // проверяем, если есть какие-то зависимости - то это patch isActive = false;
       // Если зависимостей нет - то можно rempve;
-      const removeUser = await User.findOneAndRemove({ login: req.params.id });
+      const removeUser = await User.findOneAndDelete({ login: req.params.id });
+      
+      if (!removeUser) {
+        return res.status(400).json({ message: 'Пользователь не найден' });
+      }
+
       return res.status(204);
     } catch (err) {
-      return res.status(500).json({ message: err });
+      next(err);
     }
   }
 }
