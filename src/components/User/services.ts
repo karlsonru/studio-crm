@@ -1,5 +1,5 @@
 import bcryptjs from 'bcryptjs';
-import { User, Role } from '../models';
+import { User, Role } from '../../models';
 import { IUser } from './types';
 
 export class UserServices {
@@ -13,8 +13,13 @@ export class UserServices {
     return user;
   }
 
-  // интерфейс на user
   static async create(user: IUser) {
+    const candidate = await this.getOne(user.login);
+
+    if (candidate) {
+      return null;
+    }
+
     const role = await Role.findOne({ value: user.role });
     const passHash = await bcryptjs.hash(user.password, 7);
 

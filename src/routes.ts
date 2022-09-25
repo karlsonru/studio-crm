@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import authRouter from './Auth/routes';
-import userRouter from './User/routes';
+import authRouter from './components/Auth/routes';
+import userRouter from './components/User/routes';
 import { checkToken, checkAccess } from './shared';
 
 const router = Router();

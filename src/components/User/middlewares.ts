@@ -1,25 +1,15 @@
 import { body } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 
-export async function checkCreateUser(req: Request, res: Response, next: NextFunction) {
-  await body('role')
+export function checkCreateUser(req: Request, res: Response, next: NextFunction) {
+  body('role')
     .exists({
       checkNull: true,
       checkFalsy: true,
     })
     .run(req);
 
-  await body('name')
-    .exists({
-      checkNull: true,
-      checkFalsy: true,
-    })
-    .bail()
-    .trim()
-    .isLength({ min: 2 })
-    .run(req);
-
-  await body('surname')
+  body('name')
     .exists({
       checkNull: true,
       checkFalsy: true,
@@ -29,7 +19,17 @@ export async function checkCreateUser(req: Request, res: Response, next: NextFun
     .isLength({ min: 2 })
     .run(req);
 
-  await body('isActive')
+  body('surname')
+    .exists({
+      checkNull: true,
+      checkFalsy: true,
+    })
+    .bail()
+    .trim()
+    .isLength({ min: 2 })
+    .run(req);
+
+  body('isActive')
     .exists({
       checkNull: true,
       checkFalsy: true,

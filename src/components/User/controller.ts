@@ -27,13 +27,11 @@ export class UserController {
 
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const userExists = await UserServices.getOne(req.body.login);
-
-      if (userExists) {
-        return res.status(400).json({ message: 'Пользователь с таким логином уже существует' });
-      }
-
       const newUser = await UserServices.create(req.body);
+
+      if (newUser === null) {
+        return res.status(200).json({ message: 'Пользователь с таким логином уже существует' });
+      }
 
       return res.status(201).json({ message: newUser });
     } catch (err) {

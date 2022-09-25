@@ -1,11 +1,21 @@
 import { errorLogger } from './errorLogger';
-import { checkToken } from './checkToken';
-import { checkAccess } from './checkAcces';
-import { checkLogin } from './checkLogin';
+import { errorHandler } from './errorHandler';
+import { ValidationError } from './validationError';
+import {
+  checkAccess,
+  checkToken,
+  checkId,
+  checkLogin,
+  validationMiddleware,
+} from './validationMiddlewares';
 
 export {
   errorLogger,
+  errorHandler,
+  ValidationError,
+  validationMiddleware,
   checkLogin,
   checkToken,
   checkAccess,
+  checkId,
 };

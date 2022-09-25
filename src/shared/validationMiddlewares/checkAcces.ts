@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { Group } from '../models';
+import { Group } from '../../models';
 
 interface IPayload {
   id: string,
