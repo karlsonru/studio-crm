@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { errorLogger } from '../middleware';
-import { loggerControllers } from '../logger';
-import { UserController } from '../controllers';
-import { checkLogin, checkCreateUser } from '../services';
+import { UserController } from './controller';
+import { checkCreateUser } from './middlewares';
+import { loggerControllers } from '../config/logger';
+import { errorLogger, checkLogin } from '../shared';
 
 const userRouter = Router();
 

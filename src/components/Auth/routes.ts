@@ -1,8 +1,7 @@
 import { Router } from 'express';
-import { AuthController } from '../controllers';
-import { errorLogger } from '../middleware';
-import { loggerControllers } from '../logger';
-import { checkLogin } from '../services';
+import { AuthController } from './controller';
+import { loggerControllers } from '../config/logger';
+import { errorLogger, checkLogin } from '../shared';
 
 const authRouter = Router();
 

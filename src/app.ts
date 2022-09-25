@@ -1,8 +1,8 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { router } from './routes';
-import { db } from './db';
-import { loggerApp } from './logger';
+import { db } from './config/db';
+import { loggerApp } from './config/logger';
 
 dotenv.config();
 
