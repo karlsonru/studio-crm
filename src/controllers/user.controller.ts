@@ -35,7 +35,7 @@ export class UserController {
       }
 
       const role = await Role.findOne({ value: req.body.role });
-      const passHash = await bcryptjs.hash(req.body.password, 8);
+      const passHash = await bcryptjs.hash(req.body.password, 7);
 
       const newUser = await User.create({
         ...req.body,

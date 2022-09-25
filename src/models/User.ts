@@ -6,10 +6,10 @@ const schema = new Schema({
     type: String, required: true, minLength: 5, unique: true, trim: true,
   },
   password: {
-    type: String, required: true, minLength: 7, trim: true,
+    type: String, required: true, minLength: 5, trim: true,
   },
   role: {
-    type: String, required: true, loawercase: true, trim: true, ref: 'Role',
+    type: String, required: true, lowercase: true, trim: true, ref: 'Role',
   },
   name: {
     type: String, required: true, trim: true, minLength: 2,

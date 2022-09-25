@@ -1,11 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
 import bcryptjs from 'bcryptjs';
+import { validationResult } from 'express-validator';
 import { User } from '../models';
 import { generateAccessToken } from '../middleware';
 
 export class AuthController {
   static async login(req: Request, res: Response, next: NextFunction) {
     try {
+      // обработать ошибку ?
+      validationResult(req).throw();
+
       const { login, password } = req.body;
 
       const user = await User.findOne({ login });

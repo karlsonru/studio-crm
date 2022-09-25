@@ -1,9 +1,9 @@
-import { errorLogger } from './errorLogger';
-import { generateAccessToken, checkAccess, checkToken } from './authMiddleware';
+import { errorLogger } from './logger.middleware';
+import { generateAccessToken, checkAccess, checkToken } from './auth.middleware';
 
 export {
   errorLogger,
   generateAccessToken,
-  checkAccess,
   checkToken,
+  checkAccess,
 };
