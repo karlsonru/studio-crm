@@ -27,7 +27,7 @@ export class UserServices {
       ...user,
       password: passHash,
       birthday: +user.birthday,
-      role: role?.value,
+      role: role?.id,
       isActive: true,
     });
 

@@ -9,7 +9,7 @@ export function checkLogin(req: Request, res: Response, next: NextFunction) {
     })
     .bail()
     .trim()
-    .isLength({ min: 5 })
+    .isLength({ min: 3 })
     .run(req);
 
   body('password')

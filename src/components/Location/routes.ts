@@ -1,24 +1,31 @@
-import { Router } from 'express';
-import { LocationController } from './controller';
-import { checkCreateLesson } from './middlewares';
 import { loggerControllers } from '../../config/logger';
-import {
-  errorLogger,
-  errorHandler,
-  checkLogin,
-  checkId,
+import { Location } from '../../models';
+import { createBasicRouter } from '../../shared/component';
+import { errorLogger, errorHandler, injectQuery } from '../../shared';
+import { checkLogin, checkId, validationMiddleware } from '../../shared/validationMiddlewares';
+import { LocationServices } from './services';
+import { LocationController } from './controller';
+import { checkCreateLocation } from './middlewares';
+
+const middlewares = {
   validationMiddleware,
-} from '../../shared';
+  get: [checkId],
+  post: [checkLogin, checkCreateLocation],
+  patch: [checkId],
+  delete: [checkId],
+  injectQuery,
+  query: ['title', 'address'],
+};
 
-const locationRouter = Router();
+const handlers = {
+  errorHandler,
+  errorLogger,
+  loggerControllers,
+};
 
-locationRouter.get('/', LocationController.getLocations);
-locationRouter.get('/:id', validationMiddleware([checkId]), LocationController.getLocation);
-locationRouter.post('/', validationMiddleware([checkLogin, checkCreateLesson]), LocationController.create);
-locationRouter.patch('/:id', validationMiddleware([checkId]), LocationController.patch);
-locationRouter.delete('/:id', validationMiddleware([checkId]), LocationController.delete);
+const service = new LocationServices(Location);
+const controller = new LocationController(service);
 
-locationRouter.use(errorLogger(loggerControllers));
-locationRouter.use(errorHandler);
+const locationRouter = createBasicRouter(controller, middlewares, handlers);
 
 export default locationRouter;

@@ -22,6 +22,9 @@ export function checkAccess(groupTitie: string) {
 
       const group = await RolesGroup.findOne({ title: groupTitie });
 
+      console.log(groupTitie);
+      console.log(group);
+
       if (!group) {
         return res.status(403).json({ message: 'Не авторизован' });
       }

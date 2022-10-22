@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import bcryptjs from 'bcryptjs';
-import { User, IRole } from '../../models';
+import { User } from '../../models';
 
 const secret = process.env.TOKEN_SECRET ?? 'helloWorld';
 
@@ -14,9 +14,9 @@ export class AuthServices {
   }
 
   static async login(login: string, password: string) {
-    const user = await User.findOne({ login }).populate<{ role: IRole }>('Role');
+    const user = await User.findOne({ login }).populate('role');
 
-    if (!user) {
+    if (!user || !user.role) {
       return null;
     }
 
@@ -26,6 +26,6 @@ export class AuthServices {
       return null;
     }
 
-    return this.generateAccessToken(user.id, user.role.value);
+    return this.generateAccessToken(user.id, user.role.toString());
   }
 }

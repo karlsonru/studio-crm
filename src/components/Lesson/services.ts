@@ -22,8 +22,8 @@ export class LessonServices {
     const candidate = await this.findLessons({
       day: lesson.day,
       teacher: lesson.teacher,
-      time_hh: lesson.time_hh,
-      time_min: lesson.time_min,
+      timeHh: lesson.timeHh,
+      timeMin: lesson.timeMin,
     }, 1);
 
     if (candidate) {
