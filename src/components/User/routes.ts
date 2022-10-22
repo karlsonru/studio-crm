@@ -1,24 +1,31 @@
-import { Router } from 'express';
+import { User } from '../../models';
+import { createBasicRouter } from '../../shared/component';
 import { UserController } from './controller';
-import { checkCreateUser } from './middlewares';
+import { UserServices } from './services';
 import { loggerControllers } from '../../config/logger';
-import {
-  errorLogger,
-  errorHandler,
-  checkLogin,
-  checkId,
+import { errorLogger, errorHandler, injectQuery } from '../../shared';
+import { checkCreateUser } from './middlewares';
+import { checkLogin, checkId, validationMiddleware } from '../../shared/validationMiddlewares';
+
+const middlewares = {
   validationMiddleware,
-} from '../../shared';
+  get: [checkId],
+  post: [checkLogin, checkCreateUser],
+  patch: [checkId],
+  delete: [checkId],
+  injectQuery,
+  query: ['login'],
+};
 
-const userRouter = Router();
+const handlers = {
+  errorHandler,
+  errorLogger,
+  loggerControllers,
+};
 
-userRouter.get('/', UserController.getUsers);
-userRouter.get('/:id', validationMiddleware([checkId]), UserController.getOneUser);
-userRouter.post('/', validationMiddleware([checkLogin, checkCreateUser]), UserController.create);
-userRouter.patch('/:id', validationMiddleware([checkId]), UserController.patch);
-userRouter.delete('/:id', validationMiddleware([checkId]), UserController.delete);
+const service = new UserServices(User);
+const controller = new UserController(service);
 
-userRouter.use(errorLogger(loggerControllers));
-userRouter.use(errorHandler);
+const locationRouter = createBasicRouter(controller, middlewares, handlers);
 
-export default userRouter;
+export default locationRouter;

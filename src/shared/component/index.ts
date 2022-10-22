@@ -1,5 +1,11 @@
+import { createBasicRouter } from './basicRouter';
 import { BasicController } from './basicController';
-import { BasicRouter } from './basicRouter';
-import { BasicServices } from './basicServices';
+import { BasicServices, IBasicItem, IBasicQuery } from './basicServices';
 
-export { BasicRouter, BasicController, BasicServices };
+export {
+  createBasicRouter,
+  BasicController,
+  BasicServices,
+  IBasicItem,
+  IBasicQuery,
+};

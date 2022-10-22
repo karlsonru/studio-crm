@@ -1,11 +1,11 @@
-import { loggerControllers } from '../../config/logger';
 import { Location } from '../../models';
 import { createBasicRouter } from '../../shared/component';
-import { errorLogger, errorHandler, injectQuery } from '../../shared';
-import { checkLogin, checkId, validationMiddleware } from '../../shared/validationMiddlewares';
-import { LocationServices } from './services';
 import { LocationController } from './controller';
+import { LocationServices } from './services';
+import { loggerControllers } from '../../config/logger';
+import { errorLogger, errorHandler, injectQuery } from '../../shared';
 import { checkCreateLocation } from './middlewares';
+import { checkLogin, checkId, validationMiddleware } from '../../shared/validationMiddlewares';
 
 const middlewares = {
   validationMiddleware,

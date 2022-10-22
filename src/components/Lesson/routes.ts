@@ -1,24 +1,31 @@
-import { Router } from 'express';
+import { Lesson } from '../../models';
+import { createBasicRouter } from '../../shared/component';
 import { LessonController } from './controller';
-import { checkCreateLesson } from './middlewares';
+import { LessonServices } from './services';
 import { loggerControllers } from '../../config/logger';
-import {
-  errorLogger,
-  errorHandler,
-  checkLogin,
-  checkId,
+import { checkCreateLesson } from './middlewares';
+import { errorLogger, errorHandler, injectQuery } from '../../shared';
+import { checkLogin, checkId, validationMiddleware } from '../../shared/validationMiddlewares';
+
+const middlewares = {
   validationMiddleware,
-} from '../../shared';
+  get: [checkId],
+  post: [checkLogin, checkCreateLesson],
+  patch: [checkId],
+  delete: [checkId],
+  injectQuery,
+  query: ['day', 'teacher', 'timeHh', 'timeMin'],
+};
 
-const lessonRouter = Router();
+const handlers = {
+  errorHandler,
+  errorLogger,
+  loggerControllers,
+};
 
-lessonRouter.get('/', LessonController.getLessons);
-lessonRouter.get('/:id', validationMiddleware([checkId]), LessonController.getLesson);
-lessonRouter.post('/', validationMiddleware([checkLogin, checkCreateLesson]), LessonController.create);
-lessonRouter.patch('/:id', validationMiddleware([checkId]), LessonController.patch);
-lessonRouter.delete('/:id', validationMiddleware([checkId]), LessonController.delete);
+const service = new LessonServices(Lesson);
+const controller = new LessonController(service);
 
-lessonRouter.use(errorLogger(loggerControllers));
-lessonRouter.use(errorHandler);
+const lessonRouter = createBasicRouter(controller, middlewares, handlers);
 
 export default lessonRouter;

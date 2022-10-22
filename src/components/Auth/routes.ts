@@ -1,12 +1,8 @@
 import { Router } from 'express';
 import { AuthController } from './controller';
 import { loggerControllers } from '../../config/logger';
-import {
-  errorLogger,
-  errorHandler,
-  checkLogin,
-  validationMiddleware,
-} from '../../shared';
+import { errorLogger, errorHandler } from '../../shared';
+import { checkLogin, validationMiddleware } from '../../shared/validationMiddlewares';
 
 const authRouter = Router();
 

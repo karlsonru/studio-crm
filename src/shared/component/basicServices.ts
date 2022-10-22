@@ -4,7 +4,7 @@ export interface IBasicQuery {
   [index: string]: string | number;
 }
 
-interface IBasicItem extends IBasicQuery {}
+export interface IBasicItem extends IBasicQuery {}
 
 export class BasicServices {
   db: typeof Model;

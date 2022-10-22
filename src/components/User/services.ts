@@ -1,46 +1,31 @@
 import bcryptjs from 'bcryptjs';
+import { BasicServices, IBasicItem, IBasicQuery } from '../../shared/component';
 import { User, Role } from '../../models';
-import { IUser } from './types';
 
-export class UserServices {
-  static async getAll() {
-    const users = await User.find({});
-    return users;
-  }
+export class UserServices extends BasicServices {
+  create = async (user: IBasicItem, query: IBasicQuery) => {
+    const candidate = await this.db.find(query);
 
-  static async getOne(login: string) {
-    const user = await User.findOne({ login });
-    return user;
-  }
-
-  static async create(user: IUser) {
-    const candidate = await this.getOne(user.login);
-
-    if (candidate) {
+    if (candidate.length) {
       return null;
     }
 
     const role = await Role.findOne({ value: user.role });
-    const passHash = await bcryptjs.hash(user.password, 7);
+
+    if (role === null) {
+      return null;
+    }
+
+    const passHash = await bcryptjs.hash(user.password.toString(), 7);
 
     const newUser = await User.create({
       ...user,
       password: passHash,
       birthday: +user.birthday,
-      role: role?.id,
+      role: role.id,
       isActive: true,
     });
 
     return newUser;
-  }
-
-  static async update(login: string, user: IUser) {
-    const updatedUser = await User.findOneAndUpdate({ login }, user, { returnDocument: 'after' });
-    return updatedUser;
-  }
-
-  static async delete(login: string) {
-    const removeUser = await User.findOneAndDelete({ login });
-    return removeUser;
-  }
+  };
 }
