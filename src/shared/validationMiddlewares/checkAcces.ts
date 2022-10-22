@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { Group } from '../../models';
+import { RolesGroup } from '../../models';
 
 interface IPayload {
   id: string,
   role: string,
 }
 
-export function checkAccess(accessGroup: string) {
+export function checkAccess(groupTitie: string) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { authorization } = req.headers;
@@ -20,13 +20,13 @@ export function checkAccess(accessGroup: string) {
 
       const decoded = jwt.decode(token) as IPayload;
 
-      const group = await Group.findOne({ title: accessGroup });
+      const group = await RolesGroup.findOne({ title: groupTitie });
 
       if (!group) {
         return res.status(403).json({ message: 'Не авторизован' });
       }
 
-      if (!group.get('members').includes(decoded.role)) {
+      if (!group.get('roles').includes(decoded.role)) {
         return res.status(403).json({ message: 'Не авторизован' });
       }
 

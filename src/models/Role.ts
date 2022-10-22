@@ -1,6 +1,10 @@
 import { model, Schema } from 'mongoose';
 
-const schema = new Schema({
+export interface IRole {
+  value: string;
+}
+
+const schema = new Schema<IRole>({
   value: {
     type: String, required: true, unique: true, default: 'teacher',
   },

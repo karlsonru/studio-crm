@@ -1,5 +1,17 @@
-import { User } from './User';
-import { Role } from './Role';
-import { Group } from './Group';
+import { User, IUser } from './User';
+import { Role, IRole } from './Role';
+import { RolesGroup } from './RolesGroup';
+import { Student } from './Student';
+import { Lesson } from './Lesson';
 
-export { User, Role, Group };
+export {
+  Role,
+  IRole,
+  RolesGroup,
+
+  User,
+  IUser,
+
+  Student,
+  Lesson,
+};

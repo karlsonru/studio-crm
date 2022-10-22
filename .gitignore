@@ -2,5 +2,6 @@ node_modules
 .env
 .eslintcache
 dist
-my_db.*
 *.log
+papers
+README.md
