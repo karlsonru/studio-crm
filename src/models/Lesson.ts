@@ -8,7 +8,7 @@ const schema = new Schema({
     type: Types.ObjectId, ref: 'User', required: true, lowercase: true, trim: true,
   },
   location: {
-    type: String, required: true, lowercase: true, trim: true,
+    type: Types.ObjectId, ref: 'Location', required: true, lowercase: true, trim: true,
   },
   day: {
     type: Number, required: true, min: 0, max: 6,
