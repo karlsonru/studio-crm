@@ -1,5 +1,5 @@
 import { model, Schema, Types } from 'mongoose';
-
+/*
 export interface IUser {
   login: string;
   password: string;
@@ -9,9 +9,9 @@ export interface IUser {
   birthday: number;
   isActive: boolean;
 }
-
+*/
 // пользователь это администратор, педагог или владелец
-const schema = new Schema<IUser>({
+const schema = new Schema({
   login: {
     type: String, required: true, minLength: 5, unique: true, trim: true,
   },

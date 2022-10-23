@@ -61,7 +61,7 @@ export class BasicController {
 
   patch = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const updatedItem = this.service.update(req.params.id, req.body);
+      const updatedItem = await this.service.update(req.params.id, req.body);
 
       if (!updatedItem) {
         return res.status(400).json({ message: 'Не найдено' });
@@ -75,15 +75,13 @@ export class BasicController {
 
   delete = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // проверяем, если есть какие-то зависимости - то это patch isActive = false;
-      // Если зависимостей нет - то можно rempve;
       const removedItem = await this.service.delete(req.params.id);
 
       if (!removedItem) {
         return res.status(400).json({ message: 'Не найдено' });
       }
 
-      return res.status(204);
+      return res.status(204).end();
     } catch (err) {
       next(err);
     }

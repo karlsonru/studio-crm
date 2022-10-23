@@ -2,9 +2,10 @@ import { Request, Response, NextFunction } from 'express';
 
 export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
   switch (err.name) {
+    case 'CastError':
+      return res.status(400).json({ message: 'Передан невалидный ID при запросе' });
     case 'MongoServerError':
-      res.status(500).json({ message: 'Ошибка записи в базу данных' });
-      break;
+      return res.status(500).json({ message: 'Ошибка записи в базу данных' });
     case 'ValidationError':
       return res.status(400).json({ message: err.message || 'Переданы некорректные данные при запросе' });
     default:

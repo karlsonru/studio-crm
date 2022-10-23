@@ -19,7 +19,7 @@ export class BasicServices {
   };
 
   getOne = async (id: string) => {
-    const result = await this.db.findById({ id });
+    const result = await this.db.findById(id);
     return result;
   };
 
@@ -29,7 +29,7 @@ export class BasicServices {
   };
 
   create = async (item: IBasicItem, query: IBasicQuery) => {
-    const candidate = await this.db.find({ query });
+    const candidate = await this.db.find(query);
 
     if (candidate.length) {
       return null;
@@ -41,12 +41,12 @@ export class BasicServices {
   };
 
   update = async (id: string, item: IBasicItem) => {
-    const updatedItem = await this.db.findOneAndUpdate({ id }, item, { returnDocument: 'after' });
+    const updatedItem = await this.db.findByIdAndUpdate(id, item, { new: true });
     return updatedItem;
   };
 
   delete = async (id: string) => {
-    const removedItem = await this.db.findOneAndDelete({ id });
+    const removedItem = await this.db.findByIdAndDelete(id);
     return removedItem;
   };
 }
