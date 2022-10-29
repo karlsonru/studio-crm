@@ -6,6 +6,8 @@ import { Lesson } from './Lesson';
 import { Location } from './Location';
 import { Subscription } from './Subscription';
 import { SubscriptionTemplate } from './SubscriptionTemplate';
+import { VisitedLesson } from './VisitedLesson';
+import { VisitStatus } from './VisitStatus';
 
 export {
   Role,
@@ -19,4 +21,7 @@ export {
 
   Subscription,
   SubscriptionTemplate,
+
+  VisitedLesson,
+  VisitStatus,
 };

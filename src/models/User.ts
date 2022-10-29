@@ -1,15 +1,5 @@
 import { model, Schema, Types } from 'mongoose';
-/*
-export interface IUser {
-  login: string;
-  password: string;
-  role?: Types.ObjectId;
-  name: string;
-  surname: string;
-  birthday: number;
-  isActive: boolean;
-}
-*/
+
 // пользователь это администратор, педагог или владелец
 const schema = new Schema({
   login: {
@@ -29,6 +19,8 @@ const schema = new Schema({
   },
   birthday: { type: Number },
   isActive: { type: Boolean, required: true },
+}, {
+  timestamps: true,
 });
 
 const User = model('User', schema);

@@ -4,6 +4,8 @@ import { model, Schema, Types } from 'mongoose';
 const schema = new Schema({
   title: { type: String, required: true, unique: true },
   roles: [{ type: Types.ObjectId, ref: 'Role' }],
+}, {
+  timestamps: true,
 });
 
 const RolesGroup = model('RolesGroup', schema);

@@ -29,14 +29,12 @@ export function checkCreateStudent(req: Request, res: Response, next: NextFuncti
     })
     .run(req);
 
-  body('role')
+  body('sex')
     .exists({
       checkNull: true,
       checkFalsy: true,
     })
     .run(req);
-
-  console.log('I called');
 
   body('isActive')
     .exists({

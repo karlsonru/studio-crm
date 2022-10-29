@@ -4,17 +4,14 @@ const schema = new Schema({
   title: {
     type: String, required: true, unique: true, trim: true,
   },
-  description: {
-    type: String, trim: true,
-  },
-  address: {
-    type: String, required: true, unique: true, trim: true,
+  action: {
+    type: String, required: true, trim: true,
   },
   isActive: { type: Boolean, required: true },
 }, {
   timestamps: true,
 });
 
-const Location = model('Location', schema);
+const VisitStatus = model('VisitStatus', schema);
 
-export { Location };
+export { VisitStatus };
