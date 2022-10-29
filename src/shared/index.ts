@@ -1,6 +1,6 @@
 import { errorLogger } from './errorLogger';
 import { errorHandler } from './errorHandler';
-import { injectQuery } from './injectQuery';
+import { injectQuery } from './middlewares/injectQuery';
 import { ValidationError } from './validationError';
 
 export {

@@ -10,7 +10,6 @@ export function injectQuery(fields: Array<string>) {
     }
 
     req.body.query = query;
-
     next();
   };
 }

@@ -11,7 +11,7 @@ const checkErrors = (req: Request, res: Response, next: NextFunction) => {
 };
 
 // @ts-ignore
-export function validationMiddleware(middlewares) {
+export function injectMiddlewares(middlewares) {
   return [
     ...middlewares,
     checkErrors,

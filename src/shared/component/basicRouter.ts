@@ -4,14 +4,14 @@ import { Router } from 'express';
 export function createBasicRouter(controller, middlewares, handlers) {
   const basicRouter = Router();
 
-  const validate = middlewares.validationMiddleware;
+  const injector = middlewares.injectMiddlewares;
 
   basicRouter.get('/', controller.getAll);
-  basicRouter.get('/:id', validate(middlewares.get), controller.getOne);
+  basicRouter.get('/:id', injector(middlewares.get), controller.getOne);
   basicRouter.post('/find', controller.find);
-  basicRouter.post('/', validate(middlewares.post), middlewares.injectQuery(middlewares.query), controller.create);
-  basicRouter.patch('/:id', validate(middlewares.patch), controller.patch);
-  basicRouter.delete('/:id', validate(middlewares.delete), controller.delete);
+  basicRouter.post('/', injector(middlewares.post), controller.create);
+  basicRouter.patch('/:id', injector(middlewares.patch), controller.patch);
+  basicRouter.delete('/:id', injector(middlewares.delete), controller.delete);
 
   basicRouter.use(handlers.errorLogger(handlers.loggerControllers));
   basicRouter.use(handlers.errorHandler);

@@ -5,16 +5,14 @@ import { RolesGroupServices } from './services';
 import { loggerControllers } from '../../config/logger';
 import { errorLogger, errorHandler, injectQuery } from '../../shared';
 import { checkCreateRolesGroup } from './middlewares';
-import { checkLogin, checkId, validationMiddleware } from '../../shared/validationMiddlewares';
+import { checkLogin, checkId, injectMiddlewares } from '../../shared/middlewares';
 
 const middlewares = {
-  validationMiddleware,
+  injectMiddlewares,
   get: [checkId],
-  post: [checkLogin, checkCreateRolesGroup],
+  post: [checkLogin, checkCreateRolesGroup, injectQuery(['title'])],
   patch: [checkId],
   delete: [checkId],
-  injectQuery,
-  query: ['title'],
 };
 
 const handlers = {
@@ -26,6 +24,6 @@ const handlers = {
 const service = new RolesGroupServices(RolesGroup);
 const controller = new RolesGroupController(service);
 
-const roleRouter = createBasicRouter(controller, middlewares, handlers);
+const rolesGroupRouter = createBasicRouter(controller, middlewares, handlers);
 
-export default roleRouter;
+export default rolesGroupRouter;

@@ -5,16 +5,14 @@ import { RoleServices } from './services';
 import { loggerControllers } from '../../config/logger';
 import { errorLogger, errorHandler, injectQuery } from '../../shared';
 import { checkCreateRole } from './middlewares';
-import { checkLogin, checkId, validationMiddleware } from '../../shared/validationMiddlewares';
+import { checkLogin, checkId, injectMiddlewares } from '../../shared/middlewares';
 
 const middlewares = {
-  validationMiddleware,
+  injectMiddlewares,
   get: [checkId],
-  post: [checkLogin, checkCreateRole],
+  post: [checkLogin, checkCreateRole, injectQuery(['value'])],
   patch: [checkId],
   delete: [checkId],
-  injectQuery,
-  query: ['value'],
 };
 
 const handlers = {

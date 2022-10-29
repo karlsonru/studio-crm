@@ -4,17 +4,15 @@ import { LessonController } from './controller';
 import { LessonServices } from './services';
 import { loggerControllers } from '../../config/logger';
 import { checkCreateLesson } from './middlewares';
-import { errorLogger, errorHandler, injectQuery } from '../../shared';
-import { checkLogin, checkId, validationMiddleware } from '../../shared/validationMiddlewares';
+import { errorLogger, errorHandler } from '../../shared';
+import { checkLogin, checkId, injectMiddlewares } from '../../shared/middlewares';
 
 const middlewares = {
-  validationMiddleware,
+  injectMiddlewares,
   get: [checkId],
   post: [checkLogin, checkCreateLesson],
   patch: [checkId],
   delete: [checkId],
-  injectQuery,
-  query: ['day', 'teacher', 'timeHh', 'timeMin'],
 };
 
 const handlers = {

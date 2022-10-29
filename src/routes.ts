@@ -4,14 +4,16 @@ import userRouter from './components/User/routes';
 import lessonRouter from './components/Lesson/routes';
 import locationRouter from './components/Location/routes';
 import roleRouter from './components/Role/routes';
-import { checkToken, checkAccess } from './shared/validationMiddlewares';
+import roleGroupsRouter from './components/RoleGroups/routes';
+// import { checkToken, checkAccess } from './shared/middlewares';
 
 const router = Router();
 
 router.use('/auth', authRouter);
-router.use('/user', checkToken, checkAccess('owners'), userRouter); // мы проверяем дступ для группы. Сюда доступ для группы "Владельцы"
-router.use('/lesson', checkToken, checkAccess('owners'), lessonRouter);
-router.use('/location', checkToken, locationRouter);
-router.use('/role', checkToken, roleRouter);
+router.use('/user', userRouter); // мы проверяем дступ для группы. Сюда доступ для группы "Владельцы"
+router.use('/role', roleRouter);
+router.use('/rolesGroup', roleGroupsRouter);
+router.use('/location', locationRouter);
+router.use('/lesson', lessonRouter);
 
 export { router };

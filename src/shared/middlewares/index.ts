@@ -1,4 +1,5 @@
-import { validationMiddleware } from './validationMiddleware';
+import { injectMiddlewares } from './injectMiddlewares';
+import { injectQuery } from './injectQuery';
 import { checkToken } from './checkToken';
 import { checkAccess } from './checkAcces';
 import { checkLogin } from './checkLogin';
@@ -9,5 +10,6 @@ export {
   checkToken,
   checkId,
   checkLogin,
-  validationMiddleware,
+  injectMiddlewares,
+  injectQuery,
 };

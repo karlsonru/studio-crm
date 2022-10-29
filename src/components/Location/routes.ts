@@ -5,16 +5,14 @@ import { LocationServices } from './services';
 import { loggerControllers } from '../../config/logger';
 import { errorLogger, errorHandler, injectQuery } from '../../shared';
 import { checkCreateLocation } from './middlewares';
-import { checkLogin, checkId, validationMiddleware } from '../../shared/validationMiddlewares';
+import { checkLogin, checkId, injectMiddlewares } from '../../shared/middlewares';
 
 const middlewares = {
-  validationMiddleware,
+  injectMiddlewares,
   get: [checkId],
-  post: [checkLogin, checkCreateLocation],
+  post: [checkLogin, checkCreateLocation, injectQuery(['title', 'address'])],
   patch: [checkId],
   delete: [checkId],
-  injectQuery,
-  query: ['title', 'address'],
 };
 
 const handlers = {
