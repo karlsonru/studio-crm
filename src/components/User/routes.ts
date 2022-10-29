@@ -24,6 +24,6 @@ const handlers = {
 const service = new UserServices(User);
 const controller = new UserController(service);
 
-const locationRouter = createBasicRouter(controller, middlewares, handlers);
+const userRouter = createBasicRouter(controller, middlewares, handlers);
 
-export default locationRouter;
+export default userRouter;

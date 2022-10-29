@@ -9,7 +9,6 @@ const schema = new Schema({
   },
   sex: { type: String, required: true, trim: true },
   birthday: { type: Number, required: true },
-  isActive: { type: Boolean, required: true },
   balance: { type: Number, default: 0 },
   visitingLessons: [ // уроки, которые посещает, в целом
     {
@@ -24,6 +23,7 @@ const schema = new Schema({
     },
     phone: { type: Number },
   }],
+  isActive: { type: Boolean, required: true },
 });
 
 const Student = model('Student', schema);
