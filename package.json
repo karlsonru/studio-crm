@@ -8,7 +8,9 @@
     "build": "tsc",
     "start": "node -r dotenv/config --experimental-specifier-resolution=node .",
     "prestart": "npm run build",
-    "dev": "nodemon -r dotenv/config --experimental-specifier-resolution=node src/app.ts",
+    "server": "nodemon -r dotenv/config --experimental-specifier-resolution=node src/app.ts",
+    "client": "npm run start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
     "lint:fix": "npx eslint --cache --ext .ts . --fix",
     "lint": "npx eslint --cache --ext .ts ."
   },
@@ -28,6 +30,7 @@
     "@types/jsonwebtoken": "^8.5.9",
     "@typescript-eslint/eslint-plugin": "^5.37.0",
     "@typescript-eslint/parser": "^5.37.0",
+    "concurrently": "^7.5.0",
     "eslint": "^8.23.1",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-config-prettier": "^8.5.0",
@@ -46,6 +49,7 @@
     "express-validator": "^6.14.2",
     "jsonwebtoken": "^8.5.1",
     "log4js": "^6.6.1",
-    "mongoose": "^6.6.1"
+    "mongoose": "^6.6.1",
+    "react": "^18.2.0"
   }
 }
