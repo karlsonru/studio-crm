@@ -1,8 +1,17 @@
 import { model, Schema, Types } from 'mongoose';
 
 const schema = new Schema({
-  template: {
-    type: Types.ObjectId, ref: 'SubscriptionTemplate', required: true, trim: true,
+  title: {
+    type: String, required: true, unique: true, trim: true,
+  },
+  price: {
+    type: Number, required: true, min: 0,
+  },
+  visits: {
+    type: Number, required: true, min: 1,
+  },
+  duration: {
+    type: String, required: true, trim: true,
   },
   student: {
     type: Types.ObjectId, ref: 'Student', required: true, trim: true,
