@@ -1,3 +1,5 @@
+import { AuthPage } from './pages/Auth';
+import { UsersPage } from './pages/Users';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function Hello() {
@@ -9,6 +11,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<Hello />} />
+        <Route path='/auth' element={<AuthPage />} />
+        <Route path='/users' element={<UsersPage />} />
       </Routes>
     </BrowserRouter>
   );

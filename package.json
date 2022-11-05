@@ -8,7 +8,7 @@
     "build": "tsc",
     "start": "node -r dotenv/config --experimental-specifier-resolution=node .",
     "prestart": "npm run build",
-    "server": "nodemon -r dotenv/config --experimental-specifier-resolution=node src/app.ts",
+    "server": "nodemon -r dotenv/config --experimental-specifier-resolution=node backend/app.ts",
     "client": "npm run start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "lint:fix": "npx eslint --cache --ext .ts . --fix",

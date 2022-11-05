@@ -18,7 +18,7 @@
   "ts-node": {
     "esm": true
   },
-  "include": ["src"],
+  "include": ["backend"],
   "exclude": [
     "node_modules", 
     "dist", 
