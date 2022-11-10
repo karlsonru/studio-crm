@@ -1,3 +1,3 @@
 import AuthPage from './Auth';
 
-export { AuthPage } 
+export { AuthPage };

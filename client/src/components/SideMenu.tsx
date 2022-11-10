@@ -1,6 +1,8 @@
-import React, { ReactNode, useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
-import { MenuList, Divider, Drawer, ListItemIcon, MenuItem, Typography } from "@mui/material";
+import { ReactNode, useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import {
+  MenuList, Divider, Drawer, ListItemIcon, MenuItem, Typography,
+} from '@mui/material';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import GroupIcon from '@mui/icons-material/Group';
 import ListAltIcon from '@mui/icons-material/ListAlt';
@@ -17,30 +19,29 @@ interface IMenuItem {
 interface INavItem {
   menuItem: ReactNode;
   path: string;
-}  
+}
 
 const NavItem = ({ path, menuItem }: INavItem) => {
   const activeStyle = {
     color: 'inherit',
     textDecoration: 'underline',
     background: '#fff000',
-  }
-  
+  };
+
   const regularStyle = {
     color: 'inherit',
     textDecoration: 'none',
     background: 'inherit',
-  }
+  };
 
   return (
-    <NavLink to={path} style={ ({ isActive }) => isActive ? activeStyle : regularStyle} >
+    <NavLink to={path} style={ ({ isActive }) => (isActive ? activeStyle : regularStyle)} >
       {menuItem}
     </NavLink>
-  )
-}
+  );
+};
 
-const AddMenuItem = ({ icon, title }: IMenuItem) => {
-  return (
+const AddMenuItem = ({ icon, title }: IMenuItem) => (
       <MenuItem
         sx={{
           background: 'inherit',
@@ -52,16 +53,15 @@ const AddMenuItem = ({ icon, title }: IMenuItem) => {
           {title}
         </Typography>
       </MenuItem>
-  )
-}
+);
 
 const MenuItemsList = [
   {
-    path: 'timetable', 
+    path: 'timetable',
     title: 'Расписание',
     icon: <CalendarMonthIcon />,
   },
-  {  
+  {
     path: 'students',
     title: 'Ученики',
     icon: <GroupIcon />,
@@ -80,10 +80,12 @@ const MenuItemsList = [
     path: 'finance',
     title: 'Финансы',
     icon: <CurrencyRubleIcon />,
-  }
+  },
 ];
 
-export function SideMenu({ width, setWidthHandler }: {width: number, setWidthHandler: (width: number) => void}) {
+export function SideMenu(
+  { width, setWidthHandler }: { width: number, setWidthHandler: (width: number) => void },
+) {
   const [isMenuOpen, setMenuOpen] = useState(true);
 
   useEffect(() => {
@@ -95,29 +97,35 @@ export function SideMenu({ width, setWidthHandler }: {width: number, setWidthHan
   }, [isMenuOpen, setWidthHandler]);
 
   const toggleMenuHandler = () => {
-    setMenuOpen(isMenuOpen => !isMenuOpen);
-  }
+    setMenuOpen(!isMenuOpen);
+  };
 
   const arrow = isMenuOpen ? <ArrowBackIosIcon /> : <ArrowForwardIosIcon />;
 
   return (
     <Drawer variant="persistent" open={true}>
       <MenuList sx={{
-        width: width,
+        width,
       }}>
-        <MenuItem 
-          onClick={toggleMenuHandler} 
+        <MenuItem
+          onClick={toggleMenuHandler}
           sx={{
-            justifyContent: isMenuOpen ? "end" : "start",
+            justifyContent: isMenuOpen ? 'end' : 'start',
           }}
         >
           {arrow}
         </MenuItem>
         <Divider />
-        
-        { MenuItemsList.map(elem => <NavItem key={elem.path} path={elem.path} menuItem={ <AddMenuItem icon={elem.icon} title={elem.title} /> } /> )}
-        
+
+        { MenuItemsList.map(
+          (elem) => <NavItem
+              key={elem.path}
+              path={elem.path}
+              menuItem={ <AddMenuItem icon={elem.icon} title={elem.title} /> }
+            />,
+        )}
+
       </MenuList>
     </Drawer>
-  )
+  );
 }

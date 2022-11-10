@@ -1,6 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ESNext",
+    "module": "ESNext",
+
+    "baseUrl": "./src/",
+    "outDir": "dist-client",
+
     "lib": [
       "dom",
       "dom.iterable",
@@ -10,17 +15,25 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx"
   },
+  "ts-node": {
+    "esm": true
+  },
   "include": [
-    "src"
+    "./src/*"
+  ],
+  "exclude": [
+    "node_modules", 
+    "dist", 
+    "*.d.ts"
   ]
 }

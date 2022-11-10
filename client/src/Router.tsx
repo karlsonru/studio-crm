@@ -4,7 +4,7 @@ import { AuthPage } from './pages/Auth';
 import { UsersPage } from './pages/Users';
 
 function Hello() {
-  return <h1>Hello world!</h1>
+  return <h1>Hello world!</h1>;
 }
 
 export function Router() {
@@ -22,5 +22,5 @@ export function Router() {
       </Route>
     </Routes>
   </BrowserRouter>
-  )
+  );
 }

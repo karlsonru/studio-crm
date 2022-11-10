@@ -1,8 +1,8 @@
-import { Grid, Box } from "@mui/material";
-import { Outlet } from "react-router-dom";
-import { useState } from "react";
-import { SideMenu } from "../components/SideMenu"
-import { StickyFooter } from "../components/StickyFooter"
+import { Grid, Box } from '@mui/material';
+import { Outlet } from 'react-router-dom';
+import { useState } from 'react';
+import { SideMenu } from '../components/SideMenu';
+import { StickyFooter } from '../components/StickyFooter';
 
 export function Layout() {
   const [firstColumnWidth, setFirstColumnWidth] = useState(200);
@@ -18,17 +18,17 @@ export function Layout() {
       >
         <SideMenu width={firstColumnWidth} setWidthHandler={setFirstColumnWidth}/>
       </Grid>
-  
-      <Grid 
-        item 
+
+      <Grid
+        item
         sx={{
           height: '100%',
           width: `calc(100% - ${firstColumnWidth}px)`,
         }}
         container
-        direction="column"
-        justifyContent="space-between"
-        alignItems="stretch"
+        direction='column'
+        justifyContent='space-between'
+        alignItems='stretch'
       >
         <Box sx={{
           p: 2,

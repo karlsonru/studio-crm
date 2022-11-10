@@ -1,12 +1,14 @@
-import * as React from 'react';
+import React from 'react';
 import AppBar from '@mui/material/AppBar';
-import { CssBaseline, Toolbar, IconButton, Typography } from '@mui/material';
+import {
+  CssBaseline, Toolbar, IconButton, Typography,
+} from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 
-export function Header({ width }: {width: string}) {
+export function Header({ width }: { width: string }) {
   return (
     <AppBar sx={{
-      width: width,
+      width,
     }}>
       <CssBaseline />
       <Toolbar>
@@ -22,5 +24,5 @@ export function Header({ width }: {width: string}) {
           </Typography>
         </Toolbar>
     </AppBar>
-  )
+  );
 }
