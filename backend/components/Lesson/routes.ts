@@ -13,4 +13,6 @@ const controller = new LessonController(service);
 
 const lessonRouter = createBasicRouterWithDefaultMiddlewares(controller, middlewares);
 
+lessonRouter.post('/findByDay', controller.findByDay);
+
 export default lessonRouter;

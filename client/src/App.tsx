@@ -1,5 +1,5 @@
-import { defaultTheme } from 'theme';
 import { ThemeProvider } from '@mui/material/styles';
+import { defaultTheme } from './shared/theme';
 import { Router } from './Router';
 
 function App() {

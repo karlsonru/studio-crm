@@ -30,7 +30,7 @@
   },
   "include": [
     "./src/*"
-  ],
+, "src/shared/theme.tsx"  ],
   "exclude": [
     "node_modules", 
     "dist", 

@@ -7,6 +7,8 @@ export interface IBasicQuery {
 export interface IBasicItem extends IBasicQuery {}
 
 export class BasicServices {
+  [fn: string]: any;
+
   db: typeof Model;
 
   constructor(model: typeof Model) {
@@ -24,7 +26,7 @@ export class BasicServices {
   };
 
   find = async (query: IBasicQuery, limit: number) => {
-    const result = await this.db.find({ query }).limit(limit);
+    const result = await this.db.find(query).limit(limit);
     return result;
   };
 

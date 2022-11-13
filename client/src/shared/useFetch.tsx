@@ -3,7 +3,9 @@ import { useState, useEffect } from 'react';
 interface IUseFetch {
   url: string;
   method?: string;
-  body?: { [code: string]: string | number };
+  body?: {
+    [key: string]: string | number | boolean;
+  } | any;
 }
 
 export default function useFetch({ url, method, body }: IUseFetch) {
@@ -11,7 +13,7 @@ export default function useFetch({ url, method, body }: IUseFetch) {
   const [data, setData] = useState(null);
   const [error, setError] = useState<Error | null>(null);
 
-  const baseUrl = '/api';
+  const baseUrl = 'http://localhost:5000/api';
   const headers = {
     'Content-Type': 'application/json;charset=utf-8',
   };

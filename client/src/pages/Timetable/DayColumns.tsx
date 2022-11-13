@@ -1,5 +1,6 @@
+import { useCallback, useMemo } from 'react';
 import { Box, Grid } from '@mui/material';
-import useFetch from 'useFetch';
+import useFetch from '../../shared/useFetch';
 
 function getDayName(day: number) {
   const dayNames: { [code: number]: string } = {
@@ -16,33 +17,44 @@ function getDayName(day: number) {
 
 function DayNameCell({ date }: { date: Date }) {
   return (
-    <Grid item sx={{ width: '14%', fontSize: '0.7rem' }}>
+    <Box>
       <span style={{ fontWeight: 'bold' }}>{getDayName(date.getDay())},</span>
       <span style={{ marginLeft: '5px' }}>{date.toLocaleDateString('ru-RU')}</span>
-    </Grid>
+    </Box>
   );
 }
 
-function DayColumn({ date }: { date: Date }) {
-  const { isLoading, data, error } = useFetch({ url: '/lessons' });
+function createDayLessonsQuery(date: Date) {
+  return {
+    query: {
+      day: date.getDay(),
+      date: +date,
+      isActive: true,
+    },
+  };
+}
 
-  if (isLoading) {
-    console.log(isLoading);
-  }
+function DayColumn({ date }: { date: Date }) {
+  const findDayLessonsQuery = useMemo(() => createDayLessonsQuery(date), [date]);
+  const fetch = useCallback(useFetch, [date, findDayLessonsQuery]);
+
+  const { isLoading, data, error } = fetch({ url: '/lesson/findByDay', method: 'POST', body: findDayLessonsQuery });
+
+  console.log('isLoading: {0}', isLoading);
 
   if (error) {
-    console.log(error);
+    console.log('error: {0}', error);
   }
 
   if (data) {
-    console.log(data);
+    console.log('data: {0}', data);
   }
 
   return (
-    <Box>
+    <Grid item sx={{ width: '14%', fontSize: '0.7rem' }}>
       <DayNameCell date={date} />
-    </Box>
-  )
+    </Grid>
+  );
 }
 
 interface IDayNameCells {
@@ -50,7 +62,7 @@ interface IDayNameCells {
   startDate: Date;
 }
 
-export default function DayNameCells({ isMobile, startDate }: IDayNameCells) {
+export default function DayColumns({ isMobile, startDate }: IDayNameCells) {
   const renderCells = ({ date, num }: { date: Date, num: Number }) => {
     const cells = [];
 
@@ -58,7 +70,7 @@ export default function DayNameCells({ isMobile, startDate }: IDayNameCells) {
     for (let i = 0; i < num; i++) {
       const initialDate = new Date(+date);
       initialDate.setDate(initialDate.getDate() + i);
-      cells.push(<DayNameCell key={i} date={initialDate} />);
+      cells.push(<DayColumn key={i} date={initialDate} />);
     }
 
     return cells;
@@ -67,7 +79,7 @@ export default function DayNameCells({ isMobile, startDate }: IDayNameCells) {
   const cells = renderCells({ date: startDate, num: isMobile ? 1 : 7 });
 
   return (
-    <Grid container wrap='nowrap'>
+    <Grid container wrap='nowrap' width='100%'>
       {cells}
     </Grid>
   );

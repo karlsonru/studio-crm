@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Grid } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import DateSwitcher from './DateSwitcher';
-import DayColumns from './DayColumnCell';
+import DayColumns from './DayColumns';
 
 export default function TimetablePage() {
   const [startDate, setStartDate] = useState(new Date());
