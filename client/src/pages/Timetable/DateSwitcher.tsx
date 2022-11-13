@@ -113,7 +113,7 @@ function MonthSwitcher({ startDate, setDateHandler }: IDateSwitcher) {
         type='date'
         ref={dateRef}
         onChange={dateChangeHandler}
-        style={{ visibility: 'hidden' }}
+        style={{ visibility: 'hidden', maxWidth: '95px' }}
       />
     </Box>
   );
@@ -121,7 +121,7 @@ function MonthSwitcher({ startDate, setDateHandler }: IDateSwitcher) {
 
 export default function DateSwitcher({ startDate, setDateHandler, isMobile }: IDateSwitcher) {
   return (
-    <TableCell colSpan={isMobile ? 1 : 7}>
+    <TableCell colSpan={isMobile ? 1 : 9} sx={{ padding: '0px' }} >
       <Box sx={{
         display: 'flex',
         flexDirection: 'row',
@@ -135,13 +135,3 @@ export default function DateSwitcher({ startDate, setDateHandler, isMobile }: ID
     </TableCell>
   );
 }
-
-/*
-sx={{
-      display: 'flex',
-      flexDirection: 'row',
-      flexWrap: 'nowrap',
-      alignItems: 'center',
-      justifyContent: 'flex-start',
-    }}
-    */

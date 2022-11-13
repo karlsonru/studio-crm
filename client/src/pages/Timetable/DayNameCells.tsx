@@ -14,11 +14,11 @@ function getDayName(day: number) {
   return dayNames[day];
 }
 
-function RenderHeaderCell({ date }: { date: Date }) {
+function DayNameCell({ date }: { date: Date }) {
   return (
-    <TableCell align='center'>
-      <h5 style={{ marginBottom: '-4px' }}>{getDayName(date.getDay())}</h5>
-      <span>{date.toLocaleDateString('ru-RU')}</span>
+    <TableCell sx={{ width: '14%', fontSize: '0.7rem' }}>
+      <span style={{ fontWeight: 'bold' }}>{getDayName(date.getDay())},</span>
+      <span style={{ marginLeft: '5px' }}>{date.toLocaleDateString('ru-RU')}</span>
     </TableCell>
   );
 }
@@ -36,7 +36,7 @@ export default function DayNameCells({ isMobile, startDate }: IDayNameCells) {
     for (let i = 0; i < num; i++) {
       const initialDate = new Date(+date);
       initialDate.setDate(initialDate.getDate() + i);
-      cells.push(<RenderHeaderCell key={i} date={initialDate} />);
+      cells.push(<DayNameCell key={i} date={initialDate} />);
     }
 
     return cells;
