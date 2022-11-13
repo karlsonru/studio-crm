@@ -1,8 +1,7 @@
 import {
   useState, useEffect, useRef, ChangeEvent,
 } from 'react';
-import TableCell from '@mui/material/TableCell';
-import Box from '@mui/material/Box';
+import { Grid } from '@mui/material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Input from '@mui/material/Input';
@@ -52,16 +51,13 @@ function WeekSwitcher({ startDate, setDateHandler, isMobile }: IDateSwitcher) {
     : <Input value={endDateString} readOnly={true} size="small" inputProps={{ style: { textAlign: 'center', minWidth: '100px', maxWidth: '7rem' } }} />;
 
   return (
-    <Box sx={{
-      display: 'flex',
-      justifyContent: 'center',
-    }}>
+    <Grid container alignItems='center'>
         <ArrowBackIosNewIcon onClick={decreaseDateHandler} fontSize="medium" />
         <Input value={startDateString} readOnly={true} size="small" inputProps={{ style: { textAlign: 'center', minWidth: '100px', maxWidth: '7rem' } }} />
         {splitIcon}
         {endDateInput}
         <ArrowForwardIosIcon onClick={increaseDateHandler} fontSize="medium" />
-    </Box>
+    </Grid>
   );
 }
 
@@ -105,7 +101,7 @@ function MonthSwitcher({ startDate, setDateHandler }: IDateSwitcher) {
   }, [startDate]);
 
   return (
-    <Box onClick={openDatepicker} sx={{ display: 'flex', flexDirection: 'column' }} >
+    <Grid item onClick={openDatepicker} sx={{ display: 'flex', flexDirection: 'column' }} >
       <InputLabel variant="filled" sx={{ textAlign: 'center', fontSize: '1.25rem', marginBottom: '10px' }}>
         {monthLabel}
       </InputLabel>
@@ -113,25 +109,17 @@ function MonthSwitcher({ startDate, setDateHandler }: IDateSwitcher) {
         type='date'
         ref={dateRef}
         onChange={dateChangeHandler}
-        style={{ visibility: 'hidden', maxWidth: '95px' }}
+        style={{ visibility: 'hidden', maxWidth: '100px' }}
       />
-    </Box>
+    </Grid>
   );
 }
 
 export default function DateSwitcher({ startDate, setDateHandler, isMobile }: IDateSwitcher) {
   return (
-    <TableCell colSpan={isMobile ? 1 : 9} sx={{ padding: '0px' }} >
-      <Box sx={{
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'nowrap',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-      }}>
-        <MonthSwitcher startDate={startDate} setDateHandler={setDateHandler} />
-        <WeekSwitcher startDate={startDate} setDateHandler={setDateHandler} isMobile={isMobile} />
-      </Box>
-    </TableCell>
+    <>
+      <MonthSwitcher startDate={startDate} setDateHandler={setDateHandler} />
+      <WeekSwitcher startDate={startDate} setDateHandler={setDateHandler} isMobile={isMobile} />
+    </>
   );
 }

@@ -1,5 +1,5 @@
-import React from 'react';
-import TableCell from '@mui/material/TableCell';
+import { Box, Grid } from '@mui/material';
+import useFetch from 'useFetch';
 
 function getDayName(day: number) {
   const dayNames: { [code: number]: string } = {
@@ -16,11 +16,33 @@ function getDayName(day: number) {
 
 function DayNameCell({ date }: { date: Date }) {
   return (
-    <TableCell sx={{ width: '14%', fontSize: '0.7rem' }}>
+    <Grid item sx={{ width: '14%', fontSize: '0.7rem' }}>
       <span style={{ fontWeight: 'bold' }}>{getDayName(date.getDay())},</span>
       <span style={{ marginLeft: '5px' }}>{date.toLocaleDateString('ru-RU')}</span>
-    </TableCell>
+    </Grid>
   );
+}
+
+function DayColumn({ date }: { date: Date }) {
+  const { isLoading, data, error } = useFetch({ url: '/lessons' });
+
+  if (isLoading) {
+    console.log(isLoading);
+  }
+
+  if (error) {
+    console.log(error);
+  }
+
+  if (data) {
+    console.log(data);
+  }
+
+  return (
+    <Box>
+      <DayNameCell date={date} />
+    </Box>
+  )
 }
 
 interface IDayNameCells {
@@ -44,5 +66,9 @@ export default function DayNameCells({ isMobile, startDate }: IDayNameCells) {
 
   const cells = renderCells({ date: startDate, num: isMobile ? 1 : 7 });
 
-  return <>{cells}</>;
+  return (
+    <Grid container wrap='nowrap'>
+      {cells}
+    </Grid>
+  );
 }
