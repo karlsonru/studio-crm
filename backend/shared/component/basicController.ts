@@ -11,7 +11,7 @@ export class BasicController {
   getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const results = await this.service.getAll();
-      return res.json({ message: results });
+      return res.json({ payload: results });
     } catch (err) {
       next(err);
     }
@@ -25,7 +25,7 @@ export class BasicController {
         return res.status(400).json({ message: 'Не найдено' });
       }
 
-      return res.json({ message: result });
+      return res.json({ message: 'success', payload: result });
     } catch (err) {
       next(err);
     }
@@ -39,7 +39,7 @@ export class BasicController {
         return res.status(400).json({ message: 'Не найдено' });
       }
 
-      return res.json({ message: result });
+      return res.json({ message: 'success', payload: result });
     } catch (err) {
       next(err);
     }
@@ -53,7 +53,7 @@ export class BasicController {
         return res.status(200).json({ message: 'Уже существует' });
       }
 
-      return res.status(201).json({ message: newItem });
+      return res.status(201).json({ message: 'success', payload: newItem });
     } catch (err) {
       next(err);
     }
@@ -67,7 +67,7 @@ export class BasicController {
         return res.status(400).json({ message: 'Не найдено' });
       }
 
-      return res.json({ message: updatedItem });
+      return res.json({ message: 'success', payload: updatedItem });
     } catch (err) {
       next(err);
     }

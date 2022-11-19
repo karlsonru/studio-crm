@@ -38,13 +38,25 @@ export function checkCreateLesson(req: Request, res: Response, next: NextFunctio
     })
     .run(req);
 
-  body('timeHh')
+  body('timeStart')
     .exists({
       checkNull: true,
     })
     .run(req);
 
-  body('timeMin')
+  body('timeEnd')
+    .exists({
+      checkNull: true,
+    })
+    .run(req);
+
+  body('dateFrom')
+    .exists({
+      checkNull: true,
+    })
+    .run(req);
+
+  body('dateTo')
     .exists({
       checkNull: true,
     })

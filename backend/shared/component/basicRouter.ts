@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import { checkId, injectMiddlewares } from '../middlewares';
+import { BasicController } from './basicController';
 
 // @ts-ignore
-export function createBasicRouter(controller, middlewares) {
+export function createBasicRouter(controller: BasicController, middlewares) {
   const basicRouter = Router();
 
   const injector = middlewares.injectMiddlewares;
@@ -18,7 +19,7 @@ export function createBasicRouter(controller, middlewares) {
 }
 
 // @ts-ignore
-export function createBasicRouterWithDefaultMiddlewares(controller, middlewares) {
+export function createBasicRouterWithDefaultMiddlewares(controller: BasicController, middlewares) {
   const middlewaresWithDefault = {
     injectMiddlewares,
 

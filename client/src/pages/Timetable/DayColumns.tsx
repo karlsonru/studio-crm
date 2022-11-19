@@ -1,5 +1,7 @@
 import { useCallback, useMemo } from 'react';
-import { Box, Grid } from '@mui/material';
+import { Grid, Box } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
+import { LessonCard } from './LessonCard';
 import useFetch from '../../shared/useFetch';
 
 function getDayName(day: number) {
@@ -15,7 +17,7 @@ function getDayName(day: number) {
   return dayNames[day];
 }
 
-function DayNameCell({ date }: { date: Date }) {
+function DayTitle({ date }: { date: Date }) {
   return (
     <Box>
       <span style={{ fontWeight: 'bold' }}>{getDayName(date.getDay())},</span>
@@ -40,19 +42,18 @@ function DayColumn({ date }: { date: Date }) {
 
   const { isLoading, data, error } = fetch({ url: '/lesson/findByDay', method: 'POST', body: findDayLessonsQuery });
 
-  console.log('isLoading: {0}', isLoading);
-
-  if (error) {
-    console.log('error: {0}', error);
-  }
-
-  if (data) {
-    console.log('data: {0}', data);
-  }
+  const loading = isLoading ? <CircularProgress /> : null;
+  const errorMsg = error ? '<span>Произошла ошибка</span>' : null;
+  const lessons = data && data.payload
+    ? data.payload.map((lesson) => <LessonCard key={lesson.id} cardDetails={lesson} />)
+    : null;
 
   return (
     <Grid item sx={{ width: '14%', fontSize: '0.7rem' }}>
-      <DayNameCell date={date} />
+      <DayTitle date={date} />
+      {loading}
+      {errorMsg}
+      {lessons}
     </Grid>
   );
 }
@@ -66,7 +67,6 @@ export default function DayColumns({ isMobile, startDate }: IDayNameCells) {
   const renderCells = ({ date, num }: { date: Date, num: Number }) => {
     const cells = [];
 
-    // eslint-disable-next-line no-plusplus
     for (let i = 0; i < num; i++) {
       const initialDate = new Date(+date);
       initialDate.setDate(initialDate.getDate() + i);

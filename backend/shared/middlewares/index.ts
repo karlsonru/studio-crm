@@ -1,15 +1,6 @@
-import { injectMiddlewares } from './injectMiddlewares';
-import { injectQuery } from './injectQuery';
-import { checkToken } from './checkToken';
-import { checkAccess } from './checkAcces';
-import { checkLogin } from './checkLogin';
-import { checkId } from './checkId';
-
-export {
-  checkAccess,
-  checkToken,
-  checkId,
-  checkLogin,
-  injectMiddlewares,
-  injectQuery,
-};
+export { injectMiddlewares } from './injectMiddlewares';
+export { injectQuery } from './injectQuery';
+export { checkToken } from './checkToken';
+export { checkAccess } from './checkAcces';
+export { checkLogin } from './checkLogin';
+export { checkId } from './checkId';

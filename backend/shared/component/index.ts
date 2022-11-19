@@ -1,12 +1,3 @@
-import { createBasicRouter, createBasicRouterWithDefaultMiddlewares } from './basicRouter';
-import { BasicController } from './basicController';
-import { BasicServices, IBasicItem, IBasicQuery } from './basicServices';
-
-export {
-  createBasicRouter,
-  createBasicRouterWithDefaultMiddlewares,
-  BasicController,
-  BasicServices,
-  IBasicItem,
-  IBasicQuery,
-};
+export { createBasicRouter, createBasicRouterWithDefaultMiddlewares } from './basicRouter';
+export { BasicController } from './basicController';
+export { BasicServices, IBasicItem, IBasicQuery } from './basicServices';

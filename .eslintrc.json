@@ -31,7 +31,7 @@
     ],
     "rules": {
         "linebreak-style": 0,
-        "no-console": 0,
+        "no-console": 1,
         "import/prefer-default-export": 0,
         "consistent-return": 0,
         "no-plusplus": ["warn", { "allowForLoopAfterthoughts" : true }],

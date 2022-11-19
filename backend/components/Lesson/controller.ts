@@ -10,7 +10,7 @@ export class LessonController extends BasicController {
         return res.status(400).json({ message: 'Не найдено' });
       }
 
-      return res.json({ message: result });
+      return res.json({ message: 'success', payload: result });
     } catch (err) {
       next(err);
     }

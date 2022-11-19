@@ -2,7 +2,7 @@ import { model, Schema, Types } from 'mongoose';
 
 const schema = new Schema({
   title: {
-    type: String, required: true, unique: true, trim: true,
+    type: String, required: true, trim: true,
   },
   teacher: {
     type: Types.ObjectId, ref: 'User', required: true, trim: true,
@@ -17,7 +17,7 @@ const schema = new Schema({
     type: Number, required: true, min: 0, max: 2359,
   },
   timeEnd: {
-    type: String, required: true, min: 0, max: 2359,
+    type: Number, required: true, min: 0, max: 2359,
   },
   dateFrom: {
     type: Number, required: true,

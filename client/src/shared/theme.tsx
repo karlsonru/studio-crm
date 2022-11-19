@@ -12,10 +12,10 @@ const defaultTheme = createTheme(theme, {
         },
       },
     },
-    MuiTableRow: {
+    MuiCard: {
       styleOverrides: {
         root: {
-          height: '60px',
+          padding: '8px',
         },
       },
     },

@@ -7,7 +7,9 @@ export interface IBasicQuery {
 export interface IBasicItem extends IBasicQuery {}
 
 export class BasicServices {
-  [fn: string]: any;
+  // костыль для расширения класса новыми функциями
+  // @ts-ignore
+  [x: string]: any;
 
   db: typeof Model;
 
