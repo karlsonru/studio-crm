@@ -15,7 +15,17 @@ const defaultTheme = createTheme(theme, {
     MuiCard: {
       styleOverrides: {
         root: {
-          padding: '8px',
+          margin: '8px 0px',
+        },
+      },
+    },
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          padding: '0px 4px',
+          '&:last-child': {
+            paddingBottom: '4px',
+          },
         },
       },
     },

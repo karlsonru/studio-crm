@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { Grid, Box } from '@mui/material';
+import { Grid } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { LessonCard } from './LessonCard';
 import useFetch from '../../shared/useFetch';
@@ -17,15 +17,6 @@ function getDayName(day: number) {
   return dayNames[day];
 }
 
-function DayTitle({ date }: { date: Date }) {
-  return (
-    <Box>
-      <span style={{ fontWeight: 'bold' }}>{getDayName(date.getDay())},</span>
-      <span style={{ marginLeft: '5px' }}>{date.toLocaleDateString('ru-RU')}</span>
-    </Box>
-  );
-}
-
 function createDayLessonsQuery(date: Date) {
   return {
     query: {
@@ -36,7 +27,7 @@ function createDayLessonsQuery(date: Date) {
   };
 }
 
-function DayColumn({ date }: { date: Date }) {
+function DayColumn({ date, width }: { date: Date, width: string }) {
   const findDayLessonsQuery = useMemo(() => createDayLessonsQuery(date), [date]);
   const fetch = useCallback(useFetch, [date, findDayLessonsQuery]);
 
@@ -45,12 +36,12 @@ function DayColumn({ date }: { date: Date }) {
   const loading = isLoading ? <CircularProgress /> : null;
   const errorMsg = error ? '<span>Произошла ошибка</span>' : null;
   const lessons = data && data.payload
-    ? data.payload.map((lesson) => <LessonCard key={lesson.id} cardDetails={lesson} />)
+    ? data.payload.map((lesson) => <LessonCard key={lesson._id} cardDetails={lesson} />)
     : null;
 
   return (
-    <Grid item sx={{ width: '14%', fontSize: '0.7rem' }}>
-      <DayTitle date={date} />
+    <Grid item p='4px' width={width}>
+      <span>{getDayName(date.getDay())},<br />{date.toLocaleDateString('ru-RU')}</span>
       {loading}
       {errorMsg}
       {lessons}
@@ -67,10 +58,12 @@ export default function DayColumns({ isMobile, startDate }: IDayNameCells) {
   const renderCells = ({ date, num }: { date: Date, num: Number }) => {
     const cells = [];
 
+    const width = isMobile ? '100%' : '14%';
+
     for (let i = 0; i < num; i++) {
       const initialDate = new Date(+date);
       initialDate.setDate(initialDate.getDate() + i);
-      cells.push(<DayColumn key={i} date={initialDate} />);
+      cells.push(<DayColumn key={+initialDate} date={initialDate} width={width} />);
     }
 
     return cells;

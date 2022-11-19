@@ -48,12 +48,12 @@ function WeekSwitcher({ startDate, setDateHandler, isMobile }: IDateSwitcher) {
 
   const endDateInput = isMobile
     ? null
-    : <Input value={endDateString} readOnly={true} size="small" inputProps={{ style: { textAlign: 'center', minWidth: '100px', maxWidth: '7rem' } }} />;
+    : <Input value={endDateString} readOnly={true} size="small" inputProps={{ style: { textAlign: 'center', minWidth: '90px', maxWidth: '7rem' } }} />;
 
   return (
     <Grid container alignItems='center'>
         <ArrowBackIosNewIcon onClick={decreaseDateHandler} fontSize="medium" />
-        <Input value={startDateString} readOnly={true} size="small" inputProps={{ style: { textAlign: 'center', minWidth: '100px', maxWidth: '7rem' } }} />
+        <Input value={startDateString} readOnly={true} size="small" inputProps={{ style: { textAlign: 'center', minWidth: '90px', maxWidth: '7rem' } }} />
         {splitIcon}
         {endDateInput}
         <ArrowForwardIosIcon onClick={increaseDateHandler} fontSize="medium" />
@@ -101,7 +101,7 @@ function MonthSwitcher({ startDate, setDateHandler }: IDateSwitcher) {
   }, [startDate]);
 
   return (
-    <Grid item onClick={openDatepicker} sx={{ display: 'flex', flexDirection: 'column' }} >
+    <Grid item onClick={openDatepicker} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }} >
       <InputLabel variant="filled" sx={{ textAlign: 'center', fontSize: '1.25rem', marginBottom: '10px' }}>
         {monthLabel}
       </InputLabel>

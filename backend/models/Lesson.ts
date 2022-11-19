@@ -7,6 +7,9 @@ const schema = new Schema({
   teacher: {
     type: Types.ObjectId, ref: 'User', required: true, trim: true,
   },
+  activeStudents: {
+    type: Number, min: 0,
+  },
   location: {
     type: Types.ObjectId, ref: 'Location', required: true, trim: true,
   },
