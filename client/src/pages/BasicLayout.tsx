@@ -1,11 +1,23 @@
-import { Grid, Box } from '@mui/material';
+import { Grid, Box, useMediaQuery } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 import { useState } from 'react';
 import { SideMenu } from '../components/SideMenu';
+import { MobileMenu } from '../components/MobileMenu';
 import { StickyFooter } from '../components/StickyFooter';
 
 export function Layout() {
   const [firstColumnWidth, setFirstColumnWidth] = useState(200);
+  const isMobile = useMediaQuery('(max-width: 767px)');
+
+  if (isMobile) {
+    return (
+      <>
+        <MobileMenu />
+        <Outlet />
+        <StickyFooter />
+      </>
+    );
+  }
 
   return (
     <Grid container columns={2} spacing={0}>
