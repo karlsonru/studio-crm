@@ -3,6 +3,7 @@ import { Grid } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import DateSwitcher from './DateSwitcher';
 import DayColumns from './DayColumns';
+import TimeColumn from './TimeColumn';
 
 export default function TimetablePage() {
   const [startDate, setStartDate] = useState(new Date());
@@ -25,6 +26,7 @@ export default function TimetablePage() {
         <DateSwitcher startDate={startDate} setDateHandler={setStartDate} isMobile={isMobile} />
       </Grid>
       <Grid container wrap="nowrap">
+        {!isMobile && <TimeColumn />}
         <DayColumns startDate={startDate} isMobile={isMobile} />
       </Grid>
   </Grid>

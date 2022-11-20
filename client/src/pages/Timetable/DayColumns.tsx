@@ -27,7 +27,7 @@ function createDayLessonsQuery(date: Date) {
   };
 }
 
-function DayColumn({ date, width }: { date: Date, width: string }) {
+function DayColumn({ date, isMobile }: { date: Date, isMobile: boolean }) {
   const findDayLessonsQuery = useMemo(() => createDayLessonsQuery(date), [date]);
   const fetch = useCallback(useFetch, [date, findDayLessonsQuery]);
 
@@ -36,12 +36,24 @@ function DayColumn({ date, width }: { date: Date, width: string }) {
   const loading = isLoading ? <CircularProgress /> : null;
   const errorMsg = error ? '<span>Произошла ошибка</span>' : null;
   const lessons = data && data.payload
-    ? data.payload.map((lesson) => <LessonCard key={lesson._id} cardDetails={lesson} />)
+    ? data.payload.map(
+      (lesson) => <LessonCard key={lesson._id} cardDetails={lesson} isMobile={isMobile} />,
+    )
     : null;
 
   return (
-    <Grid item p='4px' width={width}>
-      <span>{getDayName(date.getDay())},<br />{date.toLocaleDateString('ru-RU')}</span>
+    <Grid item
+      width={isMobile ? '100%' : '14%'}
+      padding='4px'
+      sx={isMobile ? {} : {
+        position: 'relative',
+        borderLeft: 'solid lightgrey',
+        borderWidth: '0px thin',
+      }}
+    >
+      <span style={{ display: 'inline-block', marginBottom: '8px' }}>
+        {getDayName(date.getDay())},<br />{date.toLocaleDateString('ru-RU')}
+      </span>
       {loading}
       {errorMsg}
       {lessons}
@@ -58,12 +70,10 @@ export default function DayColumns({ isMobile, startDate }: IDayNameCells) {
   const renderCells = ({ date, num }: { date: Date, num: Number }) => {
     const cells = [];
 
-    const width = isMobile ? '100%' : '14%';
-
     for (let i = 0; i < num; i++) {
       const initialDate = new Date(+date);
       initialDate.setDate(initialDate.getDate() + i);
-      cells.push(<DayColumn key={+initialDate} date={initialDate} width={width} />);
+      cells.push(<DayColumn key={+initialDate} date={initialDate} isMobile={isMobile} />);
     }
 
     return cells;
