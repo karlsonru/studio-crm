@@ -1,4 +1,9 @@
-import { model, Schema, Types } from 'mongoose';
+import {
+  model,
+  Schema,
+  Types,
+  InferSchemaType,
+} from 'mongoose';
 
 const schema = new Schema({
   title: {
@@ -34,5 +39,6 @@ const schema = new Schema({
 });
 
 const Lesson = model('Lesson', schema);
+type ILesson = InferSchemaType<typeof schema>;
 
-export { Lesson };
+export { Lesson, ILesson };

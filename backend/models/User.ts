@@ -1,4 +1,9 @@
-import { model, Schema, Types } from 'mongoose';
+import {
+  model,
+  Schema,
+  Types,
+  InferSchemaType,
+} from 'mongoose';
 
 // пользователь это администратор, педагог или владелец
 const schema = new Schema({
@@ -24,5 +29,6 @@ const schema = new Schema({
 });
 
 const User = model('User', schema);
+type IUser = InferSchemaType<typeof schema>;
 
-export { User };
+export { User, IUser };

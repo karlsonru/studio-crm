@@ -1,27 +1,10 @@
-import { User } from './User';
-import { Role } from './Role';
-import { RolesGroup } from './RolesGroup';
-import { Student } from './Student';
-import { Lesson } from './Lesson';
-import { Location } from './Location';
-import { Subscription } from './Subscription';
-import { SubscriptionTemplate } from './SubscriptionTemplate';
-import { VisitedLesson } from './VisitedLesson';
-import { VisitStatus } from './VisitStatus';
-
-export {
-  Role,
-  RolesGroup,
-
-  User,
-  Student,
-
-  Lesson,
-  Location,
-
-  Subscription,
-  SubscriptionTemplate,
-
-  VisitedLesson,
-  VisitStatus,
-};
+export { User, IUser } from './User';
+export { Role } from './Role';
+export { RolesGroup } from './RolesGroup';
+export { Student } from './Student';
+export { Lesson, ILesson } from './Lesson';
+export { Location } from './Location';
+export { Subscription } from './Subscription';
+export { SubscriptionTemplate } from './SubscriptionTemplate';
+export { VisitedLesson } from './VisitedLesson';
+export { VisitStatus } from './VisitStatus';

@@ -7,15 +7,6 @@ import {
 import GroupIcon from '@mui/icons-material/Group';
 import { Box } from '@mui/system';
 
-interface ILessonCardDetails {
-  [index: string]: string | number | any;
-}
-
-interface ILessonCard {
-  cardDetails: ILessonCardDetails;
-  isMobile: boolean;
-}
-
 function convertToMinutes(time: number) {
   const hours = Math.floor(time / 100) - 9;
   const minutes = Math.round(time % 100);
@@ -27,6 +18,23 @@ function convertToReadbleTime(time: number) {
   const hours = timeString.slice(0, 2);
   const minutes = timeString.slice(2);
   return `${hours}:${minutes}`;
+}
+
+export interface ICardDetails {
+  _id: string;
+  title: string;
+  teacher: {
+    name: string;
+    _id: string;
+  };
+  timeStart: number;
+  timeEnd: number;
+  activeStudents: number;
+}
+
+interface ILessonCard {
+  cardDetails: ICardDetails;
+  isMobile: boolean;
 }
 
 export function LessonCard({ cardDetails, isMobile }: ILessonCard) {

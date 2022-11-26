@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import { Grid } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
-import { LessonCard } from './LessonCard';
-import useFetch from '../../shared/useFetch';
+import { ICardDetails, LessonCard } from './LessonCard';
+import { useFetch } from '../../shared/useFetch';
 
 function getDayName(day: number) {
   const dayNames: { [code: number]: string } = {
@@ -27,19 +27,24 @@ function createDayLessonsQuery(date: Date) {
   };
 }
 
+type ICreateDayLessonsQuery = ReturnType<typeof createDayLessonsQuery>;
+
+interface ILessonByDay {
+  message: string;
+  payload: ICardDetails[];
+}
+
+function renderLessonsCards(data: ICardDetails[], isMobile: boolean) {
+  return data.map(
+    (lesson) => <LessonCard key={lesson._id} cardDetails={lesson} isMobile={isMobile} />,
+  );
+}
+
 function DayColumn({ date, isMobile }: { date: Date, isMobile: boolean }) {
   const findDayLessonsQuery = useMemo(() => createDayLessonsQuery(date), [date]);
   const fetch = useCallback(useFetch, [date, findDayLessonsQuery]);
 
-  const { isLoading, data, error } = fetch({ url: '/lesson/findByDay', method: 'POST', body: findDayLessonsQuery });
-
-  const loading = isLoading ? <CircularProgress /> : null;
-  const errorMsg = error ? '<span>Произошла ошибка</span>' : null;
-  const lessons = data && data.payload
-    ? data.payload.map(
-      (lesson) => <LessonCard key={lesson._id} cardDetails={lesson} isMobile={isMobile} />,
-    )
-    : null;
+  const { isLoading, data, error } = fetch<ILessonByDay, ICreateDayLessonsQuery>('/lesson/findByDay', 'POST', findDayLessonsQuery);
 
   return (
     <Grid item
@@ -54,9 +59,9 @@ function DayColumn({ date, isMobile }: { date: Date, isMobile: boolean }) {
       <span style={{ display: 'inline-block', marginBottom: '8px' }}>
         {getDayName(date.getDay())},<br />{date.toLocaleDateString('ru-RU')}
       </span>
-      {loading}
-      {errorMsg}
-      {lessons}
+      {isLoading && <CircularProgress />}
+      {error && <span>Произошла ошибка</span>}
+      {data?.payload && renderLessonsCards(data.payload, isMobile)}
     </Grid>
   );
 }

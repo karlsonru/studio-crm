@@ -1,17 +1,16 @@
 {
   "compilerOptions": {
-    "jsx": "react",
-    "jsx": "react",
     "target": "ESNext",
     "module": "ESNext",
+
+    "baseUrl": ".",
+    "outDir": "dist-backend",
+
     "esModuleInterop": true,
     "sourceMap": true,
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-
-    "baseUrl": ".",
-    "outDir": "dist",
     
     "strict": true,
     "noImplicitAny": true,
@@ -20,7 +19,9 @@
   "ts-node": {
     "esm": true
   },
-  "include": ["backend", "client"],
+  "include": [
+    "*.ts",
+  ],
   "exclude": [
     "node_modules", 
     "dist", 
