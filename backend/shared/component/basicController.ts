@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { BasicServices } from './basicServices';
 
-export class BasicController {
-  service: BasicServices;
+export class BasicController<T extends BasicServices> {
+  service: T;
 
-  constructor(basicService: BasicServices) {
+  constructor(basicService: T) {
     this.service = basicService;
   }
 

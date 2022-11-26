@@ -1,3 +1,3 @@
-import { BasicController } from '../../shared/component';
+import { BasicController, BasicServices } from '../../shared/component';
 
-export class StudentController extends BasicController {}
+export class StudentController extends BasicController<BasicServices> {}
