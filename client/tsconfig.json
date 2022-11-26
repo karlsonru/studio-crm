@@ -3,7 +3,7 @@
     "target": "ESNext",
     "module": "ESNext",
 
-    "baseUrl": "./src/",
+    "baseUrl": "./src",
     "outDir": "dist-client",
 
     "lib": [
@@ -11,17 +11,17 @@
       "dom.iterable",
       "esnext"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-
-    "noImplicitAny": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    
+    "strict": true,
+    "noImplicitAny": true,
+    "skipLibCheck": true,
+    "allowJs": false,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx"
@@ -30,11 +30,12 @@
     "esm": true
   },
   "include": [
-    "./src/*"
-, "src/shared/theme.tsx"  ],
+    "src/**/*.tsx",
+    ".eslintrc.json"
+  ],
   "exclude": [
     "node_modules", 
-    "dist", 
+    "dist-client", 
     "*.d.ts"
   ]
 }
