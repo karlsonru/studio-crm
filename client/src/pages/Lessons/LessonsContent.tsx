@@ -8,6 +8,7 @@ import TableCell from '@mui/material/TableCell';
 import DeleteIcon from '@mui/icons-material/Delete';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useFetch } from 'shared/useFetch';
+import { useState } from 'react';
 
 interface ILessonModel {
   _id: string;
@@ -53,8 +54,8 @@ const headCells = [
   },
 ];
 
-function createCells(args: (string | number | JSX.Element)[]) {
-  return args.map((value) => <TableCell>{value}</TableCell>);
+function createCells(id: string, args: (string | number | JSX.Element)[]) {
+  return args.map((value) => <TableCell key={id + value}>{value}</TableCell>);
 }
 
 function createRow(cells: JSX.Element[]) {
@@ -67,6 +68,7 @@ function createRow(cells: JSX.Element[]) {
 
 export function LessonsContent() {
   const isMobile = useMediaQuery('(max-width: 767px)');
+  const [page, setPage] = useState(0);
   const { data, isLoading, error } = useFetch<ILessons>({ url: '/lesson' });
 
   if (isLoading || !data?.payload) {
@@ -79,11 +81,16 @@ export function LessonsContent() {
 
   const rows = data.payload.map((lesson) => {
     const args = isMobile ? [lesson.title, lesson.activeStudents] : [lesson.title, 'Группа', lesson.activeStudents, 'Активна', <DeleteIcon />];
-    const cells = createCells(args);
+    const cells = createCells(lesson._id, args);
     return createRow(cells);
   });
 
-  const headerCells = headCells.map((cell) => <TableCell>{cell.label}</TableCell>);
+  const headerCells = isMobile
+    ? [
+      <TableCell>Название</TableCell>,
+      <TableCell>Ученики</TableCell>,
+    ]
+    : headCells.map((cell) => <TableCell key={cell.id}>{cell.label}</TableCell>);
 
   return (
     <>
@@ -98,10 +105,12 @@ export function LessonsContent() {
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPage={5}
+        component='div'
+        align='right'
+        rowsPerPage={10}
         count={data.payload.length}
-        page={1}
-        onPageChange={() => console.log('changed')}
+        page={page}
+        onPageChange={(event, pageNum) => setPage(pageNum)}
       />
     </>
   );
