@@ -1,7 +1,7 @@
 import {
   useState, useEffect, useRef, ChangeEvent,
 } from 'react';
-import { Grid } from '@mui/material';
+import { Grid, useMediaQuery } from '@mui/material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Input from '@mui/material/Input';
@@ -11,29 +11,26 @@ import InputLabel from '@mui/material/InputLabel';
 interface IDateSwitcher {
   startDate: Date;
   setDateHandler: (date: Date) => void;
-  isMobile?: boolean;
 }
 
-function WeekSwitcher({ startDate, setDateHandler, isMobile }: IDateSwitcher) {
+function WeekSwitcher({ startDate, setDateHandler }: IDateSwitcher) {
+  const isMobile = useMediaQuery('(max-width: 767px)');
   const [startDateString, setStartDateString] = useState('');
   const [endDateString, setEndDateString] = useState('');
-  const [changeDateStep, setChangeDateStep] = useState(isMobile ? 1 : 7);
+
+  const step = isMobile ? 1 : 7;
 
   const increaseDateHandler = () => {
     const nextWeek = new Date(startDate);
-    nextWeek.setDate(nextWeek.getDate() + changeDateStep);
+    nextWeek.setDate(nextWeek.getDate() + step);
     setDateHandler(nextWeek);
   };
 
   const decreaseDateHandler = () => {
     const prevWeek = new Date(startDate);
-    prevWeek.setDate(prevWeek.getDate() - changeDateStep);
+    prevWeek.setDate(prevWeek.getDate() - step);
     setDateHandler(prevWeek);
   };
-
-  useEffect(() => {
-    setChangeDateStep(isMobile ? 1 : 7);
-  }, [isMobile]);
 
   useEffect(() => {
     setStartDateString(startDate.toLocaleDateString('ru-RU'));
@@ -44,18 +41,14 @@ function WeekSwitcher({ startDate, setDateHandler, isMobile }: IDateSwitcher) {
     setEndDateString(endDate.toLocaleDateString('ru-RU'));
   }, [startDate]);
 
-  const splitIcon = isMobile ? null : <RemoveIcon />;
-
-  const endDateInput = isMobile
-    ? null
-    : <Input value={endDateString} readOnly={true} size="small" inputProps={{ style: { textAlign: 'center', minWidth: '90px', maxWidth: '7rem' } }} />;
-
   return (
     <Grid container alignItems='center'>
         <ArrowBackIosNewIcon onClick={decreaseDateHandler} fontSize="medium" />
         <Input value={startDateString} readOnly={true} size="small" inputProps={{ style: { textAlign: 'center', minWidth: '90px', maxWidth: '7rem' } }} />
-        {splitIcon}
-        {endDateInput}
+        {!isMobile && <RemoveIcon />}
+        {!isMobile
+          && <Input value={endDateString} readOnly={true} size="small" inputProps={{ style: { textAlign: 'center', minWidth: '90px', maxWidth: '7rem' } }} />
+        }
         <ArrowForwardIosIcon onClick={increaseDateHandler} fontSize="medium" />
     </Grid>
   );
@@ -115,11 +108,11 @@ function MonthSwitcher({ startDate, setDateHandler }: IDateSwitcher) {
   );
 }
 
-export default function DateSwitcher({ startDate, setDateHandler, isMobile }: IDateSwitcher) {
+export function DateSwitcher({ startDate, setDateHandler }: IDateSwitcher) {
   return (
     <>
       <MonthSwitcher startDate={startDate} setDateHandler={setDateHandler} />
-      <WeekSwitcher startDate={startDate} setDateHandler={setDateHandler} isMobile={isMobile} />
+      <WeekSwitcher startDate={startDate} setDateHandler={setDateHandler} />
     </>
   );
 }

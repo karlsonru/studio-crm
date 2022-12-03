@@ -1,3 +1,1 @@
-import TimetablePage from './Timetable';
-
-export { TimetablePage };
+export { TimetablePage } from './Timetable';

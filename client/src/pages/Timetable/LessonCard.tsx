@@ -3,6 +3,7 @@ import {
   CardContent,
   CardHeader,
   Grid,
+  useMediaQuery,
 } from '@mui/material';
 import GroupIcon from '@mui/icons-material/Group';
 import { Box } from '@mui/system';
@@ -20,9 +21,10 @@ function convertToReadbleTime(time: number) {
   return `${hours}:${minutes}`;
 }
 
-export interface ICardDetails {
+export interface ILessonModel {
   _id: string;
   title: string;
+  day: number;
   teacher: {
     name: string;
     _id: string;
@@ -30,17 +32,16 @@ export interface ICardDetails {
   timeStart: number;
   timeEnd: number;
   activeStudents: number;
+  dateFrom: number;
+  dateTo: number;
 }
 
-interface ILessonCard {
-  cardDetails: ICardDetails;
-  isMobile: boolean;
-}
-
-export function LessonCard({ cardDetails, isMobile }: ILessonCard) {
+export function LessonCard({ lessonCardDetails }: { lessonCardDetails: ILessonModel }) {
   const {
     title, teacher, timeStart, timeEnd, activeStudents,
-  } = cardDetails;
+  } = lessonCardDetails;
+
+  const isMobile = useMediaQuery('(max-width: 767px)');
 
   const timeStartReadable = convertToReadbleTime(timeStart);
   const timeEndReadable = convertToReadbleTime(timeEnd);

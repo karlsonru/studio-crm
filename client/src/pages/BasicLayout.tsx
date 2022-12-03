@@ -21,30 +21,15 @@ export function Layout() {
 
   return (
     <Grid container columns={2} spacing={0}>
-      <Grid
-        item
-        sx={{
-          position: 'relative',
-          width: `${firstColumnWidth}px`,
-        }}
-      >
+      <Grid item sx={{ width: firstColumnWidth, position: 'relative' }}>
         <SideMenu width={firstColumnWidth} setWidthHandler={setFirstColumnWidth}/>
       </Grid>
-
-      <Grid
-        item
+      <Grid item container direction='column' justifyContent='space-between' alignItems='stretch'
         sx={{
           height: '100%',
           width: `calc(100% - ${firstColumnWidth}px)`,
-        }}
-        container
-        direction='column'
-        justifyContent='space-between'
-        alignItems='stretch'
-      >
-        <Box sx={{
-          p: 2,
         }}>
+        <Box p={2}>
           <Outlet />
         </Box>
         <StickyFooter />

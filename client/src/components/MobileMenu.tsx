@@ -85,19 +85,20 @@ const MenuItemsList = [
 export function MobileMenu() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
   };
 
   return (
     <>
     <button onClick={handleClick} style={{
       background: 'transparent',
-      border: 'solid lightgrey',
-      borderWidth: '0px thin',
+      borderWidth: '0px',
     }}>
       <MenuIcon />
     </button>

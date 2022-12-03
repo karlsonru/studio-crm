@@ -1,6 +1,6 @@
 import { Box } from '@mui/system';
 
-export default function TimeColumn() {
+export function TimeColumn() {
   const time = ['09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21'];
 
   return (

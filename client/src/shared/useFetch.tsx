@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 
-export function useFetch<T, K>(url: string, method: string | undefined, body: K) {
+interface IUseFetch<K> {
+  url: string;
+  method?: string;
+  body?: K;
+}
+
+export function useFetch<T, K = undefined>({ url, method, body }: IUseFetch<K>) {
   const [isLoading, setLoading] = useState(false);
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<Error | null>(null);

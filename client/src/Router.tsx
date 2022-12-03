@@ -3,6 +3,7 @@ import { Layout } from './pages/BasicLayout';
 import { AuthPage } from './pages/Auth';
 import { UsersPage } from './pages/Users';
 import { TimetablePage } from './pages/Timetable';
+import { LessonsPage } from './pages/Lessons';
 
 function Hello() {
   return <h1>Hello world!</h1>;
@@ -17,7 +18,7 @@ export function Router() {
         <Route path='/users' element={<UsersPage />} />
         <Route path='/timetable' element={<TimetablePage />} />
         <Route path='/students' element={<Hello />} />
-        <Route path='/lessons' element={<Hello />} />
+        <Route path='/lessons' element={<LessonsPage />} />
         <Route path='/subscribtions' element={<Hello />} />
         <Route path='/finance' element={<Hello />} />
       </Route>

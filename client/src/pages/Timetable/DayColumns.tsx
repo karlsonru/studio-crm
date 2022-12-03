@@ -1,8 +1,5 @@
-import { useCallback, useMemo } from 'react';
-import { Grid } from '@mui/material';
-import CircularProgress from '@mui/material/CircularProgress';
-import { ICardDetails, LessonCard } from './LessonCard';
-import { useFetch } from '../../shared/useFetch';
+import { Grid, useMediaQuery } from '@mui/material';
+import { ILessonModel, LessonCard } from './LessonCard';
 
 function getDayName(day: number) {
   const dayNames: { [code: number]: string } = {
@@ -17,78 +14,74 @@ function getDayName(day: number) {
   return dayNames[day];
 }
 
-function createDayLessonsQuery(date: Date) {
-  return {
-    query: {
-      day: date.getDay(),
-      date: +date,
-      isActive: true,
-    },
-  };
+interface IDayColumn {
+  startDate: Date;
+  shift: number;
+  lessons: ILessonModel[];
 }
 
-type ICreateDayLessonsQuery = ReturnType<typeof createDayLessonsQuery>;
+function renderCard(date: Date, lesson: ILessonModel) {
+  if (lesson.dateTo < +date || lesson.dateFrom > +date) {
+    return;
+  }
 
-interface ILessonByDay {
-  message: string;
-  payload: ICardDetails[];
+  return <LessonCard key={lesson._id} lessonCardDetails={lesson} />;
 }
 
-function renderLessonsCards(data: ICardDetails[], isMobile: boolean) {
-  return data.map(
-    (lesson) => <LessonCard key={lesson._id} cardDetails={lesson} isMobile={isMobile} />,
-  );
-}
-
-function DayColumn({ date, isMobile }: { date: Date, isMobile: boolean }) {
-  const findDayLessonsQuery = useMemo(() => createDayLessonsQuery(date), [date]);
-  const fetch = useCallback(useFetch, [date, findDayLessonsQuery]);
-
-  const { isLoading, data, error } = fetch<ILessonByDay, ICreateDayLessonsQuery>('/lesson/findByDay', 'POST', findDayLessonsQuery);
+function DayColumn({ startDate, shift, lessons }: IDayColumn) {
+  const isMobile = useMediaQuery('(max-width: 767px)');
+  const columnDate = new Date(+startDate);
+  columnDate.setDate(startDate.getDate() + shift);
 
   return (
     <Grid item
-      width={isMobile ? '100%' : '14%'}
       padding='4px'
-      sx={isMobile ? {} : {
+      sx={{
+        flexBasis: '200px',
+        flex: 1,
         position: 'relative',
         borderLeft: 'solid lightgrey',
         borderWidth: '0px thin',
       }}
     >
-      <span style={{ display: 'inline-block', marginBottom: '8px' }}>
-        {getDayName(date.getDay())},<br />{date.toLocaleDateString('ru-RU')}
-      </span>
-      {isLoading && <CircularProgress />}
-      {error && <span>Произошла ошибка</span>}
-      {data?.payload && renderLessonsCards(data.payload, isMobile)}
+      <div
+      style={{
+        paddingLeft: '1rem',
+        marginBottom: '8px',
+        borderBottom: 'solid lightgrey',
+        borderWidth: '1px thin',
+      }}>
+        {getDayName(columnDate.getDay())},{!isMobile && <br />} {columnDate.toLocaleDateString('ru-RU')}
+      </div>
+      {lessons && lessons.map((lesson) => renderCard(columnDate, lesson))}
     </Grid>
   );
 }
 
-interface IDayNameCells {
-  isMobile: boolean;
+interface IDayColumns {
   startDate: Date;
+  lessons: {
+    [index: number]: ILessonModel[];
+  }
 }
 
-export default function DayColumns({ isMobile, startDate }: IDayNameCells) {
-  const renderCells = ({ date, num }: { date: Date, num: Number }) => {
-    const cells = [];
+export function DayColumns({ startDate, lessons }: IDayColumns) {
+  const isMobile = useMediaQuery('(max-width: 767px)');
 
-    for (let i = 0; i < num; i++) {
-      const initialDate = new Date(+date);
-      initialDate.setDate(initialDate.getDate() + i);
-      cells.push(<DayColumn key={+initialDate} date={initialDate} isMobile={isMobile} />);
-    }
-
-    return cells;
-  };
-
-  const cells = renderCells({ date: startDate, num: isMobile ? 1 : 7 });
+  if (isMobile) {
+    return (
+      <Grid container wrap='nowrap' width='100%'>
+        <DayColumn startDate={startDate} shift={1} lessons={lessons[startDate.getDay()]}/>
+      </Grid>
+    );
+  }
 
   return (
     <Grid container wrap='nowrap' width='100%'>
-      {cells}
+      {[0, 1, 2, 3, 4, 5, 6].map(
+        (num) => <DayColumn
+          key={+startDate + num} startDate={startDate} shift={num} lessons={lessons[num]} />,
+      )}
     </Grid>
   );
 }
