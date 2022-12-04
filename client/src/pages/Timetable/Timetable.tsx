@@ -7,6 +7,7 @@ import { DayColumns } from './DayColumns';
 import { ILessonModel } from './LessonCard';
 import { TimeColumn } from './TimeColumn';
 import { useFetch } from '../../shared/useFetch';
+import { useDocTitle } from '../../shared/useDocTitle';
 
 interface ILessons {
   message: string;
@@ -28,6 +29,8 @@ function structureLessons(lessons: ILessonModel[]) {
 }
 
 export function TimetablePage() {
+  useDocTitle('Расписание');
+
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [startDate, setStartDate] = useState(new Date());
   const { isLoading, data, error } = useFetch<ILessons>({ url: '/lesson' });

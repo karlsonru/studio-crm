@@ -1,9 +1,10 @@
-import { Grid, Box, useMediaQuery } from '@mui/material';
+import { Grid, useMediaQuery } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 import { useState } from 'react';
+import { AppHeader } from 'components/AppHeader';
 import { SideMenu } from '../components/SideMenu';
 import { MobileMenu } from '../components/MobileMenu';
-import { StickyFooter } from '../components/StickyFooter';
+// import { StickyFooter } from '../components/StickyFooter';
 
 export function Layout() {
   const [firstColumnWidth, setFirstColumnWidth] = useState(200);
@@ -12,9 +13,9 @@ export function Layout() {
   if (isMobile) {
     return (
       <>
+        <AppHeader />
         <MobileMenu />
         <Outlet />
-        <StickyFooter />
       </>
     );
   }
@@ -24,15 +25,19 @@ export function Layout() {
       <Grid item sx={{ width: firstColumnWidth, position: 'relative' }}>
         <SideMenu width={firstColumnWidth} setWidthHandler={setFirstColumnWidth}/>
       </Grid>
-      <Grid item container direction='column' justifyContent='space-between' alignItems='stretch'
-        sx={{
-          height: '100%',
-          width: `calc(100% - ${firstColumnWidth}px)`,
-        }}>
-        <Box p={2}>
-          <Outlet />
-        </Box>
-        <StickyFooter />
+      <Grid
+        container
+        item
+        direction='column'
+        justifyContent='space-between'
+        alignItems='stretch'
+        p={2}
+        pt={0}
+        height={'100%'}
+        width={`calc(100% - ${firstColumnWidth}px)`}
+      >
+        <AppHeader />
+        <Outlet />
       </Grid>
     </Grid>
   );

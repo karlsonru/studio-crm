@@ -8,7 +8,7 @@ import Button from '@mui/material/Button';
 
 export function LessonsHeader() {
   return (
-    <header>
+    <header style={{ margin: '1rem 0rem' }}>
       <Grid container justifyContent="space-between" alignItems="center">
         <Grid>
           <TextField
