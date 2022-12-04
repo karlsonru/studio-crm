@@ -1,5 +1,5 @@
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { ILessonModel, LessonCard } from './TimetableCard';
 
@@ -36,8 +36,8 @@ function DayColumn({ startDate, shift, lessons }: IDayColumn) {
   columnDate.setDate(startDate.getDate() + shift);
 
   return (
-    <Grid item
-      padding='4px'
+    <Stack
+      p='4px'
       flex={1}
       flexBasis='200px'
       position='relative'
@@ -57,7 +57,7 @@ function DayColumn({ startDate, shift, lessons }: IDayColumn) {
         {getDayName(columnDate.getDay())},{!isMobile && <br />} {columnDate.toLocaleDateString('ru-RU')}
       </Box>
       {lessons && lessons.map((lesson) => renderCard(columnDate, lesson))}
-    </Grid>
+    </Stack>
   );
 }
 
@@ -72,7 +72,7 @@ export function DayColumns({ startDate, lessons }: IDayColumns) {
   const isMobile = useMediaQuery('(max-width: 767px)');
 
   return (
-    <Grid container wrap='nowrap' width='100%'>
+    <Stack direction='row' width='100%'>
       {isMobile
         && <DayColumn startDate={startDate} shift={0} lessons={lessons[startDate.getDay()]} />}
 
@@ -81,6 +81,6 @@ export function DayColumns({ startDate, lessons }: IDayColumns) {
           (num) => <DayColumn
             key={+startDate + num} startDate={startDate} shift={num} lessons={lessons[num]} />,
         )}
-    </Grid>
+    </Stack>
   );
 }

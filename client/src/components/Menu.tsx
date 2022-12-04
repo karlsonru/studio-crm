@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
 import Menu from '@mui/material/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
 import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
@@ -10,9 +11,13 @@ import GroupIcon from '@mui/icons-material/Group';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import CurrencyRubleIcon from '@mui/icons-material/CurrencyRuble';
+import Stack from '@mui/material/Stack';
+import IconButton from '@mui/material/IconButton/IconButton';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { useAppSelector } from '../shared/useAppSelector';
 import { useAppDispatch } from '../shared/useAppDispatch';
-import { setMobileMenuAnchorEl } from '../store/menuSlice';
+import { setFullWidth, setMobileMenuAnchorEl, setSmallWidth } from '../store/menuSlice';
 
 interface IMenuItem {
   icon: ReactNode;
@@ -96,6 +101,24 @@ function createMenuList() {
   );
 }
 
+export function MobileMenuIcon() {
+  const dispatch = useAppDispatch();
+
+  return (
+    <IconButton
+      id="openMenuBtn"
+      onClick={(event) => dispatch(setMobileMenuAnchorEl(event.currentTarget.id))}
+      size="large"
+      edge="start"
+      color="inherit"
+      aria-label="menu"
+      sx={{ mr: 2 }}
+    >
+      <MenuIcon />
+    </IconButton>
+  );
+}
+
 export function MobileMenu() {
   const anchorEl = useAppSelector((state) => state.menuReducer.mobileMenuAnchorEl);
   const dispatch = useAppDispatch();
@@ -110,6 +133,19 @@ export function MobileMenu() {
         { createMenuList() }
       </MenuList>
     </Menu>
+  );
+}
+
+export function DesktopMenuIcon() {
+  const width = useAppSelector((state) => state.menuReducer.width);
+  const dispatch = useAppDispatch();
+
+  return (
+    <Stack width={width} alignItems={width === 200 ? 'end' : 'start'}>
+      <IconButton onClick={ () => { dispatch(width === 200 ? setSmallWidth() : setFullWidth()); }} >
+        {width === 200 ? <ArrowBackIosIcon fontSize='large' htmlColor='#fff' /> : <ArrowForwardIosIcon fontSize='large' htmlColor='#fff' />}
+      </IconButton>
+    </Stack>
   );
 }
 
