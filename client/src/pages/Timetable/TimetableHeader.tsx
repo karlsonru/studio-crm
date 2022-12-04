@@ -1,7 +1,8 @@
 import {
   useState, useEffect, useRef, ChangeEvent,
 } from 'react';
-import { Grid, useMediaQuery } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Input from '@mui/material/Input';
@@ -110,9 +111,9 @@ function MonthSwitcher({ startDate, setDateHandler }: IDateSwitcher) {
 
 export function DateSwitcher({ startDate, setDateHandler }: IDateSwitcher) {
   return (
-    <>
+    <Grid container wrap='nowrap' justifyContent='flex-start' alignItems='center' margin={'1rem 0rem'}>
       <MonthSwitcher startDate={startDate} setDateHandler={setDateHandler} />
       <WeekSwitcher startDate={startDate} setDateHandler={setDateHandler} />
-    </>
+    </Grid>
   );
 }

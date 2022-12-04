@@ -1,12 +1,10 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  Grid,
-  useMediaQuery,
-} from '@mui/material';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import GroupIcon from '@mui/icons-material/Group';
-import { Box } from '@mui/system';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
 
 function convertToMinutes(time: number) {
   const hours = Math.floor(time / 100) - 9;
@@ -50,21 +48,6 @@ export function LessonCard({ lessonCardDetails }: { lessonCardDetails: ILessonMo
   const duration = (convertToMinutes(timeEnd) - convertToMinutes(timeStart));
   const shift = isMobile ? 0 : convertToMinutes(timeStart);
 
-  const subHeader = <Grid
-    container
-    wrap='nowrap'
-    justifyContent='space-between'
-    sx={{
-      padding: '4px',
-      whiteSpace: 'nowrap',
-    }}>
-      <span>{timeStartReadable} - {timeEndReadable}</span>
-      <Box>
-        <GroupIcon sx={{ marginBottom: '-4px', fontSize: { fontSize } }}/>
-        <span style={{ margin: '0px 4px' }}>{activeStudents}</span>
-      </Box>
-  </Grid>;
-
   return (
     <Card
       variant='outlined'
@@ -79,6 +62,7 @@ export function LessonCard({ lessonCardDetails }: { lessonCardDetails: ILessonMo
         margin: '0',
         overflow: 'hidden',
       }}>
+
       <CardHeader
         title={title}
         titleTypographyProps={{
@@ -95,23 +79,27 @@ export function LessonCard({ lessonCardDetails }: { lessonCardDetails: ILessonMo
         }}
         >
       </CardHeader>
+
       <CardContent sx={{
         margin: 0,
         padding: '0 4px',
         overflow: 'hidden',
       }}>
-        <Grid container direction='column' justifyItems='space-between'>
-          {subHeader}
-          <p style={{
-            margin: '0px',
-            padding: '4px',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-          }}>
-            {teacher.name}
-          </p>
-        </Grid>
+        <Stack spacing={0}>
+
+          <Stack direction='row' spacing={0} justifyContent='space-between' p='4px' whiteSpace='nowrap'>
+            <Typography component='span' fontSize={ fontSize }>{timeStartReadable} - {timeEndReadable}</Typography>
+            <Stack direction='row' spacing={0}>
+              <GroupIcon sx={{ marginBottom: '-4px', fontSize: { fontSize } }}/>
+              <Typography component='span' m={'0px 4px'} fontSize={ fontSize }>{activeStudents}</Typography>
+            </Stack>
+          </Stack>
+
+          <Typography paragraph m='0px' p='4px' textOverflow='ellipsis' whiteSpace='nowrap' fontSize={ fontSize }>{teacher.name ?? teacher}</Typography>
+
+        </Stack>
       </CardContent>
+
     </Card>
   );
 }

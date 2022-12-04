@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Grid } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import CircularProgress from '@mui/material/CircularProgress';
-import { DateSwitcher } from './DateSwitcher';
+import { DateSwitcher } from './TimetableHeader';
 import { DayColumns } from './DayColumns';
-import { ILessonModel } from './LessonCard';
+import { ILessonModel } from './TimetableLessonCard';
 import { TimeColumn } from './TimeColumn';
 import { useFetch } from '../../shared/useFetch';
 import { useDocTitle } from '../../shared/useDocTitle';
@@ -45,19 +45,19 @@ export function TimetablePage() {
     setStartDate(monday);
   }, []);
 
+  console.log(data?.payload);
+
   return (
-    <Grid container direction='column' justifyContent='flex-start' width='100%'>
-      <Grid container wrap='nowrap' justifyContent='flex-start' alignItems='center'>
-        <DateSwitcher startDate={startDate} setDateHandler={setStartDate} />
-      </Grid>
+    <>
+      <DateSwitcher startDate={startDate} setDateHandler={setStartDate} />
       <Grid container wrap="nowrap">
         {!isMobile && <TimeColumn />}
         {isLoading && <CircularProgress />}
-        {error && <span>Произошла ошибка</span>}
+        {error && <span>Произошла ошибка!</span>}
         {data?.payload
           && <DayColumns startDate={startDate} lessons={structureLessons(data.payload)} />
         }
       </Grid>
-  </Grid>
+    </>
   );
 }

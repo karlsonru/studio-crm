@@ -1,5 +1,7 @@
-import { Grid, useMediaQuery } from '@mui/material';
-import { ILessonModel, LessonCard } from './LessonCard';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { ILessonModel, LessonCard } from './TimetableLessonCard';
 
 function getDayName(day: number) {
   const dayNames: { [code: number]: string } = {
@@ -36,23 +38,24 @@ function DayColumn({ startDate, shift, lessons }: IDayColumn) {
   return (
     <Grid item
       padding='4px'
+      flex={1}
+      flexBasis='200px'
+      position='relative'
+      borderLeft='solid lightgrey'
       sx={{
-        flexBasis: '200px',
-        flex: 1,
-        position: 'relative',
-        borderLeft: 'solid lightgrey',
         borderWidth: '0px thin',
       }}
     >
-      <div
-      style={{
-        paddingLeft: '1rem',
-        marginBottom: '8px',
-        borderBottom: 'solid lightgrey',
-        borderWidth: '1px thin',
-      }}>
+      <Box
+        pl='1rem'
+        mb='8px'
+        borderBottom='solid lightgrey'
+        sx={{
+          borderWidth: '1px thin',
+        }}
+      >
         {getDayName(columnDate.getDay())},{!isMobile && <br />} {columnDate.toLocaleDateString('ru-RU')}
-      </div>
+      </Box>
       {lessons && lessons.map((lesson) => renderCard(columnDate, lesson))}
     </Grid>
   );
@@ -68,20 +71,16 @@ interface IDayColumns {
 export function DayColumns({ startDate, lessons }: IDayColumns) {
   const isMobile = useMediaQuery('(max-width: 767px)');
 
-  if (isMobile) {
-    return (
-      <Grid container wrap='nowrap' width='100%'>
-        <DayColumn startDate={startDate} shift={1} lessons={lessons[startDate.getDay()]}/>
-      </Grid>
-    );
-  }
-
   return (
     <Grid container wrap='nowrap' width='100%'>
-      {[0, 1, 2, 3, 4, 5, 6].map(
-        (num) => <DayColumn
-          key={+startDate + num} startDate={startDate} shift={num} lessons={lessons[num]} />,
-      )}
+      {isMobile
+        && <DayColumn startDate={startDate} shift={0} lessons={lessons[startDate.getDay()]} />}
+
+      {!isMobile
+        && [0, 1, 2, 3, 4, 5, 6].map(
+          (num) => <DayColumn
+            key={+startDate + num} startDate={startDate} shift={num} lessons={lessons[num]} />,
+        )}
     </Grid>
   );
 }
