@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 
-export function useDocTitle(title: string): [string, React.Dispatch<React.SetStateAction<string>>] {
-  const [doctitle, setDocTitle] = useState(title);
+export function useDocTitle(title?: string) {
+  if (!title) return document.title;
 
   useEffect(() => {
-    document.title = doctitle;
-  }, [doctitle]);
+    document.title = title;
+  }, [title]);
 
-  return [doctitle, setDocTitle];
+  return title;
 }

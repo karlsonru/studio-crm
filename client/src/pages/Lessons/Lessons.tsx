@@ -1,9 +1,15 @@
-import { useDocTitle } from 'shared/useDocTitle';
+import { useEffect } from 'react';
 import { LessonsHeader } from './LessonsHeader';
 import { LessonsContent } from './LessonsContent';
+import { useAppDispatch } from '../../shared/useAppDispatch';
+import { setPageTitle } from '../../store/menuSlice';
 
 export function LessonsPage() {
-  useDocTitle('Занятия');
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(setPageTitle('Занятия'));
+  }, []);
 
   return (
     <>

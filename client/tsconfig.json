@@ -30,6 +30,7 @@
     "esm": true
   },
   "include": [
+    "src/**/*.ts",
     "src/**/*.tsx",
     ".eslintrc.json"
   ],

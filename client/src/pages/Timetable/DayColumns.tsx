@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { ILessonModel, LessonCard } from './TimetableLessonCard';
+import { ILessonModel, LessonCard } from './TimetableCard';
 
 function getDayName(day: number) {
   const dayNames: { [code: number]: string } = {
