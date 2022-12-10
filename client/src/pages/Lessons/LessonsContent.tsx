@@ -8,75 +8,65 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import DeleteIcon from '@mui/icons-material/Delete';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useFetch } from '../../shared/useFetch';
-import { useAppSelector } from '../../shared/useAppSelector';
-
-interface ILessonModel {
-  _id: string;
-  title: string;
-  day: number;
-  teacher: {
-    name: string;
-    _id: string;
-  };
-  timeStart: number;
-  timeEnd: number;
-  activeStudents: number;
-  dateFrom: number;
-  dateTo: number;
-  isActive: boolean;
-}
+import IconButton from '@mui/material/IconButton';
+import { TableHeader } from './LessonTableHeader';
+import { useFetch } from '../../shared/hooks/useFetch';
+import { useAppSelector } from '../../shared/hooks/useAppSelector';
+import { ILessonModel } from '../../shared/models/ILessonModes';
 
 interface ILessons {
   message: string;
   payload: Array<ILessonModel>;
 }
 
-const headCells = [
-  {
-    id: 'title',
-    label: 'Название',
-  },
-  {
-    id: 'type',
-    label: 'Тип',
-  },
-  {
-    id: 'activeStudents',
-    label: 'Ученики',
-  },
-  {
-    id: 'isActive',
-    label: 'Статус',
-  },
-  {
-    id: 'remove',
-    label: '',
-  },
-];
-
-function createCells(id: string, args: (string | number | JSX.Element)[]) {
-  return args.map((value) => <TableCell key={id + value}>{value}</TableCell>);
+function getDayName(day: number) {
+  const dayNames: { [code: number]: string } = {
+    0: 'Воскресенье',
+    1: 'Понедельник',
+    2: 'Вторник',
+    3: 'Среда',
+    4: 'Четверг',
+    5: 'Пятница',
+    6: 'Суббота',
+  };
+  return dayNames[day];
 }
 
-function createRow(cells: JSX.Element[]) {
+function createRow(id: string, args: (string | number | JSX.Element)[]) {
   return (
     <TableRow>
-      { cells }
+      { args.map((value) => <TableCell key={id + value}>{value}</TableCell>) }
     </TableRow>
   );
+}
+
+function getArgumentsFromLesson(lesson: ILessonModel, isMobile: boolean) {
+  if (isMobile) {
+    return [lesson.title, lesson.activeStudents];
+  }
+
+  return ([
+    lesson.title,
+    getDayName(lesson.day),
+    'Группа',
+    lesson.activeStudents,
+    lesson.isActive ? 'Активна' : 'В архиве',
+    <IconButton><DeleteIcon /></IconButton>,
+  ]);
 }
 
 export function LessonsContent() {
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [page, setPage] = useState(0);
   const [rowsNumber, setRowsNumbr] = useState(10);
+  const [sortBy, setSortBy] = useState('');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+
   const { data, isLoading, error } = useFetch<ILessons>({ url: '/lesson' });
   const lessonSelector = useAppSelector((state) => state.lessonPageReduer);
 
   if (isLoading || !data?.payload) {
     return null;
-    // return <h1>Loading ... </h1>;
   }
 
   if (error) {
@@ -93,20 +83,9 @@ export function LessonsContent() {
   });
 
   const filteredRows = filteredData.map((lesson) => {
-    const args = isMobile
-      ? [lesson.title, lesson.activeStudents]
-      : [lesson.title, 'Группа', lesson.activeStudents, lesson.isActive ? 'Активна' : 'В архиве', <DeleteIcon />];
-
-    const cells = createCells(lesson._id, args);
-    return createRow(cells);
+    const args = getArgumentsFromLesson(lesson, isMobile);
+    return createRow(lesson._id, args);
   });
-
-  const headerCells = isMobile
-    ? [
-      <TableCell>Название</TableCell>,
-      <TableCell>Ученики</TableCell>,
-    ]
-    : headCells.map((cell) => <TableCell key={cell.id}>{cell.label}</TableCell>);
 
   const rowsStartIdx = page === 0 ? 0 : page * rowsNumber;
   const rowsEndIdx = page === 0 ? rowsNumber : (page + 1) * rowsNumber;
@@ -116,7 +95,11 @@ export function LessonsContent() {
       <TableContainer>
         <Table>
           <TableHead>
-            { createRow(headerCells) }
+            <TableHeader
+              sortable={new Set(['day', 'activeStudents'])}
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+            />
           </TableHead>
           <TableBody>
             { filteredRows.slice(rowsStartIdx, rowsEndIdx) }

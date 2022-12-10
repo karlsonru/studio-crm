@@ -1,13 +1,13 @@
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Stack from '@mui/material/Stack';
 import { Outlet } from 'react-router-dom';
-import { AppHeader } from 'components/AppHeader';
+import { AppHeader } from 'shared/components/AppHeader';
 import {
   SideMenu,
   MobileMenu,
   MobileMenuIcon,
   DesktopMenuIcon,
-} from '../components/Menu';
+} from '../shared/components/Menu';
 // import { StickyFooter } from '../components/StickyFooter';
 
 export function Layout() {

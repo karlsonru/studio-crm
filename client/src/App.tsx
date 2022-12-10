@@ -1,6 +1,6 @@
 import { ThemeProvider } from '@mui/material/styles';
 import { Provider } from 'react-redux';
-import store from './store/store';
+import store from './shared/store';
 import { defaultTheme } from './shared/theme';
 import { Router } from './Router';
 

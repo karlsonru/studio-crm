@@ -5,6 +5,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import GroupIcon from '@mui/icons-material/Group';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
+import { ILessonModel } from '../../shared/models/ILessonModes';
 
 function convertToMinutes(time: number) {
   const hours = Math.floor(time / 100) - 9;
@@ -19,22 +20,7 @@ function convertToReadbleTime(time: number) {
   return `${hours}:${minutes}`;
 }
 
-export interface ILessonModel {
-  _id: string;
-  title: string;
-  day: number;
-  teacher: {
-    name: string;
-    _id: string;
-  };
-  timeStart: number;
-  timeEnd: number;
-  activeStudents: number;
-  dateFrom: number;
-  dateTo: number;
-}
-
-export function LessonCard({ lessonCardDetails }: { lessonCardDetails: ILessonModel }) {
+export function TimetableLessonCard({ lessonCardDetails }: { lessonCardDetails: ILessonModel }) {
   const {
     title, teacher, timeStart, timeEnd, activeStudents,
   } = lessonCardDetails;

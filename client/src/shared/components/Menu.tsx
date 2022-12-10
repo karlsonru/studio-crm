@@ -15,9 +15,9 @@ import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton/IconButton';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { useAppSelector } from '../shared/useAppSelector';
-import { useAppDispatch } from '../shared/useAppDispatch';
-import { setFullWidth, setMobileMenuAnchorEl, setSmallWidth } from '../store/slices/appMenuSlice';
+import { useAppSelector } from '../hooks/useAppSelector';
+import { useAppDispatch } from '../hooks/useAppDispatch';
+import { setFullWidth, setMobileMenuAnchorEl, setSmallWidth } from '../reducers/appMenuSlice';
 
 interface IMenuItem {
   icon: ReactNode;

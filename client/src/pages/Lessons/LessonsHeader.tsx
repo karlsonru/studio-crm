@@ -8,9 +8,9 @@ import Button from '@mui/material/Button';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import Grid from '@mui/material/Grid';
-import { setLessonActiveStatusFilter, setLessonSizeFilter, setLessonTitleFilter } from 'store/slices/lessonPageSlice';
-import { useAppSelector } from '../../shared/useAppSelector';
-import { useAppDispatch } from '../../shared/useAppDispatch';
+import { setLessonActiveStatusFilter, setLessonSizeFilter, setLessonTitleFilter } from 'shared/reducers/lessonPageSlice';
+import { useAppSelector } from '../../shared/hooks/useAppSelector';
+import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 
 function FilterButtons() {
   const lessonSelector = useAppSelector((state) => state.lessonPageReduer);

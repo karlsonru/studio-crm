@@ -4,11 +4,11 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import CircularProgress from '@mui/material/CircularProgress';
 import { DateSwitcher } from './TimetableHeader';
 import { DayColumns } from './DayColumns';
-import { ILessonModel } from './TimetableCard';
 import { TimeColumn } from './TimeColumn';
-import { useFetch } from '../../shared/useFetch';
-import { useAppDispatch } from '../../shared/useAppDispatch';
-import { setPageTitle } from '../../store/slices/appMenuSlice';
+import { useFetch } from '../../shared/hooks/useFetch';
+import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
+import { setPageTitle } from '../../shared/reducers/appMenuSlice';
+import { ILessonModel } from '../../shared/models/ILessonModes';
 
 interface ILessons {
   message: string;

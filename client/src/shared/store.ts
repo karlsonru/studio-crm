@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
-import menuReducer from './slices/appMenuSlice';
-import lessonPageReduer from './slices/lessonPageSlice';
+import menuReducer from './reducers/appMenuSlice';
+import lessonPageReduer from './reducers/lessonPageSlice';
 
 const store = configureStore({
   reducer: {

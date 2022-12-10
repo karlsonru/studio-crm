@@ -1,7 +1,8 @@
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { ILessonModel, LessonCard } from './TimetableCard';
+import { TimetableLessonCard } from './TimetableCard';
+import { ILessonModel } from '../../shared/models/ILessonModes';
 
 function getDayName(day: number) {
   const dayNames: { [code: number]: string } = {
@@ -27,7 +28,7 @@ function renderCard(date: Date, lesson: ILessonModel) {
     return;
   }
 
-  return <LessonCard key={lesson._id} lessonCardDetails={lesson} />;
+  return <TimetableLessonCard key={lesson._id} lessonCardDetails={lesson} />;
 }
 
 function DayColumn({ startDate, shift, lessons }: IDayColumn) {

@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import AppBar from '@mui/material/AppBar';
 import { Toolbar, Typography } from '@mui/material';
-import { useAppSelector } from '../shared/useAppSelector';
+import { useAppSelector } from '../hooks/useAppSelector';
 
 export function AppHeader({ menuIcon }: { menuIcon: ReactNode }) {
   const title = useAppSelector((state) => state.menuReducer.title);
