@@ -2,25 +2,43 @@ import { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
-import Select from '@mui/material/Select';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import Grid from '@mui/material/Grid';
+import { setLessonActiveStatusFilter, setLessonSizeFilter, setLessonTitleFilter } from 'store/slices/lessonPageSlice';
+import { useAppSelector } from '../../shared/useAppSelector';
+import { useAppDispatch } from '../../shared/useAppDispatch';
 
-const FilterButtons = () => (
-  <>
-    <Select label="Тип" value="groups" sx={{ m: '0rem 0.25rem' }}>
-      <MenuItem value="groups">Группа</MenuItem>
-      <MenuItem value="individuals">Индивидуальные</MenuItem>
-    </Select>
-    <Select value="active" sx={{ m: '0rem 0.25rem' }}>
-      <MenuItem value="active">Активные</MenuItem>
-      <MenuItem value="inactive">В архиве</MenuItem>
-    </Select>
-  </>
-);
+function FilterButtons() {
+  const lessonSelector = useAppSelector((state) => state.lessonPageReduer);
+  const dispatch = useAppDispatch();
+
+  const { lessonSizeFilter, lessonActiveStatusFilter } = lessonSelector;
+
+  const lessonSizeFilterChangeHandler = (event: SelectChangeEvent) => {
+    dispatch(setLessonSizeFilter(event.target.value));
+  };
+
+  const lessonActiveStatusFilterChangeHandler = (event: SelectChangeEvent) => {
+    dispatch(setLessonActiveStatusFilter(event.target.value));
+  };
+
+  return (
+    <>
+      <Select label="Тип" value={lessonSizeFilter} sx={{ m: '0rem 0.25rem' }} onChange={lessonSizeFilterChangeHandler}>
+        <MenuItem value="groups">Группа</MenuItem>
+        <MenuItem value="individuals">Индивидуальные</MenuItem>
+      </Select>
+      <Select value={lessonActiveStatusFilter} sx={{ m: '0rem 0.25rem' }} onChange={lessonActiveStatusFilterChangeHandler}>
+        <MenuItem value="active">Активные</MenuItem>
+        <MenuItem value="archived">В архиве</MenuItem>
+      </Select>
+    </>
+  );
+}
 
 const FilterButtonsWrapped = () => (
   <Grid item width='100%' justifyContent='space-around'>
@@ -31,6 +49,8 @@ const FilterButtonsWrapped = () => (
 export function LessonsHeader() {
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [isFiltersOpen, setFiltersOpen] = useState(false);
+  const lessonSelector = useAppSelector((state) => state.lessonPageReduer);
+  const dispatch = useAppDispatch();
 
   const toggleFilterButtons = () => {
     setFiltersOpen((isOpen) => !isOpen);
@@ -42,12 +62,20 @@ export function LessonsHeader() {
     </Button>
   );
 
+  const { lessonTitleFilter } = lessonSelector;
+
+  const titleFilterChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setLessonTitleFilter(event.target.value));
+  };
+
   return (
     <header style={{ margin: '1rem 0rem' }}>
       <Grid container justifyContent="space-between" alignItems="center" spacing={1}>
         <Grid item>
           <TextField
             placeholder = 'Поиск'
+            value = { lessonTitleFilter }
+            onChange = { titleFilterChangeHandler }
             InputProps = {{
               startAdornment: (
                 <InputAdornment position="start">

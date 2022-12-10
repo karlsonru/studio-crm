@@ -21,7 +21,7 @@ export function Layout() {
       <AppHeader menuIcon={menuIcon} />
       <Stack direction={isMobile ? 'column' : 'row'} spacing={1}>
         { menu }
-        <Stack direction='column' width='100%' p={1}>
+        <Stack direction='column' width='100%' p={isMobile ? 1 : 2} overflow='hidden'>
           <Outlet />
         </Stack>
       </Stack>

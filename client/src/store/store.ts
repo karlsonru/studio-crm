@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
-import menuReducer from './menuSlice';
+import menuReducer from './slices/appMenuSlice';
+import lessonPageReduer from './slices/lessonPageSlice';
 
 const store = configureStore({
   reducer: {
     menuReducer,
+    lessonPageReduer,
   },
 });
 

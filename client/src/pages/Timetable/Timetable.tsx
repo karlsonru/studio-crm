@@ -8,7 +8,7 @@ import { ILessonModel } from './TimetableCard';
 import { TimeColumn } from './TimeColumn';
 import { useFetch } from '../../shared/useFetch';
 import { useAppDispatch } from '../../shared/useAppDispatch';
-import { setPageTitle } from '../../store/menuSlice';
+import { setPageTitle } from '../../store/slices/appMenuSlice';
 
 interface ILessons {
   message: string;

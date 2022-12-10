@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -7,8 +8,8 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import DeleteIcon from '@mui/icons-material/Delete';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useFetch } from 'shared/useFetch';
-import { useState } from 'react';
+import { useFetch } from '../../shared/useFetch';
+import { useAppSelector } from '../../shared/useAppSelector';
 
 interface ILessonModel {
   _id: string;
@@ -69,18 +70,33 @@ function createRow(cells: JSX.Element[]) {
 export function LessonsContent() {
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [page, setPage] = useState(0);
+  const [rowsNumber, setRowsNumbr] = useState(10);
   const { data, isLoading, error } = useFetch<ILessons>({ url: '/lesson' });
+  const lessonSelector = useAppSelector((state) => state.lessonPageReduer);
 
   if (isLoading || !data?.payload) {
-    return <h1>Loading ... </h1>;
+    return null;
+    // return <h1>Loading ... </h1>;
   }
 
   if (error) {
     return <h1>Error!!! </h1>;
   }
 
-  const rows = data.payload.map((lesson) => {
-    const args = isMobile ? [lesson.title, lesson.activeStudents] : [lesson.title, 'Группа', lesson.activeStudents, 'Активна', <DeleteIcon />];
+  const { lessonSizeFilter, lessonActiveStatusFilter, lessonTitleFilter } = lessonSelector;
+
+  const filteredData = data.payload.filter((lesson) => {
+    const activeFilter = lessonActiveStatusFilter === 'active';
+    return lesson.isActive === activeFilter
+      && lesson.title.toLowerCase().includes(lessonTitleFilter.toLocaleLowerCase())
+      && lessonSizeFilter;
+  });
+
+  const filteredRows = filteredData.map((lesson) => {
+    const args = isMobile
+      ? [lesson.title, lesson.activeStudents]
+      : [lesson.title, 'Группа', lesson.activeStudents, lesson.isActive ? 'Активна' : 'В архиве', <DeleteIcon />];
+
     const cells = createCells(lesson._id, args);
     return createRow(cells);
   });
@@ -92,6 +108,9 @@ export function LessonsContent() {
     ]
     : headCells.map((cell) => <TableCell key={cell.id}>{cell.label}</TableCell>);
 
+  const rowsStartIdx = page === 0 ? 0 : page * rowsNumber;
+  const rowsEndIdx = page === 0 ? rowsNumber : (page + 1) * rowsNumber;
+
   return (
     <>
       <TableContainer>
@@ -100,17 +119,29 @@ export function LessonsContent() {
             { createRow(headerCells) }
           </TableHead>
           <TableBody>
-            {rows}
+            { filteredRows.slice(rowsStartIdx, rowsEndIdx) }
           </TableBody>
         </Table>
       </TableContainer>
       <TablePagination
         component='div'
-        align='right'
-        rowsPerPage={10}
-        count={data.payload.length}
+        labelRowsPerPage={ isMobile ? 'Строк' : 'Показать строк' }
+        rowsPerPage={rowsNumber}
+        rowsPerPageOptions={[5, 10, 20]}
+        count={filteredRows.length}
         page={page}
+        backIconButtonProps={{
+          disabled: page === 0,
+        }}
         onPageChange={(event, pageNum) => setPage(pageNum)}
+        onRowsPerPageChange={(event) => {
+          setRowsNumbr(+event.target.value);
+          setPage(0);
+        }}
+        sx={{
+          display: 'inline-block',
+          alignSelf: isMobile ? 'center' : 'right',
+        }}
       />
     </>
   );
