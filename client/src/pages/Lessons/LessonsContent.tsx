@@ -34,7 +34,7 @@ function getDayName(day: number) {
 
 function createRow(id: string, args: (string | number | JSX.Element)[]) {
   return (
-    <TableRow>
+    <TableRow key={id}>
       { args.map((value) => <TableCell key={id + value}>{value}</TableCell>) }
     </TableRow>
   );
@@ -82,6 +82,11 @@ export function LessonsContent() {
       && lessonSizeFilter;
   });
 
+  if (sortBy) {
+    // @ts-ignore
+    filteredData.sort((objA, objB) => (sortOrder === 'asc' ? objB[sortBy] - objA[sortBy] : objA[sortBy] - objB[sortBy]));
+  }
+
   const filteredRows = filteredData.map((lesson) => {
     const args = getArgumentsFromLesson(lesson, isMobile);
     return createRow(lesson._id, args);
@@ -96,9 +101,11 @@ export function LessonsContent() {
         <Table>
           <TableHead>
             <TableHeader
-              sortable={new Set(['day', 'activeStudents'])}
+              sortIds={new Set(['day', 'activeStudents'])}
               sortBy={sortBy}
+              setSortBy={setSortBy}
               sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
             />
           </TableHead>
           <TableBody>

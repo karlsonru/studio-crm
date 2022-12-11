@@ -2,6 +2,7 @@ import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import React from 'react';
 
 const tableHeaderCells = [
   {
@@ -30,13 +31,32 @@ const tableHeaderCells = [
   },
 ];
 
-export function TableHeader(
-  { sortable, sortBy, sortOrder }: { sortable: Set<string>, sortBy: string, sortOrder: 'asc' | 'desc' },
-) {
+interface ITableHeader {
+  sortIds: Set<string>;
+  sortBy: string;
+  setSortBy: (value: string) => void;
+  sortOrder: 'asc' | 'desc';
+  setSortOrder: (value: 'asc' | 'desc') => void;
+}
+
+export function TableHeader({
+  sortIds, sortBy, setSortBy, sortOrder, setSortOrder,
+}: ITableHeader) {
   const isMobile = useMediaQuery('(max-width: 767px)');
 
+  const clickSortHandler = (event: React.MouseEvent) => {
+    const elem = event.target as HTMLElement;
+
+    if (elem.id === sortBy) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(elem.id);
+      setSortOrder('desc');
+    }
+  };
+
   const renderHeaderCell = (cell: { id: string, label: string }) => {
-    if (!sortable.has(cell.id)) {
+    if (!sortIds.has(cell.id)) {
       return <TableCell key={cell.id}>{cell.label}</TableCell>;
     }
 
@@ -45,8 +65,9 @@ export function TableHeader(
         key={cell.id}
         sortDirection={ sortBy === cell.id ? sortOrder : 'asc' }>
         <TableSortLabel
-          active={ true }
+          id={cell.id}
           direction={ sortBy === cell.id ? sortOrder : 'asc' }
+          onClick={clickSortHandler}
         >
           { cell.label }
         </TableSortLabel>
