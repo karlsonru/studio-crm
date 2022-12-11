@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -13,6 +13,7 @@ import { TableHeader } from './LessonTableHeader';
 import { useFetch } from '../../shared/hooks/useFetch';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { ILessonModel } from '../../shared/models/ILessonModes';
+import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 
 interface ILessons {
   message: string;
@@ -40,7 +41,11 @@ function createRow(id: string, args: (string | number | JSX.Element)[]) {
   );
 }
 
-function getArgumentsFromLesson(lesson: ILessonModel, isMobile: boolean) {
+function getRowArguments(
+  lesson: ILessonModel,
+  isMobile: boolean,
+  deleteLessonHandler: (lesson: ILessonModel) => void,
+) {
   if (isMobile) {
     return [lesson.title, lesson.activeStudents];
   }
@@ -51,16 +56,25 @@ function getArgumentsFromLesson(lesson: ILessonModel, isMobile: boolean) {
     'Группа',
     lesson.activeStudents,
     lesson.isActive ? 'Активна' : 'В архиве',
-    <IconButton><DeleteIcon /></IconButton>,
+    // eslint-disable-next-line max-len
+    <IconButton onClick={() => deleteLessonHandler(lesson)}><DeleteIcon /></IconButton>,
   ]);
 }
 
 export function LessonsContent() {
   const isMobile = useMediaQuery('(max-width: 767px)');
+  const [isModalOpen, setModalOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsNumber, setRowsNumbr] = useState(10);
   const [sortBy, setSortBy] = useState('');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [lessonDetails, setLessonDetails] = useState<ILessonModel | null>(null);
+
+  const deleteLessonHandler = useCallback((currentLesson: ILessonModel) => {
+    console.log(currentLesson);
+    setLessonDetails(currentLesson);
+    setModalOpen(true);
+  }, [setModalOpen, setLessonDetails]);
 
   const { data, isLoading, error } = useFetch<ILessons>({ url: '/lesson' });
   const lessonSelector = useAppSelector((state) => state.lessonPageReduer);
@@ -88,7 +102,7 @@ export function LessonsContent() {
   }
 
   const filteredRows = filteredData.map((lesson) => {
-    const args = getArgumentsFromLesson(lesson, isMobile);
+    const args = getRowArguments(lesson, isMobile, deleteLessonHandler);
     return createRow(lesson._id, args);
   });
 
@@ -132,6 +146,12 @@ export function LessonsContent() {
           display: 'inline-block',
           alignSelf: isMobile ? 'center' : 'right',
         }}
+      />
+      <ConfirmationDialog
+        title='Удалить занятие'
+        contentEl={<DeleteDialogText name={lessonDetails?.title || ''} />}
+        isOpen={isModalOpen}
+        setModalOpen={setModalOpen}
       />
     </>
   );

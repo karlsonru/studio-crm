@@ -11,6 +11,8 @@ import Grid from '@mui/material/Grid';
 import { setLessonActiveStatusFilter, setLessonSizeFilter, setLessonTitleFilter } from 'shared/reducers/lessonPageSlice';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
+import { ConfirmationDialog } from '../../shared/components/ConfirmationDialog';
+import { CreateLessonForm } from '../../shared/components/CreateLessonForm';
 
 function FilterButtons() {
   const lessonSelector = useAppSelector((state) => state.lessonPageReduer);
@@ -48,6 +50,7 @@ const FilterButtonsWrapped = () => (
 
 export function LessonsHeader() {
   const isMobile = useMediaQuery('(max-width: 767px)');
+  const [isModalOpen, setModalOpen] = useState(false);
   const [isFiltersOpen, setFiltersOpen] = useState(false);
   const lessonSelector = useAppSelector((state) => state.lessonPageReduer);
   const dispatch = useAppDispatch();
@@ -69,28 +72,31 @@ export function LessonsHeader() {
   };
 
   return (
-    <header style={{ margin: '1rem 0rem' }}>
-      <Grid container justifyContent="space-between" alignItems="center" spacing={1}>
-        <Grid item>
-          <TextField
-            placeholder = 'Поиск'
-            value = { lessonTitleFilter }
-            onChange = { titleFilterChangeHandler }
-            InputProps = {{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }} />
-          { !isMobile && <FilterButtons /> }
-          { isMobile && <MobileFilterButton />}
+    <>
+      <header style={{ margin: '1rem 0rem' }}>
+        <Grid container justifyContent="space-between" alignItems="center" spacing={1}>
+          <Grid item>
+            <TextField
+              placeholder = 'Поиск'
+              value = { lessonTitleFilter }
+              onChange = { titleFilterChangeHandler }
+              InputProps = {{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }} />
+            { !isMobile && <FilterButtons /> }
+            { isMobile && <MobileFilterButton />}
+          </Grid>
+            { isMobile && isFiltersOpen && <FilterButtonsWrapped /> }
+          <Grid item>
+            <Button variant="contained" size="large" onClick={() => setModalOpen(true)}>Добавить</Button>
+          </Grid>
         </Grid>
-          { isMobile && isFiltersOpen && <FilterButtonsWrapped /> }
-        <Grid item>
-          <Button variant="contained" size="large">Добавить</Button>
-        </Grid>
-      </Grid>
-    </header>
+      </header>
+      <ConfirmationDialog title='Добавить занятие' contentEl={<CreateLessonForm />} isOpen={isModalOpen} setModalOpen={setModalOpen} />
+    </>
   );
 }
