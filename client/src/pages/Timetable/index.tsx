@@ -1,0 +1,1 @@
+export { TimetablePage } from './Timetable';

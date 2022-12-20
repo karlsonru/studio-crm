@@ -1,0 +1,34 @@
+{
+  "type": "module",
+  "name": "studio-app",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "build": "tsc",
+    "start": "node -r dotenv/config --experimental-specifier-resolution=node .",
+    "prestart": "npm run build",
+    "server": "npm run server --prefix backend",
+    "client": "npm run start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/karlsonru/studio-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/karlsonru/studio-app/issues"
+  },
+  "homepage": "https://github.com/karlsonru/studio-app#readme",
+  "devDependencies": {
+    "@types/react-redux": "^7.1.24",
+    "concurrently": "^7.6.0",
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3"
+  }
+}
