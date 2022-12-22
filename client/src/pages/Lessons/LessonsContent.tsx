@@ -71,7 +71,6 @@ export function LessonsContent() {
   const [lessonDetails, setLessonDetails] = useState<ILessonModel | null>(null);
 
   const deleteLessonHandler = useCallback((currentLesson: ILessonModel) => {
-    console.log(currentLesson);
     setLessonDetails(currentLesson);
     setModalOpen(true);
   }, [setModalOpen, setLessonDetails]);

@@ -39,7 +39,7 @@ export function ConfirmationDialog(
   };
 
   return (
-    <Dialog open={isOpen} maxWidth='lg' transitionDuration={500} onClose={() => setModalOpen(false)}>
+    <Dialog open={isOpen} maxWidth='xl' transitionDuration={500} onClose={() => setModalOpen(false)}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         { contentEl }

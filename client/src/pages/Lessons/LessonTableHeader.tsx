@@ -66,6 +66,7 @@ export function TableHeader({
         sortDirection={ sortBy === cell.id ? sortOrder : 'asc' }>
         <TableSortLabel
           id={cell.id}
+          active={ sortBy === cell.id }
           direction={ sortBy === cell.id ? sortOrder : 'asc' }
           onClick={clickSortHandler}
         >
