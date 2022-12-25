@@ -11,8 +11,7 @@ import Grid from '@mui/material/Grid';
 import { setLessonActiveStatusFilter, setLessonSizeFilter, setLessonTitleFilter } from 'shared/reducers/lessonPageSlice';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
-import { ConfirmationDialog } from '../../shared/components/ConfirmationDialog';
-import { CreateLessonForm } from '../../shared/components/CreateLessonForm';
+import { CreateLessonModal } from '../../shared/components/CreateLessonModal';
 
 function FilterButtons() {
   const lessonSelector = useAppSelector((state) => state.lessonPageReduer);
@@ -96,7 +95,7 @@ export function LessonsHeader() {
           </Grid>
         </Grid>
       </header>
-      <ConfirmationDialog title='Добавить занятие' contentEl={<CreateLessonForm />} isOpen={isModalOpen} setModalOpen={setModalOpen} />
+      <CreateLessonModal isOpen={isModalOpen} setModalOpen={setModalOpen} />
     </>
   );
 }
