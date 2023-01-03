@@ -19,8 +19,8 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
-import { getDayName } from '../helpers/getDayName';
 import { useMediaQuery } from '@mui/material';
+import { getDayName } from '../helpers/getDayName';
 
 /*
 {

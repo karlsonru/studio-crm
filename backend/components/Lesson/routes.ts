@@ -9,7 +9,7 @@ const middlewares = {
   post: [checkCreateLesson, injectQuery(['location', 'day', 'timeStart', 'teacher'])],
 };
 
-const service = new LessonServices(Lesson);
+const service = new LessonServices(Lesson, [{ path: 'teacher', select: '-password' }, 'location']);
 const controller = new LessonController(service);
 
 const lessonRouter = createBasicRouterWithDefaultMiddlewares(controller, middlewares);

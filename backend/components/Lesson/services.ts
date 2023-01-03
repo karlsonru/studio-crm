@@ -15,7 +15,10 @@ export class LessonServices extends BasicServices {
       day: bodyQuery.day,
     };
 
-    const result = await this.db.find(query).populate('teacher').limit(limit).sort({ timeStart: 1 });
+    const result = await this.db.find(query)
+      .populate(this.populateQuery)
+      .limit(limit)
+      .sort({ timeStart: 1 });
 
     return result;
   };

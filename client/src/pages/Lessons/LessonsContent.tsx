@@ -80,6 +80,7 @@ export function LessonsContent() {
     return <h1>Error!!! </h1>;
   }
 
+  console.log(data);
   const { lessonSizeFilter, lessonActiveStatusFilter, lessonTitleFilter } = lessonSelector;
 
   const filteredData = data.payload.filter((lesson) => {
