@@ -5,15 +5,10 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { DateSwitcher } from './TimetableHeader';
 import { DayColumns } from './DayColumns';
 import { TimeColumn } from './TimeColumn';
-import { useFetch } from '../../shared/hooks/useFetch';
+import { useGetLessonsQuery } from '../../shared/reducers/api';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
 import { ILessonModel } from '../../shared/models/ILessonModes';
-
-interface ILessons {
-  message: string;
-  payload: Array<ILessonModel>;
-}
 
 function structureLessons(lessons: ILessonModel[]) {
   const lessonsObj = {} as { [index: number]: ILessonModel[] };
@@ -33,7 +28,7 @@ export function TimetablePage() {
   const dispatch = useAppDispatch();
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [startDate, setStartDate] = useState(new Date());
-  const { isLoading, data, error } = useFetch<ILessons>({ url: '/lesson' });
+  const { isLoading, data, error } = useGetLessonsQuery();
 
   useEffect(() => {
     if (startDate.getDay() === 1) return;

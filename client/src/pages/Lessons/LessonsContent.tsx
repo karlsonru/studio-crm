@@ -10,15 +10,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import { TableHeader } from './LessonTableHeader';
-import { useFetch } from '../../shared/hooks/useFetch';
+import { useGetLessonsQuery } from '../../shared/reducers/api';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { ILessonModel } from '../../shared/models/ILessonModes';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
-
-interface ILessons {
-  message: string;
-  payload: Array<ILessonModel>;
-}
 
 function getDayName(day: number) {
   const dayNames: { [code: number]: string } = {
@@ -56,7 +51,6 @@ function getRowArguments(
     'Группа',
     lesson.activeStudents,
     lesson.isActive ? 'Активна' : 'В архиве',
-    // eslint-disable-next-line max-len
     <IconButton onClick={() => deleteLessonHandler(lesson)}><DeleteIcon /></IconButton>,
   ]);
 }
@@ -75,7 +69,7 @@ export function LessonsContent() {
     setModalOpen(true);
   }, [setModalOpen, setLessonDetails]);
 
-  const { data, isLoading, error } = useFetch<ILessons>({ url: '/lesson' });
+  const { data, isLoading, error } = useGetLessonsQuery();
   const lessonSelector = useAppSelector((state) => state.lessonPageReduer);
 
   if (isLoading || !data?.payload) {

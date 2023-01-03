@@ -20,6 +20,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
 import { useMediaQuery } from '@mui/material';
 import { getDayName } from '../helpers/getDayName';
+import { useCreateLessonMutation } from '../reducers/api';
 
 /*
 {
@@ -80,6 +81,9 @@ function validateFrom(formData: IFormData) {
 export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) {
   const isMobile = useMediaQuery('(max-width: 767px)');
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [createLesson, { isSuccess, isError, data }] = useCreateLessonMutation();
+
   const [isValidTitle, setValidTitle] = useState(true);
   const [isValidEndTime, setValidEndTime] = useState(true);
   const [isValidEndDate, setValidEndDate] = useState(true);
@@ -96,7 +100,6 @@ export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) 
     event.preventDefault();
     const form = event.currentTarget as HTMLFormElement;
     const formData = Object.fromEntries(new FormData(form).entries());
-    console.log(formData);
 
     setValidTitle(true);
     setValidEndTime(true);
@@ -106,8 +109,9 @@ export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) 
     const { isValid, type } = validateFrom(formData);
 
     if (isValid) {
-      console.log('valid');
       form.reset();
+      // @ts-ignore
+      createLesson(formData);
       return null;
     }
 

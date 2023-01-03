@@ -18,7 +18,6 @@ import InputLabel from '@mui/material/InputLabel';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import Button from '@mui/material/Button';
-import Divider from '@mui/material/Divider';
 import DialogActions from '@mui/material/DialogActions';
 import { getDayName } from '../helpers/getDayName';
 import { useMediaQuery } from '@mui/material';
@@ -45,7 +44,7 @@ interface ICreateLessonModal {
 
 const now = new Date();
 
-const deafultValues = {
+const defaultValues = {
   title: '',
   size: 'group',
   day: now.getDay(),
@@ -60,11 +59,7 @@ const deafultValues = {
 export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) {
   const isMobile = useMediaQuery('(max-width: 767px)');
 
-  const {
-    register,
-    handleSubmit,
-    control,
-  } = useForm();
+  const { register, handleSubmit, control } = useForm({ defaultValues });
 
   const handleClose = () => {
     setModalOpen(false);
@@ -86,12 +81,6 @@ export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) 
       <DialogTitle>Добавить занятие</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(handleOk)} style={{ paddingTop: '0.5rem' }}>
-          <Controller
-            name='title'
-            control={control}
-            render={({ field }) => <TextField fullWidth {...field} label="Занятие" placeholder="Занятие" required />}
-          />
-
           <TextField
             {...register('title')}
             name='title'
@@ -100,8 +89,6 @@ export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) 
             autoFocus
             fullWidth
             required
-            // eslint-disable-next-line no-return-assign
-            onBlur={(event) => (event.target.value = event.target.value.trim())}
             inputProps={{
               minLength: 3,
             }}
