@@ -12,7 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import { TableHeader } from './LessonTableHeader';
 import { useGetLessonsQuery } from '../../shared/reducers/api';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
-import { ILessonModel } from '../../shared/models/ILessonModes';
+import { ILessonModel } from '../../shared/models/ILessonModel';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 
 function getDayName(day: number) {

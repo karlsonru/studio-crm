@@ -20,22 +20,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
 import { useMediaQuery } from '@mui/material';
 import { getDayName } from '../helpers/getDayName';
-import { useCreateLessonMutation } from '../reducers/api';
-
-/*
-{
-  'title': 'Изо вт 11-14',
-  'teacher': '63540d17460f2b088105e004',
-  'activeStudents': 1,
-  'location': '63542092fca363139570253d',
-  'day': 1,
-  'timeStart': 1600,
-  'timeEnd': 1720,
-  'dateFrom': 1661979600000,
-  'dateTo': 1693515600000,
-  'isActive': true
-}
-*/
+import { useCreateLessonMutation, useGetLocationsQuery, useGetUsersQuery } from '../reducers/api';
 
 interface ICreateLessonModal {
   isOpen: boolean;
@@ -52,6 +37,10 @@ interface IFormData {
   teacher: string,
   dateFrom: string,
   dateTo: string,
+}
+
+function getDefaultDate(now: Date, shift?: number) {
+  return `${now.getFullYear() + (shift ?? 0)}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
 }
 
 function validateFrom(formData: IFormData) {
@@ -75,7 +64,22 @@ function validateFrom(formData: IFormData) {
     return { isValid: false, type: 'dateTo' };
   }
 
-  return { isValid: true, type: null };
+  return {
+    isValid: true,
+    type: null,
+    newLesson: {
+      title: formData.title,
+      teacher: formData.teacher,
+      location: formData.location,
+      day: +formData.day,
+      timeStart: +formData.timeStart.replace(':', ''),
+      timeEnd: +formData.timeEnd.replace(':', ''),
+      activeStudents: 0,
+      dateFrom: +Date.parse(formData.dateFrom),
+      dateTo: +Date.parse(formData.dateTo),
+      isActive: true,
+    },
+  };
 }
 
 export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) {
@@ -83,6 +87,8 @@ export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) 
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [createLesson, { isSuccess, isError, data }] = useCreateLessonMutation();
+  const { data: locationsData, isSuccess: isLocationsSuccess } = useGetLocationsQuery();
+  const { data: usersData, isSuccess: isUsersSuccess } = useGetUsersQuery();
 
   const [isValidTitle, setValidTitle] = useState(true);
   const [isValidEndTime, setValidEndTime] = useState(true);
@@ -106,12 +112,11 @@ export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) 
     setValidEndDate(true);
 
     // @ts-ignore
-    const { isValid, type } = validateFrom(formData);
+    const { isValid, type, newLesson } = validateFrom(formData);
 
-    if (isValid) {
+    if (isValid && newLesson) {
       form.reset();
-      // @ts-ignore
-      createLesson(formData);
+      createLesson(newLesson);
       return null;
     }
 
@@ -216,21 +221,25 @@ export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) 
 
           <InputLabel sx={{ marginTop: '1rem' }}>Помещение</InputLabel>
           <Select name='location' label='Помещение' defaultValue='location 1' fullWidth required>
-            <MenuItem value={'location 1'}>location 1</MenuItem>
-            <MenuItem value={'location 2'}>location 2</MenuItem>
+          { isLocationsSuccess
+              && locationsData.payload.map((location) => (
+                <MenuItem key={location._id} value={location._id}>{location.title}</MenuItem>
+              ))}
           </Select>
 
           <InputLabel sx={{ marginTop: '1rem' }}>Педагог</InputLabel>
           <Select name='teacher' label='Педагог' defaultValue='' fullWidth required>
             <MenuItem value={''}><em>Укажите педагога</em></MenuItem>
-            <MenuItem value={'Педагог 1'}>Педагог 1</MenuItem>
-            <MenuItem value={'Педагог 2'}>Педагог 2</MenuItem>
+            { isUsersSuccess
+              && usersData.payload.map((user) => (
+                <MenuItem key={user._id} value={user._id}>{user.name}</MenuItem>
+              ))}
           </Select>
 
           <InputLabel sx={{ margin: '1rem 0' }}>Даты занятия</InputLabel>
           <Stack direction='row'>
             <TextField name='dateFrom' type='date' required
-              defaultValue={`${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`}
+              defaultValue={getDefaultDate(now)}
               label={isMobile ? 'Начало' : ''}
               InputProps={{
                 endAdornment: <InputAdornment position='end'>{!isMobile && 'Начало'}</InputAdornment>,
@@ -238,7 +247,7 @@ export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) 
               InputLabelProps={{ shrink: true }}
             />
             <TextField name='dateTo' type='date' required
-              defaultValue={`${now.getFullYear() + 1}-${now.getMonth() + 1}-${now.getDate()}`}
+              defaultValue={getDefaultDate(now, 1)}
               label={isMobile ? 'Конец' : ''}
               error={!isValidEndDate}
               helperText={isValidEndDate ? '' : 'Дата должна быть после даты начала'}

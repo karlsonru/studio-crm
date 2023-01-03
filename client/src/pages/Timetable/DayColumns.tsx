@@ -2,25 +2,20 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { TimetableLessonCard } from './TimetableCard';
-import { ILessonModel } from '../../shared/models/ILessonModes';
-
-function getDayName(day: number) {
-  const dayNames: { [code: number]: string } = {
-    0: 'Воскресенье',
-    1: 'Понедельник',
-    2: 'Вторник',
-    3: 'Среда',
-    4: 'Четверг',
-    5: 'Пятница',
-    6: 'Суббота',
-  };
-  return dayNames[day];
-}
+import { ILessonModel } from '../../shared/models/ILessonModel';
+import { getDayName } from '../../shared/helpers/getDayName';
 
 interface IDayColumn {
   startDate: Date;
   shift: number;
   lessons: ILessonModel[];
+}
+
+interface IDayColumns {
+  startDate: Date;
+  lessons: {
+    [index: number]: ILessonModel[];
+  }
 }
 
 function renderCard(date: Date, lesson: ILessonModel) {
@@ -60,13 +55,6 @@ function DayColumn({ startDate, shift, lessons }: IDayColumn) {
       {lessons && lessons.map((lesson) => renderCard(columnDate, lesson))}
     </Stack>
   );
-}
-
-interface IDayColumns {
-  startDate: Date;
-  lessons: {
-    [index: number]: ILessonModel[];
-  }
 }
 
 export function DayColumns({ startDate, lessons }: IDayColumns) {

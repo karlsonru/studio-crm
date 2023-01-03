@@ -5,7 +5,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import GroupIcon from '@mui/icons-material/Group';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
-import { ILessonModel } from '../../shared/models/ILessonModes';
+import { ILessonModel } from '../../shared/models/ILessonModel';
 
 function convertToMinutes(time: number) {
   const hours = Math.floor(time / 100) - 9;
@@ -81,7 +81,7 @@ export function TimetableLessonCard({ lessonCardDetails }: { lessonCardDetails: 
             </Stack>
           </Stack>
 
-          <Typography paragraph m='0px' p='4px' textOverflow='ellipsis' whiteSpace='nowrap' fontSize={ fontSize }>{teacher.name ?? teacher}</Typography>
+          <Typography paragraph m='0px' p='4px' textOverflow='ellipsis' whiteSpace='nowrap' fontSize={ fontSize }>{teacher.name}</Typography>
 
         </Stack>
       </CardContent>

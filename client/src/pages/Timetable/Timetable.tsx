@@ -8,18 +8,21 @@ import { TimeColumn } from './TimeColumn';
 import { useGetLessonsQuery } from '../../shared/reducers/api';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
-import { ILessonModel } from '../../shared/models/ILessonModes';
+import { ILessonModel } from '../../shared/models/ILessonModel';
 
 function structureLessons(lessons: ILessonModel[]) {
   const lessonsObj = {} as { [index: number]: ILessonModel[] };
 
   for (let i = 0; i < lessons.length; i++) {
+    console.log(lessons[i].day);
     if (lessonsObj[lessons[i].day]) {
       lessonsObj[lessons[i].day].push(lessons[i]);
     } else {
       lessonsObj[lessons[i].day] = [lessons[i]];
     }
   }
+
+  console.log(lessonsObj);
 
   return lessonsObj;
 }
