@@ -8,7 +8,9 @@ import { getDayName } from '../../shared/helpers/getDayName';
 interface IDayColumn {
   startDate: Date;
   shift: number;
-  lessons: ILessonModel[];
+  lessons: {
+    [index: number]: ILessonModel[];
+  }
 }
 
 interface IDayColumns {
@@ -31,6 +33,8 @@ function DayColumn({ startDate, shift, lessons }: IDayColumn) {
   const columnDate = new Date(+startDate);
   columnDate.setDate(startDate.getDate() + shift);
 
+  const dayLessons = lessons[columnDate.getDay()];
+
   return (
     <Stack
       p='4px'
@@ -50,9 +54,11 @@ function DayColumn({ startDate, shift, lessons }: IDayColumn) {
           borderWidth: '1px thin',
         }}
       >
-        {getDayName(columnDate.getDay())},{!isMobile && <br />} {columnDate.toLocaleDateString('ru-RU')}
+        { getDayName(columnDate.getDay()) },
+        { !isMobile && <br /> }
+        { columnDate.toLocaleDateString('ru-RU') }
       </Box>
-      {lessons && lessons.map((lesson) => renderCard(columnDate, lesson))}
+      {dayLessons && dayLessons.map((lesson) => renderCard(columnDate, lesson))}
     </Stack>
   );
 }
@@ -63,12 +69,12 @@ export function DayColumns({ startDate, lessons }: IDayColumns) {
   return (
     <Stack direction='row' width='100%'>
       {isMobile
-        && <DayColumn startDate={startDate} shift={0} lessons={lessons[startDate.getDay()]} />}
+        && <DayColumn startDate={startDate} shift={0} lessons={lessons} />}
 
       {!isMobile
         && [0, 1, 2, 3, 4, 5, 6].map(
           (num) => <DayColumn
-            key={+startDate + num} startDate={startDate} shift={num} lessons={lessons[num]} />,
+            key={+startDate + num} startDate={startDate} shift={num} lessons={lessons} />,
         )}
     </Stack>
   );

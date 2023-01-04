@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import Stack from '@mui/material/Stack';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { DateSwitcher } from './TimetableHeader';
 import { DayColumns } from './DayColumns';
-import { TimeColumn } from './TimeColumn';
 import { useGetLessonsQuery } from '../../shared/reducers/api';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
@@ -14,7 +14,6 @@ function structureLessons(lessons: ILessonModel[]) {
   const lessonsObj = {} as { [index: number]: ILessonModel[] };
 
   for (let i = 0; i < lessons.length; i++) {
-    console.log(lessons[i].day);
     if (lessonsObj[lessons[i].day]) {
       lessonsObj[lessons[i].day].push(lessons[i]);
     } else {
@@ -22,9 +21,17 @@ function structureLessons(lessons: ILessonModel[]) {
     }
   }
 
-  console.log(lessonsObj);
-
   return lessonsObj;
+}
+
+function TimeColumn() {
+  const time = ['09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21'];
+
+  return (
+    <Box p='4px' mt='44px'>
+      { time.map((hh) => <Box key={hh} height='120px'>{hh}:00</Box>) }
+    </Box>
+  );
 }
 
 export function TimetablePage() {
