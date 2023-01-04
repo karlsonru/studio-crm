@@ -5,14 +5,6 @@ import { TimetableLessonCard } from './TimetableCard';
 import { ILessonModel } from '../../shared/models/ILessonModel';
 import { getDayName } from '../../shared/helpers/getDayName';
 
-interface IDayColumn {
-  startDate: Date;
-  shift: number;
-  lessons: {
-    [index: number]: ILessonModel[];
-  }
-}
-
 interface IDayColumns {
   startDate: Date;
   lessons: {
@@ -20,11 +12,14 @@ interface IDayColumns {
   }
 }
 
+interface IDayColumn extends IDayColumns {
+  shift: number;
+}
+
 function renderCard(date: Date, lesson: ILessonModel) {
   if (lesson.dateTo < +date || lesson.dateFrom > +date) {
     return;
   }
-
   return <TimetableLessonCard key={lesson._id} lessonCardDetails={lesson} />;
 }
 

@@ -4,7 +4,13 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import React from 'react';
 
-const tableHeaderCells = [
+interface IHeaderCell {
+  id: string;
+  label: string;
+  sortable?: boolean;
+}
+
+const tableHeaderCells: IHeaderCell[] = [
   {
     id: 'title',
     label: 'Название',
@@ -12,6 +18,7 @@ const tableHeaderCells = [
   {
     id: 'day',
     label: 'День',
+    sortable: true,
   },
   {
     id: 'type',
@@ -20,6 +27,7 @@ const tableHeaderCells = [
   {
     id: 'activeStudents',
     label: 'Ученики',
+    sortable: true,
   },
   {
     id: 'isActive',
@@ -32,20 +40,20 @@ const tableHeaderCells = [
 ];
 
 interface ITableHeader {
-  sortIds: Set<string>;
   sortBy: string;
-  setSortBy: (value: string) => void;
+  setSortBy: (value: 'day' | 'activeStudents') => void;
   sortOrder: 'asc' | 'desc';
   setSortOrder: (value: 'asc' | 'desc') => void;
 }
 
 export function TableHeader({
-  sortIds, sortBy, setSortBy, sortOrder, setSortOrder,
+  sortBy, setSortBy, sortOrder, setSortOrder,
 }: ITableHeader) {
   const isMobile = useMediaQuery('(max-width: 767px)');
 
-  const clickSortHandler = (event: React.MouseEvent) => {
+  const sortHandler = (event: React.MouseEvent) => {
     const elem = event.target as HTMLElement;
+    if (!(elem.id === 'day' || elem.id === 'activeStudents')) return;
 
     if (elem.id === sortBy) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -55,8 +63,8 @@ export function TableHeader({
     }
   };
 
-  const renderHeaderCell = (cell: { id: string, label: string }) => {
-    if (!sortIds.has(cell.id)) {
+  const renderHeaderCell = (cell: IHeaderCell) => {
+    if (!cell.sortable) {
       return <TableCell key={cell.id}>{cell.label}</TableCell>;
     }
 
@@ -68,7 +76,7 @@ export function TableHeader({
           id={cell.id}
           active={ sortBy === cell.id }
           direction={ sortBy === cell.id ? sortOrder : 'asc' }
-          onClick={clickSortHandler}
+          onClick={sortHandler}
         >
           { cell.label }
         </TableSortLabel>

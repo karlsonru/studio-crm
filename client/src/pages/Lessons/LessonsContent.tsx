@@ -48,7 +48,7 @@ function getRowArguments(
   return ([
     lesson.title,
     getDayName(lesson.day),
-    'Группа',
+    'Группа', // TODO заменть на тип занятия - individual или group
     lesson.activeStudents,
     lesson.isActive ? 'Активна' : 'В архиве',
     <IconButton onClick={() => deleteLessonHandler(lesson)}><DeleteIcon /></IconButton>,
@@ -60,7 +60,7 @@ export function LessonsContent() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsNumber, setRowsNumbr] = useState(10);
-  const [sortBy, setSortBy] = useState('');
+  const [sortBy, setSortBy] = useState<'day' | 'activeStudents'>();
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [lessonDetails, setLessonDetails] = useState<ILessonModel | null>(null);
 
@@ -80,7 +80,6 @@ export function LessonsContent() {
     return <h1>Error!!! </h1>;
   }
 
-  console.log(data);
   const { lessonSizeFilter, lessonActiveStatusFilter, lessonTitleFilter } = lessonSelector;
 
   const filteredData = data.payload.filter((lesson) => {
@@ -91,7 +90,6 @@ export function LessonsContent() {
   });
 
   if (sortBy) {
-    // @ts-ignore
     filteredData.sort((objA, objB) => (sortOrder === 'asc' ? objB[sortBy] - objA[sortBy] : objA[sortBy] - objB[sortBy]));
   }
 
@@ -109,8 +107,7 @@ export function LessonsContent() {
         <Table>
           <TableHead>
             <TableHeader
-              sortIds={new Set(['day', 'activeStudents'])}
-              sortBy={sortBy}
+              sortBy={sortBy ?? ''}
               setSortBy={setSortBy}
               sortOrder={sortOrder}
               setSortOrder={setSortOrder}
