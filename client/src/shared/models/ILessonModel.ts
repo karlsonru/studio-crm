@@ -15,7 +15,20 @@ export interface ILessonModel {
   isActive: boolean;
 }
 
-export interface INewLessonModel extends Omit<ILessonModel, '_id' | 'teacher' | 'location'> {
+export interface ILessonModelCreate extends Omit<ILessonModel, '_id' | 'teacher' | 'location'> {
   teacher: string;
   location: string;
+}
+
+export interface ILessonModelUpdate {
+  title?: string;
+  teacher?: string;
+  location?: string;
+  day?: number;
+  timeStart?: number;
+  timeEnd?: number;
+  activeStudents?: number;
+  dateFrom?: number;
+  dateTo?: number;
+  isActive?: boolean;
 }

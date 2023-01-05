@@ -11,7 +11,7 @@ interface IConfirmationDialog {
   isOpen: boolean;
   contentEl: ReactElement;
   setModalOpen: (value: boolean) => void;
-  confirmationHandler?: () => void;
+  callback?: () => void;
 }
 
 export function DeleteDialogText({ name }: { name: string }) {
@@ -24,12 +24,12 @@ export function ConfirmationDialog(
     isOpen,
     setModalOpen,
     contentEl,
-    confirmationHandler,
+    callback,
   }: IConfirmationDialog,
 ) {
   const handleOk = () => {
-    if (confirmationHandler) {
-      confirmationHandler();
+    if (callback) {
+      callback();
     }
     setModalOpen(false);
   };

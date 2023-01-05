@@ -46,9 +46,10 @@ interface ITableHeader {
   setSortOrder: (value: 'asc' | 'desc') => void;
 }
 
-export function TableHeader({
-  sortBy, setSortBy, sortOrder, setSortOrder,
-}: ITableHeader) {
+export function TableHeader(props: ITableHeader) {
+  const {
+    sortBy, setSortBy, sortOrder, setSortOrder,
+  } = props;
   const isMobile = useMediaQuery('(max-width: 767px)');
 
   const sortHandler = (event: React.MouseEvent) => {

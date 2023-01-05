@@ -10,23 +10,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import { TableHeader } from './LessonTableHeader';
-import { useGetLessonsQuery } from '../../shared/reducers/api';
+import { useGetLessonsQuery, useDeleteLessonMutation } from '../../shared/reducers/api';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { ILessonModel } from '../../shared/models/ILessonModel';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
-
-function getDayName(day: number) {
-  const dayNames: { [code: number]: string } = {
-    0: 'Воскресенье',
-    1: 'Понедельник',
-    2: 'Вторник',
-    3: 'Среда',
-    4: 'Четверг',
-    5: 'Пятница',
-    6: 'Суббота',
-  };
-  return dayNames[day];
-}
+import { getDayName } from '../../shared/helpers/getDayName';
 
 function createRow(id: string, args: (string | number | JSX.Element)[]) {
   return (
@@ -62,12 +50,14 @@ export function LessonsContent() {
   const [rowsNumber, setRowsNumbr] = useState(10);
   const [sortBy, setSortBy] = useState<'day' | 'activeStudents'>();
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [lessonDetails, setLessonDetails] = useState<ILessonModel | null>(null);
+  const [lessonDetails, setLessonDetails] = useState<ILessonModel>();
 
   const deleteLessonHandler = useCallback((currentLesson: ILessonModel) => {
     setLessonDetails(currentLesson);
     setModalOpen(true);
   }, [setModalOpen, setLessonDetails]);
+
+  const [deleteLesson] = useDeleteLessonMutation();
 
   const { data, isLoading, error } = useGetLessonsQuery();
   const lessonSelector = useAppSelector((state) => state.lessonPageReduer);
@@ -140,9 +130,10 @@ export function LessonsContent() {
       />
       <ConfirmationDialog
         title='Удалить занятие'
-        contentEl={<DeleteDialogText name={lessonDetails?.title || ''} />}
+        contentEl={<DeleteDialogText name={lessonDetails?.title ?? ''} />}
         isOpen={isModalOpen}
         setModalOpen={setModalOpen}
+        callback={() => deleteLesson(lessonDetails?._id ?? '')}
       />
     </>
   );

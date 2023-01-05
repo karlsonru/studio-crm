@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { ILocationModel } from '../models/ILocationModel';
-import { ILessonModel, INewLessonModel } from '../models/ILessonModel';
+import { ILessonModel, ILessonModelCreate, ILessonModelUpdate } from '../models/ILessonModel';
 import { IUserModel } from '../models/IUserModel';
 
 interface IResponse<T> {
@@ -10,23 +10,39 @@ interface IResponse<T> {
 
 const BASE_URL = 'http://localhost:5000/api/';
 
-export const lessonsApi = createApi({
-  reducerPath: 'lessonsApi',
-  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
-  endpoints: (builder) => ({
-    getLessons: builder.query<IResponse<Array<ILessonModel>>, void>({
-      query: () => 'lesson',
+function ApiFactory<T, K, A>(path: string) {
+  return createApi({
+    reducerPath: `${path}Api`,
+    baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
+    endpoints: (builder) => ({
+      getAll: builder.query<IResponse<Array<T>>, void>({
+        query: () => path,
+      }),
+      getOne: builder.query<IResponse<Array<T>>, string>({
+        query: (id) => ({ url: `${path}/${id}` }),
+      }),
+      create: builder.mutation<IResponse<T>, K>({
+        query: (newItem) => ({ url: path, method: 'POST', body: newItem }),
+      }),
+      delete: builder.mutation<void, string>({
+        query: (id) => ({ url: `${path}/${id}`, method: 'DELETE' }),
+      }),
+      patch: builder.mutation<IResponse<T>, { id: string, newItem: A }>({
+        query: ({ id, newItem }) => ({ url: `${path}/${id}`, method: 'PATCH', body: newItem }),
+      }),
     }),
-    getLesson: builder.query<IResponse<Array<ILessonModel>>, string>({
-      query: (lessonId) => ({ url: `lesson/${lessonId}` }),
-    }),
-    createLesson: builder.mutation<IResponse<ILessonModel>, INewLessonModel>({
-      query: (lesson) => ({ url: 'lesson', method: 'POST', body: lesson }),
-    }),
-  }),
-});
+  });
+}
 
-export const { useGetLessonsQuery, useGetLessonQuery, useCreateLessonMutation } = lessonsApi;
+export const lessonsApi = new (ApiFactory<ILessonModel, ILessonModelCreate, ILessonModelUpdate> as any)('lesson');
+
+export const {
+  useGetAllQuery: useGetLessonsQuery,
+  useGetOneQuery: useGetLessonQuery,
+  useCreateMutation: useCreateLessonMutation,
+  useDeleteMutation: useDeleteLessonMutation,
+  usePatchMutation: usePatchLessonMutation,
+} = lessonsApi;
 
 export const usersApi = createApi({
   reducerPath: 'usersApi',
