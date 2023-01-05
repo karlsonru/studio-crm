@@ -5,3 +5,5 @@ export interface ILocationModel {
   address: string;
   isActive: boolean;
 }
+
+export interface ILocationModelCreate extends Omit<ILocationModel, '_id'> {}

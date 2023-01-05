@@ -7,3 +7,5 @@ export interface IUserModel {
   birthday: number;
   isActive: boolean;
 }
+
+export interface IUserModelCreate extends Omit<IUserModel, '_id'> {}
