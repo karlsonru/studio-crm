@@ -18,7 +18,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import Radio from '@mui/material/Radio';
 import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
-import { useMediaQuery } from '@mui/material';
+import { FormControl, FormHelperText, useMediaQuery } from '@mui/material';
 import { getDayName } from '../helpers/getDayName';
 import { useCreateLessonMutation, useGetLocationsQuery, useGetUsersQuery } from '../api';
 
@@ -46,6 +46,10 @@ function validateFrom(formData: { [key: string]: FormDataEntryValue }) {
     return 'timeEnd';
   }
 
+  if (!formData.teacher) {
+    return 'teacher';
+  }
+
   if (Date.parse(formData.dateFrom as string) > Date.parse(formData.dateTo as string)) {
     return 'dateTo';
   }
@@ -64,6 +68,7 @@ export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) 
   const [formValidation, setFormValidation] = useState({
     title: true,
     timeEnd: true,
+    teacher: true,
     dateTo: true,
   });
 
@@ -83,6 +88,7 @@ export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) 
     setFormValidation({
       title: true,
       timeEnd: true,
+      teacher: true,
       dateTo: true,
     });
 
@@ -204,13 +210,16 @@ export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) 
           </Select>
 
           <InputLabel sx={{ marginTop: '1rem' }}>Педагог</InputLabel>
-          <Select name='teacher' label='Педагог' defaultValue='' fullWidth required>
-            <MenuItem value={''}><em>Укажите педагога</em></MenuItem>
-            { isUsersSuccess
-              && usersData.payload.map((user) => (
-                <MenuItem key={user._id} value={user._id}>{user.name}</MenuItem>
-              ))}
-          </Select>
+          <FormControl error={!formValidation.teacher} fullWidth>
+            <Select name='teacher' label='Педагог' defaultValue='' required>
+              <MenuItem value={''}><em>Укажите педагога</em></MenuItem>
+              { isUsersSuccess
+                && usersData.payload.map((user) => (
+                  <MenuItem key={user._id} value={user._id}>{user.name}</MenuItem>
+                ))}
+            </Select>
+            {!formValidation.teacher && <FormHelperText>Выберите педагога</FormHelperText>}
+          </FormControl>
 
           <InputLabel sx={{ margin: '1rem 0' }}>Даты занятия</InputLabel>
           <Stack direction='row'>

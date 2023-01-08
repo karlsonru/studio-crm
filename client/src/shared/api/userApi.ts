@@ -4,7 +4,7 @@ import {
 import { IUserModel, IUserModelCreate } from '../models/IUserModel';
 
 const tag = 'User';
-const route = 'location';
+const route = 'user';
 
 basicApi.enhanceEndpoints({ addTagTypes: [tag] });
 
