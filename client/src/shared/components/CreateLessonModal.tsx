@@ -27,59 +27,30 @@ interface ICreateLessonModal {
   setModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-interface IFormData {
-  title: string,
-  size: string,
-  day: string,
-  timeStart: string,
-  timeEnd: string,
-  location: string,
-  teacher: string,
-  dateFrom: string,
-  dateTo: string,
-}
-
 function getDefaultDate(now: Date, shift?: number) {
   return `${now.getFullYear() + (shift ?? 0)}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
 }
 
-function validateFrom(formData: IFormData) {
-  if (formData.title.trim().length < 3) {
-    return { isValid: false, type: 'title' };
+function validateFrom(formData: { [key: string]: FormDataEntryValue }) {
+  if ((formData.title as string).trim().length < 3) {
+    return 'title';
   }
-  // eslint-disable-next-line no-param-reassign
-  formData.title = formData.title.trim();
 
   const { timeStart, timeEnd } = formData;
-  if (timeStart.split(':')[0] > timeEnd.split(':')[0]) {
-    return { isValid: false, type: 'timeEnd' };
+  if ((timeStart as string).split(':')[0] > (timeEnd as string).split(':')[0]) {
+    return 'timeEnd';
   }
 
-  if ((timeStart.split(':')[0] === timeEnd.split(':')[0])
-      && (timeStart.split(':')[1] >= timeEnd.split(':')[1])) {
-    return { isValid: false, type: 'timeEnd' };
+  if (((timeStart as string).split(':')[0] === (timeEnd as string).split(':')[0])
+      && ((timeStart as string).split(':')[1] >= (timeEnd as string).split(':')[1])) {
+    return 'timeEnd';
   }
 
-  if (Date.parse(formData.dateFrom) > Date.parse(formData.dateTo)) {
-    return { isValid: false, type: 'dateTo' };
+  if (Date.parse(formData.dateFrom as string) > Date.parse(formData.dateTo as string)) {
+    return 'dateTo';
   }
 
-  return {
-    isValid: true,
-    type: null,
-    newLesson: {
-      title: formData.title,
-      teacher: formData.teacher,
-      location: formData.location,
-      day: +formData.day,
-      timeStart: +formData.timeStart.replace(':', ''),
-      timeEnd: +formData.timeEnd.replace(':', ''),
-      activeStudents: 0,
-      dateFrom: +Date.parse(formData.dateFrom),
-      dateTo: +Date.parse(formData.dateTo),
-      isActive: true,
-    },
-  };
+  return '';
 }
 
 export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) {
@@ -90,9 +61,11 @@ export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) 
   const { data: locationsData, isSuccess: isLocationsSuccess } = useGetLocationsQuery();
   const { data: usersData, isSuccess: isUsersSuccess } = useGetUsersQuery();
 
-  const [isValidTitle, setValidTitle] = useState(true);
-  const [isValidEndTime, setValidEndTime] = useState(true);
-  const [isValidEndDate, setValidEndDate] = useState(true);
+  const [formValidation, setFormValidation] = useState({
+    title: true,
+    timeEnd: true,
+    dateTo: true,
+  });
 
   const handleClose = () => {
     setModalOpen(false);
@@ -107,31 +80,34 @@ export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) 
     const form = event.currentTarget as HTMLFormElement;
     const formData = Object.fromEntries(new FormData(form).entries());
 
-    setValidTitle(true);
-    setValidEndTime(true);
-    setValidEndDate(true);
+    setFormValidation({
+      title: true,
+      timeEnd: true,
+      dateTo: true,
+    });
 
-    // @ts-ignore
-    const { isValid, type, newLesson } = validateFrom(formData);
-
-    if (isValid && newLesson) {
-      form.reset();
-      createLesson(newLesson);
-      return null;
+    const errorName = validateFrom(formData);
+    if (errorName) {
+      setFormValidation(() => ({
+        ...formValidation,
+        [errorName]: false,
+      }));
+      return;
     }
 
-    switch (type) {
-      case 'title':
-        setValidTitle(false);
-        break;
-      case 'endTime':
-        setValidEndTime(false);
-        break;
-      case 'dateTo':
-        setValidEndDate(false);
-        break;
-      default:
-    }
+    createLesson({
+      title: formData.title as string,
+      teacher: formData.teacher as string,
+      location: formData.location as string,
+      day: +formData.day,
+      timeStart: +(formData.timeStart as string).replace(':', ''),
+      timeEnd: +(formData.timeEnd as string).replace(':', ''),
+      activeStudents: 0,
+      dateFrom: +Date.parse(formData.dateFrom as string),
+      dateTo: +Date.parse(formData.dateTo as string),
+      isActive: true,
+    });
+    form.reset();
   };
 
   const now = new Date();
@@ -148,8 +124,8 @@ export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) 
             autoFocus
             fullWidth
             required
-            error={!isValidTitle}
-            helperText={isValidTitle ? '' : 'Укажите название не менее 3х символов'}
+            error={!formValidation.title}
+            helperText={!formValidation.title ? 'Укажите название не менее 3х символов' : ''}
             inputProps={{
               minLength: 3,
             }}
@@ -199,8 +175,8 @@ export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) 
               name='timeEnd'
               type='time'
               required
-              error={!isValidEndTime}
-              helperText={isValidEndTime ? '' : 'Время должно быть больше времени начала'}
+              error={!formValidation.timeEnd}
+              helperText={!formValidation.timeEnd ? 'Время должно быть больше времени начала' : ''}
               label={isMobile ? 'Конец' : ''}
               InputProps={{
                 endAdornment: <InputAdornment position='end'>{!isMobile && 'Конец'}</InputAdornment>,
@@ -249,8 +225,8 @@ export function CreateLessonModal({ isOpen, setModalOpen }: ICreateLessonModal) 
             <TextField name='dateTo' type='date' required
               defaultValue={getDefaultDate(now, 1)}
               label={isMobile ? 'Конец' : ''}
-              error={!isValidEndDate}
-              helperText={isValidEndDate ? '' : 'Дата должна быть после даты начала'}
+              error={!formValidation.dateTo}
+              helperText={!formValidation.dateTo ? 'Дата должна быть после даты начала' : ''}
               InputProps={{
                 endAdornment: <InputAdornment position='end'>{!isMobile && 'Конец'}</InputAdornment>,
               }}

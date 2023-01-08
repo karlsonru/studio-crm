@@ -19,7 +19,7 @@ import { getReadbleTime } from '../../shared/helpers/getReadableTime';
 
 function createRow(id: string, args: (string | number | JSX.Element)[]) {
   return (
-    <TableRow key={id}>
+    <TableRow key={id} hover={true}>
       { args.map((value) => <TableCell key={id + value}>{value}</TableCell>) }
     </TableRow>
   );
