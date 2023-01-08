@@ -15,6 +15,7 @@ import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { ILessonModel } from '../../shared/models/ILessonModel';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { getDayName } from '../../shared/helpers/getDayName';
+import { getReadbleTime } from '../../shared/helpers/getReadableTime';
 
 function createRow(id: string, args: (string | number | JSX.Element)[]) {
   return (
@@ -36,6 +37,7 @@ function getRowArguments(
   return ([
     lesson.title,
     getDayName(lesson.day),
+    getReadbleTime(lesson.timeStart),
     'Группа', // TODO заменть на тип занятия - individual или group
     lesson.activeStudents,
     lesson.isActive ? 'Активна' : 'В архиве',

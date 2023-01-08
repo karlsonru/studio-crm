@@ -6,18 +6,12 @@ import GroupIcon from '@mui/icons-material/Group';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import { ILessonModel } from '../../shared/models/ILessonModel';
+import { getReadbleTime } from '../../shared/helpers/getReadableTime';
 
 function convertToMinutes(time: number) {
   const hours = Math.floor(time / 100) - 9;
   const minutes = Math.round(time % 100);
   return hours * 60 + minutes;
-}
-
-function convertToReadbleTime(time: number) {
-  const timeString = time.toString().padStart(4, '0');
-  const hours = timeString.slice(0, 2);
-  const minutes = timeString.slice(2);
-  return `${hours}:${minutes}`;
 }
 
 export function TimetableLessonCard({ lessonCardDetails }: { lessonCardDetails: ILessonModel }) {
@@ -27,8 +21,8 @@ export function TimetableLessonCard({ lessonCardDetails }: { lessonCardDetails: 
 
   const isMobile = useMediaQuery('(max-width: 767px)');
 
-  const timeStartReadable = convertToReadbleTime(timeStart);
-  const timeEndReadable = convertToReadbleTime(timeEnd);
+  const timeStartReadable = getReadbleTime(timeStart);
+  const timeEndReadable = getReadbleTime(timeEnd);
 
   const fontSize = isMobile ? '1rem' : '0.85rem!important';
   const duration = (convertToMinutes(timeEnd) - convertToMinutes(timeStart));

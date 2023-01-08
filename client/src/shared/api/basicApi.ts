@@ -17,7 +17,7 @@ export function injectGetAll<T>(name: string, tag: any, route: string) {
   const extendedApi = basicApi.injectEndpoints({
     endpoints: (build) => ({
       [name]: build.query<IResponse<Array<T>>, void>({
-        query: (id) => ({ url: `${route}/${id}` }),
+        query: () => route,
         providesTags: [tag],
       }),
     }),
@@ -29,7 +29,7 @@ export function injectGetOne<T>(name: string, tag: any, route: string) {
   const extendedApi = basicApi.injectEndpoints({
     endpoints: (build) => ({
       [name]: build.query<IResponse<T>, string>({
-        query: () => route,
+        query: (id) => ({ url: `${route}/${id}` }),
         providesTags: [tag],
       }),
     }),

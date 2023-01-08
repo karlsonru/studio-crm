@@ -21,6 +21,10 @@ const tableHeaderCells: IHeaderCell[] = [
     sortable: true,
   },
   {
+    id: 'time',
+    label: 'Время',
+  },
+  {
     id: 'type',
     label: 'Тип',
   },
