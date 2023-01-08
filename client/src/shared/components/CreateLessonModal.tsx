@@ -20,7 +20,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
 import { useMediaQuery } from '@mui/material';
 import { getDayName } from '../helpers/getDayName';
-import { useCreateLessonMutation, useGetLocationsQuery, useGetUsersQuery } from '../reducers/api';
+import { useCreateLessonMutation, useGetLocationsQuery, useGetUsersQuery } from '../api';
 
 interface ICreateLessonModal {
   isOpen: boolean;

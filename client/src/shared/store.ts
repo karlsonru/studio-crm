@@ -1,22 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
 import menuReducer from './reducers/appMenuSlice';
 import lessonPageReduer from './reducers/lessonPageSlice';
-import {
-  usersApi,
-  locationsApi,
-  lessonsApi,
-} from './reducers/api';
+import { basicApi } from './api/basicApi';
 
 const store = configureStore({
   reducer: {
     menuReducer,
     lessonPageReduer,
-    [usersApi.reducerPath]: usersApi.reducer,
-    [locationsApi.reducerPath]: locationsApi.reducer,
-    [lessonsApi.reducerPath]: lessonsApi.reducer,
+    [basicApi.reducerPath]: basicApi.reducer,
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware()
-    .concat(usersApi.middleware, lessonsApi.middleware, locationsApi.middleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(basicApi.middleware),
 });
 
 export default store;

@@ -5,7 +5,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { DateSwitcher } from './TimetableHeader';
 import { DayColumns } from './DayColumns';
-import { useGetLessonsQuery } from '../../shared/reducers/api';
+import { useGetLessonsQuery } from '../../shared/api/lessonApi';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
 import { ILessonModel } from '../../shared/models/ILessonModel';
