@@ -71,7 +71,7 @@ export function LessonsHeader() {
   return (
     <>
       <header>
-        <Grid container justifyContent="space-between" alignItems="center" spacing={1}>
+        <Grid container justifyContent="space-between" alignItems="center" spacing={2}>
           <Grid item>
             <SearchField placeholder='Поиск' value={lessonTitleFilter} handler={titleFilterChangeHandler} />
             { !isMobile && <FilterButtons /> }

@@ -5,42 +5,91 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import Select from '@mui/material/Select';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import { SearchField } from '../../shared/components/SearchField';
-import { ILessonModel } from '../../shared/models/ILessonModel';
 import { useGetLessonsQuery } from '../../shared/api/lessonApi';
+import { ILessonFilter, studentsPageActions } from '../../shared/reducers/studentsPageSlice';
+import { useAppSelector } from '../../shared/hooks/useAppSelector';
+import { useActionCreators } from '../../shared/hooks/useActionCreators';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 interface INumberField {
   placeholder: string;
-  value: string;
+  value: number;
   handler: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function NumberField({ placeholder, value, handler }: INumberField) {
-  return <TextField type="number" inputProps={{ min: 0, max: 99 }} placeholder={placeholder} onChange={handler} sx={{ minWidth: 60 }} />;
+  return (
+    <TextField
+      value={value}
+      placeholder={placeholder}
+      onChange={handler}
+      type="number"
+      inputProps={{ min: 0, max: 99 }}
+      sx={{ minWidth: 60 }}
+    />
+  );
 }
 
 function FilterButtons() {
-  const lessons = useGetLessonsQuery().data?.payload;
+  const actions = useActionCreators(studentsPageActions);
+
+  const lessonsOptions = useGetLessonsQuery().data?.payload.map((lesson) => (
+    { id: lesson._id, title: lesson.title }
+  ));
+
+  const nameFilter = useAppSelector((state) => state.studentsPageReducer.nameFilter);
+  const phoneFilter = useAppSelector((state) => state.studentsPageReducer.phoneFilter);
+  const statusFilter = useAppSelector((state) => state.studentsPageReducer.statusFilter);
+  const ageFromFilter = useAppSelector((state) => state.studentsPageReducer.ageFromFilter);
+  const ageToFilter = useAppSelector((state) => state.studentsPageReducer.ageToFilter);
+
+  const changeNameHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    actions.setNameFilter(e.target.value);
+  };
+
+  const changePhoneHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    actions.setPhoneFilter(e.target.value);
+  };
+
+  const changeLessonsHandler = (
+    e: React.SyntheticEvent<Element, Event>,
+    value: Array<ILessonFilter>,
+  ) => {
+    actions.setLessonsFilter(value);
+  };
+
+  const changeStatusHandler = (e: SelectChangeEvent<string>) => {
+    actions.setStatusFilter(e.target.value);
+  };
+
+  const changeAgeFromHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target.value);
+    console.log(ageFromFilter);
+    actions.setAgeFromFilter(e.target.value);
+  };
+
+  const changeAgeToHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    actions.setAgeToFilter(e.target.value);
+  };
 
   return (
     <Stack direction="row" spacing={2}>
-      <SearchField placeholder='Поиск по имени' value='' handler={(e) => console.log(e.target.value)} />
-      <SearchField placeholder='Поиск по телефону' value='' handler={(e) => console.log(e.target.value)} />
+      <SearchField placeholder='Поиск по имени' value={nameFilter} handler={changeNameHandler} />
+      <SearchField placeholder='Поиск по телефону' value={phoneFilter} handler={changePhoneHandler} />
 
-      {lessons && <Autocomplete
+      {lessonsOptions && <Autocomplete
         multiple
-        options={lessons}
+        options={lessonsOptions}
         limitTags={1}
         disableCloseOnSelect
-        getOptionLabel={(option: ILessonModel) => option.title}
+        getOptionLabel={(option: ILessonFilter) => option.title}
         renderOption={(props, option, { selected }) => (
           <li {...props}>
             <Checkbox
@@ -52,8 +101,8 @@ function FilterButtons() {
             {option.title}
           </li>
         )}
-        onChange={(e) => console.log(e.target)}
         style={{ width: 300 }}
+        onChange={changeLessonsHandler}
         renderInput={(params) => (
           <TextField {...params} label="Занятия" placeholder="Занятия" />
         )}
@@ -61,7 +110,8 @@ function FilterButtons() {
 
       <FormControl sx={{ minWidth: 120 }}>
         <InputLabel id="student-status">Статус</InputLabel>
-        <Select labelId="student-status"label="Статус" onChange={(e) => console.log(e.target.value)} fullWidth>
+        <Select labelId="student-status" value={statusFilter} label="Статус" onChange={changeStatusHandler} fullWidth>
+          <MenuItem value=""><em>None</em></MenuItem>
           <MenuItem value="active">Активные</MenuItem>
           <MenuItem value="archived">В архиве</MenuItem>
         </Select>
@@ -69,9 +119,9 @@ function FilterButtons() {
 
       <FormControl sx={{ minWidth: 150 }}>
         <InputLabel id="student-age">Возраст</InputLabel>
-        <Select labelId="student-age"label="Возраст" onChange={(e) => console.log(e.target.value)} fullWidth>
-          <NumberField placeholder="От" value="0" handler={(e) => console.log(e.target.value)} />
-          <NumberField placeholder="До" value="0" handler={(e) => console.log(e.target.value)} />
+        <Select multiple value={[]} labelId="student-age" label="Возраст" onChange={(e) => console.log(e.target.value)} fullWidth>
+          <NumberField placeholder="От" value={ageFromFilter ?? 0} handler={changeAgeFromHandler} />
+          <NumberField placeholder="До" value={ageToFilter ?? 99} handler={changeAgeToHandler} />
         </Select>
 
       </FormControl>
