@@ -1,7 +1,4 @@
 import { useState } from 'react';
-import TextField from '@mui/material/TextField';
-import InputAdornment from '@mui/material/InputAdornment';
-import SearchIcon from '@mui/icons-material/Search';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
@@ -12,6 +9,7 @@ import { setLessonActiveStatusFilter, setLessonSizeFilter, setLessonTitleFilter 
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { CreateLessonModal } from '../../shared/components/CreateLessonModal';
+import { SearchField } from '../../shared/components/SearchField';
 
 function FilterButtons() {
   const lessonSelector = useAppSelector((state) => state.lessonPageReduer);
@@ -72,20 +70,10 @@ export function LessonsHeader() {
 
   return (
     <>
-      <header style={{ margin: '1rem 0rem' }}>
+      <header>
         <Grid container justifyContent="space-between" alignItems="center" spacing={1}>
           <Grid item>
-            <TextField
-              placeholder = 'Поиск'
-              value = { lessonTitleFilter }
-              onChange = { titleFilterChangeHandler }
-              InputProps = {{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }} />
+            <SearchField placeholder='Поиск' value={lessonTitleFilter} handler={titleFilterChangeHandler} />
             { !isMobile && <FilterButtons /> }
             { isMobile && <MobileFilterButton />}
           </Grid>
