@@ -1,20 +1,20 @@
 import { useEffect } from 'react';
-import { LessonsHeader } from './LessonsPageHeader';
-import { LessonsContent } from './LessonsContent';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
+import { StudentsPageHeader } from './PageHeader';
+import { StudentsContent } from './Content';
 
-export function LessonsPage() {
+export function StudentsPage() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(setPageTitle('Занятия'));
+    dispatch(setPageTitle('Ученики'));
   }, []);
 
   return (
     <>
-      <LessonsHeader />
-      <LessonsContent />
+      <StudentsPageHeader />
+      <StudentsContent />
     </>
   );
 }

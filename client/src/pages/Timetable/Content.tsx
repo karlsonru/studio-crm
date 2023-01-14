@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { TimetableLessonCard } from './TimetableCard';
+import { TimetableLessonCard } from './ContentCard';
 import { ILessonModel } from '../../shared/models/ILessonModel';
 import { getDayName } from '../../shared/helpers/getDayName';
 

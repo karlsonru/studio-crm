@@ -111,7 +111,7 @@ function MonthSwitcher({ startDate, setDateHandler }: IDateSwitcher) {
 
 export function DateSwitcher({ startDate, setDateHandler }: IDateSwitcher) {
   return (
-    <Grid container wrap='nowrap' justifyContent='flex-start' alignItems='center' margin={'1rem 0rem'}>
+    <Grid container wrap='nowrap' justifyContent='flex-start' alignItems='center'>
       <MonthSwitcher startDate={startDate} setDateHandler={setDateHandler} />
       <WeekSwitcher startDate={startDate} setDateHandler={setDateHandler} />
     </Grid>

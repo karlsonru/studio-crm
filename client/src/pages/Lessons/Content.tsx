@@ -9,7 +9,7 @@ import TableCell from '@mui/material/TableCell';
 import DeleteIcon from '@mui/icons-material/Delete';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
-import { TableHeader } from './LessonsContentHeader';
+import { TableHeader } from './ContentHeader';
 import { useGetLessonsQuery, useDeleteLessonMutation } from '../../shared/api/lessonApi';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { ILessonModel } from '../../shared/models/ILessonModel';

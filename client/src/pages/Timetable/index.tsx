@@ -1,1 +1,1 @@
-export { TimetablePage } from './TimetablePage';
+export { TimetablePage } from './Page';
