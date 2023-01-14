@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { LessonsHeader } from './LessonsHeader';
+import { LessonsHeader } from './LessonsPageHeader';
 import { LessonsContent } from './LessonsContent';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';

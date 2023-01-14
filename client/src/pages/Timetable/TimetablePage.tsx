@@ -3,7 +3,7 @@ import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { DateSwitcher } from './TimetableHeader';
+import { DateSwitcher } from './TimetablePageHeader';
 import { DayColumns } from './DayColumns';
 import { useGetLessonsQuery } from '../../shared/api/lessonApi';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
