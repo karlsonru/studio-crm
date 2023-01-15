@@ -7,14 +7,16 @@ interface IStudentModelContact {
 
 export interface IStudentModel {
   _id: string;
-  name: string;
-  surname: string;
+  fullname: string;
   sex: string;
   birthday: number;
   balance: number;
   visitingLessons: Array<ILessonModel>;
   contacts: Array<IStudentModelContact>;
+  comment?: string;
   isActive: boolean;
 }
 
-export interface IStudentModalCreate extends Omit<IStudentModel, '_id'> {}
+export interface IStudentModalCreate extends Omit<IStudentModel, '_id' | 'visitingLessons' | 'comment'> {
+  visitingLessons: Array<string>;
+}

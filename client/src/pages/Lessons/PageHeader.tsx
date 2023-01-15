@@ -7,8 +7,8 @@ import Stack from '@mui/system/Stack';
 import { CreateLessonModal } from '../../shared/components/CreateLessonModal';
 import { SearchField } from '../../shared/components/SearchField';
 import { MobileFilterButton } from '../../shared/components/MobileFilterButton';
-import { lessonsPageActions } from '../../shared/reducers/lessonsPageSlice';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
+import { lessonsPageActions } from '../../shared/reducers/lessonsPageSlice';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 
 function FilterButtons({ isMobile }: { isMobile: boolean }) {

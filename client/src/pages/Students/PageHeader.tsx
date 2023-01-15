@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import Stack from '@mui/system/Stack';
 import Checkbox from '@mui/material/Checkbox';
@@ -17,6 +18,7 @@ import { useGetLessonsQuery } from '../../shared/api/lessonApi';
 import { ILessonFilter, studentsPageActions } from '../../shared/reducers/studentsPageSlice';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
+import { CreateStudentModal } from '../../shared/components/CreateStudentModal';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -85,7 +87,8 @@ function FilterButtons({ isMobile }: { isMobile: boolean }) {
       <SearchField placeholder='Поиск по имени' value={nameFilter} handler={changeNameHandler} />
       <SearchField placeholder='Поиск по телефону' value={phoneFilter} handler={changePhoneHandler} />
 
-      {lessonsOptions && <Autocomplete
+      { // TODO - переделать разделив заголовками уроки по дням и отсортировав их по времени
+      lessonsOptions && <Autocomplete
         multiple
         options={lessonsOptions}
         limitTags={1}
@@ -137,6 +140,7 @@ function FilterButtons({ isMobile }: { isMobile: boolean }) {
 export function StudentsPageHeader() {
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [showFilters, setShowFilters] = useState(false);
+  const [, setSearchParams] = useSearchParams();
 
   const toggleFilters = () => {
     setShowFilters((state) => !state);
@@ -147,9 +151,10 @@ export function StudentsPageHeader() {
       <Stack direction='row' justifyContent="space-between" alignItems="center">
         {isMobile && <MobileFilterButton handler={toggleFilters} />}
         {!isMobile && <FilterButtons isMobile={isMobile} />}
-        <Button variant="contained" size="large" onClick={() => console.log('Добавлен новый ученик!')}>Добавить</Button>
+        <Button variant="contained" size="large" onClick={() => setSearchParams({ 'create-student': 'true' })}>Добавить</Button>
       </Stack>
       {showFilters && <FilterButtons isMobile={isMobile} />}
+      <CreateStudentModal />
     </header>
   );
 }
