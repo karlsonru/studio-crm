@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Button from '@mui/material/Button';
 import Stack from '@mui/system/Stack';
 import Checkbox from '@mui/material/Checkbox';
@@ -9,6 +10,8 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import { useMediaQuery } from '@mui/material';
 import { SearchField } from '../../shared/components/SearchField';
 import { useGetLessonsQuery } from '../../shared/api/lessonApi';
 import { ILessonFilter, studentsPageActions } from '../../shared/reducers/studentsPageSlice';
@@ -20,7 +23,7 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 interface INumberField {
   placeholder: string;
-  value: number;
+  value: number | string;
   handler: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -37,7 +40,7 @@ function NumberField({ placeholder, value, handler }: INumberField) {
   );
 }
 
-function FilterButtons() {
+function FilterButtons({ isMobile }: { isMobile: boolean }) {
   const actions = useActionCreators(studentsPageActions);
 
   const lessonsOptions = useGetLessonsQuery().data?.payload.map((lesson) => (
@@ -70,8 +73,6 @@ function FilterButtons() {
   };
 
   const changeAgeFromHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.target.value);
-    console.log(ageFromFilter);
     actions.setAgeFromFilter(e.target.value);
   };
 
@@ -80,7 +81,7 @@ function FilterButtons() {
   };
 
   return (
-    <Stack direction="row" spacing={2}>
+    <Stack direction={isMobile ? 'column' : 'row'} spacing={2}>
       <SearchField placeholder='Поиск по имени' value={nameFilter} handler={changeNameHandler} />
       <SearchField placeholder='Поиск по телефону' value={phoneFilter} handler={changePhoneHandler} />
 
@@ -119,11 +120,14 @@ function FilterButtons() {
 
       <FormControl sx={{ minWidth: 150 }}>
         <InputLabel id="student-age">Возраст</InputLabel>
-        <Select multiple value={[]} labelId="student-age" label="Возраст" onChange={(e) => console.log(e.target.value)} fullWidth>
-          <NumberField placeholder="От" value={ageFromFilter ?? 0} handler={changeAgeFromHandler} />
-          <NumberField placeholder="До" value={ageToFilter ?? 99} handler={changeAgeToHandler} />
+        <Select multiple value={[]} labelId="student-age" label="Возраст" fullWidth>
+          <MenuItem disableGutters component="span" sx={{ display: 'inline' }}>
+            <NumberField placeholder="От" value={ageFromFilter ?? ''} handler={changeAgeFromHandler} />
+          </MenuItem>
+          <MenuItem disableGutters component="span" sx={{ display: 'inline' }}>
+            <NumberField placeholder="До" value={ageToFilter ?? ''} handler={changeAgeToHandler} />
+          </MenuItem>
         </Select>
-
       </FormControl>
 
     </Stack>
@@ -131,16 +135,24 @@ function FilterButtons() {
 }
 
 export function StudentsPageHeader() {
+  const isMobile = useMediaQuery('(max-width: 767px)');
+  const [showFilters, setShowFilters] = useState(false);
+
+  const toggleFilters = () => {
+    setShowFilters((state) => !state);
+  };
+
   return (
   <header>
-    <Stack direction="row" justifyContent="space-between" alignItems="center">
-      <div>
-        <FilterButtons />
-      </div>
-      <div>
-        <Button variant="contained" size="large" onClick={() => console.log('Clicked!')}>Добавить</Button>
-      </div>
+    <Stack direction='row' justifyContent="space-between" alignItems="center">
+      {isMobile && <Button variant='contained' size='large' onClick={toggleFilters} style={{ height: '100%' }}>
+            <FilterAltIcon htmlColor='#fff' />
+          </Button>
+      }
+      {!isMobile && <FilterButtons isMobile={isMobile} />}
+      <Button variant="contained" size="large" onClick={() => console.log('Добавлен новый ученик!')}>Добавить</Button>
     </Stack>
+    {showFilters && <FilterButtons isMobile={isMobile} />}
   </header>
   );
 }
