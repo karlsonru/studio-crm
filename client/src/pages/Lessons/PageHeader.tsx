@@ -34,7 +34,7 @@ function FilterButtons({ isMobile }: { isMobile: boolean }) {
     <Stack direction={isMobile ? 'column' : 'row'} spacing={isMobile ? 1 : 2}>
       <SearchField placeholder='Поиск' value={titleFilter} handler={changeTitleHandler} />
 
-      <Select label="Тип" value={sizeFilter} onChange={changeSizeHandler}>
+      <Select value={sizeFilter} onChange={changeSizeHandler}>
         <MenuItem value="groups">Группа</MenuItem>
         <MenuItem value="individuals">Индивидуальные</MenuItem>
       </Select>

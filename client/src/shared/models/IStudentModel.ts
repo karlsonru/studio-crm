@@ -17,6 +17,6 @@ export interface IStudentModel {
   isActive: boolean;
 }
 
-export interface IStudentModalCreate extends Omit<IStudentModel, '_id' | 'visitingLessons' | 'comment'> {
+export interface IStudentModalCreate extends Omit<IStudentModel, '_id' | 'visitingLessons'> {
   visitingLessons: Array<string>;
 }

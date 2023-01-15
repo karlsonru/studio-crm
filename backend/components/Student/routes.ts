@@ -6,7 +6,7 @@ import { checkCreateStudent } from './middlewares';
 import { injectQuery } from '../../shared/middlewares';
 
 const middlewares = {
-  post: [checkCreateStudent, injectQuery(['name', 'surname'])],
+  post: [checkCreateStudent, injectQuery(['fullname'])],
 };
 
 const service = new StudentServices(Student);

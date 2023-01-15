@@ -1,10 +1,7 @@
 import { model, Schema, Types } from 'mongoose';
 
 const schema = new Schema({
-  name: {
-    type: String, required: true, trim: true, minLength: 2,
-  },
-  surname: {
+  fullname: {
     type: String, required: true, trim: true, minLength: 2,
   },
   sex: { type: String, required: true, trim: true },
