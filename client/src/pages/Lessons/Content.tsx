@@ -11,11 +11,11 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import { TableHeader } from './ContentHeader';
 import { useGetLessonsQuery, useDeleteLessonMutation } from '../../shared/api/lessonApi';
-import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { ILessonModel } from '../../shared/models/ILessonModel';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { getDayName } from '../../shared/helpers/getDayName';
 import { getReadbleTime } from '../../shared/helpers/getReadableTime';
+import { useAppSelector } from '../../shared/hooks/useAppSelector';
 
 function createRow(id: string, args: (string | number | JSX.Element)[]) {
   return (
@@ -62,7 +62,10 @@ export function LessonsContent() {
   const [deleteLesson] = useDeleteLessonMutation();
 
   const { data, isLoading, error } = useGetLessonsQuery();
-  const lessonSelector = useAppSelector((state) => state.lessonPageReduer);
+
+  const titleFilter = useAppSelector((state) => state.lessonsPageReducer.titleFilter);
+  const sizeFilter = useAppSelector((state) => state.lessonsPageReducer.sizeFilter);
+  const statusFilter = useAppSelector((state) => state.lessonsPageReducer.statusFilter);
 
   if (isLoading || !data?.payload) {
     return null;
@@ -72,13 +75,11 @@ export function LessonsContent() {
     return <h1>Error!!! </h1>;
   }
 
-  const { lessonSizeFilter, lessonActiveStatusFilter, lessonTitleFilter } = lessonSelector;
-
   const filteredData = data.payload.filter((lesson) => {
-    const activeFilter = lessonActiveStatusFilter === 'active';
+    const activeFilter = statusFilter === 'active';
     return lesson.isActive === activeFilter
-      && lesson.title.toLowerCase().includes(lessonTitleFilter.toLocaleLowerCase())
-      && lessonSizeFilter;
+      && lesson.title.toLowerCase().includes(titleFilter.toLocaleLowerCase())
+      && sizeFilter;
   });
 
   if (sortBy) {
