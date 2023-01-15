@@ -81,7 +81,7 @@ function FilterButtons({ isMobile }: { isMobile: boolean }) {
   };
 
   return (
-    <Stack direction={isMobile ? 'column' : 'row'} spacing={2}>
+    <Stack direction={isMobile ? 'column' : 'row'} spacing={isMobile ? 1 : 2}>
       <SearchField placeholder='Поиск по имени' value={nameFilter} handler={changeNameHandler} />
       <SearchField placeholder='Поиск по телефону' value={phoneFilter} handler={changePhoneHandler} />
 
