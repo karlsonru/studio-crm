@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
@@ -49,7 +50,7 @@ function FilterButtons({ isMobile }: { isMobile: boolean }) {
 
 export function LessonsHeader() {
   const isMobile = useMediaQuery('(max-width: 767px)');
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [, setSearchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
 
   const toggleFilterButtons = () => {
@@ -61,10 +62,10 @@ export function LessonsHeader() {
       <Stack direction='row' justifyContent="space-between" alignItems="center">
         {isMobile && <MobileFilterButton handler={toggleFilterButtons} />}
         {!isMobile && <FilterButtons isMobile={isMobile} />}
-        <Button variant="contained" size="large" onClick={() => setModalOpen(true)}>Добавить</Button>
+        <Button variant="contained" size="large" onClick={() => setSearchParams({ 'create-lesson': 'true' })}>Добавить</Button>
       </Stack>
       {showFilters && <FilterButtons isMobile={isMobile} />}
-      <CreateLessonModal isOpen={isModalOpen} setModalOpen={setModalOpen} />
+      <CreateLessonModal />
     </header>
   );
 }

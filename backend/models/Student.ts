@@ -18,6 +18,7 @@ const schema = new Schema({
     },
     phone: { type: Number },
   }],
+  source: { type: String }, // источник, откуда ребёнок узнал о занятии
   isActive: { type: Boolean, required: true },
 }, {
   timestamps: true,
