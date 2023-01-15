@@ -3,19 +3,23 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import Grid from '@mui/material/Grid';
+import Stack from '@mui/system/Stack';
 import { setLessonActiveStatusFilter, setLessonSizeFilter, setLessonTitleFilter } from 'shared/reducers/lessonPageSlice';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { CreateLessonModal } from '../../shared/components/CreateLessonModal';
 import { SearchField } from '../../shared/components/SearchField';
+import { MobileFilterButton } from '../../shared/components/MobileFilterButton';
 
-function FilterButtons() {
+function FilterButtons({ isMobile }: { isMobile: boolean }) {
   const lessonSelector = useAppSelector((state) => state.lessonPageReduer);
   const dispatch = useAppDispatch();
 
-  const { lessonSizeFilter, lessonActiveStatusFilter } = lessonSelector;
+  const { lessonTitleFilter, lessonSizeFilter, lessonActiveStatusFilter } = lessonSelector;
+
+  const titleFilterChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(setLessonTitleFilter(event.target.value));
+  };
 
   const lessonSizeFilterChangeHandler = (event: SelectChangeEvent) => {
     dispatch(setLessonSizeFilter(event.target.value));
@@ -26,64 +30,40 @@ function FilterButtons() {
   };
 
   return (
-    <>
-      <Select label="Тип" value={lessonSizeFilter} sx={{ m: '0rem 0.25rem' }} onChange={lessonSizeFilterChangeHandler}>
+    <Stack direction={isMobile ? 'column' : 'row'} spacing={isMobile ? 1 : 2}>
+      <SearchField placeholder='Поиск' value={lessonTitleFilter} handler={titleFilterChangeHandler} />
+
+      <Select label="Тип" value={lessonSizeFilter} onChange={lessonSizeFilterChangeHandler}>
         <MenuItem value="groups">Группа</MenuItem>
         <MenuItem value="individuals">Индивидуальные</MenuItem>
       </Select>
-      <Select value={lessonActiveStatusFilter} sx={{ m: '0rem 0.25rem' }} onChange={lessonActiveStatusFilterChangeHandler}>
+
+      <Select value={lessonActiveStatusFilter} onChange={lessonActiveStatusFilterChangeHandler}>
         <MenuItem value="active">Активные</MenuItem>
         <MenuItem value="archived">В архиве</MenuItem>
       </Select>
-    </>
+    </Stack>
   );
 }
-
-const FilterButtonsWrapped = () => (
-  <Grid item width='100%' justifyContent='space-around'>
-    <FilterButtons />
-  </Grid>
-);
 
 export function LessonsHeader() {
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [isModalOpen, setModalOpen] = useState(false);
-  const [isFiltersOpen, setFiltersOpen] = useState(false);
-  const lessonSelector = useAppSelector((state) => state.lessonPageReduer);
-  const dispatch = useAppDispatch();
+  const [showFilters, setShowFilters] = useState(false);
 
   const toggleFilterButtons = () => {
-    setFiltersOpen((isOpen) => !isOpen);
-  };
-
-  const MobileFilterButton = () => (
-    <Button size='large' variant='contained' onClick={toggleFilterButtons} sx={{ m: 0.25 }}>
-        <FilterAltIcon fontSize='large' htmlColor='#fff' />
-    </Button>
-  );
-
-  const { lessonTitleFilter } = lessonSelector;
-
-  const titleFilterChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setLessonTitleFilter(event.target.value));
+    setShowFilters((isOpen) => !isOpen);
   };
 
   return (
-    <>
-      <header>
-        <Grid container justifyContent="space-between" alignItems="center" spacing={2}>
-          <Grid item>
-            <SearchField placeholder='Поиск' value={lessonTitleFilter} handler={titleFilterChangeHandler} />
-            { !isMobile && <FilterButtons /> }
-            { isMobile && <MobileFilterButton />}
-          </Grid>
-            { isMobile && isFiltersOpen && <FilterButtonsWrapped /> }
-          <Grid item>
-            <Button variant="contained" size="large" onClick={() => setModalOpen(true)}>Добавить</Button>
-          </Grid>
-        </Grid>
-      </header>
+    <header>
+      <Stack direction='row' justifyContent="space-between" alignItems="center">
+        {isMobile && <MobileFilterButton handler={toggleFilterButtons} />}
+        {!isMobile && <FilterButtons isMobile={isMobile} />}
+        <Button variant="contained" size="large" onClick={() => setModalOpen(true)}>Добавить</Button>
+      </Stack>
+      {showFilters && <FilterButtons isMobile={isMobile} />}
       <CreateLessonModal isOpen={isModalOpen} setModalOpen={setModalOpen} />
-    </>
+    </header>
   );
 }

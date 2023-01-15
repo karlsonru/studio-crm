@@ -10,9 +10,9 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { useMediaQuery } from '@mui/material';
 import { SearchField } from '../../shared/components/SearchField';
+import { MobileFilterButton } from '../../shared/components/MobileFilterButton';
 import { useGetLessonsQuery } from '../../shared/api/lessonApi';
 import { ILessonFilter, studentsPageActions } from '../../shared/reducers/studentsPageSlice';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
@@ -102,7 +102,7 @@ function FilterButtons({ isMobile }: { isMobile: boolean }) {
             {option.title}
           </li>
         )}
-        style={{ width: 300 }}
+        style={{ width: isMobile ? '100%' : 300 }}
         onChange={changeLessonsHandler}
         renderInput={(params) => (
           <TextField {...params} label="Занятия" placeholder="Занятия" />
@@ -143,16 +143,13 @@ export function StudentsPageHeader() {
   };
 
   return (
-  <header>
-    <Stack direction='row' justifyContent="space-between" alignItems="center">
-      {isMobile && <Button variant='contained' size='large' onClick={toggleFilters} style={{ height: '100%' }}>
-            <FilterAltIcon htmlColor='#fff' />
-          </Button>
-      }
-      {!isMobile && <FilterButtons isMobile={isMobile} />}
-      <Button variant="contained" size="large" onClick={() => console.log('Добавлен новый ученик!')}>Добавить</Button>
-    </Stack>
-    {showFilters && <FilterButtons isMobile={isMobile} />}
-  </header>
+    <header>
+      <Stack direction='row' justifyContent="space-between" alignItems="center">
+        {isMobile && <MobileFilterButton handler={toggleFilters} />}
+        {!isMobile && <FilterButtons isMobile={isMobile} />}
+        <Button variant="contained" size="large" onClick={() => console.log('Добавлен новый ученик!')}>Добавить</Button>
+      </Stack>
+      {showFilters && <FilterButtons isMobile={isMobile} />}
+    </header>
   );
 }
