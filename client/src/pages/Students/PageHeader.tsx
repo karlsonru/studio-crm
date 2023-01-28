@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
@@ -49,43 +49,16 @@ function FilterButtons({ isMobile }: { isMobile: boolean }) {
     { id: lesson._id, title: lesson.title }
   ));
 
-  const nameFilter = useAppSelector((state) => state.studentsPageReducer.nameFilter);
-  const phoneFilter = useAppSelector((state) => state.studentsPageReducer.phoneFilter);
-  const statusFilter = useAppSelector((state) => state.studentsPageReducer.statusFilter);
-  const ageFromFilter = useAppSelector((state) => state.studentsPageReducer.ageFromFilter);
-  const ageToFilter = useAppSelector((state) => state.studentsPageReducer.ageToFilter);
-
-  const changeNameHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    actions.setNameFilter(e.target.value);
-  };
-
-  const changePhoneHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    actions.setPhoneFilter(e.target.value);
-  };
-
-  const changeLessonsHandler = (
-    e: React.SyntheticEvent<Element, Event>,
-    value: Array<ILessonFilter>,
-  ) => {
-    actions.setLessonsFilter(value);
-  };
-
-  const changeStatusHandler = (e: SelectChangeEvent<string>) => {
-    actions.setStatusFilter(e.target.value);
-  };
-
-  const changeAgeFromHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    actions.setAgeFromFilter(e.target.value);
-  };
-
-  const changeAgeToHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    actions.setAgeToFilter(e.target.value);
-  };
+  const nameFilter = useAppSelector((state) => state.studentsPageReducer.filters.fullname);
+  const phoneFilter = useAppSelector((state) => state.studentsPageReducer.filters.phone);
+  const statusFilter = useAppSelector((state) => state.studentsPageReducer.filters.status);
+  const ageFromFilter = useAppSelector((state) => state.studentsPageReducer.filters.ageFrom);
+  const ageToFilter = useAppSelector((state) => state.studentsPageReducer.filters.ageTo);
 
   return (
     <Stack direction={isMobile ? 'column' : 'row'} spacing={isMobile ? 1 : 2}>
-      <SearchField placeholder='Поиск по имени' value={nameFilter} handler={changeNameHandler} />
-      <SearchField placeholder='Поиск по телефону' value={phoneFilter} handler={changePhoneHandler} />
+      <SearchField placeholder='Поиск по имени' value={nameFilter} handler={(e) => actions.setFilter({ fullname: e.target.value }) } />
+      <SearchField placeholder='Поиск по телефону' value={phoneFilter} handler={(e) => actions.setFilter({ phone: e.target.value }) } />
 
       { // TODO - переделать разделив заголовками уроки по дням и отсортировав их по времени
       lessonsOptions && <Autocomplete
@@ -106,7 +79,7 @@ function FilterButtons({ isMobile }: { isMobile: boolean }) {
           </li>
         )}
         style={{ width: isMobile ? '100%' : 300 }}
-        onChange={changeLessonsHandler}
+        onChange={(e, value) => actions.setFilter({ lessons: value }) }
         renderInput={(params) => (
           <TextField {...params} label="Занятия" placeholder="Занятия" />
         )}
@@ -114,7 +87,7 @@ function FilterButtons({ isMobile }: { isMobile: boolean }) {
 
       <FormControl sx={{ minWidth: 120 }}>
         <InputLabel id="student-status">Статус</InputLabel>
-        <Select labelId="student-status" value={statusFilter} label="Статус" onChange={changeStatusHandler} fullWidth>
+        <Select labelId="student-status" value={statusFilter} label="Статус" onChange={(e) => actions.setFilter({ status: e.target.value })} fullWidth>
           <MenuItem value=""><em>None</em></MenuItem>
           <MenuItem value="active">Активные</MenuItem>
           <MenuItem value="archived">В архиве</MenuItem>
@@ -125,10 +98,10 @@ function FilterButtons({ isMobile }: { isMobile: boolean }) {
         <InputLabel id="student-age">Возраст</InputLabel>
         <Select multiple value={[]} labelId="student-age" label="Возраст" fullWidth>
           <MenuItem disableGutters component="span" sx={{ display: 'inline' }}>
-            <NumberField placeholder="От" value={ageFromFilter ?? ''} handler={changeAgeFromHandler} />
+            <NumberField placeholder="От" value={ageFromFilter ?? ''} handler={(e) => actions.setFilter({ ageFrom: +e.target.value }) } />
           </MenuItem>
           <MenuItem disableGutters component="span" sx={{ display: 'inline' }}>
-            <NumberField placeholder="До" value={ageToFilter ?? ''} handler={changeAgeToHandler} />
+            <NumberField placeholder="До" value={ageToFilter ?? ''} handler={(e) => actions.setFilter({ ageTo: +e.target.value })} />
           </MenuItem>
         </Select>
       </FormControl>

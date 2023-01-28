@@ -3,7 +3,7 @@ import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { DateSwitcher } from './PageHeader';
+import { TimetableHeader } from './PageHeader';
 import { DayColumns } from './Content';
 import { useGetLessonsQuery } from '../../shared/api/lessonApi';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
@@ -54,7 +54,7 @@ export function TimetablePage() {
 
   return (
     <>
-      <DateSwitcher startDate={startDate} setDateHandler={setStartDate} />
+      <TimetableHeader startDate={startDate} setDateHandler={setStartDate} />
       <Stack direction='row'>
         {!isMobile && <TimeColumn />}
         {isLoading && <CircularProgress />}
