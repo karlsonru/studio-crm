@@ -7,7 +7,6 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import DeleteIcon from '@mui/icons-material/Delete';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import { TableHeader } from './ContentHeader';
 import { useGetLessonsQuery, useDeleteLessonMutation } from '../../shared/api/lessonApi';
@@ -16,6 +15,7 @@ import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/Co
 import { getDayName } from '../../shared/helpers/getDayName';
 import { getReadbleTime } from '../../shared/helpers/getReadableTime';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
+import { useMobile } from '../../shared/hooks/useMobile';
 
 function createRow(id: string, args: (string | number | JSX.Element)[]) {
   return (
@@ -46,7 +46,7 @@ function getRowArguments(
 }
 
 export function LessonsContent() {
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  const isMobile = useMobile();
   const [isModalOpen, setModalOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsNumber, setRowsNumbr] = useState(10);

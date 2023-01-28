@@ -42,6 +42,7 @@ const studentsPageState = createSlice({
     },
     setSort: (state, action: PayloadAction<Partial<typeof initialState.sort>>) => {
       state.sort = { ...state.sort, ...action.payload };
+      console.log(state.sort);
     },
 
     // Вариант 2

@@ -7,13 +7,13 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import DeleteIcon from '@mui/icons-material/Delete';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
 import { TableHeader } from './ContentHeader';
 import { useGetStudentsQuery, useDeleteStudentMutation } from '../../shared/api/studentApi';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { IStudentModel } from '../../shared/models/IStudentModel';
+import { useMobile } from '../../shared/hooks/useMobile';
 
 interface IRowArguments<T> {
   student: T;
@@ -26,11 +26,14 @@ function getRowArguments({ student, isMobile, deleteHandler }: IRowArguments<ISt
     return [student.fullname];
   }
 
+  const bDay = new Date(student.birthday);
+  const birthday = `${bDay.getDate().toString().padStart(2, '0')}-${(bDay.getMonth() + 1).toString().padStart(2, '0')}-${bDay.getFullYear()}`;
+
   return ([
     student.fullname,
     student.contacts[0].phone,
     student.sex,
-    student.birthday,
+    birthday,
     student.isActive ? 'Активен' : 'В архиве',
     <IconButton onClick={() => deleteHandler(student)}><DeleteIcon /></IconButton>,
   ]);
@@ -45,7 +48,7 @@ function createRow(id: string, args: (string | number | JSX.Element)[]) {
 }
 
 export function StudentsContent() {
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  const isMobile = useMobile();
 
   const sortBy = useAppSelector((state) => state.studentsPageReducer.sort.item);
   const sortOrder = useAppSelector((state) => state.studentsPageReducer.sort.order);
@@ -73,6 +76,7 @@ export function StudentsContent() {
     return <h1>Error!!! </h1>;
   }
 
+  // TODO: получилась монструозная функция фильтра. Подумать над упрощением
   const filteredData = data.payload.filter((student) => {
     const age = new Date(Date.now() - +(new Date(student.birthday))).getFullYear();
     return (
@@ -83,7 +87,6 @@ export function StudentsContent() {
       && (filters.phone
         ? student.contacts.some((contact) => contact.phone.toString().includes(filters.phone))
         : true)
-      // TODO: получилась монструозная функция фильтра. Подумать над упрощением
       && (filters.lessons.length
         ? filters.lessons.filter(
           (lesson) => student.visitingLessons.some((les) => les._id === lesson.id),

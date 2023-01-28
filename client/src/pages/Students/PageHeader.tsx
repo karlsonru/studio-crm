@@ -11,7 +11,6 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import { useMediaQuery } from '@mui/material';
 import { SearchField } from '../../shared/components/SearchField';
 import { MobileFilterButton } from '../../shared/components/MobileFilterButton';
 import { useGetLessonsQuery } from '../../shared/api/lessonApi';
@@ -19,6 +18,7 @@ import { ILessonFilter, studentsPageActions } from '../../shared/reducers/studen
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { CreateStudentModal } from '../../shared/components/CreateStudentModal';
+import { useMobile } from '../../shared/hooks/useMobile';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -111,7 +111,7 @@ function FilterButtons({ isMobile }: { isMobile: boolean }) {
 }
 
 export function StudentsPageHeader() {
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  const isMobile = useMobile();
   const [showFilters, setShowFilters] = useState(false);
   const [, setSearchParams] = useSearchParams();
 

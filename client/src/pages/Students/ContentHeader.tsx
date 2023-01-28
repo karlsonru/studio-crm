@@ -1,7 +1,7 @@
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { useMobile } from '../../shared/hooks/useMobile';
 import { studentsPageActions } from '../../shared/reducers/studentsPageSlice';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
@@ -76,7 +76,7 @@ function HeaderCell({ cell, params }: IHeaderCellParams) {
 }
 
 export function TableHeader() {
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  const isMobile = useMobile();
   const actions = useActionCreators(studentsPageActions);
   const sortBy = useAppSelector((state) => state.studentsPageReducer.sort.item);
   const sortOrder = useAppSelector((state) => state.studentsPageReducer.sort.order);
