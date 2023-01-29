@@ -5,6 +5,7 @@ import { UsersPage } from './pages/Users';
 import { TimetablePage } from './pages/Timetable';
 import { LessonsPage } from './pages/Lessons';
 import { StudentsPage } from './pages/Students';
+import { SubscribtionsPage } from './pages/Subscribtions';
 
 function Hello() {
   return <h1>Work in progress...</h1>;
@@ -20,7 +21,7 @@ export function Router() {
         <Route path='/timetable' element={<TimetablePage />} />
         <Route path='/students' element={<StudentsPage />} />
         <Route path='/lessons' element={<LessonsPage />} />
-        <Route path='/subscribtions' element={<Hello />} />
+        <Route path='/subscribtions' element={<SubscribtionsPage />} />
         <Route path='/finance' element={<Hello />} />
       </Route>
     </Routes>

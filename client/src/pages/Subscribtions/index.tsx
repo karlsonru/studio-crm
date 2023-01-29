@@ -1,0 +1,1 @@
+export { SubscribtionsPage } from './Page';

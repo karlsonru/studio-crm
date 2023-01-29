@@ -11,7 +11,7 @@ const schema = new Schema({
     type: Number, required: true, min: 1,
   },
   duration: {
-    type: String, required: true, trim: true,
+    type: Number, required: true, min: 86400000,
   },
   isActive: { type: Boolean, required: true },
 }, {

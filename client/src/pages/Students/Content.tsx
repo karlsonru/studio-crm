@@ -16,12 +16,12 @@ import { IStudentModel } from '../../shared/models/IStudentModel';
 import { useMobile } from '../../shared/hooks/useMobile';
 
 interface IRowArguments<T> {
-  student: T;
+  item: T;
   isMobile: boolean;
-  deleteHandler: (student: T) => void;
+  deleteHandler: (item: T) => void;
 }
 
-function getRowArguments({ student, isMobile, deleteHandler }: IRowArguments<IStudentModel>) {
+function getRowArguments({ item: student, isMobile, deleteHandler }: IRowArguments<IStudentModel>) {
   if (isMobile) {
     return [student.fullname];
   }
@@ -103,7 +103,7 @@ export function StudentsContent() {
   }
 
   const filteredRows = filteredData.map((student) => {
-    const args = getRowArguments({ student, isMobile, deleteHandler });
+    const args = getRowArguments({ item: student, isMobile, deleteHandler });
     return createRow(student._id, args);
   });
 
