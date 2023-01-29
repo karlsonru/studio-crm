@@ -11,78 +11,30 @@ import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/system/Stack';
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
-import { useCreateSubscribtionTemplateMutation } from '../api';
+import { useCreateSubscriptionTemplateMutation } from '../api';
 import { useMobile } from '../hooks/useMobile';
 import { NumberField } from './NumberField';
 
 function validateForm(formData: { [key: string]: FormDataEntryValue }) {
-  if (!formData.fullname || (formData.fullname as string).trim().length < 3) {
+  if (!formData.title || (formData.title as string).trim().length < 3) {
     return 'fullname';
   }
 
-  if (!formData.contactName1 || (formData.contactName1 as string).trim().length < 2) {
-    return 'hasContacts';
-  }
-
-  if (!formData.contactPhone1 || (formData.contactPhone1 as string).trim().length !== 11) {
-    return 'validPhone';
+  if (!formData.price || (+formData.price as number) < 0) {
+    return 'price';
   }
 
   return '';
 }
-/*
-export function CreateStudentModal() {
-  const submitHandler = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const form = event.currentTarget as HTMLFormElement;
-    const formData = Object.fromEntries(new FormData(form).entries());
 
-    validateForm(formData);
-
-    setFormValidation({
-      fullname: true,
-      hasContacts: true,
-      validPhone: true,
-    });
-
-    const errorName = validateForm(formData);
-    if (errorName) {
-      setFormValidation(() => ({
-        ...formValidation,
-        [errorName]: false,
-      }));
-      return;
-    }
-
-    const studentContacts = contacts.map((idx) => ({
-      name: formData[`contactName${idx + 1}`] as string,
-      phone: +(formData[`contactPhone${idx + 1}`] as string),
-    }));
-
-    createStudent({
-      fullname: (formData.fullname as string).trim(),
-      sex: formData.sex as string,
-      birthday: +Date.parse(formData.birthday as string),
-      balance: 0,
-      visitingLessons: [],
-      contacts: studentContacts,
-      comment: (formData.comment as string).trim() ?? '',
-      isActive: true,
-    });
-
-    form.reset();
-  };
-}
-*/
-
-export function CreateSubscribtionTemplateModal() {
+export function CreateSubscriptionTemplateModal() {
   const isMobile = useMobile();
   const [searchParams, setSearchParams] = useSearchParams();
   const [
-    createSubscribtionTemplate,
+    createSubscriptionTemplate,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     { isSuccess, isError },
-  ] = useCreateSubscribtionTemplateMutation();
+  ] = useCreateSubscriptionTemplateMutation();
   const [formValidation, setFormValidation] = useState({
     title: true,
     price: true,
@@ -95,10 +47,52 @@ export function CreateSubscribtionTemplateModal() {
     const form = event.currentTarget as HTMLFormElement;
     const formData = Object.fromEntries(new FormData(form).entries());
     console.log(formData);
+
+    validateForm(formData);
+
+    setFormValidation({
+      title: true,
+      price: true,
+      visits: true,
+      duration: true,
+    });
+
+    const errorName = validateForm(formData);
+    if (errorName) {
+      setFormValidation(() => ({
+        ...formValidation,
+        [errorName]: false,
+      }));
+      return;
+    }
+
+    const calculateDuration = () => {
+      const day = 86400000; // длительность дня в милисекундах
+      switch (formData.period) {
+        case 'month':
+          return +formData.duration * day * 30;
+        case 'week':
+          return +formData.duration * day * 7;
+        case 'day':
+          return +formData.duration * day;
+        default:
+          return 0;
+      }
+    };
+
+    createSubscriptionTemplate({
+      title: formData.title as string,
+      price: +formData.price as number,
+      visits: +formData.visits as number,
+      duration: calculateDuration(),
+      isActive: true,
+    });
+
+    form.reset();
   };
 
   return (
-    <Dialog open={searchParams.has('create-subscribtion-template')} onClose={() => setSearchParams('')}>
+    <Dialog open={searchParams.has('create-subscription-template')} onClose={() => setSearchParams('')}>
       <DialogTitle>Добавить шаблон</DialogTitle>
       <DialogContent>
         <form onSubmit={submitHandler}>

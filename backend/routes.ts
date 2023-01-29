@@ -24,8 +24,8 @@ router.use('/rolesGroup', roleGroupsRouter);
 router.use('/location', locationRouter);
 router.use('/lesson', lessonRouter);
 router.use('/student', studentRouter);
-router.use('/subsciption/templates', subscriptionTemplateRouter);
-router.use('/subsciption', subscriptionRouter);
+router.use('/subscription/templates', subscriptionTemplateRouter);
+router.use('/subscription', subscriptionRouter);
 router.use('/visitStatus', visitStatusRouter);
 router.use('/visitedLesson', visitedLessonRouter);
 

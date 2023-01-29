@@ -24,7 +24,7 @@ export function NumberField({
   useEffect(() => {
     if (!minValue || !value) return;
 
-    if (+value > minValue) {
+    if (+value >= minValue) {
       setValueError(false);
       return;
     }

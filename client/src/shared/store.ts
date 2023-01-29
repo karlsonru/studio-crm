@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import menuReducer from './reducers/appMenuSlice';
 import { lessonsPageReducer } from './reducers/lessonsPageSlice';
 import { studentsPageReducer } from './reducers/studentsPageSlice';
-import { subscribtionsPageReducer } from './reducers/subscribtionsPageSlice';
+import { subscriptionsPageReducer } from './reducers/subscriptionsPageSlice';
 import { basicApi } from './api/basicApi';
 
 const store = configureStore({
@@ -10,7 +10,7 @@ const store = configureStore({
     menuReducer,
     lessonsPageReducer,
     studentsPageReducer,
-    subscribtionsPageReducer,
+    subscriptionsPageReducer,
     [basicApi.reducerPath]: basicApi.reducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(basicApi.middleware),

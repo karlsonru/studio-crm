@@ -1,8 +1,8 @@
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import { useEffect, useState } from 'react';
-import { SubscribtionsTemplatesHeader } from './Templates/PageHeader';
-import { SubscribtionsTemplatesContent } from './Templates/Content';
+import { SubscriptionsTemplatesHeader } from './Templates/PageHeader';
+import { SubscriptionsTemplatesContent } from './Templates/Content';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
 
@@ -25,7 +25,7 @@ function TabPanel({ children, value, index }: TabPanelProps) {
   );
 }
 
-export function SubscribtionsPage() {
+export function SubscriptionsPage() {
   const dispatch = useAppDispatch();
   const [value, setValue] = useState(0);
 
@@ -37,11 +37,11 @@ export function SubscribtionsPage() {
     <>
     <Tabs value={value} onChange={(e, val) => setValue(val)} sx={{ mb: 2 }}>
       <Tab label='Шаблоны' id="templates" />
-      <Tab label='Абонементы' id="subscribtions" />
+      <Tab label='Абонементы' id="subscriptions" />
     </Tabs>
     <TabPanel value={value} index={0} >
-      <SubscribtionsTemplatesHeader />
-      <SubscribtionsTemplatesContent />
+      <SubscriptionsTemplatesHeader />
+      <SubscriptionsTemplatesContent />
     </TabPanel>
     <TabPanel value={value} index={1} >
     </TabPanel>

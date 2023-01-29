@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface ISubscribtionsPageState {
+interface ISubscriptionsPageState {
   templates: {
     filters: {
       title: string;
@@ -9,7 +9,7 @@ interface ISubscribtionsPageState {
   },
 }
 
-const initialState: ISubscribtionsPageState = {
+const initialState: ISubscriptionsPageState = {
   templates: {
     filters: {
       title: '',
@@ -18,8 +18,8 @@ const initialState: ISubscribtionsPageState = {
   },
 };
 
-const subscribtionsPageState = createSlice({
-  name: 'subscribtionsPage',
+const subscriptionsPageState = createSlice({
+  name: 'subscriptionsPage',
   initialState,
   reducers: {
     setTemplateFilterTitle: (state, action: PayloadAction<string>) => {
@@ -32,6 +32,6 @@ const subscribtionsPageState = createSlice({
 });
 
 export const {
-  reducer: subscribtionsPageReducer,
-  actions: subscribtionsPageActions,
-} = subscribtionsPageState;
+  reducer: subscriptionsPageReducer,
+  actions: subscriptionsPageActions,
+} = subscriptionsPageState;
