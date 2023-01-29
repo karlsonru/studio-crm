@@ -4,7 +4,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import Stack from '@mui/system/Stack';
-import { CreateTemplateModal } from '../../../shared/components/CreateTemplateModal';
+import { CreateSubscribtionTemplateModal } from '../../../shared/components/CreateSubscribtionTemplateModal';
 import { SearchField } from '../../../shared/components/SearchField';
 import { MobileFilterButton } from '../../../shared/components/MobileFilterButton';
 import { useAppSelector } from '../../../shared/hooks/useAppSelector';
@@ -59,7 +59,7 @@ export function SubscribtionsTemplatesHeader() {
         <Button variant="contained" size="large" onClick={() => setSearchParams({ 'create-subscribtion-template': 'true' })}>Добавить</Button>
       </Stack>
       {showFilters && <FilterButtons isMobile={isMobile} />}
-      <CreateTemplateModal />
+      <CreateSubscribtionTemplateModal />
     </header>
   );
 }
