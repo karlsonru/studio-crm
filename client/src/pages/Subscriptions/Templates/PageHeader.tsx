@@ -8,7 +8,7 @@ import { CreateSubscriptionTemplateModal } from '../../../shared/components/Crea
 import { SearchField } from '../../../shared/components/SearchField';
 import { MobileFilterButton } from '../../../shared/components/MobileFilterButton';
 import { useAppSelector } from '../../../shared/hooks/useAppSelector';
-import { lessonsPageActions } from '../../../shared/reducers/lessonsPageSlice';
+import { subscriptionsPageActions } from '../../../shared/reducers/subscriptionsPageSlice';
 import { useActionCreators } from '../../../shared/hooks/useActionCreators';
 import { useMobile } from '../../../shared/hooks/useMobile';
 
@@ -16,18 +16,19 @@ function FilterButtons({ isMobile }: { isMobile: boolean }) {
   const titleFilter = useAppSelector(
     (state) => state.subscriptionsPageReducer.templates.filters.title,
   );
+
   const statusFilter = useAppSelector(
     (state) => state.subscriptionsPageReducer.templates.filters.status,
   );
 
-  const actions = useActionCreators(lessonsPageActions);
+  const actions = useActionCreators(subscriptionsPageActions);
 
   const changeTitleHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    actions.setTitleFilter(event.target.value);
+    actions.setTemplateFilterTitle(event.target.value);
   };
 
   const changeStatusHandler = (event: SelectChangeEvent) => {
-    actions.setStatusFilter(event.target.value);
+    actions.setTemplateFilterStatus(event.target.value);
   };
 
   return (
@@ -52,7 +53,7 @@ export function SubscriptionsTemplatesHeader() {
   };
 
   return (
-    <header>
+    <header style={{ margin: '1rem 0' }}>
       <Stack direction='row' justifyContent="space-between" alignItems="center">
         {isMobile && <MobileFilterButton handler={toggleFilterButtons} />}
         {!isMobile && <FilterButtons isMobile={isMobile} />}
