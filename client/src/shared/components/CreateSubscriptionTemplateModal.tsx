@@ -130,7 +130,7 @@ export function CreateSubscriptionTemplateModal() {
                   minValue={1}
                 />
 
-                <Select name="period" defaultValue="month" sx={{ flexGrow: 1 }}>
+                <Select name="period" defaultValue="month" sx={{ flexGrow: 1, minWidth: '115px' }}>
                   <MenuItem value="day">Дней</MenuItem>
                   <MenuItem value="week">Недель</MenuItem>
                   <MenuItem value="month">Месяцев</MenuItem>

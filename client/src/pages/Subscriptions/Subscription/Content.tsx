@@ -45,7 +45,7 @@ function getRowArguments(
   ]);
 }
 
-export function LessonsContent() {
+export function SubscriptionContent() {
   const isMobile = useMobile();
   const [isModalOpen, setModalOpen] = useState(false);
   const [page, setPage] = useState(0);
