@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -17,21 +17,45 @@ import { getReadbleTime } from '../../shared/helpers/getReadableTime';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useMobile } from '../../shared/hooks/useMobile';
 
-function createRow(id: string, args: (string | number | JSX.Element)[]) {
+interface IAddRow {
+  lesson: ILessonModel;
+  args: (string | number | JSX.Element)[];
+}
+
+function AddRow({ lesson, args }: IAddRow) {
+  const isMobile = useMobile();
+  const [deleteLesson] = useDeleteLessonMutation();
+  const [isModalOpen, setModalOpen] = useState(false);
+
   return (
-    <TableRow key={id} hover={true}>
-      { args.map((value) => <TableCell key={id + value}>{value}</TableCell>) }
-    </TableRow>
+    <>
+      <TableRow key={lesson._id} hover={true}>
+        { args.map((value) => <TableCell key={lesson._id + value}>{value}</TableCell>) }
+
+        {!isMobile
+         && <TableCell>
+              <IconButton onClick={() => setModalOpen(true)}><DeleteIcon /></IconButton>
+            </TableCell>
+        }
+      </TableRow>
+
+      {!isMobile && <ConfirmationDialog
+        title='Удалить занятие'
+        contentEl={<DeleteDialogText name={lesson.title} />}
+        isOpen={isModalOpen}
+        setModalOpen={setModalOpen}
+        callback={() => deleteLesson(lesson._id)}
+      />}
+    </>
   );
 }
 
-function getRowArguments(
-  lesson: ILessonModel,
-  isMobile: boolean,
-  deleteLessonHandler: (lesson: ILessonModel) => void,
-) {
+function getRowArguments(lesson: ILessonModel, isMobile: boolean) {
   if (isMobile) {
-    return [lesson.title, lesson.activeStudents];
+    return [
+      lesson.title,
+      lesson.activeStudents,
+    ];
   }
 
   return ([
@@ -41,25 +65,15 @@ function getRowArguments(
     'Группа', // TODO заменть на тип занятия - individual или group
     lesson.activeStudents,
     lesson.isActive ? 'Активна' : 'В архиве',
-    <IconButton onClick={() => deleteLessonHandler(lesson)}><DeleteIcon /></IconButton>,
   ]);
 }
 
 export function LessonsContent() {
   const isMobile = useMobile();
-  const [isModalOpen, setModalOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsNumber, setRowsNumbr] = useState(10);
-  const [sortBy, setSortBy] = useState<'day' | 'activeStudents'>();
+  const [sortBy, setSortBy] = useState<'day' | 'activeStudents'>('day');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [lessonDetails, setLessonDetails] = useState<ILessonModel>();
-
-  const deleteLessonHandler = useCallback((currentLesson: ILessonModel) => {
-    setLessonDetails(currentLesson);
-    setModalOpen(true);
-  }, [setModalOpen, setLessonDetails]);
-
-  const [deleteLesson] = useDeleteLessonMutation();
 
   const { data, isLoading, error } = useGetLessonsQuery();
 
@@ -87,8 +101,8 @@ export function LessonsContent() {
   }
 
   const filteredRows = filteredData.map((lesson) => {
-    const args = getRowArguments(lesson, isMobile, deleteLessonHandler);
-    return createRow(lesson._id, args);
+    const args = getRowArguments(lesson, isMobile);
+    return <AddRow key={lesson._id} lesson={lesson} args={args} />;
   });
 
   const rowsStartIdx = page === 0 ? 0 : page * rowsNumber;
@@ -100,7 +114,7 @@ export function LessonsContent() {
         <Table>
           <TableHead>
             <TableHeader
-              sortBy={sortBy ?? ''}
+              sortBy={sortBy}
               setSortBy={setSortBy}
               sortOrder={sortOrder}
               setSortOrder={setSortOrder}
@@ -130,13 +144,6 @@ export function LessonsContent() {
           display: 'inline-block',
           alignSelf: isMobile ? 'center' : 'right',
         }}
-      />
-      <ConfirmationDialog
-        title='Удалить занятие'
-        contentEl={<DeleteDialogText name={lessonDetails?.title ?? ''} />}
-        isOpen={isModalOpen}
-        setModalOpen={setModalOpen}
-        callback={() => deleteLesson(lessonDetails?._id ?? '')}
       />
     </>
   );

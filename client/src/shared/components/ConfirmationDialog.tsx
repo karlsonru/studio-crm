@@ -15,7 +15,7 @@ interface IConfirmationDialog {
 }
 
 export function DeleteDialogText({ name }: { name: string }) {
-  return <DialogContentText>Вы уверены что хотите удалить {name}?</DialogContentText>;
+  return <DialogContentText>Вы уверены что хотите удалить <b>{name}</b>?</DialogContentText>;
 }
 
 export function ConfirmationDialog(
