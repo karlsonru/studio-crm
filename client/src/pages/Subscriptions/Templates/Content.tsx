@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -17,21 +18,26 @@ function CardContentItem({ title, value }: { title: string, value: string | numb
       <Typography>
         { title }
       </Typography>
-    <Typography sx={{ fontWeight: 'bold' }}>
-      { value }
-    </Typography>
+      <Typography sx={{ fontWeight: 'bold' }}>
+        { value }
+      </Typography>
   </Stack>
   );
 }
 
 function AddCard({ cardDetails }: { cardDetails: ISubscriptionTemplateModel }) {
-  const days = cardDetails.duration / 1000 / 86400;
+  const [, setSearchParams] = useSearchParams();
+  const days = cardDetails.duration / 86400000;
   const isMobile = useMobile();
+
+  const clickHanler = () => {
+    setSearchParams({ 'update-template': 'true', id: cardDetails._id });
+  };
 
   return (
     <Card variant="outlined" sx={{ width: '325px', marginRight: isMobile ? 0 : '0.5rem', marginBottom: '0.5rem' }}>
       <CardHeader title={cardDetails.title} />
-      <CardActionArea>
+      <CardActionArea onClick={clickHanler}>
         <CardContent>
           <CardContentItem title="Занятий" value={cardDetails.visits} />
           <Divider />
@@ -46,6 +52,7 @@ function AddCard({ cardDetails }: { cardDetails: ISubscriptionTemplateModel }) {
 
 export function SubscriptionsTemplatesContent() {
   const { data } = useGetSubscriptionTemplatesQuery();
+
   const titleFilter = useAppSelector(
     (state) => state.subscriptionsPageReducer.templates.filters.title,
   );
@@ -55,7 +62,7 @@ export function SubscriptionsTemplatesContent() {
 
   if (!data) return <></>;
 
-  const filteredData = data.payload.filter((template) => {
+  const filteredData = data.payload.filter((template: ISubscriptionTemplateModel) => {
     if (titleFilter && !template.title.includes(titleFilter)) return false;
     if (statusFilter === 'active' && !template.isActive) return false;
     if (statusFilter === 'archived' && template.isActive) return false;

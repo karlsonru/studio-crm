@@ -81,7 +81,7 @@ function createMenuList() {
       icon: <ListAltIcon />,
     },
     {
-      path: 'subscriptions',
+      path: 'subscriptions/templates',
       title: 'Абонементы',
       icon: <CardMembershipIcon />,
     },

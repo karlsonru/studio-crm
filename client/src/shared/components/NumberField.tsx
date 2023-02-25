@@ -7,12 +7,13 @@ interface INumberField {
   error: boolean;
   helperText?: string;
   minValue?: number;
+  defaultValue?: number;
 }
 
 export function NumberField({
-  name, label, error, helperText, minValue,
+  name, label, error, helperText, minValue, defaultValue,
 }: INumberField) {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(defaultValue ?? '');
   const [valueError, setValueError] = useState(false);
   const valueErrorText = `Укажите число больше ${minValue}`;
 

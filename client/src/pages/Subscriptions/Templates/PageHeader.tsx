@@ -5,6 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import Stack from '@mui/system/Stack';
 import { CreateSubscriptionTemplateModal } from '../../../shared/components/CreateSubscriptionTemplateModal';
+import { UpdateSubscriptionTemplateModal } from '../../../shared/components/UpdateSubscriptionTemplateModal';
 import { SearchField } from '../../../shared/components/SearchField';
 import { MobileFilterButton } from '../../../shared/components/MobileFilterButton';
 import { useAppSelector } from '../../../shared/hooks/useAppSelector';
@@ -61,6 +62,7 @@ export function SubscriptionsTemplatesHeader() {
       </Stack>
       {showFilters && <FilterButtons isMobile={isMobile} />}
       <CreateSubscriptionTemplateModal />
+      <UpdateSubscriptionTemplateModal />
     </header>
   );
 }
