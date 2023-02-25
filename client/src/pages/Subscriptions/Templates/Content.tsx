@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -7,7 +8,10 @@ import Stack from '@mui/material/Stack';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import { useGetSubscriptionTemplatesQuery } from 'shared/api';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useGetSubscriptionTemplatesQuery, useDeleteSubscriptionTemplateMutation } from '../../../shared/api';
+import { ConfirmationDialog, DeleteDialogText } from '../../../shared/components/ConfirmationDialog';
 import { useMobile } from '../../../shared/hooks/useMobile';
 import { ISubscriptionTemplateModel } from '../../../shared/models/ISubscriptionModel';
 import { useAppSelector } from '../../../shared/hooks/useAppSelector';
@@ -30,23 +34,36 @@ function AddCard({ cardDetails }: { cardDetails: ISubscriptionTemplateModel }) {
   const days = cardDetails.duration / 86400000;
   const isMobile = useMobile();
 
-  const clickHanler = () => {
-    setSearchParams({ 'update-template': 'true', id: cardDetails._id });
-  };
+  const [deleteCard] = useDeleteSubscriptionTemplateMutation();
+  const [isModalOpen, setModalOpen] = useState(false);
 
   return (
-    <Card variant="outlined" sx={{ width: '325px', marginRight: isMobile ? 0 : '0.5rem', marginBottom: '0.5rem' }}>
-      <CardHeader title={cardDetails.title} />
-      <CardActionArea onClick={clickHanler}>
-        <CardContent>
-          <CardContentItem title="Занятий" value={cardDetails.visits} />
-          <Divider />
-          <CardContentItem title="Длительность (дней)" value={days} />
-          <Divider />
-          <CardContentItem title="Стоимость P" value={cardDetails.price} />
-        </CardContent>
-      </CardActionArea>
-    </Card>
+    <>
+      <Card variant="outlined" sx={{ width: '325px', marginRight: isMobile ? 0 : '0.5rem', marginBottom: '0.5rem' }}>
+        <CardHeader title={cardDetails.title} action={
+          <IconButton onClick={() => setModalOpen(true)}>
+            <DeleteIcon />
+          </IconButton>
+          } />
+        <CardActionArea onClick={() => setSearchParams({ 'update-template': 'true', id: cardDetails._id })}>
+          <CardContent>
+            <CardContentItem title="Занятий" value={cardDetails.visits} />
+            <Divider />
+            <CardContentItem title="Длительность (дней)" value={days} />
+            <Divider />
+            <CardContentItem title="Стоимость P" value={cardDetails.price} />
+          </CardContent>
+        </CardActionArea>
+      </Card>
+
+      <ConfirmationDialog
+        title='Удалить шаблон'
+        contentEl={<DeleteDialogText name={cardDetails.title} />}
+        isOpen={isModalOpen}
+        setModalOpen={setModalOpen}
+        callback={() => deleteCard(cardDetails._id)}
+      />
+    </>
   );
 }
 
