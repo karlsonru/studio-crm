@@ -54,7 +54,7 @@ export function SubscriptionsTemplatesHeader() {
   };
 
   return (
-    <header style={{ margin: '1rem 0' }}>
+    <header style={{ marginBottom: '1rem' }}>
       <Stack direction='row' justifyContent="space-between" alignItems="center">
         {isMobile && <MobileFilterButton handler={toggleFilterButtons} />}
         {!isMobile && <FilterButtons isMobile={isMobile} />}

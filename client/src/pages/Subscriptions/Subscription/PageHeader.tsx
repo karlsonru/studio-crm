@@ -4,7 +4,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import Stack from '@mui/system/Stack';
-import { CreateLessonModal } from '../../../shared/components/CreateLessonModal';
+import { CreateSubscriptionModal } from '../../../shared/components/CreateSubscriptionModal';
 import { SearchField } from '../../../shared/components/SearchField';
 import { MobileFilterButton } from '../../../shared/components/MobileFilterButton';
 import { useAppSelector } from '../../../shared/hooks/useAppSelector';
@@ -12,6 +12,9 @@ import { lessonsPageActions } from '../../../shared/reducers/lessonsPageSlice';
 import { useActionCreators } from '../../../shared/hooks/useActionCreators';
 import { useMobile } from '../../../shared/hooks/useMobile';
 
+// фильтры по имени ?
+// по датам
+// активный / неактивный
 function FilterButtons({ isMobile }: { isMobile: boolean }) {
   const titleFilter = useAppSelector((state) => state.lessonsPageReducer.titleFilter);
   const sizeFilter = useAppSelector((state) => state.lessonsPageReducer.sizeFilter);
@@ -62,10 +65,10 @@ export function SubscriptionsHeader() {
       <Stack direction='row' justifyContent="space-between" alignItems="center">
         {isMobile && <MobileFilterButton handler={toggleFilterButtons} />}
         {!isMobile && <FilterButtons isMobile={isMobile} />}
-        <Button variant="contained" size="large" onClick={() => setSearchParams({ 'create-lesson': 'true' })}>Добавить</Button>
+        <Button variant="contained" size="large" onClick={() => setSearchParams({ 'create-subscription': 'true' })}>Оформить</Button>
       </Stack>
       {showFilters && <FilterButtons isMobile={isMobile} />}
-      <CreateLessonModal />
+      <CreateSubscriptionModal />
     </header>
   );
 }

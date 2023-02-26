@@ -1,8 +1,13 @@
-import { model, Schema, Types } from 'mongoose';
+import {
+  InferSchemaType, model, Schema, Types,
+} from 'mongoose';
 
 const schema = new Schema({
-  title: {
-    type: String, required: true, unique: true, trim: true,
+  student: {
+    type: Types.ObjectId, ref: 'Student', required: true,
+  },
+  template: {
+    type: Types.ObjectId, ref: 'SubsciptionTemplate', required: true,
   },
   price: {
     type: Number, required: true, min: 0,
@@ -12,9 +17,6 @@ const schema = new Schema({
   },
   duration: {
     type: String, required: true, trim: true,
-  },
-  student: {
-    type: Types.ObjectId, ref: 'Student', required: true, trim: true,
   },
   dateFrom: {
     type: Number, required: true,
@@ -31,5 +33,6 @@ const schema = new Schema({
 });
 
 const Subscription = model('Subscription', schema);
+type ISubscription = InferSchemaType<typeof schema>;
 
-export { Subscription };
+export { Subscription, ISubscription };

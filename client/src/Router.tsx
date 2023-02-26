@@ -5,7 +5,7 @@ import { UsersPage } from './pages/Users';
 import { TimetablePage } from './pages/Timetable';
 import { LessonsPage } from './pages/Lessons';
 import { StudentsPage } from './pages/Students';
-import { SubscriptionsPageLayout, SubscriptionsTemplatePage } from './pages/Subscriptions';
+import { SubscriptionsPageLayout, SubscriptionsTemplatePage, SubscriptionsPage } from './pages/Subscriptions';
 
 function Hello() {
   return <h1>Work in progress...</h1>;
@@ -23,7 +23,7 @@ export function Router() {
         <Route path='/lessons' element={<LessonsPage />} />
 
         <Route path='/subscriptions' element={<SubscriptionsPageLayout />}>
-          <Route index element={<Hello />} />
+          <Route index element={<SubscriptionsPage />} />
           <Route path=':templates' element={<SubscriptionsTemplatePage />} />
         </Route>
 

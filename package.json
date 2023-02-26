@@ -29,6 +29,7 @@
     "ts-node": "^10.9.1"
   },
   "dependencies": {
+    "@mui/x-data-grid": "^5.17.25",
     "dotenv": "^16.0.3"
   }
 }
