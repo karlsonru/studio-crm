@@ -1,143 +1,54 @@
-import { useState, useCallback } from 'react';
-import TableContainer from '@mui/material/TableContainer';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableHead from '@mui/material/TableHead';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-import TableCell from '@mui/material/TableCell';
-import DeleteIcon from '@mui/icons-material/Delete';
-import IconButton from '@mui/material/IconButton';
-import { TableHeader } from './ContentHeader';
-import { useGetLessonsQuery, useDeleteLessonMutation } from '../../../shared/api/lessonApi';
-import { ILessonModel } from '../../../shared/models/ILessonModel';
-import { ConfirmationDialog, DeleteDialogText } from '../../../shared/components/ConfirmationDialog';
-import { getDayName } from '../../../shared/helpers/getDayName';
-import { getReadbleTime } from '../../../shared/helpers/getReadableTime';
-import { useAppSelector } from '../../../shared/hooks/useAppSelector';
+import { DataGrid } from '@mui/x-data-grid/DataGrid';
+import { GridColDef, GridValueFormatterParams } from '@mui/x-data-grid';
 import { useMobile } from '../../../shared/hooks/useMobile';
+import { useGetSubscriptionsQuery } from '../../../shared/api';
 
-function createRow(id: string, args: (string | number | JSX.Element)[]) {
-  return (
-    <TableRow key={id} hover={true}>
-      { args.map((value) => <TableCell key={id + value}>{value}</TableCell>) }
-    </TableRow>
-  );
+function valueFormatter(params: GridValueFormatterParams<any>) {
+  return new Intl.DateTimeFormat('ru-RU', {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour12: false,
+  }).format(new Date(params.value));
 }
 
-function getRowArguments(
-  lesson: ILessonModel,
-  isMobile: boolean,
-  deleteLessonHandler: (lesson: ILessonModel) => void,
-) {
+function getColumns(isMobile: boolean) {
+  const columns: GridColDef[] = [
+    { field: 'student', headerName: 'Ученик', flex: 1 },
+    // Посещено? Запрос к другой коллекции базы с фильтрацией? Доп.поле к этому абонементу?
+    { field: 'visits', headerName: 'Занятий', flex: 1 },
+    {
+      field: 'duration', headerName: 'Длительность', flex: 1, valueFormatter: (params) => Math.floor(params.value / 86400000),
+    },
+    {
+      field: 'dateFrom', headerName: 'Дата от', flex: 1, valueFormatter,
+    },
+    {
+      field: 'dateTo', headerName: 'Дата до', flex: 1, valueFormatter,
+    },
+    { field: 'price', headerName: 'Цена', flex: 1 },
+  ];
+
   if (isMobile) {
-    return [lesson.title, lesson.activeStudents];
+    return [columns[0], columns[1], columns[2]];
   }
 
-  return ([
-    lesson.title,
-    getDayName(lesson.day),
-    getReadbleTime(lesson.timeStart),
-    'Группа', // TODO заменть на тип занятия - individual или group
-    lesson.activeStudents,
-    lesson.isActive ? 'Активна' : 'В архиве',
-    <IconButton onClick={() => deleteLessonHandler(lesson)}><DeleteIcon /></IconButton>,
-  ]);
+  return columns;
 }
 
 export function SubscriptionContent() {
   const isMobile = useMobile();
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [page, setPage] = useState(0);
-  const [rowsNumber, setRowsNumbr] = useState(10);
-  const [sortBy, setSortBy] = useState<'day' | 'activeStudents'>();
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [lessonDetails, setLessonDetails] = useState<ILessonModel>();
 
-  const deleteLessonHandler = useCallback((currentLesson: ILessonModel) => {
-    setLessonDetails(currentLesson);
-    setModalOpen(true);
-  }, [setModalOpen, setLessonDetails]);
+  const { data } = useGetSubscriptionsQuery();
 
-  const [deleteLesson] = useDeleteLessonMutation();
+  if (!data) return <h1>Is loading ...</h1>;
 
-  const { data, isLoading, error } = useGetLessonsQuery();
+  const columns = getColumns(isMobile);
 
-  const titleFilter = useAppSelector((state) => state.lessonsPageReducer.titleFilter);
-  const sizeFilter = useAppSelector((state) => state.lessonsPageReducer.sizeFilter);
-  const statusFilter = useAppSelector((state) => state.lessonsPageReducer.statusFilter);
-
-  if (isLoading || !data?.payload) {
-    return null;
-  }
-
-  if (error) {
-    return <h1>Error!!! </h1>;
-  }
-
-  const filteredData = data.payload.filter((lesson) => {
-    const activeFilter = statusFilter === 'active';
-    return lesson.isActive === activeFilter
-      && lesson.title.toLowerCase().includes(titleFilter.toLocaleLowerCase())
-      && sizeFilter;
-  });
-
-  if (sortBy) {
-    filteredData.sort((objA, objB) => (sortOrder === 'asc' ? objB[sortBy] - objA[sortBy] : objA[sortBy] - objB[sortBy]));
-  }
-
-  const filteredRows = filteredData.map((lesson) => {
-    const args = getRowArguments(lesson, isMobile, deleteLessonHandler);
-    return createRow(lesson._id, args);
-  });
-
-  const rowsStartIdx = page === 0 ? 0 : page * rowsNumber;
-  const rowsEndIdx = page === 0 ? rowsNumber : (page + 1) * rowsNumber;
-
-  return (
-    <>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableHeader
-              sortBy={sortBy ?? ''}
-              setSortBy={setSortBy}
-              sortOrder={sortOrder}
-              setSortOrder={setSortOrder}
-            />
-          </TableHead>
-          <TableBody>
-            { filteredRows.slice(rowsStartIdx, rowsEndIdx) }
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        component='div'
-        labelRowsPerPage={ isMobile ? 'Строк' : 'Показать строк' }
-        rowsPerPage={rowsNumber}
-        rowsPerPageOptions={[5, 10, 20]}
-        count={filteredRows.length}
-        page={page}
-        backIconButtonProps={{
-          disabled: page === 0,
-        }}
-        onPageChange={(event, pageNum) => setPage(pageNum)}
-        onRowsPerPageChange={(event) => {
-          setRowsNumbr(+event.target.value);
-          setPage(0);
-        }}
-        sx={{
-          display: 'inline-block',
-          alignSelf: isMobile ? 'center' : 'right',
-        }}
-      />
-      <ConfirmationDialog
-        title='Удалить занятие'
-        contentEl={<DeleteDialogText name={lessonDetails?.title ?? ''} />}
-        isOpen={isModalOpen}
-        setModalOpen={setModalOpen}
-        callback={() => deleteLesson(lessonDetails?._id ?? '')}
-      />
-    </>
-  );
+  return <DataGrid
+    autoHeight
+    columns={columns}
+    rows={data.payload}
+    getRowId={(item) => item._id}
+  />;
 }
