@@ -1,7 +1,22 @@
 import { DataGrid } from '@mui/x-data-grid/DataGrid';
-import { GridColDef, GridValueFormatterParams } from '@mui/x-data-grid';
+import {
+  GridColDef,
+  GridValueFormatterParams,
+  GridToolbarContainer,
+  GridToolbarExport,
+  GridToolbarFilterButton,
+} from '@mui/x-data-grid';
 import { useMobile } from '../../../shared/hooks/useMobile';
 import { useGetSubscriptionsQuery } from '../../../shared/api';
+
+function CustomToolbar() {
+  return (
+    <GridToolbarContainer sx={{ minHeight: '2rem' }}>
+      <GridToolbarFilterButton sx={{ fontSize: '1rem' }} />
+      <GridToolbarExport sx={{ fontSize: '1rem' }} />
+    </GridToolbarContainer>
+  );
+}
 
 function valueFormatter(params: GridValueFormatterParams<any>) {
   return new Intl.DateTimeFormat('ru-RU', {
@@ -12,21 +27,51 @@ function valueFormatter(params: GridValueFormatterParams<any>) {
   }).format(new Date(params.value));
 }
 
+const leftAlignNumberColumn: Partial<GridColDef> = {
+  type: 'number',
+  flex: 1,
+  align: 'left',
+  headerAlign: 'left',
+};
+
 function getColumns(isMobile: boolean) {
   const columns: GridColDef[] = [
-    { field: 'student', headerName: 'Ученик', flex: 1 },
+    {
+      field: 'student',
+      headerName: 'Ученик',
+      flex: 1,
+    },
     // Посещено? Запрос к другой коллекции базы с фильтрацией? Доп.поле к этому абонементу?
-    { field: 'visits', headerName: 'Занятий', flex: 1 },
     {
-      field: 'duration', headerName: 'Длительность', flex: 1, valueFormatter: (params) => Math.floor(params.value / 86400000),
+      field: 'visits',
+      headerName: 'Занятий',
+      ...leftAlignNumberColumn,
     },
     {
-      field: 'dateFrom', headerName: 'Дата от', flex: 1, valueFormatter,
+      field: 'duration',
+      headerName: 'Длительность',
+      valueFormatter: (params) => Math.floor(params.value / 86400000),
+      ...leftAlignNumberColumn,
     },
     {
-      field: 'dateTo', headerName: 'Дата до', flex: 1, valueFormatter,
+      field: 'dateFrom',
+      type: 'dateTime',
+      headerName: 'Дата от',
+      flex: 1,
+      valueFormatter,
     },
-    { field: 'price', headerName: 'Цена', flex: 1 },
+    {
+      field: 'dateTo',
+      type: 'dateTime',
+      headerName: 'Дата до',
+      flex: 1,
+      valueFormatter,
+    },
+    {
+      field: 'price',
+      headerName: 'Цена',
+      ...leftAlignNumberColumn,
+    },
   ];
 
   if (isMobile) {
@@ -50,5 +95,9 @@ export function SubscriptionContent() {
     columns={columns}
     rows={data.payload}
     getRowId={(item) => item._id}
+    disableColumnMenu
+    components={{
+      Toolbar: CustomToolbar,
+    }}
   />;
 }

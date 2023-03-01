@@ -22,7 +22,7 @@ export function SubscriptionsPageLayout() {
     <>
       <Tabs value={value} onChange={handleChange} sx={{ marginBottom: '1rem' }}>
         <Tab label="Абонементы" component={NavLink} to="/subscriptions" />
-        <Tab label="Шаблоны" component={NavLink} to="./templates" />
+        <Tab label="Шаблоны" component={NavLink} to="/subscriptions/templates" />
       </Tabs>
       <Outlet />
     </>
