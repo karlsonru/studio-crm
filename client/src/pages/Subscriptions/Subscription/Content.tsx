@@ -1,31 +1,8 @@
-import { DataGrid } from '@mui/x-data-grid/DataGrid';
-import {
-  GridColDef,
-  GridValueFormatterParams,
-  GridToolbarContainer,
-  GridToolbarExport,
-  GridToolbarFilterButton,
-} from '@mui/x-data-grid';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useMobile } from '../../../shared/hooks/useMobile';
 import { useGetSubscriptionsQuery } from '../../../shared/api';
-
-function CustomToolbar() {
-  return (
-    <GridToolbarContainer sx={{ minHeight: '2rem' }}>
-      <GridToolbarFilterButton sx={{ fontSize: '1rem' }} />
-      <GridToolbarExport sx={{ fontSize: '1rem' }} />
-    </GridToolbarContainer>
-  );
-}
-
-function valueFormatter(params: GridValueFormatterParams<any>) {
-  return new Intl.DateTimeFormat('ru-RU', {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour12: false,
-  }).format(new Date(params.value));
-}
+import { CustomGridToolbar } from '../../../shared/components/CustomGridToolbar';
+import { dateValueFormatter } from '../../../shared/helpers/dateValueFormatter';
 
 const leftAlignNumberColumn: Partial<GridColDef> = {
   type: 'number',
@@ -58,14 +35,14 @@ function getColumns(isMobile: boolean) {
       type: 'dateTime',
       headerName: 'Дата от',
       flex: 1,
-      valueFormatter,
+      valueFormatter: dateValueFormatter,
     },
     {
       field: 'dateTo',
       type: 'dateTime',
       headerName: 'Дата до',
       flex: 1,
-      valueFormatter,
+      valueFormatter: dateValueFormatter,
     },
     {
       field: 'price',
@@ -97,7 +74,7 @@ export function SubscriptionContent() {
     getRowId={(item) => item._id}
     disableColumnMenu
     components={{
-      Toolbar: CustomToolbar,
+      Toolbar: CustomGridToolbar,
     }}
   />;
 }
