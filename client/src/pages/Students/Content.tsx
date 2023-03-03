@@ -13,6 +13,7 @@ import { IStudentModel } from '../../shared/models/IStudentModel';
 import { useMobile } from '../../shared/hooks/useMobile';
 import { CustomGridToolbar } from '../../shared/components/CustomGridToolbar';
 import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
+import { SearchParamsButton } from '../../shared/components/SearchParamsButton';
 
 export function StudentsContent() {
   const isMobile = useMobile();
@@ -20,21 +21,13 @@ export function StudentsContent() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [studentDetails, setStudentDetails] = useState<IStudentModel>();
 
+  const { data, isLoading, error } = useGetStudentsQuery();
+  const [deleteStudent] = useDeleteStudentMutation();
+
   const deleteStudentHandler = useCallback((currentStudent: IStudentModel) => {
     setStudentDetails(currentStudent);
     setModalOpen(true);
   }, [setModalOpen, setStudentDetails]);
-
-  const { data, isLoading, error } = useGetStudentsQuery();
-  const [deleteStudent] = useDeleteStudentMutation();
-
-  if (isLoading || !data?.payload) {
-    return null;
-  }
-
-  if (error) {
-    return <h1>Error!!! </h1>;
-  }
 
   const columns: GridEnrichedColDef[] = useMemo(() => [
     {
@@ -45,6 +38,7 @@ export function StudentsContent() {
     {
       field: 'contacts',
       headerName: 'Телефон',
+      sortable: false,
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams<any>) => (
         params.value[0].phone
@@ -86,25 +80,33 @@ export function StudentsContent() {
     },
   ], [deleteStudentHandler]);
 
+  if (isLoading || !data?.payload) {
+    return null;
+  }
+
+  if (error) {
+    return <h1>Error!!! </h1>;
+  }
+
+  const extendedToolbar = () => (
+    CustomGridToolbar([
+      <SearchParamsButton title="Добавить" param="create-student" />,
+    ])
+  );
+
   return (
-    <>
-      <DataGrid
-        autoHeight
-        columns={isMobile ? [columns[0]] : columns}
-        rows={data.payload}
-        getRowId={(item) => item._id}
-        disableColumnMenu
-        components={{
-          Toolbar: CustomGridToolbar,
-        }}
-      />;
-      <ConfirmationDialog
-        title='Удалить занятие'
-        contentEl={<DeleteDialogText name={studentDetails?.fullname || ''} />}
-        isOpen={isModalOpen}
-        setModalOpen={setModalOpen}
-        callback={() => deleteStudent(studentDetails?._id || '')}
-        />
-    </>
+    <DataGrid
+      autoHeight
+      columns={isMobile ? [columns[0]] : columns}
+      rows={data.payload}
+      getRowId={(item) => item._id}
+      disableColumnMenu
+      components={{
+        Toolbar: extendedToolbar,
+      }}
+      localeText={{
+        toolbarFilters: 'Фильтры',
+      }}
+    />
   );
 }
