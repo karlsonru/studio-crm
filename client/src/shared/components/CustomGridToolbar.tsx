@@ -31,7 +31,9 @@ export function CustomGridToolbar(elements: React.ReactNode[]) {
         {!isMobile && <GridToolbarExport size="large" variant="outlined" />}
       </Box>
 
-      {elements}
+      <Box>
+        {elements.map((elem, idx) => <span key={idx}>{elem}</span>)}
+      </Box>
 
     </GridToolbarContainer>
   );

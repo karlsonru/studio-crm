@@ -54,14 +54,6 @@ export function LessonsContent() {
     actions.setConfirmationDialog(true);
   }, [actions.setCurrentLesson, actions.setConfirmationDialog]);
 
-  if (isLoading || !data?.payload) {
-    return null;
-  }
-
-  if (error) {
-    return <h1>Error!!! </h1>;
-  }
-
   const columns: GridColDef<ILessonModel>[] = useMemo(() => [
     {
       field: 'title',
@@ -84,16 +76,20 @@ export function LessonsContent() {
         getReadbleTime(params.value)
       ),
     },
+    /*
     {
       field: 'type',
       headerName: 'Тип',
       flex: 1,
     },
+    */
     {
       field: 'activeStudents',
       type: 'number',
       headerName: 'Ученики',
       flex: 1,
+      align: 'left',
+      headerAlign: 'left',
     },
     {
       field: 'isActive',
@@ -113,6 +109,14 @@ export function LessonsContent() {
     },
   ], [deleteLessonHandler]);
 
+  if (isLoading || !data?.payload) {
+    return null;
+  }
+
+  if (error) {
+    return <h1>Error!!! </h1>;
+  }
+
   return (
     <DataGrid
       autoHeight
@@ -128,7 +132,7 @@ export function LessonsContent() {
       }}
       initialState={{
         sorting: {
-          sortModel: [{ field: 'asc', sort: 'desc' }],
+          sortModel: [{ field: 'day', sort: 'asc' }],
         },
       }}
     />

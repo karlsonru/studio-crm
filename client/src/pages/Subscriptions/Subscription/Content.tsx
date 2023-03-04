@@ -1,9 +1,11 @@
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridValueFormatterParams } from '@mui/x-data-grid';
 import { useMobile } from '../../../shared/hooks/useMobile';
 import { useGetSubscriptionsQuery } from '../../../shared/api';
 import { CustomGridToolbar } from '../../../shared/components/CustomGridToolbar';
 import { dateValueFormatter } from '../../../shared/helpers/dateValueFormatter';
 import { SearchParamsButton } from '../../../shared/components/SearchParamsButton';
+import { CreateSubscriptionModal } from '../../../shared/components/CreateSubscriptionModal';
+import { ISubscriptionModel } from '../../../shared/models/ISubscriptionModel';
 
 const leftAlignNumberColumn: Partial<GridColDef> = {
   type: 'number',
@@ -18,6 +20,9 @@ function getColumns(isMobile: boolean) {
       field: 'student',
       headerName: 'Ученик',
       flex: 1,
+      valueFormatter: (params: GridValueFormatterParams<ISubscriptionModel['student']>) => (
+        params.value.fullname
+      ),
     },
     // eslint-disable-next-line max-len
     // Посещено занятий по абонементу? Запрос к другой коллекции базы с фильтрацией? Доп.поле к этому абонементу?
@@ -72,6 +77,7 @@ export function SubscriptionContent() {
   const ExtendedToolbar = () => (
     CustomGridToolbar([
       <SearchParamsButton title="Оформить" param="create-subscription" />,
+      <CreateSubscriptionModal />,
     ])
   );
 

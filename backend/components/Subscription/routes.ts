@@ -9,7 +9,7 @@ const middlewares = {
   post: [checkCreateSubscription, injectQuery(['_id'])],
 };
 
-const service = new SubscriptionServices(Subscription);
+const service = new SubscriptionServices(Subscription, ['student']);
 const controller = new SubscriptionController(service);
 
 const subscriptionRouter = createBasicRouterWithDefaultMiddlewares(controller, middlewares);
