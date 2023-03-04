@@ -1,61 +1,29 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-export interface ILessonFilter {
-  id: string;
-  title: string;
-}
+import { IStudentModel } from '../models/IStudentModel';
 
 interface IStudentsPageState {
-  filters: {
-    fullname: string;
-    phone: string;
-    lessons: Array<ILessonFilter>;
-    status: string;
-    ageFrom?: number;
-    ageTo?: number;
-  },
-  sort: {
-    item: string,
-    order: 'asc' | 'desc',
-  }
+  students: IStudentModel[],
+  studentsIds: string[],
+  currentStudent?: IStudentModel,
+  isConfirmationDialog: boolean;
 }
 
 const initialState: IStudentsPageState = {
-  filters: {
-    fullname: '',
-    phone: '',
-    lessons: [],
-    status: '',
-  },
-  sort: {
-    item: '',
-    order: 'asc',
-  },
+  students: [],
+  studentsIds: [],
+  isConfirmationDialog: false,
 };
 
 const studentsPageState = createSlice({
   name: 'studentsPage',
   initialState,
   reducers: {
-    setFilter: (state, action: PayloadAction<Partial<typeof initialState.filters>>) => {
-      state.filters = { ...state.filters, ...action.payload };
+    setCurrentStudent: (state, action: PayloadAction<IStudentModel>) => {
+      state.currentStudent = action.payload;
     },
-    setSort: (state, action: PayloadAction<Partial<typeof initialState.sort>>) => {
-      state.sort = { ...state.sort, ...action.payload };
+    setConfirmationDialog: (state, action: PayloadAction<boolean>) => {
+      state.isConfirmationDialog = action.payload;
     },
-
-    // Вариант 2
-    setSortItem: (state, action: PayloadAction<string>) => {
-      state.sort.item = action.payload;
-    },
-    setSortOrder: (state, action: PayloadAction<'asc' | 'desc'>) => {
-      state.sort.order = action.payload;
-    },
-
-    setSortName: (state, action: PayloadAction<string>) => {
-      state.filters.fullname = action.payload;
-    },
-    // ....
   },
 });
 

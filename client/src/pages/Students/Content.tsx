@@ -1,8 +1,8 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   DataGrid,
   GridActionsCellItem,
-  GridEnrichedColDef,
+  GridColDef,
   GridRowParams,
   GridValueFormatterParams,
 } from '@mui/x-data-grid';
@@ -14,22 +14,46 @@ import { useMobile } from '../../shared/hooks/useMobile';
 import { CustomGridToolbar } from '../../shared/components/CustomGridToolbar';
 import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
 import { SearchParamsButton } from '../../shared/components/SearchParamsButton';
+import { CreateStudentModal } from '../../shared/components/CreateStudentModal';
+import { useAppSelector } from '../../shared/hooks/useAppSelector';
+import { studentsPageActions } from '../../shared/reducers/studentsPageSlice';
+import { useActionCreators } from '../../shared/hooks/useActionCreators';
+
+function ExtendedToolbar() {
+  const [deleteStudent] = useDeleteStudentMutation();
+
+  const actions = useActionCreators(studentsPageActions);
+
+  const {
+    isConfirmationDialog,
+    currentStudent,
+  } = useAppSelector((state) => state.studentsPageReducer);
+
+  return CustomGridToolbar([
+    <SearchParamsButton title="Добавить" param="create-student" />,
+    <CreateStudentModal />,
+    <ConfirmationDialog
+      title="Удалить ученика"
+      contentEl={<DeleteDialogText name={currentStudent?.fullname ?? ''} />}
+      isOpen={isConfirmationDialog}
+      setModalOpen={actions.setConfirmationDialog}
+      callback={() => deleteStudent(currentStudent?._id ?? '')}
+    />,
+  ]);
+}
 
 export function StudentsContent() {
   const isMobile = useMobile();
-
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [studentDetails, setStudentDetails] = useState<IStudentModel>();
+  const actions = useActionCreators(studentsPageActions);
 
   const { data, isLoading, error } = useGetStudentsQuery();
-  const [deleteStudent] = useDeleteStudentMutation();
 
   const deleteStudentHandler = useCallback((currentStudent: IStudentModel) => {
-    setStudentDetails(currentStudent);
-    setModalOpen(true);
-  }, [setModalOpen, setStudentDetails]);
+    actions.setCurrentStudent(currentStudent);
+    actions.setConfirmationDialog(true);
+  }, [actions.setCurrentStudent, actions.setConfirmationDialog]);
 
-  const columns: GridEnrichedColDef[] = useMemo(() => [
+  const columns: GridColDef<IStudentModel>[] = useMemo(() => [
     {
       field: 'fullname',
       headerName: 'Ученик',
@@ -40,7 +64,7 @@ export function StudentsContent() {
       headerName: 'Телефон',
       sortable: false,
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams<any>) => (
+      valueFormatter: (params: GridValueFormatterParams<IStudentModel['contacts']>) => (
         params.value[0].phone
       ),
     },
@@ -48,13 +72,13 @@ export function StudentsContent() {
       field: 'sex',
       headerName: 'Пол',
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams<any>) => (
+      valueFormatter: (params: GridValueFormatterParams<IStudentModel['sex']>) => (
         params.value === 'male' ? 'Мужской' : 'Женский'
       ),
     },
     {
       field: 'birthday',
-      type: 'dateTime',
+      type: 'date',
       headerName: 'Дата рождения',
       flex: 1,
       valueFormatter: dateValueFormatter,
@@ -71,14 +95,11 @@ export function StudentsContent() {
         <GridActionsCellItem
           label="Delete"
           icon={<DeleteIcon />}
-          onClick={() => {
-            deleteStudentHandler(params.row);
-          }
-        }
+          onClick={() => deleteStudentHandler(params.row)}
       />,
       ],
     },
-  ], [deleteStudentHandler]);
+  ], [deleteStudentHandler, dateValueFormatter]);
 
   if (isLoading || !data?.payload) {
     return null;
@@ -88,12 +109,6 @@ export function StudentsContent() {
     return <h1>Error!!! </h1>;
   }
 
-  const extendedToolbar = () => (
-    CustomGridToolbar([
-      <SearchParamsButton title="Добавить" param="create-student" />,
-    ])
-  );
-
   return (
     <DataGrid
       autoHeight
@@ -102,10 +117,15 @@ export function StudentsContent() {
       getRowId={(item) => item._id}
       disableColumnMenu
       components={{
-        Toolbar: extendedToolbar,
+        Toolbar: ExtendedToolbar,
       }}
       localeText={{
         toolbarFilters: 'Фильтры',
+      }}
+      initialState={{
+        sorting: {
+          sortModel: [{ field: 'fullname', sort: 'desc' }],
+        },
       }}
     />
   );

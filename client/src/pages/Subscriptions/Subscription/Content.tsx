@@ -3,6 +3,7 @@ import { useMobile } from '../../../shared/hooks/useMobile';
 import { useGetSubscriptionsQuery } from '../../../shared/api';
 import { CustomGridToolbar } from '../../../shared/components/CustomGridToolbar';
 import { dateValueFormatter } from '../../../shared/helpers/dateValueFormatter';
+import { SearchParamsButton } from '../../../shared/components/SearchParamsButton';
 
 const leftAlignNumberColumn: Partial<GridColDef> = {
   type: 'number',
@@ -18,7 +19,8 @@ function getColumns(isMobile: boolean) {
       headerName: 'Ученик',
       flex: 1,
     },
-    // Посещено? Запрос к другой коллекции базы с фильтрацией? Доп.поле к этому абонементу?
+    // eslint-disable-next-line max-len
+    // Посещено занятий по абонементу? Запрос к другой коллекции базы с фильтрацией? Доп.поле к этому абонементу?
     {
       field: 'visits',
       headerName: 'Занятий',
@@ -32,14 +34,14 @@ function getColumns(isMobile: boolean) {
     },
     {
       field: 'dateFrom',
-      type: 'dateTime',
+      type: 'date',
       headerName: 'Дата от',
       flex: 1,
       valueFormatter: dateValueFormatter,
     },
     {
       field: 'dateTo',
-      type: 'dateTime',
+      type: 'date',
       headerName: 'Дата до',
       flex: 1,
       valueFormatter: dateValueFormatter,
@@ -67,6 +69,12 @@ export function SubscriptionContent() {
 
   const columns = getColumns(isMobile);
 
+  const ExtendedToolbar = () => (
+    CustomGridToolbar([
+      <SearchParamsButton title="Оформить" param="create-subscription" />,
+    ])
+  );
+
   return <DataGrid
     autoHeight
     columns={columns}
@@ -74,7 +82,12 @@ export function SubscriptionContent() {
     getRowId={(item) => item._id}
     disableColumnMenu
     components={{
-      Toolbar: CustomGridToolbar,
+      Toolbar: ExtendedToolbar,
+    }}
+    initialState={{
+      sorting: {
+        sortModel: [{ field: 'dateTo', sort: 'desc' }],
+      },
     }}
   />;
 }

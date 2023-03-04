@@ -1,29 +1,28 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ILessonModel } from 'shared/models/ILessonModel';
 
 interface ILessonPageFiltersState {
-  titleFilter: string;
-  sizeFilter: string;
-  statusFilter: string;
+  lessons: ILessonModel[],
+  lessonsIds: string[],
+  currentLesson?: ILessonModel,
+  isConfirmationDialog: boolean;
 }
 
 const initialState: ILessonPageFiltersState = {
-  titleFilter: '',
-  sizeFilter: 'groups',
-  statusFilter: 'active',
+  lessons: [],
+  lessonsIds: [],
+  isConfirmationDialog: false,
 };
 
 const lessonsPageState = createSlice({
   name: 'lessonPage',
   initialState,
   reducers: {
-    setTitleFilter: (state, action: PayloadAction<string>) => {
-      state.titleFilter = action.payload;
+    setCurrentLesson: (state, action: PayloadAction<ILessonModel>) => {
+      state.currentLesson = action.payload;
     },
-    setSizeFilter: (state, action: PayloadAction<string>) => {
-      state.sizeFilter = action.payload;
-    },
-    setStatusFilter: (state, action: PayloadAction<string>) => {
-      state.statusFilter = action.payload;
+    setConfirmationDialog: (state, action: PayloadAction<boolean>) => {
+      state.isConfirmationDialog = action.payload;
     },
   },
 });

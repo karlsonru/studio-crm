@@ -10,9 +10,5 @@ export function StudentsPage() {
     dispatch(setPageTitle('Ученики'));
   }, []);
 
-  return (
-    <>
-      <StudentsContent />
-    </>
-  );
+  return <StudentsContent />;
 }

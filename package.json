@@ -23,13 +23,11 @@
   },
   "homepage": "https://github.com/karlsonru/studio-app#readme",
   "devDependencies": {
-    "@types/react-redux": "^7.1.24",
     "concurrently": "^7.6.0",
     "nodemon": "^2.0.20",
     "ts-node": "^10.9.1"
   },
   "dependencies": {
-    "@mui/x-data-grid": "^5.17.25",
     "dotenv": "^16.0.3"
   }
 }
