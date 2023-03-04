@@ -95,6 +95,8 @@ export function UpdateSubscriptionTemplateModal() {
     form.reset();
   };
 
+  const template = Array.isArray(data.payload) ? data.payload[0] : data.payload;
+
   return (
     <Dialog open={searchParams.has('update-template')} onClose={() => setSearchParams('')}>
       <DialogTitle>Редактировать шаблон</DialogTitle>
@@ -105,7 +107,7 @@ export function UpdateSubscriptionTemplateModal() {
               variant="outlined"
               name="title"
               label="Название"
-              defaultValue={data.payload.title}
+              defaultValue={template.title}
               fullWidth
               required
               error={!formValidation.title}
@@ -116,14 +118,14 @@ export function UpdateSubscriptionTemplateModal() {
               label="Цена"
               error={!formValidation.price}
               minValue={0}
-              defaultValue={data.payload.price}
+              defaultValue={template.price}
             />
             <NumberField
               name="visits"
               label="Количество занятий"
               error={!formValidation.visits}
               minValue={1}
-              defaultValue={data.payload.visits}
+              defaultValue={template.visits}
             />
 
             <FormControl>
@@ -135,7 +137,7 @@ export function UpdateSubscriptionTemplateModal() {
                   label="Длительность"
                   error={!formValidation.duration}
                   minValue={1}
-                  defaultValue={Math.floor(data.payload.duration / 86400000)}
+                  defaultValue={Math.floor(template.duration / 86400000)}
                 />
 
                 <Select name="period" defaultValue="day" sx={{ flexGrow: 1, minWidth: '115px' }}>

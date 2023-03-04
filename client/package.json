@@ -27,6 +27,7 @@
   "dependencies": {
     "@fontsource/roboto": "^4.5.8",
     "@mui/icons-material": "^5.10.9",
+    "@mui/lab": "^5.0.0-alpha.121",
     "@mui/material": "^5.11.10",
     "@mui/system": "^5.10.12",
     "@mui/x-data-grid": "^6.0.0",

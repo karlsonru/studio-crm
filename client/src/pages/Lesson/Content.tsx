@@ -1,5 +1,4 @@
 import { useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   DataGrid,
   GridActionsCellItem,
@@ -46,7 +45,6 @@ function ExtendedToolbar() {
 
 export function LessonsContent() {
   const isMobile = useMobile();
-  const navigate = useNavigate();
   const actions = useActionCreators(lessonsPageActions);
 
   const { data, isLoading, error } = useGetLessonsQuery();
@@ -126,9 +124,6 @@ export function LessonsContent() {
       rows={data.payload}
       getRowId={(item) => item._id}
       disableColumnMenu
-      density="comfortable"
-      pageSizeOptions={[10, 25]}
-      onRowDoubleClick={((params: GridRowParams<ILessonModel>) => navigate(`./${params.id}`))}
       components={{
         Toolbar: ExtendedToolbar,
       }}
@@ -138,9 +133,6 @@ export function LessonsContent() {
       initialState={{
         sorting: {
           sortModel: [{ field: 'day', sort: 'asc' }],
-        },
-        pagination: {
-          paginationModel: { pageSize: 10 },
         },
       }}
     />

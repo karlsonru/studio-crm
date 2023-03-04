@@ -4,6 +4,7 @@ import { AuthPage } from './pages/Auth';
 import { UsersPage } from './pages/Users';
 import { TimetablePage } from './pages/Timetable';
 import { LessonsPage } from './pages/Lessons';
+import { LessonPage } from './pages/Lesson';
 import { StudentsPage } from './pages/Students';
 import { SubscriptionsPageLayout, SubscriptionsTemplatePage, SubscriptionsPage } from './pages/Subscriptions';
 
@@ -20,7 +21,11 @@ export function Router() {
         <Route path='/users' element={<UsersPage />} />
         <Route path='/timetable' element={<TimetablePage />} />
         <Route path='/students' element={<StudentsPage />} />
-        <Route path='/lessons' element={<LessonsPage />} />
+
+        <Route path='/lessons'>
+          <Route index element={<LessonsPage />} />
+          <Route path=':lessonId' element={<LessonPage />} />
+        </Route>
 
         <Route path='/subscriptions' element={<SubscriptionsPageLayout />}>
           <Route index element={<SubscriptionsPage />} />

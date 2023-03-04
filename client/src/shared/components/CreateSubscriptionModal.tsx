@@ -15,7 +15,12 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Autocomplete from '@mui/material/Autocomplete';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useCreateSubscriptionMutation, useGetStudentsQuery, useGetSubscriptionTemplatesQuery } from '../api';
+import {
+  useCreateSubscriptionMutation,
+  useGetStudentsQuery,
+  useGetSubscriptionTemplatesQuery,
+  useGetLessonsQuery,
+} from '../api';
 
 function getDefaultDate(now: Date, shift?: number) {
   return `${now.getFullYear() + (shift ?? 0)}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
@@ -28,8 +33,9 @@ export function CreateSubscriptionModal() {
   const [createSubsciption] = useCreateSubscriptionMutation();
   const { data: studentsData } = useGetStudentsQuery();
   const { data: templatesData } = useGetSubscriptionTemplatesQuery();
+  const { data: lessonsData } = useGetLessonsQuery();
 
-  if (!templatesData || !studentsData) return <h1>Loading...</h1>;
+  if (!templatesData || !studentsData || !lessonsData) return <h1>Loading...</h1>;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -38,13 +44,12 @@ export function CreateSubscriptionModal() {
 
     const template = templatesData.payload.find((temp) => temp.title === formData.template);
     const student = studentsData.payload.find((std) => std.fullname === formData.student);
+    const lesson = lessonsData.payload.find((les) => les.title === formData.lesson);
 
-    if (!template || !student) {
+    if (!template || !student || !lesson) {
       console.error('template or student not found');
       return;
     }
-
-    console.log('send request');
 
     createSubsciption({
       template: template._id,
@@ -52,6 +57,7 @@ export function CreateSubscriptionModal() {
       visits: template.visits,
       duration: template.duration,
       student: student._id,
+      lesson: lesson._id,
       paymentMethod: formData.paymentMethod as string,
       dateFrom: +Date.parse(formData.dateFrom as string),
       dateTo: +Date.parse(formData.dateFrom as string) + template.duration,
@@ -78,6 +84,12 @@ export function CreateSubscriptionModal() {
               options={studentsData.payload}
               getOptionLabel={(option) => option.fullname}
               renderInput={(params) => <TextField {...params} required name="student" label="Студент" />}
+            />
+
+            <Autocomplete
+              options={lessonsData.payload}
+              getOptionLabel={(option) => option.title}
+              renderInput={(params) => <TextField {...params} required name="lesson" label="Занятие" />}
             />
 
             <FormControl fullWidth>

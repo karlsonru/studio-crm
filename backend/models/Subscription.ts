@@ -9,6 +9,9 @@ const schema = new Schema({
   template: {
     type: Types.ObjectId, ref: 'SubsciptionTemplate', required: true,
   },
+  lesson: {
+    type: Types.ObjectId, ref: 'Lesson', required: true,
+  },
   price: {
     type: Number, required: true, min: 0,
   },
