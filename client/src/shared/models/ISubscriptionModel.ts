@@ -1,4 +1,4 @@
-import { ILessonModel } from './ILessonModel';
+// import { ILessonModel } from './ILessonModel';
 import { IStudentModel } from './IStudentModel';
 
 export interface ISubscriptionTemplateModel {
@@ -16,9 +16,10 @@ export interface ISubscriptionModel {
   _id: string;
   student: IStudentModel;
   template: ISubscriptionTemplateModel;
-  lesson: ILessonModel;
+  lesson: string;
   price: number;
   visits: number;
+  visitsLeft: number;
   duration: number;
   dateFrom: number;
   dateTo: number;

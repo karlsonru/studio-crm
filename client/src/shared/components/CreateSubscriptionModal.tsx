@@ -55,6 +55,7 @@ export function CreateSubscriptionModal() {
       template: template._id,
       price: template.price,
       visits: template.visits,
+      visitsLeft: template.visits,
       duration: template.duration,
       student: student._id,
       lesson: lesson._id,

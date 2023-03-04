@@ -18,6 +18,9 @@ const schema = new Schema({
   visits: {
     type: Number, required: true, min: 1,
   },
+  visitsLeft: {
+    type: Number, required: true, min: 0,
+  },
   duration: {
     type: String, required: true, trim: true,
   },
