@@ -7,10 +7,10 @@ const schema = new Schema({
     type: Types.ObjectId, ref: 'Student', required: true,
   },
   template: {
-    type: Types.ObjectId, ref: 'SubsciptionTemplate', required: true,
+    type: Types.ObjectId, ref: 'SubscriptionTemplate', required: true,
   },
   lesson: {
-    type: Types.ObjectId, ref: 'Lesson', required: true,
+    type: Types.ObjectId, ref: 'Lesson', required: true, nullable: true,
   },
   price: {
     type: Number, required: true, min: 0,

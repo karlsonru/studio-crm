@@ -37,6 +37,17 @@ export function injectGetOne<T>(name: string, tag: any, route: string) {
   return extendedApi;
 }
 
+export function injectFind<T>(name: string, tag: any, route: string) {
+  const extendedApi = basicApi.injectEndpoints({
+    endpoints: (build) => ({
+      [name]: build.mutation<IResponse<Array<T>>, { [key: string]: any }>({
+        query: (query) => ({ url: `${route}/find`, method: 'POST', body: query }),
+      }),
+    }),
+  });
+  return extendedApi;
+}
+
 export function injectCreate<T, K>(name: string, tag: any, route: string) {
   const extendedApi = basicApi.injectEndpoints({
     endpoints: (build) => ({

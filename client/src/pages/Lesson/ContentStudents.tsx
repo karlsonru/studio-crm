@@ -9,48 +9,46 @@ import { useFindSubscriptionsMutation } from '../../shared/api';
 import { ISubscriptionModel } from '../../shared/models/ISubscriptionModel';
 import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
 
-interface IContentSubscriptions {
+interface IContentStudents {
   lessonId: string;
 }
 
-function CreateRowMobile(subscription: ISubscriptionModel) {
-  return (
-    <TableRow key={subscription._id}>
-      <TableCell>
-        {subscription.student.fullname}
-      </TableCell>
-      <TableCell>
-        {subscription.visitsLeft}
-      </TableCell>
-    </TableRow>
-  );
-}
+function AddCard({ cardDetails }: { cardDetails: ISubscriptionTemplateModel }) {
+  const [, setSearchParams] = useSearchParams();
+  const days = cardDetails.duration / 86400000;
+  const isMobile = useMobile();
 
-function CreateRow(subscription: ISubscriptionModel) {
-  return (
-    <TableRow key={subscription._id} hover>
-      <TableCell>
-        {subscription.student.fullname}
-      </TableCell>
-      <TableCell>
-        {subscription.visits}
-      </TableCell>
-      <TableCell>
-        {subscription.visitsLeft}
-      </TableCell>
-      <TableCell>
-        {dateValueFormatter(subscription.dateTo)}
-      </TableCell>
-      <TableCell>
-        {subscription.price}
-      </TableCell>
-    </TableRow>
-  );
-}
+  const [deleteCard] = useDeleteSubscriptionTemplateMutation();
+  const [isModalOpen, setModalOpen] = useState(false);
 
-interface IShowSubscriptions {
-  lessonId: string;
-  isActive: boolean;
+  return (
+    <>
+      <Card variant="outlined" sx={{ width: '325px', marginRight: isMobile ? 0 : '0.5rem', marginBottom: '0.5rem' }}>
+        <CardHeader title={cardDetails.title} action={
+          <IconButton onClick={() => setModalOpen(true)}>
+            <DeleteIcon />
+          </IconButton>
+          } />
+        <CardActionArea onClick={() => setSearchParams({ 'update-template': 'true', id: cardDetails._id })}>
+          <CardContent>
+            <CardContentItem title="Занятий" value={cardDetails.visits} />
+            <Divider />
+            <CardContentItem title="Длительность (дней)" value={days} />
+            <Divider />
+            <CardContentItem title="Стоимость P" value={cardDetails.price} />
+          </CardContent>
+        </CardActionArea>
+      </Card>
+
+      <ConfirmationDialog
+        title='Удалить шаблон'
+        contentEl={<DeleteDialogText name={cardDetails.title} />}
+        isOpen={isModalOpen}
+        setModalOpen={setModalOpen}
+        callback={() => deleteCard(cardDetails._id)}
+      />
+    </>
+  );
 }
 
 function ShowSubscriptions({ lessonId, isActive }: IShowSubscriptions) {
@@ -90,7 +88,7 @@ function ShowSubscriptions({ lessonId, isActive }: IShowSubscriptions) {
   );
 }
 
-export function ContentSubscriptions({ lessonId }: IContentSubscriptions) {
+export function ContentStudents({ lessonId }: IContentStudents) {
   const [showAll, setShowAll] = useState(false);
 
   const showAllHandler = () => {

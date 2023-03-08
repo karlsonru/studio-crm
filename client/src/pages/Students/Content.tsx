@@ -81,7 +81,8 @@ export function StudentsContent() {
       type: 'date',
       headerName: 'Дата рождения',
       flex: 1,
-      valueFormatter: dateValueFormatter,
+      valueFormatter:
+        (params: GridValueFormatterParams<IStudentModel['birthday']>) => dateValueFormatter(params.value),
     },
     {
       field: 'isActive',

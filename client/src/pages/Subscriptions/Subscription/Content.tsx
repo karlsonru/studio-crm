@@ -42,14 +42,16 @@ function getColumns(isMobile: boolean) {
       type: 'date',
       headerName: 'Дата от',
       flex: 1,
-      valueFormatter: dateValueFormatter,
+      valueFormatter:
+        (params: GridValueFormatterParams<ISubscriptionModel['dateFrom']>) => dateValueFormatter(params.value),
     },
     {
       field: 'dateTo',
       type: 'date',
       headerName: 'Дата до',
       flex: 1,
-      valueFormatter: dateValueFormatter,
+      valueFormatter:
+        (params: GridValueFormatterParams<ISubscriptionModel['dateTo']>) => dateValueFormatter(params.value),
     },
     {
       field: 'price',

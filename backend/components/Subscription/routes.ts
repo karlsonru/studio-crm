@@ -9,9 +9,11 @@ const middlewares = {
   post: [checkCreateSubscription, injectQuery(['_id'])],
 };
 
-const service = new SubscriptionServices(Subscription, ['student']);
+const service = new SubscriptionServices(Subscription, ['student', 'lesson', 'template']);
 const controller = new SubscriptionController(service);
 
 const subscriptionRouter = createBasicRouterWithDefaultMiddlewares(controller, middlewares);
+
+subscriptionRouter.post('/find', controller.find);
 
 export default subscriptionRouter;

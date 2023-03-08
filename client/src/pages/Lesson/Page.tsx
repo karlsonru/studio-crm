@@ -8,6 +8,7 @@ import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
 import { useGetLessonQuery } from '../../shared/api';
 import { ContentSubscriptions } from './ContentSubscriptions';
+import { ContentStudents } from './ContentStudents';
 
 export function LessonPage() {
   const dispatch = useAppDispatch();
@@ -34,12 +35,16 @@ export function LessonPage() {
       <Tabs value={value} onChange={handleChange} sx={{ marginBottom: '1rem' }}>
         <Tab label="Абонементы" value="subscriptions" />
         <Tab label="Участники" value="students" />
+        <Tab label="Расписание" value="timetable" />
       </Tabs>
       <TabPanel value="subscriptions">
         <ContentSubscriptions lessonId={lessonId} />
       </TabPanel>
       <TabPanel value="students">
-        Участники
+        <ContentStudents lessonId={lessonId} />
+      </TabPanel>
+      <TabPanel value="timetable">
+        Расписание
       </TabPanel>
     </TabContext>
   );
