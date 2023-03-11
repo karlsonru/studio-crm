@@ -1,12 +1,13 @@
-import { List } from '@mui/material';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
+import Divider from '@mui/material/Divider';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
 import { useEffect, useState } from 'react';
 import { useGetUsersQuery, usePatchLessonMutation } from 'shared/api';
 
@@ -27,25 +28,25 @@ interface IListTeachers {
 function ListTeachers({ lessonTeacherId, setSelected }: IListTeachers) {
   const { data: teachers } = useGetUsersQuery();
 
-  console.log('listTeachers');
-  console.log(teachers);
-
   if (!teachers?.payload) {
     return <></>;
   }
 
   return (
-    <List>
+    <RadioGroup
+      onChange={(event: React.ChangeEvent<HTMLInputElement>, value: string) => setSelected(value)}
+    >
       {
         teachers.payload
           .filter((teacher) => teacher._id !== lessonTeacherId)
-          .map((teacher) => <ListItem key={teacher._id}>
-            <ListItemButton onClick={() => setSelected(teacher._id)}>
-              {teacher.fullname}
-            </ListItemButton>
-          </ListItem>)
-      }
-    </List>
+          .map((teacher) => <FormControlLabel
+            key={teacher._id}
+            value={teacher._id}
+            control={<Radio />}
+            label={teacher.fullname}
+          />)
+    }
+    </RadioGroup>
   );
 }
 
@@ -85,12 +86,12 @@ export function ChangeTeacherDialog(
       <DialogContent>
         <DialogContentText>
           Вы хотите заменить педагога <strong>{teacherName}</strong>
-          в занятии <strong>{lessonTitle}</strong>.
-          Выберите нового педагога.
-        </DialogContentText>
-
+           в занятии <strong>{lessonTitle}</strong>.
+         <p>Выберите нового педагога.</p>
+        <Divider />
         <ListTeachers lessonTeacherId={teacherId} setSelected={setSelected} />
 
+        </DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button autoFocus variant='contained' color='error' onClick={handleCancel}>

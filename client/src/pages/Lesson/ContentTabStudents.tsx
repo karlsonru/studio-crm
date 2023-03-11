@@ -121,7 +121,7 @@ export function ContentStudents({ lessonId }: IContentStudents) {
 
       <Divider sx={{ m: '1rem 0' }} />
 
-      <Typography mb="1rem" variant="h5" component={'h5'}>Педагоги</Typography>
+      <Typography mb="1rem" variant="h5" component={'h5'}>Педагог</Typography>
       <Card variant="outlined" sx={{ width: '325px', marginRight: isMobile ? 0 : '0.5rem', marginBottom: '0.5rem' }}>
         <CardHeader title={lessonData.payload.teacher.fullname} action={
           <IconButton onClick={() => setModalOpen(true)}>
