@@ -16,10 +16,7 @@ const schema = new Schema({
   role: {
     type: Types.ObjectId, ref: 'Role', required: true, lowercase: true, trim: true,
   },
-  name: {
-    type: String, required: true, trim: true, minLength: 2,
-  },
-  surname: {
+  fullname: {
     type: String, required: true, trim: true, minLength: 2,
   },
   birthday: { type: Number },

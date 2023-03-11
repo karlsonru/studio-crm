@@ -7,8 +7,8 @@ import TabPanel from '@mui/lab/TabPanel';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
 import { useGetLessonQuery } from '../../shared/api';
-import { ContentSubscriptions } from './ContentSubscriptions';
-import { ContentStudents } from './ContentStudents';
+import { ContentSubscriptions } from './ContentTabSubscriptions';
+import { ContentStudents } from './ContentTabStudents';
 
 export function LessonPage() {
   const dispatch = useAppDispatch();
@@ -45,6 +45,8 @@ export function LessonPage() {
       </TabPanel>
       <TabPanel value="timetable">
         Расписание
+        Здесь будем выводить пбудущее занятие и прошедшие занятия.
+        Нужна возможность "провести занятие" прежде чем приступить к этой вкладке.
       </TabPanel>
     </TabContext>
   );

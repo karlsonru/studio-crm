@@ -33,7 +33,7 @@ export class BasicController<T extends BasicServices> {
 
   find = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.service.find(req.body.query, +req.params.limit);
+      const result = await this.service.find(req.body, +req.params.limit);
 
       if (!result) {
         return res.status(400).json({ message: 'Не найдено' });

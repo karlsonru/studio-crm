@@ -210,7 +210,7 @@ export function CreateLessonModal() {
                 <MenuItem value={''}><em>Укажите педагога</em></MenuItem>
                 { isUsersSuccess
                   && usersData.payload.map((user) => (
-                    <MenuItem key={user._id} value={user._id}>{user.name}</MenuItem>
+                    <MenuItem key={user._id} value={user._id}>{user.fullname}</MenuItem>
                   ))}
               </Select>
               {!formValidation.teacher && <FormHelperText>Выберите педагога</FormHelperText>}

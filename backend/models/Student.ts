@@ -8,9 +8,7 @@ const schema = new Schema({
   birthday: { type: Number, required: true },
   balance: { type: Number, default: 0 },
   visitingLessons: [ // уроки, которые посещает, в целом в настоящий момент
-    {
-      lesson: { type: Types.ObjectId, ref: 'Lesson' },
-    },
+    { type: Types.ObjectId, ref: 'Lesson' },
   ],
   contacts: [{
     name: {

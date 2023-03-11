@@ -75,7 +75,7 @@ export function TimetableLessonCard({ lessonCardDetails }: { lessonCardDetails: 
             </Stack>
           </Stack>
 
-          <Typography paragraph m='0px' p='4px' textOverflow='ellipsis' whiteSpace='nowrap' fontSize={ fontSize }>{teacher.name}</Typography>
+          <Typography paragraph m='0px' p='4px' textOverflow='ellipsis' whiteSpace='nowrap' fontSize={ fontSize }>{teacher.fullname}</Typography>
 
         </Stack>
       </CardContent>
