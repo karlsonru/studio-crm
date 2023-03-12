@@ -16,7 +16,7 @@ import Checkbox from '@mui/material/Checkbox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { useMobile } from '../../shared/hooks/useMobile';
-import { useFindStudentsMutation, usePatchStudentMutation } from '../../shared/api';
+import { useFindStudentsQuery, usePatchStudentMutation } from '../../shared/api';
 import { IStudentModel } from '../../shared/models/IStudentModel';
 
 interface IAddStudentsDialog {
@@ -27,16 +27,12 @@ interface IAddStudentsDialog {
 
 function AddStudentsDialog({ lessonId, isOpen, setModalOpen }: IAddStudentsDialog) {
   const [selectedOptions, setSelected] = useState<IStudentModel[]>([]);
-  const [findStudents, { data }] = useFindStudentsMutation();
+  const { data } = useFindStudentsQuery({
+    visitingLessons: {
+      $nin: lessonId,
+    },
+  });
   const [updateStudent, { isSuccess }] = usePatchStudentMutation();
-
-  useEffect(() => {
-    findStudents({
-      visitingLessons: {
-        $nin: lessonId,
-      },
-    });
-  }, []);
 
   useEffect(() => {
     setModalOpen(false);

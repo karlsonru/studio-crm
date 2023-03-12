@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography/Typography';
 import Button from '@mui/material/Button/Button';
 import { BasicTable } from '../../shared/components/BasicTable';
 import { useMobile } from '../../shared/hooks/useMobile';
-import { useFindSubscriptionsMutation } from '../../shared/api';
+import { useFindSubscriptionsQuery } from '../../shared/api';
 import { ISubscriptionModel } from '../../shared/models/ISubscriptionModel';
 import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
 
@@ -55,23 +55,19 @@ interface IShowSubscriptions {
 
 function ShowSubscriptions({ lessonId, isActive }: IShowSubscriptions) {
   const isMobile = useMobile();
-  const [findSubscriptions, { data, isLoading, isError }] = useFindSubscriptionsMutation();
+  const query = isActive ? { isActive } : { dateTo: { $gte: Date.now() } };
 
-  const query = isActive ? { isActive } : { dateTo: { $lte: Date.now() } };
+  const { data, isError, isLoading } = useFindSubscriptionsQuery({
+    lesson: lessonId,
+    ...query,
+  });
 
-  useEffect(() => {
-    findSubscriptions({
-      lesson: lessonId,
-      ...query,
-    });
-  }, []);
+  if (isLoading) {
+    return <h3>Идёт загрузка...</h3>;
+  }
 
   if (isError) {
     return <h3>Ошибка при запросе!</h3>;
-  }
-
-  if (isLoading) {
-    return <h3>Загружаем ...</h3>;
   }
 
   if (!data?.payload.length) {

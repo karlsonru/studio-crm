@@ -31,8 +31,8 @@ export class BasicServices {
     return result;
   };
 
-  find = async (query: IBasicQuery, limit: number) => {
-    const result = await this.db.find(query).populate(this.populateQuery).limit(limit);
+  find = async (query: IBasicQuery) => {
+    const result = await this.db.find(query).populate(this.populateQuery);
     return result;
   };
 

@@ -4,7 +4,8 @@ import { BasicController, BasicServices } from '../../shared/component';
 export class SubscriptionController extends BasicController<BasicServices> {
   find = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.service.find(req.body, +req.params.limit);
+      const params = JSON.parse(req.query.findQuery as string);
+      const result = await this.service.find(params);
 
       if (!result) {
         return res.status(400).json({ message: 'Не найдено' });

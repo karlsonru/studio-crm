@@ -7,10 +7,9 @@ import { BasicServices, IBasicQuery } from '../../shared/component';
 // тогда значит урок пересекается с каким-то другим, нужно запретить создание такого урока
 
 export class LessonServices extends BasicServices {
-  find = async (bodyQuery: IBasicQuery, limit: number) => {
+  find = async (bodyQuery: IBasicQuery) => {
     const result = await this.db.find(bodyQuery)
       .populate(this.populateQuery)
-      .limit(limit)
       .sort({ createdAt: 1 });
 
     return result;

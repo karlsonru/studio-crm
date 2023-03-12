@@ -40,8 +40,9 @@ export function injectGetOne<T>(name: string, tag: any, route: string) {
 export function injectFind<T>(name: string, tag: any, route: string) {
   const extendedApi = basicApi.injectEndpoints({
     endpoints: (build) => ({
-      [name]: build.mutation<IResponse<Array<T>>, { [key: string]: any }>({
-        query: (query) => ({ url: `${route}/find`, method: 'POST', body: query }),
+      [name]: build.query<IResponse<Array<T>>, { [key: string]: any } >({
+        query: (query) => ({ url: `${route}/find`, params: { findQuery: JSON.stringify(query) } }),
+        providesTags: [tag],
       }),
     }),
   });

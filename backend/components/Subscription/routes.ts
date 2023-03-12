@@ -14,6 +14,6 @@ const controller = new SubscriptionController(service);
 
 const subscriptionRouter = createBasicRouterWithDefaultMiddlewares(controller, middlewares);
 
-subscriptionRouter.post('/find', controller.find);
+subscriptionRouter.get('/find', controller.find);
 
 export default subscriptionRouter;

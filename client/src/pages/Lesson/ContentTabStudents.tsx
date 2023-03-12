@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Typography from '@mui/material/Typography/Typography';
 import Stack from '@mui/system/Stack';
 import Card from '@mui/material/Card';
@@ -11,7 +11,7 @@ import Grid from '@mui/material/Grid';
 import SyncIcon from '@mui/icons-material/Sync';
 import { ChangeTeacherDialog } from './ChangeTeacherDialog';
 import { useMobile } from '../../shared/hooks/useMobile';
-import { useFindStudentsMutation, useGetLessonQuery, usePatchStudentMutation } from '../../shared/api';
+import { useFindStudentsQuery, useGetLessonQuery, usePatchStudentMutation } from '../../shared/api';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { IStudentModel } from '../../shared/models/IStudentModel';
 import { AddStudentButton } from './AddStudentDialog';
@@ -86,15 +86,11 @@ function AddCard({ lessonId, cardDetails }: IAddCard) {
 export function ContentStudents({ lessonId }: IContentStudents) {
   const isMobile = useMobile();
   const [isModalOpen, setModalOpen] = useState(false);
-  const [findStudents, { data, isLoading, isError }] = useFindStudentsMutation();
+  const { data, isLoading, isError } = useFindStudentsQuery({
+    lesson: lessonId,
+    visitingLessons: lessonId,
+  });
   const { data: lessonData } = useGetLessonQuery(lessonId);
-
-  useEffect(() => {
-    findStudents({
-      lesson: lessonId,
-      visitingLessons: lessonId,
-    });
-  }, []);
 
   if (isError) {
     return <h3>Ошибка при запросе!</h3>;
