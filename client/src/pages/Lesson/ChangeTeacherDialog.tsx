@@ -10,12 +10,10 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import { useEffect, useState } from 'react';
 import { useGetUsersQuery, usePatchLessonMutation } from 'shared/api';
+import { ILessonModel } from 'shared/models/ILessonModel';
 
 interface IChangeTeacherDialog {
-  lessonId: string;
-  lessonTitle: string;
-  teacherName: string;
-  teacherId: string;
+  lesson: ILessonModel,
   isOpen: boolean;
   setModalOpen: (value: boolean) => void;
 }
@@ -52,15 +50,12 @@ function ListTeachers({ lessonTeacherId, setSelected }: IListTeachers) {
 
 export function ChangeTeacherDialog(
   {
-    lessonId,
-    lessonTitle,
-    teacherId,
-    teacherName,
+    lesson,
     isOpen,
     setModalOpen,
   }: IChangeTeacherDialog,
 ) {
-  const [selected, setSelected] = useState(teacherId);
+  const [selected, setSelected] = useState(lesson.teacher._id);
   const [updateLesson, { isSuccess }] = usePatchLessonMutation();
 
   useEffect(() => {
@@ -69,7 +64,7 @@ export function ChangeTeacherDialog(
 
   const handleOk = () => {
     updateLesson({
-      id: lessonId,
+      id: lesson._id,
       newItem: {
         teacher: selected,
       },
@@ -85,11 +80,11 @@ export function ChangeTeacherDialog(
       <DialogTitle>Заменить педагога</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Вы хотите заменить педагога <strong>{teacherName}</strong>
-           в занятии <strong>{lessonTitle}</strong>.
+          Вы хотите заменить педагога <strong>{lesson.teacher.fullname}</strong>
+           в занятии <strong>{lesson.title}</strong>.
          <p>Выберите нового педагога.</p>
         <Divider />
-        <ListTeachers lessonTeacherId={teacherId} setSelected={setSelected} />
+        <ListTeachers lessonTeacherId={lesson.teacher._id} setSelected={setSelected} />
 
         </DialogContentText>
       </DialogContent>

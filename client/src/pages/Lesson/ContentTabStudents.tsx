@@ -3,17 +3,18 @@ import Typography from '@mui/material/Typography/Typography';
 import Stack from '@mui/system/Stack';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
+import CardContent from '@mui/material/CardContent';
 import IconButton from '@mui/material/IconButton';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
-import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import SyncIcon from '@mui/icons-material/Sync';
 import { ChangeTeacherDialog } from './ChangeTeacherDialog';
 import { useMobile } from '../../shared/hooks/useMobile';
-import { useFindStudentsMutation, useGetLessonQuery } from '../../shared/api';
+import { useFindStudentsMutation, useGetLessonQuery, usePatchStudentMutation } from '../../shared/api';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { IStudentModel } from '../../shared/models/IStudentModel';
+import { AddStudentButton } from './AddStudentDialog';
 
 interface IContentStudents {
   lessonId: string;
@@ -39,14 +40,18 @@ interface IAddCard {
 
 function AddCard({ lessonId, cardDetails }: IAddCard) {
   const isMobile = useMobile();
+  const [updateStudent] = usePatchStudentMutation();
 
-  // TODO должна быть функцция удаления студента из группы
-  // Удаляется запись у студента о вхождении в группы,
-  // запись у active абонемента становится null,
-  // у lesson студент удаляется из массива ?
-  // скорее всего нужен запрос к lesson + trx транзакция на backend
   const excludeHandler = () => {
-    console.log(`Исключён с занятия ${lessonId}`);
+    updateStudent({
+      id: cardDetails._id,
+      newItem: {
+        // @ts-ignore
+        $pull: {
+          visitingLessons: lessonId,
+        },
+      },
+    });
   };
 
   const [isModalOpen, setModalOpen] = useState(false);
@@ -99,24 +104,22 @@ export function ContentStudents({ lessonId }: IContentStudents) {
     return <h3>Загружаем ...</h3>;
   }
 
-  if (!data?.payload.length) {
-    return <h3>Не найдено</h3>;
+  if (!lessonData) {
+    return <h3>Нет информации по занятию</h3>;
   }
 
   // TODO - добавить телефон педагога и выводить его в карточке
-  // Для карточки педагога - замена педагога в занятии
-
-  if (!lessonData) {
-    return <h3>Нет педагога</h3>;
-  }
 
   return (
     <>
       <Typography mb="1rem" variant="h5" component={'h5'}>Ученики</Typography>
       <Grid container direction="row">
-        { data.payload.map(
-          (student) => <AddCard key={student._id} lessonId={lessonId} cardDetails={student} />,
-        )}
+        {
+          data?.payload.map(
+            (student) => <AddCard key={student._id} lessonId={lessonId} cardDetails={student} />,
+          )
+        }
+        <AddStudentButton lessonId={lessonId} />
       </Grid>
 
       <Divider sx={{ m: '1rem 0' }} />
@@ -134,10 +137,7 @@ export function ContentStudents({ lessonId }: IContentStudents) {
       </Card>
 
       <ChangeTeacherDialog
-        lessonId={lessonData.payload._id}
-        lessonTitle={lessonData.payload.title}
-        teacherId={lessonData.payload.teacher._id}
-        teacherName={lessonData.payload.teacher.fullname}
+        lesson={lessonData.payload}
         isOpen={isModalOpen}
         setModalOpen={setModalOpen}
       />
