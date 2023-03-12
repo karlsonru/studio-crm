@@ -32,6 +32,8 @@ export function Router() {
           <Route path=':templates' element={<SubscriptionsTemplatePage />} />
         </Route>
 
+        <Route path='/collaborators' element={<Hello />} />
+        <Route path='/visits' element={<Hello />} />
         <Route path='/finance' element={<Hello />} />
       </Route>
     </Routes>
