@@ -1,12 +1,13 @@
+import { useNavigate } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import GroupIcon from '@mui/icons-material/Group';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import { ILessonModel } from '../../shared/models/ILessonModel';
 import { getReadbleTime } from '../../shared/helpers/getReadableTime';
+import { useMobile } from '../../shared/hooks/useMobile';
 
 function convertToMinutes(time: number) {
   const hours = Math.floor(time / 100) - 9;
@@ -14,12 +15,18 @@ function convertToMinutes(time: number) {
   return hours * 60 + minutes;
 }
 
-export function TimetableLessonCard({ lessonCardDetails }: { lessonCardDetails: ILessonModel }) {
+interface ITimetableLessonCard {
+  lessonCardDetails: ILessonModel;
+  date: Date;
+}
+
+export function TimetableLessonCard({ lessonCardDetails, date }: ITimetableLessonCard) {
   const {
     title, teacher, timeStart, timeEnd, activeStudents,
   } = lessonCardDetails;
 
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  const isMobile = useMobile();
+  const navigate = useNavigate();
 
   const timeStartReadable = getReadbleTime(timeStart);
   const timeEndReadable = getReadbleTime(timeEnd);
@@ -28,8 +35,15 @@ export function TimetableLessonCard({ lessonCardDetails }: { lessonCardDetails: 
   const duration = (convertToMinutes(timeEnd) - convertToMinutes(timeStart));
   const shift = isMobile ? 0 : convertToMinutes(timeStart);
 
+  const doubleClickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (event.detail !== 2) return null;
+
+    navigate(`/visits/${+date}?lessonId=${lessonCardDetails._id}`);
+  };
+
   return (
     <Card
+      onClick={doubleClickHandler}
       variant='outlined'
       sx={{
         position: isMobile ? 'static' : 'absolute',

@@ -16,11 +16,11 @@ interface IDayColumn extends IDayColumns {
   shift: number;
 }
 
-function renderCard(date: Date, lesson: ILessonModel) {
-  if (lesson.dateTo < +date || lesson.dateFrom > +date) {
+function renderCard(columnDate: Date, lesson: ILessonModel) {
+  if (lesson.dateTo < +columnDate || lesson.dateFrom > +columnDate) {
     return;
   }
-  return <TimetableLessonCard key={lesson._id} lessonCardDetails={lesson} />;
+  return <TimetableLessonCard key={lesson._id} date={columnDate} lessonCardDetails={lesson} />;
 }
 
 function DayColumn({ startDate, shift, lessons }: IDayColumn) {
