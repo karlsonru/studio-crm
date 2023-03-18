@@ -11,7 +11,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/system/Stack';
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
-import { usePatchSubscriptionTemplateMutation, useGetSubscriptionTemplateQuery } from '../api';
+import { usePatchSubscriptionTemplateMutation, useGetSubscriptionTemplatesQuery } from '../api';
 import { useMobile } from '../hooks/useMobile';
 import { NumberField } from './NumberField';
 
@@ -44,7 +44,11 @@ function calculateDuration(period: string, duration: number) {
 export function UpdateSubscriptionTemplateModal() {
   const isMobile = useMobile();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { data } = useGetSubscriptionTemplateQuery(searchParams.get('id') ?? '');
+  const { data: templateEdit } = useGetSubscriptionTemplatesQuery(undefined, {
+    selectFromResult: ({ data }) => ({
+      data: data?.payload.find((template) => template._id === searchParams.get('id')),
+    }),
+  });
 
   const [updateSubscriptionTemplate] = usePatchSubscriptionTemplateMutation();
   const [formValidation, setFormValidation] = useState({
@@ -54,7 +58,9 @@ export function UpdateSubscriptionTemplateModal() {
     duration: true,
   });
 
-  if (!data) {
+  if (!searchParams.has('update-template')) return <></>;
+
+  if (!templateEdit) {
     return <h1>Is Loading...</h1>;
   }
 
@@ -90,12 +96,10 @@ export function UpdateSubscriptionTemplateModal() {
       isActive: true,
     };
 
-    updateSubscriptionTemplate({ id: data.payload._id, newItem: payload });
+    updateSubscriptionTemplate({ id: templateEdit._id, newItem: payload });
 
     form.reset();
   };
-
-  const template = Array.isArray(data.payload) ? data.payload[0] : data.payload;
 
   return (
     <Dialog open={searchParams.has('update-template')} onClose={() => setSearchParams('')}>
@@ -107,7 +111,7 @@ export function UpdateSubscriptionTemplateModal() {
               variant="outlined"
               name="title"
               label="Название"
-              defaultValue={template.title}
+              defaultValue={templateEdit.title}
               fullWidth
               required
               error={!formValidation.title}
@@ -118,14 +122,14 @@ export function UpdateSubscriptionTemplateModal() {
               label="Цена"
               error={!formValidation.price}
               minValue={0}
-              defaultValue={template.price}
+              defaultValue={templateEdit.price}
             />
             <NumberField
               name="visits"
               label="Количество занятий"
               error={!formValidation.visits}
               minValue={1}
-              defaultValue={template.visits}
+              defaultValue={templateEdit.visits}
             />
 
             <FormControl>
@@ -137,7 +141,7 @@ export function UpdateSubscriptionTemplateModal() {
                   label="Длительность"
                   error={!formValidation.duration}
                   minValue={1}
-                  defaultValue={Math.floor(template.duration / 86400000)}
+                  defaultValue={Math.floor(templateEdit.duration / 86400000)}
                 />
 
                 <Select name="period" defaultValue="day" sx={{ flexGrow: 1, minWidth: '115px' }}>

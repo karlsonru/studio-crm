@@ -55,7 +55,7 @@ interface IShowSubscriptions {
 
 function ShowSubscriptions({ lessonId, isActive }: IShowSubscriptions) {
   const isMobile = useMobile();
-  const query = isActive ? { isActive } : { dateTo: { $gte: Date.now() } };
+  const query = isActive ? { isActive } : { dateTo: { $lte: Date.now() } };
 
   const { data, isError, isLoading } = useFindSubscriptionsQuery({
     lesson: lessonId,
