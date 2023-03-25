@@ -27,7 +27,7 @@ router.use('/student', studentRouter);
 router.use('/subscription/templates', subscriptionTemplateRouter);
 router.use('/subscription', subscriptionRouter);
 router.use('/visitStatus', visitStatusRouter);
-router.use('/visitedLesson', visitedLessonRouter);
+router.use('/visits', visitedLessonRouter);
 
 router.use(errorLogger(loggerControllers));
 router.use(errorHandler);

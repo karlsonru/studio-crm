@@ -10,13 +10,21 @@ const schema = new Schema({
   date: {
     type: Number, required: true, index: true,
   },
+  teacher: {
+    type: Types.ObjectId, ref: 'User', required: true,
+  },
   students: [
     {
       student: {
         type: Types.ObjectId, ref: 'Student', required: true,
       },
+      /*
       visitStatus: {
         type: Types.ObjectId, ref: 'VisitStatus', required: true,
+      },
+      */
+      visitStatus: {
+        type: Number, required: true,
       },
     },
   ],
@@ -24,6 +32,6 @@ const schema = new Schema({
   timestamps: true,
 });
 
-const VisitedLesson = model('VisitedLesson', schema);
+const VisitedLesson = model('Visit', schema);
 
 export { VisitedLesson };
