@@ -1,12 +1,22 @@
 import { configureStore } from '@reduxjs/toolkit';
 import menuReducer from './reducers/appMenuSlice';
-import lessonPageReduer from './reducers/lessonPageSlice';
+import { lessonsPageReducer } from './reducers/lessonsPageSlice';
+import { studentsPageReducer } from './reducers/studentsPageSlice';
+import { subscriptionsPageReducer } from './reducers/subscriptionsPageSlice';
+import { visitsPageReducer } from './reducers/visitsPageSlice';
+import { basicApi } from './api/basicApi';
 
 const store = configureStore({
   reducer: {
     menuReducer,
-    lessonPageReduer,
+    lessonsPageReducer,
+    studentsPageReducer,
+    subscriptionsPageReducer,
+    visitsPageReducer,
+    [basicApi.reducerPath]: basicApi.reducer,
   },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(basicApi.middleware),
+  devTools: true,
 });
 
 export default store;

@@ -13,15 +13,13 @@ import {
 export function Layout() {
   const isMobile = useMediaQuery('(max-width: 767px)');
 
-  const menu = isMobile ? <MobileMenu /> : <SideMenu />;
-  const menuIcon = isMobile ? <MobileMenuIcon /> : <DesktopMenuIcon />;
-
   return (
     <>
-      <AppHeader menuIcon={menuIcon} />
-      <Stack direction={isMobile ? 'column' : 'row'} spacing={1}>
-        { menu }
-        <Stack direction='column' width='100%' p={isMobile ? 1 : 2} overflow='hidden'>
+      <AppHeader menuIcon={isMobile ? <MobileMenuIcon /> : <DesktopMenuIcon />} />
+      <Stack direction={isMobile ? 'column' : 'row'} spacing={1} >
+        {isMobile && <MobileMenu />}
+        {!isMobile && <SideMenu />}
+        <Stack direction='column' p={isMobile ? 1 : 2} overflow='hidden' width={isMobile ? 'auto' : '100%'}>
           <Outlet />
         </Stack>
       </Stack>

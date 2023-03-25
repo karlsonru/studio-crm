@@ -30,7 +30,8 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "no-underscore-dangle": 1,
+        "no-param-reassign": ["error", { "props": false }],
+        "no-underscore-dangle": 0,
         "linebreak-style": 0,
         "no-console": 1,
         "import/prefer-default-export": 0,

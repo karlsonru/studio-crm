@@ -1,13 +1,17 @@
 import {
   useState, useEffect, useRef, ChangeEvent,
 } from 'react';
-import Grid from '@mui/material/Grid';
+import { useSearchParams } from 'react-router-dom';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import Stack from '@mui/system/Stack';
+import Input from '@mui/material/Input';
+import Button from '@mui/material/Button';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
+import RemoveIcon from '@mui/icons-material/Remove';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import Input from '@mui/material/Input';
-import RemoveIcon from '@mui/icons-material/Remove';
-import InputLabel from '@mui/material/InputLabel';
+import { CreateLessonModal } from '../../shared/components/CreateLessonModal';
 
 interface IDateSwitcher {
   startDate: Date;
@@ -43,7 +47,7 @@ function WeekSwitcher({ startDate, setDateHandler }: IDateSwitcher) {
   }, [startDate]);
 
   return (
-    <Grid container alignItems='center'>
+    <Stack direction="row" alignItems='center'>
         <ArrowBackIosNewIcon onClick={decreaseDateHandler} fontSize="medium" />
         <Input value={startDateString} readOnly={true} size="small" inputProps={{ style: { textAlign: 'center', minWidth: '90px', maxWidth: '7rem' } }} />
         {!isMobile && <RemoveIcon />}
@@ -51,7 +55,7 @@ function WeekSwitcher({ startDate, setDateHandler }: IDateSwitcher) {
           && <Input value={endDateString} readOnly={true} size="small" inputProps={{ style: { textAlign: 'center', minWidth: '90px', maxWidth: '7rem' } }} />
         }
         <ArrowForwardIosIcon onClick={increaseDateHandler} fontSize="medium" />
-    </Grid>
+    </Stack>
   );
 }
 
@@ -95,25 +99,29 @@ function MonthSwitcher({ startDate, setDateHandler }: IDateSwitcher) {
   }, [startDate]);
 
   return (
-    <Grid item onClick={openDatepicker} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }} >
-      <InputLabel variant="filled" sx={{ textAlign: 'center', fontSize: '1.25rem', marginBottom: '10px' }}>
+    <FormControl onClick={openDatepicker}>
+      <FormLabel sx={{ fontSize: '1.5rem' }}>
         {monthLabel}
-      </InputLabel>
-      <input
-        type='date'
-        ref={dateRef}
-        onChange={dateChangeHandler}
-        style={{ visibility: 'hidden', maxWidth: '100px' }}
-      />
-    </Grid>
+      </FormLabel>
+      <input type='date' ref={dateRef} onChange={dateChangeHandler} style={{ visibility: 'hidden' }} />
+    </FormControl>
   );
 }
 
-export function DateSwitcher({ startDate, setDateHandler }: IDateSwitcher) {
+export function TimetableHeader({ startDate, setDateHandler }: IDateSwitcher) {
+  const isMobile = useMediaQuery('(max-width: 767px)');
+  const [, setSearchParams] = useSearchParams();
+
   return (
-    <Grid container wrap='nowrap' justifyContent='flex-start' alignItems='center' margin={'1rem 0rem'}>
-      <MonthSwitcher startDate={startDate} setDateHandler={setDateHandler} />
-      <WeekSwitcher startDate={startDate} setDateHandler={setDateHandler} />
-    </Grid>
+    <header>
+      <Stack direction={isMobile ? 'column' : 'row'} margin={isMobile ? '1rem 0' : 0} justifyContent="space-between" alignItems="start" width="100%">
+        <Stack direction="row" justifyContent={isMobile ? 'space-between' : 'start'} alignItems="start" spacing={2}>
+          <MonthSwitcher startDate={startDate} setDateHandler={setDateHandler} />
+          <WeekSwitcher startDate={startDate} setDateHandler={setDateHandler} />
+        </Stack>
+        {!isMobile && <Button variant="contained" size="large" onClick={() => setSearchParams({ 'create-lesson': 'true' })}>Добавить</Button>}
+      </Stack>
+      <CreateLessonModal />
+    </header>
   );
 }

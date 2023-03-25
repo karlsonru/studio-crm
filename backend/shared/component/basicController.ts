@@ -33,7 +33,9 @@ export class BasicController<T extends BasicServices> {
 
   find = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const result = await this.service.find(req.body.query, +req.params.limit);
+      // @ts-ignore
+      const params = JSON.parse(req.query.findQuery);
+      const result = await this.service.find(params);
 
       if (!result) {
         return res.status(400).json({ message: 'Не найдено' });

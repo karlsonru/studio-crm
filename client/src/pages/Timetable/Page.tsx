@@ -1,19 +1,14 @@
 import { useEffect, useState } from 'react';
 import Stack from '@mui/material/Stack';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
-import { DateSwitcher } from './TimetableHeader';
-import { DayColumns } from './DayColumns';
-import { TimeColumn } from './TimeColumn';
-import { useFetch } from '../../shared/hooks/useFetch';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { TimetableHeader } from './PageHeader';
+import { DayColumns } from './Content';
+import { useGetLessonsQuery } from '../../shared/api/lessonApi';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
-import { ILessonModel } from '../../shared/models/ILessonModes';
-
-interface ILessons {
-  message: string;
-  payload: Array<ILessonModel>;
-}
+import { ILessonModel } from '../../shared/models/ILessonModel';
 
 function structureLessons(lessons: ILessonModel[]) {
   const lessonsObj = {} as { [index: number]: ILessonModel[] };
@@ -29,11 +24,21 @@ function structureLessons(lessons: ILessonModel[]) {
   return lessonsObj;
 }
 
+function TimeColumn() {
+  const time = ['09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21'];
+
+  return (
+    <Box p='4px' mt='44px'>
+      { time.map((hh) => <Box key={hh} height='120px'>{hh}:00</Box>) }
+    </Box>
+  );
+}
+
 export function TimetablePage() {
   const dispatch = useAppDispatch();
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [startDate, setStartDate] = useState(new Date());
-  const { isLoading, data, error } = useFetch<ILessons>({ url: '/lesson' });
+  const { isLoading, data, error } = useGetLessonsQuery();
 
   useEffect(() => {
     if (startDate.getDay() === 1) return;
@@ -49,7 +54,7 @@ export function TimetablePage() {
 
   return (
     <>
-      <DateSwitcher startDate={startDate} setDateHandler={setStartDate} />
+      <TimetableHeader startDate={startDate} setDateHandler={setStartDate} />
       <Stack direction='row'>
         {!isMobile && <TimeColumn />}
         {isLoading && <CircularProgress />}

@@ -1,11 +1,15 @@
+import { useNavigate } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import GroupIcon from '@mui/icons-material/Group';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
-import { ILessonModel } from '../../shared/models/ILessonModes';
+import { ILessonModel } from '../../shared/models/ILessonModel';
+import { getReadbleTime } from '../../shared/helpers/getReadableTime';
+import { useMobile } from '../../shared/hooks/useMobile';
+import { useActionCreators } from '../../shared/hooks/useActionCreators';
+import { visitsPageActions } from '../../shared/reducers/visitsPageSlice';
 
 function convertToMinutes(time: number) {
   const hours = Math.floor(time / 100) - 9;
@@ -13,29 +17,39 @@ function convertToMinutes(time: number) {
   return hours * 60 + minutes;
 }
 
-function convertToReadbleTime(time: number) {
-  const timeString = time.toString().padStart(4, '0');
-  const hours = timeString.slice(0, 2);
-  const minutes = timeString.slice(2);
-  return `${hours}:${minutes}`;
+interface ITimetableLessonCard {
+  lessonCardDetails: ILessonModel;
+  date: Date;
 }
 
-export function TimetableLessonCard({ lessonCardDetails }: { lessonCardDetails: ILessonModel }) {
+export function TimetableLessonCard({ lessonCardDetails, date }: ITimetableLessonCard) {
   const {
     title, teacher, timeStart, timeEnd, activeStudents,
   } = lessonCardDetails;
 
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  const actions = useActionCreators(visitsPageActions);
 
-  const timeStartReadable = convertToReadbleTime(timeStart);
-  const timeEndReadable = convertToReadbleTime(timeEnd);
+  const isMobile = useMobile();
+  const navigate = useNavigate();
+
+  const timeStartReadable = getReadbleTime(timeStart);
+  const timeEndReadable = getReadbleTime(timeEnd);
 
   const fontSize = isMobile ? '1rem' : '0.85rem!important';
   const duration = (convertToMinutes(timeEnd) - convertToMinutes(timeStart));
   const shift = isMobile ? 0 : convertToMinutes(timeStart);
 
+  const doubleClickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (event.detail !== 2) return null;
+
+    navigate(`/visits?date=${+date}&lessonId=${lessonCardDetails._id}`);
+    actions.setCurrentDateTimestamp(+date);
+    actions.setCurrentLessonId(lessonCardDetails._id);
+  };
+
   return (
     <Card
+      onClick={doubleClickHandler}
       variant='outlined'
       sx={{
         position: isMobile ? 'static' : 'absolute',
@@ -81,7 +95,7 @@ export function TimetableLessonCard({ lessonCardDetails }: { lessonCardDetails: 
             </Stack>
           </Stack>
 
-          <Typography paragraph m='0px' p='4px' textOverflow='ellipsis' whiteSpace='nowrap' fontSize={ fontSize }>{teacher.name ?? teacher}</Typography>
+          <Typography paragraph m='0px' p='4px' textOverflow='ellipsis' whiteSpace='nowrap' fontSize={ fontSize }>{teacher.fullname}</Typography>
 
         </Stack>
       </CardContent>

@@ -15,6 +15,8 @@ import Stack from '@mui/material/Stack';
 import IconButton from '@mui/material/IconButton/IconButton';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import DomainVerificationIcon from '@mui/icons-material/DomainVerification';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import { useAppSelector } from '../hooks/useAppSelector';
 import { useAppDispatch } from '../hooks/useAppDispatch';
 import { setFullWidth, setMobileMenuAnchorEl, setSmallWidth } from '../reducers/appMenuSlice';
@@ -71,17 +73,22 @@ function createMenuList() {
       icon: <CalendarMonthIcon />,
     },
     {
-      path: 'students',
-      title: 'Ученики',
-      icon: <GroupIcon />,
-    },
-    {
       path: 'lessons',
       title: 'Занятия',
       icon: <ListAltIcon />,
     },
     {
-      path: 'subscribtions',
+      path: 'visits',
+      title: 'Посещения',
+      icon: <DomainVerificationIcon />,
+    },
+    {
+      path: 'students',
+      title: 'Ученики',
+      icon: <GroupIcon />,
+    },
+    {
+      path: 'subscriptions/templates',
       title: 'Абонементы',
       icon: <CardMembershipIcon />,
     },
@@ -89,6 +96,11 @@ function createMenuList() {
       path: 'finance',
       title: 'Финансы',
       icon: <CurrencyRubleIcon />,
+    },
+    {
+      path: 'collaborators',
+      title: 'Сотрудники',
+      icon: <AccountBoxIcon />,
     },
   ];
 
