@@ -26,11 +26,12 @@ export function LessonsList() {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedLessonId = searchParams.get('lessonId');
+  const date = searchParams.get('date') ?? 'unknown';
 
   if (isFetching || !data?.payload) return null;
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, lessonId: string) => {
-    setSearchParams({ lessonId });
+    setSearchParams({ date, lessonId });
   };
 
   return (

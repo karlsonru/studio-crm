@@ -23,9 +23,7 @@ export function Router() {
 
         <Route path='/timetable' element={<TimetablePage />} />
 
-        <Route path='/visits' element={<VisititedLessonsPage />} >
-          <Route path=':date' element={<VisititedLessonsPage />} />
-        </Route>
+        <Route path='/visits' element={<VisititedLessonsPage />} />
 
         <Route path='/students' element={<StudentsPage />} />
 

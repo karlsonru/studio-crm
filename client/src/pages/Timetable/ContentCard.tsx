@@ -8,6 +8,8 @@ import Stack from '@mui/material/Stack';
 import { ILessonModel } from '../../shared/models/ILessonModel';
 import { getReadbleTime } from '../../shared/helpers/getReadableTime';
 import { useMobile } from '../../shared/hooks/useMobile';
+import { useActionCreators } from '../../shared/hooks/useActionCreators';
+import { visitsPageActions } from '../../shared/reducers/visitsPageSlice';
 
 function convertToMinutes(time: number) {
   const hours = Math.floor(time / 100) - 9;
@@ -25,6 +27,8 @@ export function TimetableLessonCard({ lessonCardDetails, date }: ITimetableLesso
     title, teacher, timeStart, timeEnd, activeStudents,
   } = lessonCardDetails;
 
+  const actions = useActionCreators(visitsPageActions);
+
   const isMobile = useMobile();
   const navigate = useNavigate();
 
@@ -38,7 +42,9 @@ export function TimetableLessonCard({ lessonCardDetails, date }: ITimetableLesso
   const doubleClickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (event.detail !== 2) return null;
 
-    navigate(`/visits/${+date}?lessonId=${lessonCardDetails._id}`);
+    navigate(`/visits?date=${+date}&lessonId=${lessonCardDetails._id}`);
+    actions.setCurrentDateTimestamp(+date);
+    actions.setCurrentLessonId(lessonCardDetails._id);
   };
 
   return (

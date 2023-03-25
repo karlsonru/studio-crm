@@ -95,6 +95,7 @@ export function CreateLessonModal() {
       timeStart: +(formData.timeStart as string).replace(':', ''),
       timeEnd: +(formData.timeEnd as string).replace(':', ''),
       activeStudents: 0,
+      students: [],
       dateFrom: +Date.parse(formData.dateFrom as string),
       dateTo: +Date.parse(formData.dateTo as string),
       isActive: true,

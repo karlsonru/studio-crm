@@ -40,14 +40,14 @@ export function LessonInfoCard() {
 
   const { data, isFetching } = useGetLessonQuery(selectedLessonId);
 
-  if (isFetching || !data?.payload) return null;
+  if (selectedLessonId === 'unknown' || isFetching || !data?.payload) return null;
 
-  const lesson = data?.payload;
+  const lesson = data.payload;
 
   const dateField = `${dateValueFormatter(currentDateTimestamp)} c ${convertTime(lesson.timeStart)} до ${convertTime(lesson.timeEnd)}`;
 
   return (
-    <Card>
+    <Card sx={{ maxHeight: '250px' }}>
       <CardHeader title={lesson.title} />
       <CardContent>
         <List>

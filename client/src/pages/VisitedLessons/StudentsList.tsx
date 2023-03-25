@@ -9,7 +9,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { visitsPageActions } from '../../shared/reducers/visitsPageSlice';
-import { useFindStudentsQuery } from '../../shared/api';
+import { useFindStudentsQuery, useGetLessonQuery } from '../../shared/api';
 
 function StatusButton() {
   return (
@@ -33,22 +33,33 @@ export function StudentsList() {
     (state) => state.visitsPageReducer.currentDateTimestamp,
   );
   const [searchParams] = useSearchParams('');
-  const lessonId = searchParams.get('lessonId');
+  const lessonId = searchParams.get('lessonId') ?? '';
+
+  // если нет id - не делаем запрос
+  const lesson = useGetLessonQuery(lessonId, {
+    skip: !lessonId,
+    selectFromResult: ((response) => response),
+  });
 
   // если это будущее - показываем кто должен прийти (кто записан в группы)
   // иначе покажем кто должен был прийти в день date
   const isFuture = date > Date.now();
 
-  const { data, isFetching } = useFindStudentsQuery({
-    // _id: { $in: [] },
+  // получим студентов по id из массива занятия
+  const { data: students, isFetching } = useFindStudentsQuery({
+    _id: { $in: lesson.data?.payload.students },
+  }, {
+    skip: !lessonId,
   });
 
-  if (isFetching || !data?.payload) return null;
+  if (isFetching || !students?.payload) return null;
+
+  if (!lessonId) return null;
 
   return (
     <List sx={{ width: '100%', maxWidth: '600px' }}>
       {
-        data.payload.map((student) => (
+        students.payload.map((student) => (
         <ListItem key={student._id}>
           <ListItemText primary={student.fullname} />
           <StatusButton />

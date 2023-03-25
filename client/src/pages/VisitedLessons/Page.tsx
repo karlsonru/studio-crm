@@ -1,39 +1,39 @@
-import { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Input from '@mui/material/Input';
 import Stack from '@mui/system/Stack';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import Typography from '@mui/material/Typography';
 import { LessonsList } from './LessonsList';
 import { StudentsList } from './StudentsList';
+import { LessonInfoCard } from './LessonInfoCard';
 import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
-import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { visitsPageActions } from '../../shared/reducers/visitsPageSlice';
-import { LessonInfoCard } from './LessonInfoCard';
+import { getDayName } from '../../shared/helpers/getDayName';
 
 function DaySwitcher() {
-  const currentDateTimestamp = useAppSelector(
-    (state) => state.visitsPageReducer.currentDateTimestamp,
-  );
   const actions = useActionCreators(visitsPageActions);
-  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [date, setDate] = useState(+(searchParams.get('date') ?? Date.now()));
+
+  useEffect(() => {
+    actions.setCurrentDateTimestamp(date);
+    setSearchParams({ date: date.toString() });
+  }, [date]);
 
   const nextDate = () => {
-    const nextDayTimestamp = currentDateTimestamp + 86_400_000;
-    actions.setCurrentDateTimestamp(nextDayTimestamp);
-    navigate(`/visits/${nextDayTimestamp}`);
+    setDate(() => date + 86_400_000);
   };
 
   const prevDate = () => {
-    const prevDayTimestamp = currentDateTimestamp - 86_400_000;
-    actions.setCurrentDateTimestamp(prevDayTimestamp);
-    navigate(`/visits/${prevDayTimestamp}`);
+    setDate(() => date - 86_400_000);
   };
 
-  const dateString = dateValueFormatter(currentDateTimestamp);
+  const dateString = dateValueFormatter(date);
 
   return (
     <Stack direction="row" alignItems="center" justifyContent="start">
@@ -51,28 +51,35 @@ function DaySwitcher() {
           }}
         />
       <ArrowForwardIosIcon onClick={nextDate} fontSize="medium" />
+      <Typography variant="h6" marginLeft="1rem">
+        { getDayName(new Date(date).getDay()) }
+      </Typography>
     </Stack>
   );
 }
 
 export function VisititedLessonsPage() {
   const dispatch = useAppDispatch();
-  const { date } = useParams();
-  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const actions = useActionCreators(visitsPageActions);
 
   useEffect(() => {
     dispatch(setPageTitle('Учёт посещений'));
+  }, []);
 
-    // если никакой даты передано при переходе не было - ставим сейчас
-    if (date === undefined) {
-      actions.setCurrentDateTimestamp(Date.now());
-      navigate(`/visits/${Date.now()}`);
+  useEffect(() => {
+    const date = searchParams.get('date');
+
+    // если даты нет в search params - добавим самостоятельно текущую
+    if (!date) {
+      const now = Date.now();
+      setSearchParams({ date: now.toString() });
+      actions.setCurrentDateTimestamp(now);
+    // если есть - обновим state чтобы дата в state соответствовала дате в params
     } else {
-    // иначе дату берём из параметров
       actions.setCurrentDateTimestamp(+date);
     }
-  }, []);
+  });
 
   return (
     <>
@@ -81,10 +88,8 @@ export function VisititedLessonsPage() {
       </header>
       <Stack direction="row" flexWrap="wrap">
         <LessonsList />
-        <Stack>
-          <LessonInfoCard />
-          <StudentsList />
-        </Stack>
+        <LessonInfoCard />
+        <StudentsList />
       </Stack>
     </>
   );

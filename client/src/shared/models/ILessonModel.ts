@@ -10,6 +10,7 @@ export interface ILessonModel {
   timeStart: number;
   timeEnd: number;
   activeStudents: number;
+  students: Array<string>,
   dateFrom: number;
   dateTo: number;
   isActive: boolean;
