@@ -12,14 +12,14 @@ const schema = new Schema({
   teacher: {
     type: Types.ObjectId, ref: 'User', required: true, trim: true,
   },
-  activeStudents: {
-    type: Number, min: 0,
-  },
+  students: [
+    { type: Types.ObjectId, ref: 'Student' },
+  ],
   location: {
     type: Types.ObjectId, ref: 'Location', required: true, trim: true,
   },
   day: {
-    type: Number, required: true, min: 0, max: 6,
+    type: Number, required: true, min: 0, max: 6, index: true,
   },
   timeStart: {
     type: Number, required: true, min: 0, max: 2359,

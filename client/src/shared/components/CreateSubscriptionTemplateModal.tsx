@@ -46,7 +46,6 @@ export function CreateSubscriptionTemplateModal() {
     event.preventDefault();
     const form = event.currentTarget as HTMLFormElement;
     const formData = Object.fromEntries(new FormData(form).entries());
-    console.log(formData);
 
     validateForm(formData);
 

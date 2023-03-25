@@ -32,15 +32,17 @@ function AddListItem({ text, icon }: { text: string, icon: React.ReactElement })
 
 export function LessonInfoCard() {
   const [searchParams] = useSearchParams();
-  const selectedLessonId = searchParams.get('lessonId') ?? 'unknown';
+  const selectedLessonId = searchParams.get('lessonId') ?? '';
 
   const currentDateTimestamp = useAppSelector(
     (state) => state.visitsPageReducer.currentDateTimestamp,
   );
 
-  const { data, isFetching } = useGetLessonQuery(selectedLessonId);
+  const { data, isFetching } = useGetLessonQuery(selectedLessonId, {
+    skip: !selectedLessonId,
+  });
 
-  if (selectedLessonId === 'unknown' || isFetching || !data?.payload) return null;
+  if (!selectedLessonId || isFetching || !data?.payload) return null;
 
   const lesson = data.payload;
 

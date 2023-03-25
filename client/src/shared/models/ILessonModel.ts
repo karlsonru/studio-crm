@@ -1,5 +1,6 @@
 import { IUserModel } from './IUserModel';
 import { ILocationModel } from './ILocationModel';
+import { IStudentModel } from './IStudentModel';
 
 export interface ILessonModel {
   _id: string;
@@ -10,13 +11,14 @@ export interface ILessonModel {
   timeStart: number;
   timeEnd: number;
   activeStudents: number;
-  students: Array<string>,
+  students: Array<IStudentModel>,
   dateFrom: number;
   dateTo: number;
   isActive: boolean;
 }
 
-export interface ILessonModelCreate extends Omit<ILessonModel, '_id' | 'teacher' | 'location'> {
+export interface ILessonModelCreate extends Omit<ILessonModel, '_id' | 'teacher' | 'location' | 'students'> {
   teacher: string;
   location: string;
+  students: Array<string>;
 }

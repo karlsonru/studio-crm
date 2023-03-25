@@ -2,13 +2,13 @@ import { model, Schema, Types } from 'mongoose';
 
 const schema = new Schema({
   lesson: {
-    type: Types.ObjectId, ref: 'Lesson', required: true,
+    type: Types.ObjectId, ref: 'Lesson', required: true, index: true,
   },
   day: {
     type: Number, required: true, min: 0, max: 6,
   },
   date: {
-    type: Number, required: true,
+    type: Number, required: true, index: true,
   },
   students: [
     {

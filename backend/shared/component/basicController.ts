@@ -35,7 +35,6 @@ export class BasicController<T extends BasicServices> {
     try {
       // @ts-ignore
       const params = JSON.parse(req.query.findQuery);
-      console.log(req.query.findQuery);
       const result = await this.service.find(params);
 
       if (!result) {

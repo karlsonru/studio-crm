@@ -103,7 +103,6 @@ export function CreateStudentModal() {
       sex: formData.sex as string,
       birthday: +Date.parse(formData.birthday as string),
       balance: 0,
-      visitingLessons: [],
       contacts: studentContacts,
       comment: (formData.comment as string).trim() ?? '',
       isActive: true,

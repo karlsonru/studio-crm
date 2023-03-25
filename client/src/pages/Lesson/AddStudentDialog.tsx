@@ -16,23 +16,24 @@ import Checkbox from '@mui/material/Checkbox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { useMobile } from '../../shared/hooks/useMobile';
-import { useFindStudentsQuery, usePatchStudentMutation } from '../../shared/api';
+import { useFindStudentsQuery, useGetLessonQuery, usePatchLessonMutation } from '../../shared/api';
 import { IStudentModel } from '../../shared/models/IStudentModel';
+import { ILessonModel } from '../../shared/models/ILessonModel';
 
 interface IAddStudentsDialog {
-  lessonId: string;
+  lesson: ILessonModel;
   isOpen: boolean;
   setModalOpen: (value: boolean) => void;
 }
 
-function AddStudentsDialog({ lessonId, isOpen, setModalOpen }: IAddStudentsDialog) {
+function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudentsDialog) {
   const [selectedOptions, setSelected] = useState<IStudentModel[]>([]);
   const { data } = useFindStudentsQuery({
-    visitingLessons: {
-      $nin: lessonId,
+    _id: {
+      $nin: [...lesson.students.map((student) => student._id)],
     },
   });
-  const [updateStudent, { isSuccess }] = usePatchStudentMutation();
+  const [updateLesson, { isSuccess }] = usePatchLessonMutation();
 
   useEffect(() => {
     setModalOpen(false);
@@ -43,16 +44,14 @@ function AddStudentsDialog({ lessonId, isOpen, setModalOpen }: IAddStudentsDialo
   }
 
   const handleOk = () => {
-    selectedOptions.forEach((student) => {
-      updateStudent({
-        id: student._id,
-        newItem: {
-          // @ts-ignore
-          $addToSet: {
-            visitingLessons: [lessonId],
-          },
+    updateLesson({
+      id: lesson._id,
+      newItem: {
+        // @ts-ignore
+        $addToSet: {
+          students: [...selectedOptions.map((student) => student._id)],
         },
-      });
+      },
     });
   };
 
@@ -114,6 +113,19 @@ export function AddStudentButton({ lessonId }: { lessonId: string }) {
   const isMobile = useMobile();
   const [isModalOpen, setModalOpen] = useState(false);
 
+  const {
+    data, isFetching, isError, error,
+  } = useGetLessonQuery(lessonId);
+
+  if (isFetching || !data?.payload) {
+    return null;
+  }
+
+  if (isError) {
+    console.error(error);
+    return <h3>Ошибка при запросе</h3>;
+  }
+
   return (
     <>
       <Card variant="outlined" sx={{ width: '325px', marginRight: isMobile ? 0 : '0.5rem', marginBottom: '0.5rem' }}>
@@ -128,7 +140,7 @@ export function AddStudentButton({ lessonId }: { lessonId: string }) {
       </Card>
 
       <AddStudentsDialog
-        lessonId={lessonId}
+        lesson={data?.payload}
         isOpen={isModalOpen}
         setModalOpen={setModalOpen}
       />

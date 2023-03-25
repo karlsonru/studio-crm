@@ -4,13 +4,13 @@ import {
 
 const schema = new Schema({
   student: {
-    type: Types.ObjectId, ref: 'Student', required: true,
+    type: Types.ObjectId, ref: 'Student', required: true, index: true,
   },
   template: {
     type: Types.ObjectId, ref: 'SubscriptionTemplate', required: true,
   },
   lesson: {
-    type: Types.ObjectId, ref: 'Lesson', required: true, nullable: true,
+    type: Types.ObjectId, ref: 'Lesson', required: true, nullable: true, index: true,
   },
   price: {
     type: Number, required: true, min: 0,

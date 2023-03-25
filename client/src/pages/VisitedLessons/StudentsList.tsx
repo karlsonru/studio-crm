@@ -45,7 +45,7 @@ export function StudentsList() {
   // иначе покажем кто должен был прийти в день date
   const isFuture = date > Date.now();
 
-  // получим студентов по id из массива занятия
+  // получим студентов по id из массива студентов занятия
   const { data: students, isFetching } = useFindStudentsQuery({
     _id: { $in: lesson.data?.payload.students },
   }, {

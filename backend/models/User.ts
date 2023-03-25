@@ -13,13 +13,18 @@ const schema = new Schema({
   password: {
     type: String, required: true, minLength: 5, trim: true,
   },
-  role: {
-    type: Types.ObjectId, ref: 'Role', required: true, lowercase: true, trim: true,
-  },
   fullname: {
     type: String, required: true, trim: true, minLength: 2,
   },
-  birthday: { type: Number },
+  role: {
+    type: Types.ObjectId, ref: 'Role', required: true, lowercase: true, trim: true,
+  },
+  birthday: {
+    type: Number, required: true,
+  },
+  phone: {
+    type: Number, required: true,
+  },
   isActive: { type: Boolean, required: true },
 }, {
   timestamps: true,
