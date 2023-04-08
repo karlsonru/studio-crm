@@ -74,8 +74,6 @@ export function SubscriptionContent() {
 
   if (!data) return <h1>Is loading ...</h1>;
 
-  console.log(data.payload);
-
   const columns = getColumns(isMobile);
 
   const ExtendedToolbar = () => (

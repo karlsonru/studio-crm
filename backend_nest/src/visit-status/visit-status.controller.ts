@@ -15,7 +15,7 @@ import { CreateVisitStatusDto } from './dto/create-visit-status.dto';
 import { UpdateVisitStatusDto } from './dto/update-visit-status.dto';
 import { ValidateIdPipe } from 'src/shared/validaitonPipe';
 
-@Controller('visit-status')
+@Controller('visitstatus')
 export class VisitStatusController {
   constructor(private readonly service: VisitStatusService) {}
 

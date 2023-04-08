@@ -1,26 +1,68 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { VisitedLessonEntity } from './entities/visited-lesson.entity';
 import { CreateVisitedLessonDto } from './dto/create-visited-lesson.dto';
 import { UpdateVisitedLessonDto } from './dto/update-visited-lesson.dto';
+import { IFilterQuery } from '../shared/IFilterQuery';
+import {
+  VisitedLesson,
+  VisitedLessonDocument,
+} from '../schemas/visitedLesson.schema';
 
 @Injectable()
 export class VisitedLessonService {
-  create(createVisitedLessonDto: CreateVisitedLessonDto) {
-    return 'This action adds a new visitedLesson';
+  constructor(
+    @InjectModel(VisitedLesson.name)
+    private readonly model: Model<VisitedLessonDocument>,
+  ) {}
+
+  async create(
+    createVisitedLessonDto: CreateVisitedLessonDto,
+  ): Promise<VisitedLessonEntity | null> {
+    const candidate = await this.model.findOne({
+      $and: [
+        { date: createVisitedLessonDto.date },
+        { lesson: createVisitedLessonDto.lesson },
+      ],
+    });
+
+    if (candidate) {
+      return null;
+    }
+
+    const created = await this.model.create(createVisitedLessonDto);
+
+    return created;
   }
 
-  findAll() {
-    return `This action returns all visitedLesson`;
+  async findAll(
+    query?: IFilterQuery<VisitedLessonEntity>,
+  ): Promise<Array<VisitedLessonEntity>> {
+    return await this.model.find(query ?? {});
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} visitedLesson`;
+  async findOne(id: string): Promise<VisitedLessonEntity | null> {
+    return await this.model.findById(id);
   }
 
-  update(id: number, updateVisitedLessonDto: UpdateVisitedLessonDto) {
-    return `This action updates a #${id} visitedLesson`;
+  async update(
+    id: string,
+    updateVisitedLessonDto: UpdateVisitedLessonDto,
+  ): Promise<VisitedLessonEntity | null> {
+    const updated = await this.model.findByIdAndUpdate(
+      id,
+      updateVisitedLessonDto,
+      {
+        new: true,
+      },
+    );
+
+    return updated;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} visitedLesson`;
+  async remove(id: string) {
+    await this.model.findByIdAndRemove(id);
+    return;
   }
 }

@@ -5,7 +5,7 @@ import { User } from './user.schema';
 
 export type VisitedLessonDocument = HydratedDocument<VisitedLesson>;
 
-interface IVisit {
+export class Visit {
   student: Types.ObjectId;
   visitStatus: Types.ObjectId;
 }
@@ -61,7 +61,7 @@ export class VisitedLesson {
       },
     ],
   })
-  students: IVisit[];
+  students: Visit[];
 }
 
 export const VisitedLessonSchema = SchemaFactory.createForClass(VisitedLesson);
