@@ -34,7 +34,7 @@ function getColumns(isMobile: boolean) {
     {
       field: 'duration',
       headerName: 'Длительность',
-      valueFormatter: (params) => Math.floor(params.value / 86400000),
+      valueFormatter: (params) => Math.floor(params.value / 86_400_000),
       ...leftAlignNumberColumn,
     },
     {
@@ -73,6 +73,8 @@ export function SubscriptionContent() {
   const { data } = useGetSubscriptionsQuery();
 
   if (!data) return <h1>Is loading ...</h1>;
+
+  console.log(data.payload);
 
   const columns = getColumns(isMobile);
 

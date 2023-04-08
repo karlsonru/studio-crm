@@ -34,11 +34,11 @@ export class SubscriptionService {
   async findAll(
     query?: IFilterQuery<SubscriptionEntity>,
   ): Promise<Array<SubscriptionEntity>> {
-    return await this.model.find(query ?? {});
+    return await this.model.find(query ?? {}).populate(this.populateQuery);
   }
 
   async findOne(id: string): Promise<SubscriptionEntity | null> {
-    return await this.model.findById(id);
+    return await this.model.findById(id).populate(this.populateQuery);
   }
 
   async update(

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 export type RoleDocument = HydratedDocument<Role>;
 
@@ -7,6 +7,8 @@ export type RoleDocument = HydratedDocument<Role>;
   timestamps: true,
 })
 export class Role {
+  _id: Types.ObjectId;
+
   @Prop({
     type: String,
     required: true,

@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 
 export type VisitStatusDocument = HydratedDocument<VisitStatus>;
 
@@ -7,6 +7,8 @@ export type VisitStatusDocument = HydratedDocument<VisitStatus>;
   timestamps: true,
 })
 export class VisitStatus {
+  _id: Types.ObjectId;
+
   @Prop({
     type: String,
     required: true,
