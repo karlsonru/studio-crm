@@ -6,7 +6,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Typography from '@mui/material/Typography';
 import { LessonsList } from './LessonsList';
-import { StudentsList } from './StudentsList';
+import { StudentsVisitsList } from './StudentsList';
 import { LessonInfoCard } from './LessonInfoCard';
 import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
@@ -86,10 +86,10 @@ export function VisititedLessonsPage() {
       <header style={{ margin: '1rem 0' }}>
         <DaySwitcher />
       </header>
-      <Stack direction="row" flexWrap="wrap">
+      <Stack direction="row" flexWrap="wrap" spacing={2} >
         <LessonsList />
         <LessonInfoCard />
-        <StudentsList />
+        <StudentsVisitsList />
       </Stack>
     </>
   );

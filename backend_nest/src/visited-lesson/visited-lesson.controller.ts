@@ -13,9 +13,9 @@ import {
 import { VisitedLessonService } from './visited-lesson.service';
 import { CreateVisitedLessonDto } from './dto/create-visited-lesson.dto';
 import { UpdateVisitedLessonDto } from './dto/update-visited-lesson.dto';
-import { ValidateIdPipe } from 'src/shared/validaitonPipe';
+import { ValidateIdPipe } from '../shared/validaitonPipe';
 
-@Controller('visited-lesson')
+@Controller('visits')
 export class VisitedLessonController {
   constructor(private readonly service: VisitedLessonService) {}
 
@@ -24,10 +24,7 @@ export class VisitedLessonController {
     const created = await this.service.create(createVisitedLessonDto);
 
     if (created === null) {
-      throw new HttpException(
-        { message: 'Уже существует' },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
     }
 
     return {
@@ -72,6 +69,8 @@ export class VisitedLessonController {
     @Param('id', ValidateIdPipe) id: string,
     @Body() updateVisitedLessonDto: UpdateVisitedLessonDto,
   ) {
+    console.log(id);
+    console.log(updateVisitedLessonDto);
     const updated = await this.service.update(id, updateVisitedLessonDto);
 
     if (updated === null) {

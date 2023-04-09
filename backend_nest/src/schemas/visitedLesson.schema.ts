@@ -7,7 +7,8 @@ export type VisitedLessonDocument = HydratedDocument<VisitedLesson>;
 
 export class Visit {
   student: Types.ObjectId;
-  visitStatus: Types.ObjectId;
+  visitStatus: string;
+  // visitStatus: Types.ObjectId;
 }
 
 @Schema({
@@ -55,8 +56,12 @@ export class VisitedLesson {
           required: true,
         },
         visitStatus: {
+          type: String,
+          trim: true,
+          /*
           type: Types.ObjectId,
           ref: 'VisitStatus',
+          */
         },
       },
     ],

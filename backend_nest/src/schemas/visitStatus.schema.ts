@@ -24,6 +24,14 @@ export class VisitStatus {
     trim: true,
   })
   action: string;
+
+  // что делать после сабмита визита с таким статусом?
+  @Prop({
+    type: String,
+    default: 'success',
+    trim: true,
+  })
+  color: string;
 }
 
 export const VisitStatusSchema = SchemaFactory.createForClass(VisitStatus);

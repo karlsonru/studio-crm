@@ -1,122 +1,149 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
-import CircleIcon from '@mui/icons-material/Circle';
+import { IStudentModel } from 'shared/models/IStudentModel';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { visitsPageActions } from '../../shared/reducers/visitsPageSlice';
-import { useGetLessonQuery } from '../../shared/api';
-import { useCreateVisitMutation } from '../../shared/api/visitsApi';
+import {
+  useGetLessonQuery, useCreateVisitMutation, useFindVisitsQuery, usePatchVisitMutation,
+} from '../../shared/api';
+import { VisitStatusButton } from './VisitStatusButton';
 
-function StatusButton({ studentId }: { studentId: string }) {
-  const [defaultStatus] = useState(1);
-  const actions = useActionCreators(visitsPageActions);
+interface IStudentsList {
+  lessonId: string;
+  date: number;
+}
 
-  useEffect(() => {
-    actions.setVisits({
-      student: studentId,
-      visitStatus: defaultStatus,
-    });
-  }, []);
+interface IStudentsListItem {
+  student: IStudentModel;
+  defaultStatus?: string;
+}
 
-  const changeHandler = (event: SelectChangeEvent<number>) => {
-    actions.setVisits({
-      student: studentId,
-      visitStatus: event.target.value,
-    });
-  };
-
+function StudentsListItem({ student, defaultStatus }: IStudentsListItem) {
   return (
-    <FormControl sx={{ width: '180px' }}>
-      <InputLabel>Сатус</InputLabel>
-      <Select
-        defaultValue={defaultStatus}
-        label="Статус"
-        onChange={changeHandler}
-      >
-        <MenuItem value={1}>
-          <CircleIcon color="success" fontSize="small" sx={{ marginRight: '0.5rem' }} />
-          Посетил
-        </MenuItem>
-        <MenuItem value={2}>
-          <CircleIcon color="error" fontSize="small" sx={{ marginRight: '0.5rem' }} />
-          Пропустил
-        </MenuItem>
-        <MenuItem value={3}>
-          <CircleIcon color="info" fontSize="small" sx={{ marginRight: '0.5rem' }} />
-          Болел
-        </MenuItem>
-        <MenuItem value={4}>
-          <CircleIcon color="warning" fontSize="small" sx={{ marginRight: '0.5rem' }} />
-          К отработке
-        </MenuItem>
-      </Select>
-    </FormControl>
+    <ListItem divider={true}>
+      <ListItemText primary={student.fullname} />
+      <VisitStatusButton studentId={student._id} defaultStatus={defaultStatus} />
+    </ListItem>
   );
 }
 
-export function StudentsList() {
+function StudentsList({ lessonId, date }: IStudentsList) {
+  const isFuture = date > Date.now();
+
+  const actions = useActionCreators(visitsPageActions);
+
+  // если это future, то это не может быть visited lesson - делаем skip
+  const { data: visitedLesson, isFetching: isFetchingVisited } = useFindVisitsQuery({
+    $and: [
+      { lesson: lessonId },
+      { date },
+    ],
+  }, {
+    skip: isFuture,
+  });
+
+  // в любом случае получим futureLesson. Возможно это должен быть visited, но он не был отмечен
+  const { data: futureLesson } = useGetLessonQuery(lessonId, {
+    selectFromResult: (result) => ({ data: result.data?.payload }),
+  });
+
+  // не рендерим компонент если не завершился хотя бы один из запросов
+  if (isFetchingVisited) return null;
+
+  // если у нас есть прошедшее занятие - возвращаем информацию по нему
+  if (visitedLesson?.payload.length) {
+    // скажем что этот урок был посещён
+    actions.setIsCurrentLessonVisited(true);
+    actions.setCurrentLessonId(visitedLesson.payload[0]._id);
+
+    return (
+      <List>
+        {visitedLesson.payload[0].students.map(
+          (visit) => <StudentsListItem
+            key={visit.student._id}
+            student={visit.student}
+            defaultStatus={visit.visitStatus}
+          />,
+        )}
+      </List>
+    );
+  }
+
+  if (!futureLesson) return null;
+
+  // в остальных случаях вернём информацию по будущему занятию
+  actions.setIsCurrentLessonVisited(false);
+  actions.setCurrentLessonId(futureLesson._id);
+
+  return (
+    <List>
+      {futureLesson.students.map(
+        (student) => <StudentsListItem key={student._id} student={student} />,
+      )}
+    </List>
+  );
+}
+
+export function StudentsVisitsList() {
   const date = useAppSelector(
     (state) => state.visitsPageReducer.currentDateTimestamp,
   );
   const visits = useAppSelector(
     (state) => state.visitsPageReducer.visits,
   );
+  const isCurrentLessonVisited = useAppSelector(
+    (state) => state.visitsPageReducer.isCurrentLessonVisited,
+  );
+  const currentLessonId = useAppSelector(
+    (state) => state.visitsPageReducer.currentLessonId,
+  );
 
+  const [updateVisit] = usePatchVisitMutation();
   const [createVisit] = useCreateVisitMutation();
-  const [searchParams] = useSearchParams('');
+
+  const [searchParams] = useSearchParams();
   const lessonId = searchParams.get('lessonId') ?? '';
 
-  // если это будущее - показываем кто должен прийти (кто записан в группы)
-  // иначе покажем кто должен был прийти в день date
-  const isFuture = date > Date.now();
-
-  // если нет id или это прошедшее занятие - не делаем запрос к занятиям
-  const {
-    data, isFetching, isError, error,
-  } = useGetLessonQuery(lessonId, {
-    skip: !lessonId || !isFuture,
-    selectFromResult: ((response) => response),
+  // возьмём информацию по текущему занятию из кэша RTK Query
+  const { data: currentLesson } = useGetLessonQuery(lessonId, {
+    selectFromResult: (result) => ({ data: result.data?.payload }),
+    // skip: true,
   });
 
-  if (isFetching || !data?.payload || !lessonId) return null;
-
-  if (isError) {
-    console.error(error);
-    return <h3>Не удалось получить список студентов</h3>;
-  }
+  if (!lessonId || !currentLesson) return null;
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    createVisit({
-      lesson: lessonId,
-      teacher: data.payload.teacher._id,
-      day: data.payload.day,
-      date,
-      students: visits,
-    });
+    if (isCurrentLessonVisited) {
+      updateVisit({
+        id: currentLessonId,
+        newItem: {
+          // @ts-ignore
+          // $addToSet: {
+          students: visits,
+          /// },
+        },
+      });
+    } else {
+      createVisit({
+        lesson: lessonId,
+        teacher: currentLesson.teacher._id,
+        day: currentLesson.day,
+        date,
+        students: visits,
+      });
+    }
   };
 
   return (
     <form onSubmit={submitHandler} style={{ width: '100%', maxWidth: '600px' }}>
-      <List>
-        {
-          data.payload.students.map((student) => (
-          <ListItem key={student._id} divider={true}>
-            <ListItemText primary={student.fullname} />
-            <StatusButton studentId={student._id} />
-          </ListItem>
-          ))
-        }
-      </List>
+      <StudentsList lessonId={lessonId} date={date} />
       <Button
         type='submit'
         variant='contained'
@@ -126,7 +153,7 @@ export function StudentsList() {
           marginRight: '1rem',
         }}
       >
-        Отметить
+        {isCurrentLessonVisited ? 'Обновить' : 'Отметить'}
       </Button>
     </form>
   );

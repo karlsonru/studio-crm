@@ -12,12 +12,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useGetLessonQuery } from '../../shared/api';
 import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
-
-function convertTime(time: number) {
-  const hh = Math.floor(time / 100).toString().padStart(2, '0');
-  const min = (time % 100).toString().padStart(2, '0');
-  return `${hh}:${min}`;
-}
+import { convertTime } from '../../shared/helpers/convertTime';
 
 function AddListItem({ text, icon }: { text: string, icon: React.ReactElement }) {
   return (
@@ -31,12 +26,12 @@ function AddListItem({ text, icon }: { text: string, icon: React.ReactElement })
 }
 
 export function LessonInfoCard() {
-  const [searchParams] = useSearchParams();
-  const selectedLessonId = searchParams.get('lessonId') ?? '';
-
   const currentDateTimestamp = useAppSelector(
     (state) => state.visitsPageReducer.currentDateTimestamp,
   );
+
+  const [searchParams] = useSearchParams();
+  const selectedLessonId = searchParams.get('lessonId') ?? '';
 
   const { data, isFetching } = useGetLessonQuery(selectedLessonId, {
     skip: !selectedLessonId,
@@ -55,7 +50,7 @@ export function LessonInfoCard() {
         <List>
           <AddListItem text={lesson.location.address} icon={<LocationOnOutlinedIcon />} />
           <AddListItem text={dateField} icon={<ScheduleOutlinedIcon />} />
-          <AddListItem text={`Посетило 0 из ${lesson.activeStudents}`} icon={<PersonOutlineOutlinedIcon />} />
+          <AddListItem text={`Посетило 0 из ${lesson.students.length}`} icon={<PersonOutlineOutlinedIcon />} />
         </List>
       </CardContent>
     </Card>

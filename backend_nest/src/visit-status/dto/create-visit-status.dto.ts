@@ -7,5 +7,10 @@ export class CreateVisitStatusDto {
   title: string;
 
   @IsString()
+  @IsNotEmpty()
   action: string;
+
+  @IsString()
+  @IsNotEmpty()
+  color: string;
 }

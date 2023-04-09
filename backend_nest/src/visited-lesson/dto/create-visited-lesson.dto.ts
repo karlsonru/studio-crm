@@ -30,7 +30,7 @@ export class CreateVisitedLessonDto {
   teacher: string;
 
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => Visit)
+  // @ValidateNested({ each: true })
+  // @Type(() => Visit)
   students: Visit[];
 }

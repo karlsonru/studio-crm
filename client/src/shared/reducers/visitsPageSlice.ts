@@ -1,9 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ILessonModel } from 'shared/models/ILessonModel';
+import { ILessonModel } from '../models/ILessonModel';
 
 export interface IVisit {
   student: string;
-  visitStatus: string | number;
+  visitStatus: string;
 }
 
 interface IVisitPageState {
@@ -11,6 +11,7 @@ interface IVisitPageState {
   lessonsIds: string[],
   currentLesson?: ILessonModel,
   currentLessonId: string,
+  isCurrentLessonVisited: boolean,
   currentDateTimestamp: number;
   visits: Array<IVisit>;
 }
@@ -19,6 +20,7 @@ const initialState: IVisitPageState = {
   lessons: [],
   lessonsIds: [],
   currentLessonId: '',
+  isCurrentLessonVisited: false,
   currentDateTimestamp: 0,
   visits: [],
 };
@@ -30,9 +32,19 @@ const visitsPageState = createSlice({
     setCurrentDateTimestamp: (state, action: PayloadAction<number>) => {
       state.currentDateTimestamp = action.payload;
     },
+
+    setCurrentLessonLesson: (state, action: PayloadAction<ILessonModel>) => {
+      state.currentLesson = action.payload;
+    },
+
     setCurrentLessonId: (state, action: PayloadAction<string>) => {
       state.currentLessonId = action.payload;
     },
+
+    setIsCurrentLessonVisited: (state, action: PayloadAction<boolean>) => {
+      state.isCurrentLessonVisited = action.payload;
+    },
+
     setVisits: (state, action: PayloadAction<IVisit>) => {
       const student = state.visits.find((visit) => visit.student === action.payload.student);
 
