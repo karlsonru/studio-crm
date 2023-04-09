@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ILessonModel } from '../models/ILessonModel';
 
 export interface IVisit {
+  _id?: string;
   student: string;
   visitStatus: string;
 }

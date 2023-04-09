@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsArray,
   IsMongoId,
@@ -8,8 +9,14 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { Visit } from '../../schemas/visitedLesson.schema';
-import { Type } from 'class-transformer';
+
+class Visit {
+  @IsMongoId()
+  student: string;
+
+  @IsString()
+  visitStatus: string;
+}
 
 export class CreateVisitedLessonDto {
   @IsString()
@@ -30,7 +37,7 @@ export class CreateVisitedLessonDto {
   teacher: string;
 
   @IsArray()
-  // @ValidateNested({ each: true })
-  // @Type(() => Visit)
+  @ValidateNested({ each: true })
+  @Type(() => Visit)
   students: Visit[];
 }

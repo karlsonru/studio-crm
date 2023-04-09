@@ -2,12 +2,14 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { Lesson } from './lesson.schema';
 import { User } from './user.schema';
+import { Student } from './student.schema';
 
 export type VisitedLessonDocument = HydratedDocument<VisitedLesson>;
 
 export class Visit {
-  student: Types.ObjectId;
+  student: Student;
   visitStatus: string;
+  // student: Types.ObjectId;
   // visitStatus: Types.ObjectId;
 }
 

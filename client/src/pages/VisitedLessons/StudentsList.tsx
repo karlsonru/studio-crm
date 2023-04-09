@@ -124,10 +124,13 @@ export function StudentsVisitsList() {
       updateVisit({
         id: currentLessonId,
         newItem: {
+          students: visits,
+          /*
           // @ts-ignore
           // $addToSet: {
           students: visits,
-          /// },
+          // },
+          */
         },
       });
     } else {
