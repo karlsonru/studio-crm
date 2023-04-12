@@ -37,6 +37,7 @@ function TimeColumn() {
 export function TimetablePage() {
   const dispatch = useAppDispatch();
   const isMobile = useMediaQuery('(max-width: 767px)');
+
   const [startDate, setStartDate] = useState(new Date());
   const { isLoading, data, error } = useGetLessonsQuery();
 

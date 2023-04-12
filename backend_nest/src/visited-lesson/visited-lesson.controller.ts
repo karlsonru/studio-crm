@@ -35,6 +35,7 @@ export class VisitedLessonController {
 
   @Get()
   async findAll(@Query('filter') filter?: string) {
+    console.log(`filter: ${filter}`);
     if (filter) {
       const query = JSON.parse(filter);
 
@@ -69,8 +70,6 @@ export class VisitedLessonController {
     @Param('id', ValidateIdPipe) id: string,
     @Body() updateVisitedLessonDto: UpdateVisitedLessonDto,
   ) {
-    console.log(id);
-    console.log(updateVisitedLessonDto);
     const updated = await this.service.update(id, updateVisitedLessonDto);
 
     if (updated === null) {

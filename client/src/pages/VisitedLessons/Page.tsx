@@ -6,19 +6,19 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Typography from '@mui/material/Typography';
 import { LessonsList } from './LessonsList';
-import { StudentsVisitsList } from './StudentsList';
-import { LessonInfoCard } from './LessonInfoCard';
+import { LessonInfo } from './LessonInfo';
 import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { visitsPageActions } from '../../shared/reducers/visitsPageSlice';
 import { getDayName } from '../../shared/helpers/getDayName';
+import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 
 function DaySwitcher() {
   const actions = useActionCreators(visitsPageActions);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [date, setDate] = useState(+(searchParams.get('date') ?? Date.now()));
+  const [date, setDate] = useState(+(searchParams.get('date') ?? getTodayTimestamp()));
 
   useEffect(() => {
     actions.setCurrentDateTimestamp(date);
@@ -70,11 +70,10 @@ export function VisititedLessonsPage() {
   useEffect(() => {
     const date = searchParams.get('date');
 
-    // если даты нет в search params - добавим самостоятельно текущую
+    // если даты нет в search params - добавим самостоятельно текущий день
     if (!date) {
-      const now = Date.now();
-      setSearchParams({ date: now.toString() });
-      actions.setCurrentDateTimestamp(now);
+      setSearchParams({ date: getTodayTimestamp().toString() });
+      actions.setCurrentDateTimestamp(getTodayTimestamp());
     // если есть - обновим state чтобы дата в state соответствовала дате в params
     } else {
       actions.setCurrentDateTimestamp(+date);
@@ -88,8 +87,7 @@ export function VisititedLessonsPage() {
       </header>
       <Stack direction="row" flexWrap="wrap" spacing={2} >
         <LessonsList />
-        <LessonInfoCard />
-        <StudentsVisitsList />
+        <LessonInfo />
       </Stack>
     </>
   );

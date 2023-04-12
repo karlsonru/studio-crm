@@ -8,11 +8,9 @@ import ListItemText from '@mui/material/ListItemText';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import ScheduleOutlinedIcon from '@mui/icons-material/ScheduleOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import { useSearchParams } from 'react-router-dom';
-import { useAppSelector } from '../../shared/hooks/useAppSelector';
-import { useGetLessonQuery } from '../../shared/api';
 import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
 import { convertTime } from '../../shared/helpers/convertTime';
+import { ILessonModel } from '../../shared/models/ILessonModel';
 
 function AddListItem({ text, icon }: { text: string, icon: React.ReactElement }) {
   return (
@@ -25,23 +23,14 @@ function AddListItem({ text, icon }: { text: string, icon: React.ReactElement })
   );
 }
 
-export function LessonInfoCard() {
-  const currentDateTimestamp = useAppSelector(
-    (state) => state.visitsPageReducer.currentDateTimestamp,
-  );
+interface ILessonDetails {
+  lesson: ILessonModel;
+  dateTimestamp: number;
+  visitedStudents: number;
+}
 
-  const [searchParams] = useSearchParams();
-  const selectedLessonId = searchParams.get('lessonId') ?? '';
-
-  const { data, isFetching } = useGetLessonQuery(selectedLessonId, {
-    skip: !selectedLessonId,
-  });
-
-  if (!selectedLessonId || isFetching || !data?.payload) return null;
-
-  const lesson = data.payload;
-
-  const dateField = `${dateValueFormatter(currentDateTimestamp)} c ${convertTime(lesson.timeStart)} до ${convertTime(lesson.timeEnd)}`;
+export function LessonDetails({ lesson, dateTimestamp, visitedStudents }: ILessonDetails) {
+  const dateField = `${dateValueFormatter(dateTimestamp)} c ${convertTime(lesson.timeStart)} до ${convertTime(lesson.timeEnd)}`;
 
   return (
     <Card sx={{ maxHeight: '250px' }}>
@@ -50,7 +39,7 @@ export function LessonInfoCard() {
         <List>
           <AddListItem text={lesson.location.address} icon={<LocationOnOutlinedIcon />} />
           <AddListItem text={dateField} icon={<ScheduleOutlinedIcon />} />
-          <AddListItem text={`Посетило 0 из ${lesson.students.length}`} icon={<PersonOutlineOutlinedIcon />} />
+          <AddListItem text={`Посетило ${visitedStudents} из ${lesson.students.length}`} icon={<PersonOutlineOutlinedIcon />} />
         </List>
       </CardContent>
     </Card>

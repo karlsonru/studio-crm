@@ -42,8 +42,10 @@ export function TimetableLessonCard({ lessonCardDetails, date }: ITimetableLesso
   const doubleClickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (event.detail !== 2) return null;
 
-    navigate(`/visits?date=${+date}&lessonId=${lessonCardDetails._id}`);
-    actions.setCurrentDateTimestamp(+date);
+    const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+    navigate(`/visits?date=${+day}&lessonId=${lessonCardDetails._id}`);
+    actions.setCurrentDateTimestamp(+day);
     actions.setCurrentLessonId(lessonCardDetails._id);
   };
 
