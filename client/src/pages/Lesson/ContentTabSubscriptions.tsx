@@ -8,9 +8,14 @@ import { useMobile } from '../../shared/hooks/useMobile';
 import { useFindSubscriptionsQuery } from '../../shared/api';
 import { ISubscriptionModel } from '../../shared/models/ISubscriptionModel';
 import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
+import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 
 interface IContentSubscriptions {
   lessonId: string;
+}
+
+interface IShowSubscriptions extends IContentSubscriptions {
+  isActive: boolean;
 }
 
 function CreateRowMobile(subscription: ISubscriptionModel) {
@@ -48,15 +53,10 @@ function CreateRow(subscription: ISubscriptionModel) {
   );
 }
 
-interface IShowSubscriptions {
-  lessonId: string;
-  isActive: boolean;
-  dateTo?: number;
-}
-
-function ShowSubscriptions({ lessonId, isActive, dateTo }: IShowSubscriptions) {
+function ShowSubscriptions({ lessonId, isActive }: IShowSubscriptions) {
   const isMobile = useMobile();
-  const query = isActive ? { isActive } : { dateTo: { $lte: dateTo } };
+  const today = getTodayTimestamp();
+  const query = { dateTo: isActive ? { $gte: today } : { $lte: today } };
 
   const { data, isError, isLoading } = useFindSubscriptionsQuery({
     lesson: lessonId,
@@ -94,8 +94,6 @@ export function ContentSubscriptions({ lessonId }: IContentSubscriptions) {
     setShowAll((isShowAll) => !isShowAll);
   };
 
-  const dateTo = Date.now();
-
   return (
     <>
       <ShowSubscriptions lessonId={lessonId} isActive={true} />
@@ -107,7 +105,7 @@ export function ContentSubscriptions({ lessonId }: IContentSubscriptions) {
       >
         {showAll ? 'Скрыть' : 'Показать'} прошлые абонементы
       </Button>
-      {showAll && <ShowSubscriptions lessonId={lessonId} dateTo={dateTo} isActive={false} />}
+      {showAll && <ShowSubscriptions lessonId={lessonId} isActive={false} />}
     </>
   );
 }
