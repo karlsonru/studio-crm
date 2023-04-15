@@ -9,6 +9,7 @@ export type VisitedLessonDocument = HydratedDocument<VisitedLesson>;
 export class Visit {
   student: Student;
   visitStatus: string;
+  subscription?: string;
   // student: Types.ObjectId;
   // visitStatus: Types.ObjectId;
 }
@@ -60,11 +61,15 @@ export class VisitedLesson {
         visitStatus: {
           type: String,
           trim: true,
-          /*
-          type: Types.ObjectId,
-          ref: 'VisitStatus',
-          */
         },
+        subscription: {
+          type: String,
+          trim: true,
+        },
+        /*
+        type: Types.ObjectId,
+        ref: 'VisitStatus',
+        */
       },
     ],
   })

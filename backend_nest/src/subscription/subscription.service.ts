@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, QueryOptions, mongo } from 'mongoose';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { SubscriptionEntity } from './entities/subscription.entity';
@@ -26,8 +26,13 @@ export class SubscriptionService {
     return created;
   }
 
-  async findAll(query?: IFilterQuery<SubscriptionEntity>): Promise<Array<SubscriptionEntity>> {
-    return await this.subscriptionModel.find(query ?? {}).populate(this.populateQuery);
+  async findAll(
+    query?: IFilterQuery<SubscriptionEntity>,
+    options?: QueryOptions,
+  ): Promise<Array<SubscriptionEntity>> {
+    return await this.subscriptionModel
+      .find(query ?? {}, null, options)
+      .populate(this.populateQuery);
   }
 
   async findOne(id: string): Promise<SubscriptionEntity | null> {
@@ -42,6 +47,14 @@ export class SubscriptionService {
       new: true,
     });
 
+    return updated;
+  }
+
+  async updateMany(
+    ids: IFilterQuery<SubscriptionEntity>,
+    update: IFilterQuery<SubscriptionEntity>,
+  ): Promise<mongo.UpdateResult> {
+    const updated = await this.subscriptionModel.updateMany(ids, update);
     return updated;
   }
 

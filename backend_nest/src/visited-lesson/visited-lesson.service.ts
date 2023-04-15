@@ -1,12 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, PopulateOptions } from 'mongoose';
+import { ClientSession, Model, PopulateOptions } from 'mongoose';
 import { VisitedLessonEntity } from './entities/visited-lesson.entity';
 import { CreateVisitedLessonDto } from './dto/create-visited-lesson.dto';
 import { UpdateVisitedLessonDto } from './dto/update-visited-lesson.dto';
 import { IFilterQuery } from '../shared/IFilterQuery';
 import { VisitedLessonModel, VisitedLessonDocument } from '../schemas';
-import { SubscriptionModel, SubscriptionDocument } from '../schemas';
+import { SubscriptionModel } from '../schemas';
+import { withTransaction } from '../shared/withTransaction';
+import { SubscriptionService } from '../subscription/subscription.service';
+
+enum VisitStatus {
+  VISITED = 'visited',
+  POSTPONED = 'postponed',
+}
 
 @Injectable()
 export class VisitedLessonService {
@@ -16,7 +23,7 @@ export class VisitedLessonService {
     @InjectModel(VisitedLessonModel.name)
     private readonly visitedLessonModel: Model<VisitedLessonDocument>,
     @InjectModel(SubscriptionModel.name)
-    private readonly subscriptionModel: Model<SubscriptionDocument>,
+    private readonly subscriptionService: SubscriptionService,
   ) {
     this.populateQueryVisitedLesson = [
       'lesson',
@@ -41,7 +48,66 @@ export class VisitedLessonService {
       return null;
     }
 
-    const created = await this.visitedLessonModel.create(createVisitedLessonDto);
+    const transaction = async (session: ClientSession) => {
+      // найдём всех студентов, про которых сказано что посетили сегодняшнее занятие или занятие перенесено (к отработке)
+      const visitedStudents = createVisitedLessonDto.students.filter(
+        (visit) =>
+          visit.visitStatus === VisitStatus.VISITED || visit.visitStatus === VisitStatus.POSTPONED,
+      );
+
+      // найдём все абонементы студентов, посетивших занятие или у кого занятие перенесено (к отработке)
+      const subscriptions = await this.subscriptionService.findAll(
+        {
+          $and: [
+            { lesson: createVisitedLessonDto.lesson },
+            { student: { $in: visitedStudents } },
+            { visitsLeft: { $gte: 1 } },
+            { dateTo: { $gte: createVisitedLessonDto.date } },
+          ],
+        },
+        {
+          sort: {
+            visitsLeft: 1,
+          },
+        },
+      );
+
+      // у всех студентов, которые посетили занятие - добавим _id абонемента с которого будет списание в визит
+      const updateSubscriptions: { [key in VisitStatus]: string[] } = {
+        [VisitStatus.VISITED]: [],
+        [VisitStatus.POSTPONED]: [],
+      };
+
+      visitedStudents.forEach((visit) => {
+        Object.defineProperty(visit, 'subscription', {
+          enumerable: true,
+          value: subscriptions.find((subscription) => subscription._id.toString() === visit.student)
+            ?._id,
+        });
+        // @ts-ignore
+        updateSubscriptions[visit.visitStatus].push(visit.subscription);
+      });
+
+      // обновим сразу все отобранные абонементы - те что посетили уменьшим на 1
+      await this.subscriptionService.updateMany(
+        { _id: { $in: updateSubscriptions[VisitStatus.VISITED] } },
+        { visitsLeft: { $inc: -1 } },
+      );
+
+      // те что посетили отложили - перенесём визит из оставшихся в отложенные
+      await this.subscriptionService.updateMany(
+        { _id: { $in: updateSubscriptions[VisitStatus.POSTPONED] } },
+        {
+          visitsLeft: { $inc: -1 },
+          visitsPostponed: { $inc: 1 },
+        },
+      );
+
+      // сохраним] само занятие и вернём его
+      return await this.visitedLessonModel.create(createVisitedLessonDto);
+    };
+
+    const created = await withTransaction(this.visitedLessonModel, transaction);
 
     return created;
   }

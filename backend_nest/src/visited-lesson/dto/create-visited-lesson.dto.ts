@@ -3,6 +3,7 @@ import {
   IsArray,
   IsMongoId,
   IsNumber,
+  IsOptional,
   IsPositive,
   IsString,
   Max,
@@ -16,6 +17,11 @@ class Visit {
 
   @IsString()
   visitStatus: string;
+
+  @IsOptional()
+  @IsString()
+  @IsMongoId()
+  subscription: string;
 }
 
 export class CreateVisitedLessonDto {

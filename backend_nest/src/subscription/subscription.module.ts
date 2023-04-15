@@ -10,5 +10,6 @@ import { SubscriptionModel, SubscriptionSchema } from '../schemas';
   ],
   controllers: [SubscriptionController],
   providers: [SubscriptionService],
+  exports: [SubscriptionService],
 })
 export class SubscriptionModule {}
