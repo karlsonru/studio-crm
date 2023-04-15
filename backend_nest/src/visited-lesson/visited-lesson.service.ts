@@ -6,16 +6,19 @@ import { CreateVisitedLessonDto } from './dto/create-visited-lesson.dto';
 import { UpdateVisitedLessonDto } from './dto/update-visited-lesson.dto';
 import { IFilterQuery } from '../shared/IFilterQuery';
 import { VisitedLesson, VisitedLessonDocument } from '../schemas/visitedLesson.schema';
+import { Subscription, SubscriptionDocument } from '../schemas/subscription.schema';
 
 @Injectable()
 export class VisitedLessonService {
-  private readonly populateQuery: Array<string | PopulateOptions>;
+  private readonly populateQueryVisitedLesson: Array<string | PopulateOptions>;
 
   constructor(
     @InjectModel(VisitedLesson.name)
-    private readonly model: Model<VisitedLessonDocument>,
+    private readonly visitedLessonModel: Model<VisitedLessonDocument>,
+    @InjectModel(Subscription.name)
+    private readonly subscriptionModel: Model<SubscriptionDocument>,
   ) {
-    this.populateQuery = [
+    this.populateQueryVisitedLesson = [
       'lesson',
       'teacher',
       {
@@ -30,7 +33,7 @@ export class VisitedLessonService {
   async create(
     createVisitedLessonDto: CreateVisitedLessonDto,
   ): Promise<VisitedLessonEntity | null> {
-    const candidate = await this.model.findOne({
+    const candidate = await this.visitedLessonModel.findOne({
       $and: [{ date: createVisitedLessonDto.date }, { lesson: createVisitedLessonDto.lesson }],
     });
 
@@ -38,24 +41,26 @@ export class VisitedLessonService {
       return null;
     }
 
-    const created = await this.model.create(createVisitedLessonDto);
+    const created = await this.visitedLessonModel.create(createVisitedLessonDto);
 
     return created;
   }
 
   async findAll(query?: IFilterQuery<VisitedLessonEntity>): Promise<Array<VisitedLessonEntity>> {
-    return await this.model.find(query ?? {}).populate(this.populateQuery);
+    return await this.visitedLessonModel
+      .find(query ?? {})
+      .populate(this.populateQueryVisitedLesson);
   }
 
   async findOne(id: string): Promise<VisitedLessonEntity | null> {
-    return await this.model.findById(id).populate(this.populateQuery);
+    return await this.visitedLessonModel.findById(id).populate(this.populateQueryVisitedLesson);
   }
 
   async update(
     id: string,
     updateVisitedLessonDto: UpdateVisitedLessonDto,
   ): Promise<VisitedLessonEntity | null> {
-    const updated = await this.model.findByIdAndUpdate(id, updateVisitedLessonDto, {
+    const updated = await this.visitedLessonModel.findByIdAndUpdate(id, updateVisitedLessonDto, {
       new: true,
     });
 
@@ -63,7 +68,7 @@ export class VisitedLessonService {
   }
 
   async remove(id: string) {
-    await this.model.findByIdAndRemove(id);
+    await this.visitedLessonModel.findByIdAndRemove(id);
     return;
   }
 }

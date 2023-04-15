@@ -7,11 +7,8 @@ export class SubscriptionEntity {
   _id: Types.ObjectId;
   student: StudentEntity;
   template: SubscriptionTemplateEntity;
-  lesson: LessonEntity | null;
-  price: number;
-  visits: number;
+  lesson: LessonEntity;
   visitsLeft: number;
-  duration: number;
   dateFrom: number;
   dateTo: number;
   paymentMethod: string;

@@ -34,21 +34,7 @@ export class Subscription {
     index: true,
     nullable: true,
   })
-  lesson: Lesson | null;
-
-  @Prop({
-    type: Number,
-    required: true,
-    min: 0,
-  })
-  price: number;
-
-  @Prop({
-    type: Number,
-    required: true,
-    min: 1,
-  })
-  visits: number;
+  lesson: Lesson;
 
   @Prop({
     type: Number,
@@ -56,13 +42,6 @@ export class Subscription {
     min: 0,
   })
   visitsLeft: number;
-
-  @Prop({
-    type: Number,
-    required: true,
-    min: 86_400_000,
-  })
-  duration: number;
 
   @Prop({
     type: Number,
