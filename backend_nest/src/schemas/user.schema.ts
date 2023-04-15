@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { Role } from './role.schema';
+import { RoleModel } from './role.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -42,7 +42,7 @@ export class User {
     lowercase: true,
     trim: true,
   })
-  role: Role;
+  role: RoleModel;
 
   @Prop({
     type: Number,

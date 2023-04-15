@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
-export type VisitStatusDocument = HydratedDocument<VisitStatus>;
+export type VisitStatusDocument = HydratedDocument<VisitStatusModel>;
 
 @Schema({
   timestamps: true,
 })
-export class VisitStatus {
+export class VisitStatusModel {
   _id: Types.ObjectId;
 
   @Prop({
@@ -34,4 +34,4 @@ export class VisitStatus {
   color: string;
 }
 
-export const VisitStatusSchema = SchemaFactory.createForClass(VisitStatus);
+export const VisitStatusSchema = SchemaFactory.createForClass(VisitStatusModel);

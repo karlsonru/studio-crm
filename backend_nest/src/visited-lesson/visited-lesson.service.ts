@@ -5,17 +5,17 @@ import { VisitedLessonEntity } from './entities/visited-lesson.entity';
 import { CreateVisitedLessonDto } from './dto/create-visited-lesson.dto';
 import { UpdateVisitedLessonDto } from './dto/update-visited-lesson.dto';
 import { IFilterQuery } from '../shared/IFilterQuery';
-import { VisitedLesson, VisitedLessonDocument } from '../schemas/visitedLesson.schema';
-import { Subscription, SubscriptionDocument } from '../schemas/subscription.schema';
+import { VisitedLessonModel, VisitedLessonDocument } from '../schemas/visitedLesson.schema';
+import { SubscriptionModel, SubscriptionDocument } from '../schemas/subscription.schema';
 
 @Injectable()
 export class VisitedLessonService {
   private readonly populateQueryVisitedLesson: Array<string | PopulateOptions>;
 
   constructor(
-    @InjectModel(VisitedLesson.name)
+    @InjectModel(VisitedLessonModel.name)
     private readonly visitedLessonModel: Model<VisitedLessonDocument>,
-    @InjectModel(Subscription.name)
+    @InjectModel(SubscriptionModel.name)
     private readonly subscriptionModel: Model<SubscriptionDocument>,
   ) {
     this.populateQueryVisitedLesson = [

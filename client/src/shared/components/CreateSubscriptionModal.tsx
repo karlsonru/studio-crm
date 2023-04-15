@@ -51,17 +51,16 @@ export function CreateSubscriptionModal() {
       return;
     }
 
+    const dateFromTimestamp = Date.parse(formData.dateFrom as string);
+
     createSubsciption({
       template: template._id,
-      price: template.price,
-      visits: template.visits,
       visitsLeft: template.visits,
-      duration: template.duration,
       student: student._id,
       lesson: lesson._id,
       paymentMethod: formData.paymentMethod as string,
-      dateFrom: +Date.parse(formData.dateFrom as string),
-      dateTo: +Date.parse(formData.dateFrom as string) + template.duration,
+      dateFrom: dateFromTimestamp,
+      dateTo: dateFromTimestamp + template.duration,
       isActive: true,
     });
 

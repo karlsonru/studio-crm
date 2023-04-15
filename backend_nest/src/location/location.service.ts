@@ -3,20 +3,18 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
-import { Location, LocationDocument } from '../schemas/location.schema';
+import { LocationModel, LocationDocument } from '../schemas/location.schema';
 import { LocationEntity } from './entities/location.entity';
 
 @Injectable()
 export class LocationService {
   constructor(
-    @InjectModel(Location.name)
-    private readonly model: Model<LocationDocument>,
+    @InjectModel(LocationModel.name)
+    private readonly locationModel: Model<LocationDocument>,
   ) {}
 
-  async create(
-    createLocationDto: CreateLocationDto,
-  ): Promise<LocationEntity | null> {
-    const candidate = await this.model.find({
+  async create(createLocationDto: CreateLocationDto): Promise<LocationEntity | null> {
+    const candidate = await this.locationModel.find({
       $or: [
         {
           title: {
@@ -37,22 +35,19 @@ export class LocationService {
       return null;
     }
 
-    return await this.model.create(createLocationDto);
+    return await this.locationModel.create(createLocationDto);
   }
 
   async findAll(): Promise<Array<LocationEntity>> {
-    return await this.model.find({});
+    return await this.locationModel.find({});
   }
 
   async findOne(id: string): Promise<LocationEntity | null> {
-    return await this.model.findById(id);
+    return await this.locationModel.findById(id);
   }
 
-  async update(
-    id: string,
-    updateLocationDto: UpdateLocationDto,
-  ): Promise<LocationEntity | null> {
-    const updated = await this.model.findOneAndUpdate(
+  async update(id: string, updateLocationDto: UpdateLocationDto): Promise<LocationEntity | null> {
+    const updated = await this.locationModel.findOneAndUpdate(
       id as unknown as Types.ObjectId,
       updateLocationDto,
       {
@@ -64,6 +59,6 @@ export class LocationService {
   }
 
   async remove(id: string) {
-    return await this.model.findByIdAndDelete(id);
+    return await this.locationModel.findByIdAndDelete(id);
   }
 }

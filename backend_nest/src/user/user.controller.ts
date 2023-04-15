@@ -23,10 +23,7 @@ export class UserController {
     const created = await this.service.create(createUserDto);
 
     if (created === null) {
-      throw new HttpException(
-        { message: 'Уже существует' },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
     }
 
     return {

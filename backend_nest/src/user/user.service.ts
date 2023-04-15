@@ -4,21 +4,21 @@ import { Model } from 'mongoose';
 import { createHash } from 'crypto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User, UserDocument } from '../schemas/user.schema';
+import { UserModel, UserDocument } from '../schemas/user.schema';
 import { UserEntity } from './entities/user.entity';
-import { Role, RoleDocument } from '../schemas/role.schema';
+import { RoleModel, RoleDocument } from '../schemas/role.schema';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel(User.name)
-    private readonly model: Model<UserDocument>,
-    @InjectModel(Role.name)
+    @InjectModel(UserModel.name)
+    private readonly userModel: Model<UserDocument>,
+    @InjectModel(RoleModel.name)
     private readonly roleModel: Model<RoleDocument>,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserEntity | null> {
-    const candidate = await this.model.find({
+    const candidate = await this.userModel.find({
       login: createUserDto.login,
     });
 
@@ -35,7 +35,7 @@ export class UserService {
     const hash = createHash('sha-256');
     const passHash = hash.update(createUserDto.password);
 
-    const newUser = await this.model.create({
+    const newUser = await this.userModel.create({
       ...createUserDto,
       password: passHash,
       birthday: createUserDto.birthday,
@@ -47,18 +47,15 @@ export class UserService {
   }
 
   async findAll(): Promise<Array<UserEntity>> {
-    return await this.model.find({});
+    return await this.userModel.find({});
   }
 
   async findOne(id: string): Promise<UserEntity | null> {
-    return await this.model.findById(id);
+    return await this.userModel.findById(id);
   }
 
-  async update(
-    id: string,
-    updateUserDto: UpdateUserDto,
-  ): Promise<UserEntity | null> {
-    const updated = await this.model.findByIdAndUpdate(id, updateUserDto, {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserEntity | null> {
+    const updated = await this.userModel.findByIdAndUpdate(id, updateUserDto, {
       new: true,
     });
 
@@ -66,7 +63,7 @@ export class UserService {
   }
 
   async remove(id: string) {
-    await this.model.findByIdAndRemove(id);
+    await this.userModel.findByIdAndRemove(id);
     return;
   }
 }

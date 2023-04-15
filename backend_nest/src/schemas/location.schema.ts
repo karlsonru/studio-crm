@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
-export type LocationDocument = HydratedDocument<Location>;
+export type LocationDocument = HydratedDocument<LocationModel>;
 
 @Schema({
   timestamps: true,
 })
-export class Location {
+export class LocationModel {
   _id: Types.ObjectId;
 
   @Prop({
@@ -32,4 +32,4 @@ export class Location {
   description?: string;
 }
 
-export const LocationSchema = SchemaFactory.createForClass(Location);
+export const LocationSchema = SchemaFactory.createForClass(LocationModel);

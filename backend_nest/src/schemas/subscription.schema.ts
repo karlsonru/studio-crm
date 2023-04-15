@@ -1,15 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { Lesson } from './lesson.schema';
-import { Student } from './student.schema';
-import { SubscriptionTemplate } from './subscriptionTemplate.schema';
+import { LessonModel } from './lesson.schema';
+import { StudentModel } from './student.schema';
+import { SubscriptionTemplateModel } from './subscriptionTemplate.schema';
 
-export type SubscriptionDocument = HydratedDocument<Subscription>;
+export type SubscriptionDocument = HydratedDocument<SubscriptionModel>;
 
 @Schema({
   timestamps: true,
 })
-export class Subscription {
+export class SubscriptionModel {
   _id: Types.ObjectId;
 
   @Prop({
@@ -18,14 +18,14 @@ export class Subscription {
     required: true,
     index: true,
   })
-  student: Student;
+  student: StudentModel;
 
   @Prop({
     type: Types.ObjectId,
     ref: 'SubscriptionTemplate',
     required: true,
   })
-  template: SubscriptionTemplate;
+  template: SubscriptionTemplateModel;
 
   @Prop({
     type: Types.ObjectId,
@@ -34,7 +34,7 @@ export class Subscription {
     index: true,
     nullable: true,
   })
-  lesson: Lesson;
+  lesson: LessonModel;
 
   @Prop({
     type: Number,
@@ -63,4 +63,4 @@ export class Subscription {
   paymentMethod: string;
 }
 
-export const SubscriptionSchema = SchemaFactory.createForClass(Subscription);
+export const SubscriptionSchema = SchemaFactory.createForClass(SubscriptionModel);
