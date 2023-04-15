@@ -6,11 +6,10 @@ import { CreateVisitedLessonDto } from './dto/create-visited-lesson.dto';
 import { UpdateVisitedLessonDto } from './dto/update-visited-lesson.dto';
 import { IFilterQuery } from '../shared/IFilterQuery';
 import { VisitedLessonModel, VisitedLessonDocument } from '../schemas';
-import { SubscriptionModel } from '../schemas';
 import { withTransaction } from '../shared/withTransaction';
 import { SubscriptionService } from '../subscription/subscription.service';
 
-enum VisitStatus {
+const enum VisitStatus {
   VISITED = 'visited',
   POSTPONED = 'postponed',
 }
@@ -22,7 +21,6 @@ export class VisitedLessonService {
   constructor(
     @InjectModel(VisitedLessonModel.name)
     private readonly visitedLessonModel: Model<VisitedLessonDocument>,
-    @InjectModel(SubscriptionModel.name)
     private readonly subscriptionService: SubscriptionService,
   ) {
     this.populateQueryVisitedLesson = [
@@ -60,7 +58,7 @@ export class VisitedLessonService {
         {
           $and: [
             { lesson: createVisitedLessonDto.lesson },
-            { student: { $in: visitedStudents } },
+            { student: { $in: visitedStudents.map((visit) => visit.student) } },
             { visitsLeft: { $gte: 1 } },
             { dateTo: { $gte: createVisitedLessonDto.date } },
           ],
@@ -73,7 +71,7 @@ export class VisitedLessonService {
       );
 
       // у всех студентов, которые посетили занятие - добавим _id абонемента с которого будет списание в визит
-      const updateSubscriptions: { [key in VisitStatus]: string[] } = {
+      const updateSubscriptions = {
         [VisitStatus.VISITED]: [],
         [VisitStatus.POSTPONED]: [],
       };
@@ -81,8 +79,9 @@ export class VisitedLessonService {
       visitedStudents.forEach((visit) => {
         Object.defineProperty(visit, 'subscription', {
           enumerable: true,
-          value: subscriptions.find((subscription) => subscription._id.toString() === visit.student)
-            ?._id,
+          value: subscriptions.find(
+            (subscription) => subscription.student._id.toString() === visit.student,
+          )?._id,
         });
         // @ts-ignore
         updateSubscriptions[visit.visitStatus].push(visit.subscription);
@@ -91,15 +90,17 @@ export class VisitedLessonService {
       // обновим сразу все отобранные абонементы - те что посетили уменьшим на 1
       await this.subscriptionService.updateMany(
         { _id: { $in: updateSubscriptions[VisitStatus.VISITED] } },
-        { visitsLeft: { $inc: -1 } },
+        { $inc: { visitsLeft: -1 } },
       );
 
       // те что посетили отложили - перенесём визит из оставшихся в отложенные
       await this.subscriptionService.updateMany(
         { _id: { $in: updateSubscriptions[VisitStatus.POSTPONED] } },
         {
-          visitsLeft: { $inc: -1 },
-          visitsPostponed: { $inc: 1 },
+          $inc: {
+            visitsLeft: -1,
+            visitsPostponed: 1,
+          },
         },
       );
 

@@ -45,6 +45,12 @@ export class Subscription {
 
   @Prop({
     type: Number,
+    min: 0,
+  })
+  visitsPostponed: number;
+
+  @Prop({
+    type: Number,
     required: true,
   })
   dateFrom: number;

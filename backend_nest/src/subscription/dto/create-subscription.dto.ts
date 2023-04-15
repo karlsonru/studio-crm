@@ -21,23 +21,16 @@ export class CreateSubscriptionDto {
   @IsString()
   @IsMongoId()
   lesson: string | null;
-  /*
-  @IsNumber()
-  @Min(1)
-  price: number;
 
-  @IsNumber()
-  @Min(1)
-  visits: number;
-  */
   @IsNumber()
   @Min(0)
   visitsLeft: number;
-  /*
+
+  @IsOptional()
   @IsNumber()
-  @Min(86_400_000)
-  duration: number;
-  */
+  @Min(0)
+  visitsPostponed: number;
+
   @IsNumber()
   @IsPositive()
   dateFrom: number;

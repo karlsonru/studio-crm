@@ -41,7 +41,7 @@ export function LessonPage() {
           <Tab label="Участники" value="students" />
           <Tab label="Расписание" value="timetable" />
         </Tabs>
-        <SearchParamsButton title="Оформить" param="create-subscription" />
+        {value === 'subscriptions' && <SearchParamsButton title="Оформить" param="create-subscription" />}
       </Stack>
       <TabPanel value="subscriptions">
         <ContentSubscriptions lessonId={lessonId} />

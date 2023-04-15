@@ -9,6 +9,7 @@ export class SubscriptionEntity {
   template: SubscriptionTemplateEntity;
   lesson: LessonEntity;
   visitsLeft: number;
+  visitsPostponed: number;
   dateFrom: number;
   dateTo: number;
   paymentMethod: string;
