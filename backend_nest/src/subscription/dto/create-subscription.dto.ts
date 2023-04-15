@@ -21,7 +21,7 @@ export class CreateSubscriptionDto {
   @IsString()
   @IsMongoId()
   lesson: string | null;
-
+  /*
   @IsNumber()
   @Min(1)
   price: number;
@@ -29,15 +29,15 @@ export class CreateSubscriptionDto {
   @IsNumber()
   @Min(1)
   visits: number;
-
+  */
   @IsNumber()
   @Min(0)
   visitsLeft: number;
-
+  /*
   @IsNumber()
   @Min(86_400_000)
   duration: number;
-
+  */
   @IsNumber()
   @IsPositive()
   dateFrom: number;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import Stack from '@mui/system/Stack';
 import TabContext from '@mui/lab/TabContext';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -9,6 +10,8 @@ import { setPageTitle } from '../../shared/reducers/appMenuSlice';
 import { useGetLessonQuery } from '../../shared/api';
 import { ContentSubscriptions } from './ContentTabSubscriptions';
 import { ContentStudents } from './ContentTabStudents';
+import { CreateSubscriptionModal } from '../../shared/components/CreateSubscriptionModal';
+import { SearchParamsButton } from '../../shared/components/SearchParamsButton';
 
 export function LessonPage() {
   const dispatch = useAppDispatch();
@@ -32,11 +35,14 @@ export function LessonPage() {
 
   return (
     <TabContext value={value}>
-      <Tabs value={value} onChange={handleChange} sx={{ marginBottom: '1rem' }}>
-        <Tab label="Абонементы" value="subscriptions" />
-        <Tab label="Участники" value="students" />
-        <Tab label="Расписание" value="timetable" />
-      </Tabs>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" paddingX={3}>
+        <Tabs value={value} onChange={handleChange} sx={{ marginBottom: '1rem' }}>
+          <Tab label="Абонементы" value="subscriptions" />
+          <Tab label="Участники" value="students" />
+          <Tab label="Расписание" value="timetable" />
+        </Tabs>
+        <SearchParamsButton title="Оформить" param="create-subscription" />
+      </Stack>
       <TabPanel value="subscriptions">
         <ContentSubscriptions lessonId={lessonId} />
       </TabPanel>
@@ -48,6 +54,8 @@ export function LessonPage() {
         Здесь будем выводить пбудущее занятие и прошедшие занятия.
         Нужна возможность "провести занятие" прежде чем приступить к этой вкладке.
       </TabPanel>
+
+      <CreateSubscriptionModal />
     </TabContext>
   );
 }
