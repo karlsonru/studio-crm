@@ -38,7 +38,7 @@ function CreateRow(subscription: ISubscriptionModel) {
         {subscription.student.fullname}
       </TableCell>
       <TableCell>
-        {subscription.visits}
+        {subscription.template.visits}
       </TableCell>
       <TableCell>
         {subscription.visitsLeft}
@@ -47,7 +47,7 @@ function CreateRow(subscription: ISubscriptionModel) {
         {dateValueFormatter(subscription.dateTo)}
       </TableCell>
       <TableCell>
-        {subscription.price}
+        {subscription.template.price}
       </TableCell>
     </TableRow>
   );

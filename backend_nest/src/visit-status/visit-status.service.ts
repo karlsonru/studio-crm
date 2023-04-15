@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { CreateVisitStatusDto } from './dto/create-visit-status.dto';
 import { UpdateVisitStatusDto } from './dto/update-visit-status.dto';
 import { VisitStatusEntity } from './entities/visit-status.entity';
-import { VisitStatusModel, VisitStatusDocument } from '../schemas/visitStatus.schema';
+import { VisitStatusModel, VisitStatusDocument } from '../schemas';
 import { IFilterQuery } from '../shared/IFilterQuery';
 
 @Injectable()

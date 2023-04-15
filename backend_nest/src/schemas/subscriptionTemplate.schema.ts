@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
-export type SubscriptionTemplateDocument = HydratedDocument<SubscriptionTemplateModel>;
+export type SubscriptionTemplateDocument = HydratedDocument<SubscriptionTemplate>;
 
 @Schema({
   timestamps: true,
 })
-export class SubscriptionTemplateModel {
+export class SubscriptionTemplate {
   _id: Types.ObjectId;
 
   @Prop({
@@ -39,4 +39,4 @@ export class SubscriptionTemplateModel {
   duration: number;
 }
 
-export const SubscriptionTemplateSchema = SchemaFactory.createForClass(SubscriptionTemplateModel);
+export const SubscriptionTemplateSchema = SchemaFactory.createForClass(SubscriptionTemplate);

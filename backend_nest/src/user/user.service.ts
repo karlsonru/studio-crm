@@ -4,9 +4,9 @@ import { Model } from 'mongoose';
 import { createHash } from 'crypto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserModel, UserDocument } from '../schemas/user.schema';
 import { UserEntity } from './entities/user.entity';
-import { RoleModel, RoleDocument } from '../schemas/role.schema';
+import { UserModel, UserDocument } from '../schemas';
+import { RoleModel, RoleDocument } from '../schemas';
 
 @Injectable()
 export class UserService {

@@ -1,13 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { LessonModel } from './lesson.schema';
-import { UserModel } from './user.schema';
-import { StudentModel } from './student.schema';
+import { Lesson } from './lesson.schema';
+import { User } from './user.schema';
+import { Student } from './student.schema';
 
-export type VisitedLessonDocument = HydratedDocument<VisitedLessonModel>;
+export type VisitedLessonDocument = HydratedDocument<VisitedLesson>;
 
-export class VisitModel {
-  student: StudentModel;
+export class Visit {
+  student: Student;
   visitStatus: string;
   // student: Types.ObjectId;
   // visitStatus: Types.ObjectId;
@@ -16,7 +16,7 @@ export class VisitModel {
 @Schema({
   timestamps: true,
 })
-export class VisitedLessonModel {
+export class VisitedLesson {
   _id: Types.ObjectId;
 
   @Prop({
@@ -25,7 +25,7 @@ export class VisitedLessonModel {
     required: true,
     index: true,
   })
-  lesson: LessonModel;
+  lesson: Lesson;
 
   @Prop({
     type: Number,
@@ -47,7 +47,7 @@ export class VisitedLessonModel {
     ref: 'User',
     required: true,
   })
-  teacher: UserModel;
+  teacher: User;
 
   @Prop({
     type: [
@@ -68,7 +68,7 @@ export class VisitedLessonModel {
       },
     ],
   })
-  students: VisitModel[];
+  students: Visit[];
 }
 
-export const VisitedLessonSchema = SchemaFactory.createForClass(VisitedLessonModel);
+export const VisitedLessonSchema = SchemaFactory.createForClass(VisitedLesson);

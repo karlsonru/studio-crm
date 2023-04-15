@@ -5,8 +5,8 @@ import { VisitedLessonEntity } from './entities/visited-lesson.entity';
 import { CreateVisitedLessonDto } from './dto/create-visited-lesson.dto';
 import { UpdateVisitedLessonDto } from './dto/update-visited-lesson.dto';
 import { IFilterQuery } from '../shared/IFilterQuery';
-import { VisitedLessonModel, VisitedLessonDocument } from '../schemas/visitedLesson.schema';
-import { SubscriptionModel, SubscriptionDocument } from '../schemas/subscription.schema';
+import { VisitedLessonModel, VisitedLessonDocument } from '../schemas';
+import { SubscriptionModel, SubscriptionDocument } from '../schemas';
 
 @Injectable()
 export class VisitedLessonService {

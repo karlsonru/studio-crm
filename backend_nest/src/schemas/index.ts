@@ -1,12 +1,25 @@
-export { UserModel, UserSchema } from './user.schema';
-export { StudentModel, StudentSchema } from './student.schema';
-export { RoleModel, RoleSchema } from './role.schema';
-export { LessonModel, LessonSchema } from './lesson.schema';
-export { LocationModel, LocationSchema } from './location.schema';
-export { SubscriptionModel, SubscriptionSchema } from './subscription.schema';
+export { User as UserModel, UserSchema, UserDocument } from './user.schema';
+export { Student as StudentModel, StudentSchema, StudentDocument } from './student.schema';
+export { Role as RoleModel, RoleSchema, RoleDocument } from './role.schema';
+export { Lesson as LessonModel, LessonSchema, LessonDocument } from './lesson.schema';
+export { Location as LocationModel, LocationSchema, LocationDocument } from './location.schema';
 export {
-  SubscriptionTemplateModel,
+  Subscription as SubscriptionModel,
+  SubscriptionSchema,
+  SubscriptionDocument,
+} from './subscription.schema';
+export {
+  SubscriptionTemplate as SubscriptionTemplateModel,
   SubscriptionTemplateSchema,
+  SubscriptionTemplateDocument,
 } from './subscriptionTemplate.schema';
-export { VisitStatusModel, VisitStatusSchema } from './visitStatus.schema';
-export { VisitedLessonModel, VisitedLessonSchema } from './visitedLesson.schema';
+export {
+  VisitStatus as VisitStatusModel,
+  VisitStatusSchema,
+  VisitStatusDocument,
+} from './visitStatus.schema';
+export {
+  VisitedLesson as VisitedLessonModel,
+  VisitedLessonSchema,
+  VisitedLessonDocument,
+} from './visitedLesson.schema';

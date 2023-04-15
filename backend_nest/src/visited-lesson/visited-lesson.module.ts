@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { VisitedLessonService } from './visited-lesson.service';
 import { VisitedLessonController } from './visited-lesson.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { VisitedLessonModel, VisitedLessonSchema } from '../schemas/visitedLesson.schema';
-import { SubscriptionModel, SubscriptionSchema } from '../schemas/subscription.schema';
+import { VisitedLessonModel, VisitedLessonSchema } from '../schemas';
+import { SubscriptionModel, SubscriptionSchema } from '../schemas';
 
 @Module({
   imports: [

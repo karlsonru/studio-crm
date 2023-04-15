@@ -3,8 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
-import { StudentModel, StudentDocument } from '../schemas/student.schema';
 import { StudentEntity } from './entities/student.entity';
+import { StudentModel, StudentDocument } from '../schemas';
 
 @Injectable()
 export class StudentService {

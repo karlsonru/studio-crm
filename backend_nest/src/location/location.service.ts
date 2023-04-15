@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
-import { LocationModel, LocationDocument } from '../schemas/location.schema';
+import { LocationModel, LocationDocument } from '../schemas';
 import { LocationEntity } from './entities/location.entity';
 
 @Injectable()

@@ -24,10 +24,7 @@ export class LessonController {
     const created = await this.service.create(createLessonDto);
 
     if (created === null) {
-      throw new HttpException(
-        { message: 'Уже существует' },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
     }
 
     return {
@@ -68,10 +65,7 @@ export class LessonController {
   }
 
   @Patch(':id')
-  async update(
-    @Param('id', ValidateIdPipe) id: string,
-    @Body() updateLessonDto: UpdateLessonDto,
-  ) {
+  async update(@Param('id', ValidateIdPipe) id: string, @Body() updateLessonDto: UpdateLessonDto) {
     const updated = await this.service.update(id, updateLessonDto);
 
     if (updated === null) {

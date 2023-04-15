@@ -1,13 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import {
-  SubscriptionTemplateModel,
-  SubscriptionTemplateDocument,
-} from '../schemas/subscriptionTemplate.schema';
 import { CreateSubscriptionTemplateDto } from './dto/create-subscription-template.dto';
 import { UpdateSubscriptionTemplateDto } from './dto/update-subscription-template.dto';
 import { SubscriptionTemplateEntity } from './entities/subscription-template.entity';
+import { SubscriptionTemplateModel, SubscriptionTemplateDocument } from '../schemas';
 
 @Injectable()
 export class SubscriptionTemplateService {

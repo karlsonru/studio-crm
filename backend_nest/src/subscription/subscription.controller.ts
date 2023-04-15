@@ -24,10 +24,7 @@ export class SubscriptionController {
     const created = await this.service.create(createSubscriptionDto);
 
     if (created === null) {
-      throw new HttpException(
-        { message: 'Уже существует' },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
     }
 
     return {

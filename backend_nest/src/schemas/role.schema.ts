@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
-export type RoleDocument = HydratedDocument<RoleModel>;
+export type RoleDocument = HydratedDocument<Role>;
 
 @Schema({
   timestamps: true,
 })
-export class RoleModel {
+export class Role {
   _id: Types.ObjectId;
 
   @Prop({
@@ -20,4 +20,4 @@ export class RoleModel {
   value: string;
 }
 
-export const RoleSchema = SchemaFactory.createForClass(RoleModel);
+export const RoleSchema = SchemaFactory.createForClass(Role);

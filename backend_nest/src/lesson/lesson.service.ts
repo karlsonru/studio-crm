@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 import { LessonEntity } from './entities/lesson.entity';
-import { LessonModel, LessonDocument } from '../schemas/lesson.schema';
+import { LessonModel, LessonDocument } from '../schemas';
 import { IFilterQuery } from '../shared/IFilterQuery';
 
 @Injectable()

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 
-export type StudentDocument = HydratedDocument<StudentModel>;
+export type StudentDocument = HydratedDocument<Student>;
 
 export interface IStudentContact {
   name: string;
@@ -11,7 +11,7 @@ export interface IStudentContact {
 @Schema({
   timestamps: true,
 })
-export class StudentModel {
+export class Student {
   _id: Types.ObjectId;
 
   @Prop({
@@ -57,4 +57,4 @@ export class StudentModel {
   source?: string;
 }
 
-export const StudentSchema = SchemaFactory.createForClass(StudentModel);
+export const StudentSchema = SchemaFactory.createForClass(Student);

@@ -1,15 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { UserModel } from './user.schema';
-import { StudentModel } from './student.schema';
-import { LocationModel } from './location.schema';
+import { User } from './user.schema';
+import { Student } from './student.schema';
+import { Location } from './location.schema';
 
-export type LessonDocument = HydratedDocument<LessonModel>;
+export type LessonDocument = HydratedDocument<Lesson>;
 
 @Schema({
   timestamps: true,
 })
-export class LessonModel {
+export class Lesson {
   _id: Types.ObjectId;
 
   @Prop({
@@ -24,7 +24,7 @@ export class LessonModel {
     required: true,
     trim: true,
   })
-  teacher: UserModel;
+  teacher: User;
 
   @Prop({
     type: [
@@ -34,7 +34,7 @@ export class LessonModel {
       },
     ],
   })
-  students: StudentModel[];
+  students: Student[];
 
   @Prop({
     type: Types.ObjectId,
@@ -42,7 +42,7 @@ export class LessonModel {
     required: true,
     trim: true,
   })
-  location: LocationModel;
+  location: Location;
 
   @Prop({
     required: true,
@@ -82,4 +82,4 @@ export class LessonModel {
   isActive: boolean;
 }
 
-export const LessonSchema = SchemaFactory.createForClass(LessonModel);
+export const LessonSchema = SchemaFactory.createForClass(Lesson);
