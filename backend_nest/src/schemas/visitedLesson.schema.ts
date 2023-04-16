@@ -7,8 +7,11 @@ import { Student } from './student.schema';
 export type VisitedLessonDocument = HydratedDocument<VisitedLesson>;
 
 export const enum VisitStatus {
+  UNKNOWN = 'unknown',
   VISITED = 'visited',
   POSTPONED = 'postponed',
+  MISSED = 'missed',
+  SICK = 'sick',
 }
 
 export class Visit {

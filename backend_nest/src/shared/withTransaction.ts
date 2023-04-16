@@ -3,7 +3,7 @@ import { Model, Document, ClientSession } from 'mongoose';
 export async function withTransaction<T extends Document>(
   model: Model<T>,
   transactionOps: (session: ClientSession) => Promise<T>,
-): Promise<T> {
+): Promise<T | null> {
   const session = await model.startSession();
 
   try {
