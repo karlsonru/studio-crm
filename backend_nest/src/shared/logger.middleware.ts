@@ -1,6 +1,23 @@
-import { Request, Response, NextFunction } from 'express';
+import { createLogger, format, transports } from 'winston';
+const { printf } = format;
 
-export function logger(req: Request, res: Response, next: NextFunction) {
-  console.log(`Request`);
-  next();
-}
+const defaultformat = printf(({ level, message, label, timestamp }) => {
+  return `${timestamp} [${label}] ${level}: ${message}`;
+});
+
+const logger = createLogger({
+  level: 'debug',
+  format: format.combine(
+    format.timestamp({
+      format: 'DD-MMM-YYYY HH:mm:ss',
+    }),
+    defaultformat,
+  ),
+  transports: [
+    new transports.Console(),
+    new transports.File({ filename: 'logs/error.log', level: 'error' }),
+    new transports.File({ filename: 'logs/combined.log' }),
+  ],
+});
+
+export { logger };

@@ -9,6 +9,7 @@ import { VisitedLessonModel, VisitedLessonDocument } from '../schemas';
 import { Visit, VisitStatus } from '../schemas/visitedLesson.schema';
 import { withTransaction } from '../shared/withTransaction';
 import { SubscriptionService } from '../subscription/subscription.service';
+import { logger } from '../shared/logger.middleware';
 
 interface INewVisit extends Omit<Visit, 'student'> {
   student: string;
@@ -43,6 +44,12 @@ export class VisitedLessonService {
   async create(
     createVisitedLessonDto: CreateVisitedLessonDto,
   ): Promise<VisitedLessonEntity | null> {
+    logger.debug(
+      `Обрабатываем запрос на создание нового посещённого занятия по уроку с ID: ${
+        createVisitedLessonDto.lesson
+      } за дату ${new Date(createVisitedLessonDto.date).toDateString()}`,
+    );
+
     const candidate = await this.visitedLessonModel.findOne({
       $and: [{ date: createVisitedLessonDto.date }, { lesson: createVisitedLessonDto.lesson }],
     });
@@ -267,31 +274,39 @@ export class VisitedLessonService {
       }
     });
 
-    // добавлям транзакцию для обновления
+    // добавлям транзакцию для обновления различных статусов абонементов
     const transaction = async (session: ClientSession) => {
       // вернём по 1 визиту в абонементы
-      await this.subscriptionService.updateMany(
-        { _id: { $in: returnVisit.map((visit) => visit.prevVisit?.subscription) } },
-        { $inc: { visitsLeft: 1 } },
-      );
+      if (returnVisit.length) {
+        await this.subscriptionService.updateMany(
+          { _id: { $in: returnVisit.map((visit) => visit.prevVisit?.subscription) } },
+          { $inc: { visitsLeft: 1 } },
+        );
+      }
 
       // вернём по 1 отложенному визиту в абонементы
-      await this.subscriptionService.updateMany(
-        { _id: { $in: returnPostponedVisit.map((visit) => visit.prevVisit?.subscription) } },
-        { $inc: { vistsPostponed: 1 } },
-      );
+      if (returnPostponedVisit.length) {
+        await this.subscriptionService.updateMany(
+          { _id: { $in: returnPostponedVisit.map((visit) => visit.prevVisit?.subscription) } },
+          { $inc: { vistsPostponed: 1 } },
+        );
+      }
 
       // добавим по 1  визиту в абонементы
-      await this.subscriptionService.updateMany(
-        { _id: { $in: addVisit.map((visit) => visit.prevVisit?.subscription) } },
-        { $inc: { visitsLeft: -1 } },
-      );
+      if (addVisit.length) {
+        await this.subscriptionService.updateMany(
+          { _id: { $in: addVisit.map((visit) => visit.prevVisit?.subscription) } },
+          { $inc: { visitsLeft: -1 } },
+        );
+      }
 
       // добавим по 1 отложенному визиту в абонементы
-      await this.subscriptionService.updateMany(
-        { _id: { $in: addPostponedVisit.map((visit) => visit.prevVisit?.subscription) } },
-        { $inc: { visitsLeft: -1 } },
-      );
+      if (addPostponedVisit.length) {
+        await this.subscriptionService.updateMany(
+          { _id: { $in: addPostponedVisit.map((visit) => visit.prevVisit?.subscription) } },
+          { $inc: { visitsLeft: -1 } },
+        );
+      }
 
       // обновим занятие и вернём результат
       return await this.visitedLessonModel.findByIdAndUpdate(id, updateVisitedLessonDto, {
