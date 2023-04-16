@@ -46,6 +46,7 @@ export class Subscription {
   @Prop({
     type: Number,
     min: 0,
+    index: true,
   })
   visitsPostponed: number;
 

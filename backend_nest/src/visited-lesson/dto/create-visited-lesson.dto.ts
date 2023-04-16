@@ -10,13 +10,14 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
+import { VisitStatus } from '../../schemas/visitedLesson.schema';
 
 class Visit {
   @IsMongoId()
   student: string;
 
   @IsString()
-  visitStatus: string;
+  visitStatus: VisitStatus;
 
   @IsOptional()
   @IsString()

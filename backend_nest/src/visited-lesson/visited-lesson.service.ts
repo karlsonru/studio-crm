@@ -6,13 +6,9 @@ import { CreateVisitedLessonDto } from './dto/create-visited-lesson.dto';
 import { UpdateVisitedLessonDto } from './dto/update-visited-lesson.dto';
 import { IFilterQuery } from '../shared/IFilterQuery';
 import { VisitedLessonModel, VisitedLessonDocument } from '../schemas';
+import { VisitStatus } from '../schemas/visitedLesson.schema';
 import { withTransaction } from '../shared/withTransaction';
 import { SubscriptionService } from '../subscription/subscription.service';
-
-const enum VisitStatus {
-  VISITED = 'visited',
-  POSTPONED = 'postponed',
-}
 
 @Injectable()
 export class VisitedLessonService {
@@ -71,7 +67,7 @@ export class VisitedLessonService {
       );
 
       // у всех студентов, которые посетили занятие - добавим _id абонемента с которого будет списание в визит
-      const updateSubscriptions = {
+      const updateSubscriptions: { [key in VisitStatus]: string[] } = {
         [VisitStatus.VISITED]: [],
         [VisitStatus.POSTPONED]: [],
       };
@@ -83,7 +79,7 @@ export class VisitedLessonService {
             (subscription) => subscription.student._id.toString() === visit.student,
           )?._id,
         });
-        // @ts-ignore
+
         updateSubscriptions[visit.visitStatus].push(visit.subscription);
       });
 

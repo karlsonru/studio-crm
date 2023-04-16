@@ -6,9 +6,14 @@ import { Student } from './student.schema';
 
 export type VisitedLessonDocument = HydratedDocument<VisitedLesson>;
 
+export const enum VisitStatus {
+  VISITED = 'visited',
+  POSTPONED = 'postponed',
+}
+
 export class Visit {
   student: Student;
-  visitStatus: string;
+  visitStatus: VisitStatus;
   subscription?: string;
   // student: Types.ObjectId;
   // visitStatus: Types.ObjectId;
