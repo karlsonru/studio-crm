@@ -10,12 +10,16 @@ interface IVisitedStudentDto extends Omit<VisitedStudentDto, 'subscription'> {
   subscription: string | null | SubscriptionEntity;
 }
 
+interface IVisitedStudentEntity extends Omit<VisitedStudent, 'subscription'> {
+  subscription: string | null;
+}
+
 interface IUpdatedVisitedStudent extends Omit<VisitedStudent, 'student'> {
   student: string;
 }
 
 interface IPrevAndUpdatedVisit {
-  prevVisit: VisitedStudent | undefined;
+  prevVisit: IVisitedStudentEntity | undefined;
   updatedVisit: IUpdatedVisitedStudent;
 }
 
@@ -156,44 +160,44 @@ export class BillingService {
     // проверим списки студентов и найдём отличающуюся информацию
     const studentsWithChangedStatuses = this.compareVisits(updatedVisitedStudents, visitedLesson);
 
-    if (studentsWithChangedStatuses.length) {
-      logger.debug(`
-        Посещённое занятие: ${visitedLesson._id}. Изменился статус у ${studentsWithChangedStatuses.length} студентов. 
-      `);
+    if (!studentsWithChangedStatuses.length) return;
+    logger.debug(`
+      Посещённое занятие: ${visitedLesson._id}. Изменился статус у ${studentsWithChangedStatuses.length} студентов. 
+    `);
 
-      const { increaseVisitsLeft, deductPostponedVisits, increasePostponedVisits } =
-        this.findChangedSubscriptions(studentsWithChangedStatuses);
+    const { increaseVisitsLeft, deductPostponedVisits, increasePostponedVisits } =
+      this.findChangedSubscriptions(studentsWithChangedStatuses);
 
-      // по полученным спискам ID абонементов где есть отличия пройдём по всем и внесём изменения в абонементы
-      [increaseVisitsLeft, deductPostponedVisits, increasePostponedVisits].forEach(
-        async (change) => {
-          if (!change.ids.length) return;
+    // по полученным спискам ID абонементов где есть отличия пройдём по всем и внесём изменения в абонементы
+    [increaseVisitsLeft, deductPostponedVisits, increasePostponedVisits].forEach(async (change) => {
+      if (!change.ids.length) return;
 
-          await this.subscriptionService.updateMany(
-            { _id: { $in: change.ids } },
-            { $inc: change.action },
-          );
-
-          logger.debug(
-            `Посещённое занятие: ${visitedLesson._id}. У ${change.ids.length} студентов действие ${change.action}`,
-          );
-        },
+      const updatedResult = await this.subscriptionService.updateMany(
+        { _id: { $in: change.ids } },
+        { $inc: change.action },
       );
 
-      const updatedStudents = studentsWithChangedStatuses.map(
-        (prevAndNextVisit) => prevAndNextVisit.updatedVisit,
+      logger.debug(
+        `Посещённое занятие: ${visitedLesson._id}. У ${change.ids.length} студентов выполнено действие ${change.action}. Обновлено ${updatedResult.modifiedCount} документов`,
       );
-      const sourceLessonId = visitedLesson.lesson._id.toString();
+    });
 
-      // найдём абонемент с которого списать
-      await this.addSubscription(updatedStudents, sourceLessonId, visitedLesson.date);
+    const updatedStudents = studentsWithChangedStatuses.map(
+      (prevAndNextVisit) => prevAndNextVisit.updatedVisit,
+    );
+    const sourceLessonId = visitedLesson.lesson._id.toString();
 
-      // добавим биллинг статус
-      await this.addBillingStatus(updatedStudents, sourceLessonId);
+    // найдём абонемент с которого списать
+    await this.addSubscription(updatedStudents, sourceLessonId, visitedLesson.date);
 
-      // спишем занятие
-      await this.chargeSubscriptions(updatedStudents, sourceLessonId);
-    }
+    // добавим биллинг статус
+    await this.addBillingStatus(updatedStudents, sourceLessonId);
+
+    // конвертируем объекты с подписками в обычные текстовые строки с id
+    this.normalizeSubscriptionIds(updatedStudents);
+
+    // спишем занятие
+    await this.chargeSubscriptions(updatedStudents, sourceLessonId);
   }
 
   compareVisits(updatedVisitedStudents: VisitedStudentDto[], visitedLesson: VisitedLessonEntity) {
@@ -214,6 +218,12 @@ export class BillingService {
         );
       }
 
+      // !!! здесь subscription превращается в subscriptionEntity ?
+      if (previousVisit?.subscription) {
+        // @ts-ignore
+        previousVisit.subscription = previousVisit?.subscription._id;
+      }
+
       studentsWithChangedStatuses.push({
         prevVisit: previousVisit,
         updatedVisit: updatedVisitedStudent,
@@ -228,6 +238,14 @@ export class BillingService {
     return studentsWithChangedStatuses;
   }
 
+  normalizeSubscriptionIds(visitedStudents: IVisitedStudentDto[]) {
+    visitedStudents.forEach((visitedStudent) => {
+      if (!visitedStudent.subscription || typeof visitedStudent.subscription === 'string') return;
+
+      visitedStudent.subscription = visitedStudent.subscription._id.toString();
+    });
+  }
+
   findChangedSubscriptions(studentsWithChangedStatuses: Array<IPrevAndUpdatedVisit>) {
     const increaseVisitsLeft: Array<string> = []; // visitsLeft: 1,
     const deductPostponedVisits: Array<string> = []; // visitsPostponed: -1,
@@ -236,6 +254,9 @@ export class BillingService {
     studentsWithChangedStatuses.forEach((prevAndUpdatedVisit) => {
       const { prevVisit, updatedVisit } = prevAndUpdatedVisit;
 
+      console.log('prevVisit?.subscription');
+      console.log(prevVisit?.subscription);
+      console.log(prevVisit);
       // если у нас нет абонемента на предыдущее занятие - то искать разницу не нужно
       if (!prevVisit?.subscription) return;
 
@@ -270,11 +291,16 @@ export class BillingService {
 
         // если старый статус - что посетил
         case VisitStatus.VISITED:
+          logger.debug('Предыдщий статус - посетил');
+          logger.debug(prevVisit.visitStatus);
+
           switch (updatedVisit.visitStatus) {
             // если сейчас оказывается что не посещал
             case VisitStatus.MISSED:
             case VisitStatus.SICK:
             case VisitStatus.UNKNOWN:
+              logger.debug('Предыдщий статус - посетил');
+              logger.debug(prevVisit.visitStatus);
               // вернём ему списанное занятие
               increaseVisitsLeft.push(prevVisit.subscription);
               break;

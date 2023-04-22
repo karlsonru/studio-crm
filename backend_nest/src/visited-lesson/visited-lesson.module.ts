@@ -5,10 +5,12 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { VisitedLessonModel, VisitedLessonSchema } from '../schemas';
 import { SubscriptionModel, SubscriptionSchema } from '../schemas';
 import { SubscriptionModule } from '../subscription/subscription.module';
+import { BillingModulde } from '../billing/billing.module';
 
 @Module({
   imports: [
     SubscriptionModule,
+    BillingModulde,
     MongooseModule.forFeature([
       { name: VisitedLessonModel.name, schema: VisitedLessonSchema },
       { name: SubscriptionModel.name, schema: SubscriptionSchema },

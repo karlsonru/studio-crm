@@ -63,6 +63,9 @@ export class VisitedLessonService {
         createVisitedLessonDto.lesson,
       );
 
+      // конвертируем объекты с подписками в обычные текстовые строки с id
+      this.billingService.normalizeSubscriptionIds(createVisitedLessonDto.students);
+
       // после проставления статусов спишем занятия с найденных абонементов
       await this.billingService.chargeSubscriptions(
         createVisitedLessonDto.students,
