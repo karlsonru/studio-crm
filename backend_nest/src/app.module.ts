@@ -11,6 +11,7 @@ import { SubscriptionTemplateModule } from './subscription-template/subscription
 import { SubscriptionModule } from './subscription/subscription.module';
 import { VisitStatusModule } from './visit-status/visit-status.module';
 import { VisitedLessonModule } from './visited-lesson/visited-lesson.module';
+import { BillingService } from './billing/billing.service';
 
 @Module({
   imports: [
@@ -30,6 +31,6 @@ import { VisitedLessonModule } from './visited-lesson/visited-lesson.module';
     VisitedLessonModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, BillingService],
 })
 export class AppModule {}

@@ -3,13 +3,13 @@ import { logger } from './logger.middleware';
 
 export async function withTransaction<T extends Document>(
   model: Model<T>,
-  transactionOps: (session: ClientSession) => Promise<T>,
+  transactionOps: (session: ClientSession) => Promise<T | null>,
 ): Promise<T | null> {
   const session = await model.startSession();
   logger.info(`Начинаем выполнять транзакцию`);
 
   try {
-    let result: T;
+    let result: T | null;
     await session.withTransaction(async () => {
       result = await transactionOps(session);
     });

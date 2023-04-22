@@ -6,7 +6,7 @@ import { Student } from './student.schema';
 
 export type VisitedLessonDocument = HydratedDocument<VisitedLesson>;
 
-export const enum VisitStatus {
+export enum VisitStatus {
   UNKNOWN = 'unknown',
   VISITED = 'visited',
   POSTPONED = 'postponed',
@@ -14,12 +14,17 @@ export const enum VisitStatus {
   SICK = 'sick',
 }
 
-export class Visit {
+export enum BillingStatus {
+  PAID = 'paid',
+  UNPAID = 'unpaid',
+  UNCHARGED = 'uncharged',
+}
+
+export class VisitedStudent {
   student: Student;
   visitStatus: VisitStatus;
-  subscription?: string;
-  // student: Types.ObjectId;
-  // visitStatus: Types.ObjectId;
+  billingStatus: BillingStatus;
+  subscription: string | null;
 }
 
 @Schema({
@@ -62,26 +67,34 @@ export class VisitedLesson {
     type: [
       {
         student: {
+          index: true,
           type: Types.ObjectId,
           ref: 'Student',
           required: true,
         },
         visitStatus: {
           type: String,
+          enum: VisitStatus,
+          default: VisitStatus.UNKNOWN,
           trim: true,
+          required: true,
+        },
+        billingStatus: {
+          type: String,
+          enum: BillingStatus,
+          default: BillingStatus.UNCHARGED,
+          trim: true,
+          required: true,
         },
         subscription: {
           type: String,
           trim: true,
+          default: null,
         },
-        /*
-        type: Types.ObjectId,
-        ref: 'VisitStatus',
-        */
       },
     ],
   })
-  students: Visit[];
+  students: VisitedStudent[];
 }
 
 export const VisitedLessonSchema = SchemaFactory.createForClass(VisitedLesson);

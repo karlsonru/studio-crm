@@ -4,6 +4,11 @@ export { Role as RoleModel, RoleSchema, RoleDocument } from './role.schema';
 export { Lesson as LessonModel, LessonSchema, LessonDocument } from './lesson.schema';
 export { Location as LocationModel, LocationSchema, LocationDocument } from './location.schema';
 export {
+  VisitBillingStatus as VisitBillingStatusModel,
+  VisitBillingStatusSchema,
+  VisitBillingStatusDocument,
+} from './visitBillingStatus.schema';
+export {
   Subscription as SubscriptionModel,
   SubscriptionSchema,
   SubscriptionDocument,
