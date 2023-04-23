@@ -1,69 +1,158 @@
-import { useEffect, useState } from 'react';
-import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
-import CircularProgress from '@mui/material/CircularProgress';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { TimetableHeader } from './PageHeader';
-import { DayColumns } from './Content';
-import { useGetLessonsQuery } from '../../shared/api/lessonApi';
+import { useEffect, useRef, useState } from 'react';
+import { Scheduler } from '@aldabil/react-scheduler';
+import type { ProcessedEvent, SchedulerRef } from '@aldabil/react-scheduler/types';
+import { ru } from 'date-fns/locale';
+import { subMonths, addMonths, eachDayOfInterval } from 'date-fns';
+import { WeekProps } from '@aldabil/react-scheduler/views/Week';
+import { DayProps } from '@aldabil/react-scheduler/views/Day';
+import { ViewEvent } from '@aldabil/react-scheduler/types';
+import { useMobile } from '../../shared/hooks/useMobile';
+import { useFindLessonsQuery } from '../../shared/api/lessonApi';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
+import './timetable.module.scss';
+
 import { ILessonModel } from '../../shared/models/ILessonModel';
 
-function structureLessons(lessons: ILessonModel[]) {
-  const lessonsObj = {} as { [index: number]: ILessonModel[] };
+// перезапишем dayValues из date-fns. Подставится нужный текст в заголовках расписания
+const dayValues = {
+  narrow: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+  short: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+  abbreviated: ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+  wide: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+};
 
-  for (let i = 0; i < lessons.length; i++) {
-    if (lessonsObj[lessons[i].day]) {
-      lessonsObj[lessons[i].day].push(lessons[i]);
-    } else {
-      lessonsObj[lessons[i].day] = [lessons[i]];
-    }
-  }
-
-  return lessonsObj;
+interface ILocalizeOptions {
+  context: string;
+  width: 'narrow' | 'short' | 'abbreviated' | 'wide';
 }
 
-function TimeColumn() {
-  const time = ['09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21'];
+if (ru.localize) {
+  ru.localize.day = (day: number, options: ILocalizeOptions) => dayValues[options.width][day];
+}
 
-  return (
-    <Box p='4px' mt='44px'>
-      { time.map((hh) => <Box key={hh} height='120px'>{hh}:00</Box>) }
-    </Box>
-  );
+const weekOption: WeekProps = {
+  weekDays: [0, 1, 2, 3, 4, 5, 6],
+  weekStartOn: 1,
+  startHour: 9,
+  endHour: 22,
+  step: 30,
+  navigation: true,
+  disableGoToDay: false,
+};
+
+const dayOptions: DayProps = {
+  startHour: 9,
+  endHour: 22,
+  step: 60,
+};
+
+const translations = {
+  navigation: {
+    month: 'Мессяц',
+    week: 'Неделя',
+    day: 'День',
+    today: 'Сегодня',
+  },
+  form: {
+    addTitle: 'Добавить',
+    editTitle: 'Изменить',
+    confirm: 'Подтвердить',
+    delete: 'Удалить',
+    cancel: 'Отмена',
+  },
+  event: {
+    title: 'Название',
+    start: 'Начало',
+    end: 'Конец',
+    allDay: 'Весь день',
+  },
+  moreEvents: 'More...',
+  loading: 'Loading...',
+};
+
+function getWeekDates(period: Record<string, number>) {
+  const interval = eachDayOfInterval({
+    start: new Date(period.start),
+    end: new Date(period.end),
+  });
+
+  const weekDates: Record<number, number> = {};
+  interval.forEach((date) => {
+    weekDates[date.getDay()] = date.getTime();
+  });
+
+  return weekDates;
+}
+
+function setDateWithTime(timestamp: number, hh: string, min: string) {
+  const date = new Date(timestamp);
+  date.setHours(+hh);
+  date.setMinutes(+min);
+  return date;
+}
+
+function addEvent(lesson: ILessonModel, weekDates: Record<number, number>): ProcessedEvent {
+  const startTime = lesson.timeStart.toString().padStart(4, '0');
+  const endTime = lesson.timeEnd.toString().padStart(4, '0');
+  const [startHour, startMinute] = [startTime.slice(0, 2), startTime.slice(2)];
+  const [endHour, endMinute] = [endTime.slice(0, 2), endTime.slice(2)];
+
+  return {
+    event_id: lesson._id,
+    title: lesson.title,
+    start: setDateWithTime(weekDates[lesson.day], startHour, startMinute),
+    end: setDateWithTime(weekDates[lesson.day], endHour, endMinute),
+  };
 }
 
 export function TimetablePage() {
   const dispatch = useAppDispatch();
-  const isMobile = useMediaQuery('(max-width: 767px)');
-
-  const [startDate, setStartDate] = useState(new Date());
-  const { isLoading, data, error } = useGetLessonsQuery();
+  const isMobile = useMobile();
+  const calendarRef = useRef<SchedulerRef>(null);
 
   useEffect(() => {
-    if (startDate.getDay() === 1) return;
-
-    const monday = new Date();
-    const shift = monday.getDay() === 0 ? 1 : 1 - monday.getDay();
-    monday.setDate(monday.getDate() + shift);
-
-    setStartDate(monday);
-
     dispatch(setPageTitle('Расписание'));
   }, []);
 
+  const [period, setPeriod] = useState({ start: 0, end: 0 });
+
+  const { data, isFetching } = useFindLessonsQuery({
+    dateFrom: { $lte: subMonths(period.start, 1).setDate(1) },
+    dateTo: { $gte: addMonths(period.end, 2).setDate(1) },
+  }, {
+    skip: !period.start || !period.end,
+  });
+
+  useEffect(() => {
+    const weekDates = getWeekDates(period);
+    const events = data?.payload.map((lesson) => addEvent(lesson, weekDates)) ?? [];
+
+    calendarRef.current?.scheduler.handleState(events, 'events');
+  }, [period, data]);
+
+  const getRemoteEvents = async (query: ViewEvent) => {
+    const { start, end } = query;
+
+    setPeriod({
+      start: start.getTime(),
+      end: end.getTime(),
+    });
+  };
+
   return (
-    <>
-      <TimetableHeader startDate={startDate} setDateHandler={setStartDate} />
-      <Stack direction='row'>
-        {!isMobile && <TimeColumn />}
-        {isLoading && <CircularProgress />}
-        {error && <span>Произошла ошибка!</span>}
-        {data?.payload
-          && <DayColumns startDate={startDate} lessons={structureLessons(data.payload)} />
-        }
-      </Stack>
-    </>
+    <Scheduler
+      ref={calendarRef}
+      view={isMobile ? 'day' : 'week'}
+      month={null}
+      getRemoteEvents={getRemoteEvents}
+      week={weekOption}
+      day={dayOptions}
+      loading={isFetching}
+      locale={ru}
+      hourFormat="24"
+      timeZone="Europe/Moscow"
+      translations={translations}
+    />
   );
 }
