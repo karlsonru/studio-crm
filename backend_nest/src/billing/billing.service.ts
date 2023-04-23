@@ -23,6 +23,11 @@ interface IPrevAndUpdatedVisit {
   updatedVisit: IUpdatedVisitedStudent;
 }
 
+interface IChargeBackSubscription {
+  ids: Array<string>;
+  action: Record<string, number>;
+}
+
 @Injectable()
 export class BillingService {
   constructor(private readonly subscriptionService: SubscriptionService) {}
@@ -165,22 +170,8 @@ export class BillingService {
       Посещённое занятие: ${visitedLesson._id}. Изменился статус у ${studentsWithChangedStatuses.length} студентов. 
     `);
 
-    const { increaseVisitsLeft, deductPostponedVisits, increasePostponedVisits } =
-      this.findChangedSubscriptions(studentsWithChangedStatuses);
-
-    // по полученным спискам ID абонементов где есть отличия пройдём по всем и внесём изменения в абонементы
-    [increaseVisitsLeft, deductPostponedVisits, increasePostponedVisits].forEach(async (change) => {
-      if (!change.ids.length) return;
-
-      const updatedResult = await this.subscriptionService.updateMany(
-        { _id: { $in: change.ids } },
-        { $inc: change.action },
-      );
-
-      logger.debug(
-        `Посещённое занятие: ${visitedLesson._id}. У ${change.ids.length} студентов выполнено действие ${change.action}. Обновлено ${updatedResult.modifiedCount} документов`,
-      );
-    });
+    // возвращаем все изменения в абонементах сделанные по прошлому занятию обратно
+    await this.chargeBackSubscriptions(studentsWithChangedStatuses);
 
     const updatedStudents = studentsWithChangedStatuses.map(
       (prevAndNextVisit) => prevAndNextVisit.updatedVisit,
@@ -246,89 +237,59 @@ export class BillingService {
     });
   }
 
-  findChangedSubscriptions(studentsWithChangedStatuses: Array<IPrevAndUpdatedVisit>) {
-    const increaseVisitsLeft: Array<string> = []; // visitsLeft: 1,
-    const deductPostponedVisits: Array<string> = []; // visitsPostponed: -1,
-    const increasePostponedVisits: Array<string> = []; // visitsPostponed: 1,
+  async chargeBackSubscriptions(studentsWithChangedStatuses: Array<IPrevAndUpdatedVisit>) {
+    const increaseVisitsLeft: IChargeBackSubscription = {
+      ids: [],
+      action: { visitsLeft: 1 },
+    };
+    const deductPostponedVisits: IChargeBackSubscription = {
+      ids: [],
+      action: { visitsPostponed: -1 },
+    };
+    const increasePostponedVisits: IChargeBackSubscription = {
+      ids: [],
+      action: { visitsPostponed: 1 },
+    };
 
     studentsWithChangedStatuses.forEach((prevAndUpdatedVisit) => {
-      const { prevVisit, updatedVisit } = prevAndUpdatedVisit;
+      const { prevVisit } = prevAndUpdatedVisit;
 
-      console.log('prevVisit?.subscription');
-      console.log(prevVisit?.subscription);
-      console.log(prevVisit);
-      // если у нас нет абонемента на предыдущее занятие - то искать разницу не нужно
-      if (!prevVisit?.subscription) return;
+      // если у нас нет абонемента на предыдущее занятие или с него не было списания - то искать разницу не нужно
+      if (!prevVisit?.subscription || prevVisit.billingStatus !== BillingStatus.PAID) return;
 
       // смотрим какой был статус и какой новый
       switch (prevVisit.visitStatus) {
-        // если старый статус был не определён - то ничего не делаем
+        // если старый статус не подразуемвал списания - то ничего не делаем
         case VisitStatus.MISSED:
         case VisitStatus.SICK:
         case VisitStatus.UNKNOWN:
           break;
 
-        // если ранее был статус перенесён
+        // если ранее был статус ПЕРЕНЕСЁН - вернём списанное и отложенное занятие
         case VisitStatus.POSTPONED:
-          switch (updatedVisit.visitStatus) {
-            // если сейчас выясняется что его не было
-            case VisitStatus.MISSED:
-            case VisitStatus.SICK:
-            case VisitStatus.UNKNOWN:
-              // вернём ему списанное занятие и вернём отложенное занятие
-              increaseVisitsLeft.push(prevVisit.subscription);
-              deductPostponedVisits.push(prevVisit.subscription);
-              break;
-
-            // если указываем что он посетил - то списываем только перенесённое занятие
-            case VisitStatus.VISITED:
-              deductPostponedVisits.push(prevVisit.subscription);
-              break;
-
-            default:
-          }
+          increaseVisitsLeft.ids.push(prevVisit.subscription);
+          deductPostponedVisits.ids.push(prevVisit.subscription);
           break;
 
-        // если старый статус - что посетил
+        // если старый статус ПОСЕТИЛ вернём ему списанное занятие
         case VisitStatus.VISITED:
-          logger.debug('Предыдщий статус - посетил');
-          logger.debug(prevVisit.visitStatus);
-
-          switch (updatedVisit.visitStatus) {
-            // если сейчас оказывается что не посещал
-            case VisitStatus.MISSED:
-            case VisitStatus.SICK:
-            case VisitStatus.UNKNOWN:
-              logger.debug('Предыдщий статус - посетил');
-              logger.debug(prevVisit.visitStatus);
-              // вернём ему списанное занятие
-              increaseVisitsLeft.push(prevVisit.subscription);
-              break;
-
-            case VisitStatus.POSTPONED:
-              // добавим ему занятие в перенесённые
-              increasePostponedVisits.push(prevVisit.subscription);
-              break;
-
-            default:
-          }
+          increaseVisitsLeft.ids.push(prevVisit.subscription);
           break;
       }
     });
 
-    return {
-      increaseVisitsLeft: {
-        ids: increaseVisitsLeft,
-        action: { visitsLeft: 1 },
-      },
-      deductPostponedVisits: {
-        ids: deductPostponedVisits,
-        action: { visitsPostponed: -1 },
-      },
-      increasePostponedVisits: {
-        ids: increasePostponedVisits,
-        action: { visitsPostponed: 1 },
-      },
-    };
+    // по полученным спискам ID абонементов где есть отличия пройдём по всем и внесём изменения в абонементы
+    [increaseVisitsLeft, deductPostponedVisits, increasePostponedVisits].forEach(async (change) => {
+      if (!change.ids.length) return;
+
+      const updatedResult = await this.subscriptionService.updateMany(
+        { _id: { $in: change.ids } },
+        { $inc: change.action },
+      );
+
+      logger.debug(
+        `У ${change.ids.length} студентов выполнено действие ${change.action}. Обновлено ${updatedResult.modifiedCount} документов`,
+      );
+    });
   }
 }
