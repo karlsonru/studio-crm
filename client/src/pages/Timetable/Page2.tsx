@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Scheduler } from '@aldabil/react-scheduler';
-import type { ProcessedEvent, SchedulerRef } from '@aldabil/react-scheduler/types';
+import type {
+  CellRenderedProps, ProcessedEvent, SchedulerRef,
+} from '@aldabil/react-scheduler/types';
 import { ru } from 'date-fns/locale';
 import { subMonths, addMonths, eachDayOfInterval } from 'date-fns';
 import { WeekProps } from '@aldabil/react-scheduler/views/Week';
@@ -13,7 +15,6 @@ import { setPageTitle } from '../../shared/reducers/appMenuSlice';
 import './timetable.module.scss';
 
 import { ILessonModel } from '../../shared/models/ILessonModel';
-import { EventCard } from './eventCard';
 
 // перезапишем dayValues из date-fns. Подставится нужный текст в заголовках расписания
 const dayValues = {
@@ -46,6 +47,10 @@ const dayOptions: DayProps = {
   startHour: 9,
   endHour: 22,
   step: 60,
+  cellRenderer: (props: CellRenderedProps) => (
+      <h1>
+        This is custom
+      </h1>),
 };
 
 const translations = {
@@ -106,12 +111,10 @@ function addEvent(lesson: ILessonModel, weekDates: Record<number, number>): Proc
     title: lesson.title,
     start: setDateWithTime(weekDates[lesson.day], startHour, startMinute),
     end: setDateWithTime(weekDates[lesson.day], endHour, endMinute),
-    color: '#fff',
-    payload: lesson,
   };
 }
 
-export function TimetablePage() {
+export function TimetablePage2() {
   const dispatch = useAppDispatch();
   const isMobile = useMobile();
   const calendarRef = useRef<SchedulerRef>(null);
@@ -163,7 +166,6 @@ export function TimetablePage() {
       hourFormat="24"
       timeZone="Europe/Moscow"
       translations={translations}
-      eventRenderer={EventCard}
       // viewerExtraComponent={viewerExtraComponent} // here goes custom description in preview
       // viewerTitleComponent={(event) => <h1>This is custom title in preview</h1>}
     />

@@ -35,7 +35,7 @@ const NavItem = ({ path, menuItem }: INavItem) => {
   const activeStyle = {
     color: 'inherit',
     textDecoration: 'underline',
-    background: '#fff000',
+    background: '#fff77f',
   };
 
   const regularStyle = {

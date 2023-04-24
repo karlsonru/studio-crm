@@ -1,7 +1,13 @@
 p.MuiTypography-root.MuiTypography-body1.css-1mdftu-MuiTypography-root {
-  font-size: 1rem!important;
+  font-size: 1rem !important;
 }
 
 p.MuiTypography-root.MuiTypography-body1.css-vkc4v8-MuiTypography-root {
-  font-size: 1rem!important;
+  font-size: 1rem !important;
+}
+
+div[data-testid="view-navigator"] {
+  button:first-child {
+    color: inherit !important;
+  }
 }
