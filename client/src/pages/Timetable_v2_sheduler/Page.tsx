@@ -11,9 +11,9 @@ import { useFindLessonsQuery } from '../../shared/api/lessonApi';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
 import './timetable.module.scss';
-
 import { ILessonModel } from '../../shared/models/ILessonModel';
-import { EventCard } from './eventCard';
+import { EventCard } from './EventCard';
+import { PreviewCard } from './PreviewCard';
 
 // перезапишем dayValues из date-fns. Подставится нужный текст в заголовках расписания
 const dayValues = {
@@ -50,7 +50,7 @@ const dayOptions: DayProps = {
 
 const translations = {
   navigation: {
-    month: 'Мессяц',
+    month: 'Месяц',
     week: 'Неделя',
     day: 'День',
     today: 'Сегодня',
@@ -107,7 +107,10 @@ function addEvent(lesson: ILessonModel, weekDates: Record<number, number>): Proc
     start: setDateWithTime(weekDates[lesson.day], startHour, startMinute),
     end: setDateWithTime(weekDates[lesson.day], endHour, endMinute),
     color: '#fff',
-    payload: lesson,
+    payload: {
+      lesson,
+      date: weekDates[lesson.day],
+    },
   };
 }
 
@@ -162,10 +165,15 @@ export function TimetablePage() {
       locale={ru}
       hourFormat="24"
       timeZone="Europe/Moscow"
+      draggable={false}
+      editable={false}
+      deletable={false}
       translations={translations}
       eventRenderer={EventCard}
+      customViewer={(event: ProcessedEvent) => <PreviewCard event={event} />}
+      onEventClick={() => console.log('clicked')}
+      // viewerTitleComponent={(event) => <PreviewCardTitle title={event.title} />}
       // viewerExtraComponent={viewerExtraComponent} // here goes custom description in preview
-      // viewerTitleComponent={(event) => <h1>This is custom title in preview</h1>}
     />
   );
 }

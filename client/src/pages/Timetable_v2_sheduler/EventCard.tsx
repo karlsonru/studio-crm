@@ -47,7 +47,9 @@ interface ITitleWithIcon {
 function TitleWithIcon({ title, amount }: ITitleWithIcon) {
   return (
     <Stack justifyContent="space-between" {...stackStyleProps}>
-      { title }
+      <Typography component="h6" fontWeight="bold">
+        { title }
+      </Typography>
       <Stack {...stackStyleProps} >
         <Typography component="span" fontWeight="bold">
           { amount }
@@ -59,17 +61,21 @@ function TitleWithIcon({ title, amount }: ITitleWithIcon) {
 }
 
 interface ExtendedProcessedEvent extends ProcessedEvent {
-  payload: ILessonModel;
+  payload: {
+    lesson: ILessonModel;
+    date: number;
+  }
 }
 
 export function EventCard(event: EventRendererProps) {
-  const lesson = event.event as ExtendedProcessedEvent;
+  const processedEvent = event.event;
+  const { lesson } = (processedEvent as ExtendedProcessedEvent).payload;
 
   return (
     <Card {...event} {...cardStyleProps}>
       <CardHeader
-        title={<TitleWithIcon title={lesson.title} amount={lesson.payload?.students.length} />}
-        subheader={`${format(lesson.start, 'HH:mm')} - ${format(lesson.end, 'HH:mm')}`}
+        title={<TitleWithIcon title={lesson.title} amount={lesson.students.length} />}
+        subheader={`${format(processedEvent.start, 'HH:mm')} - ${format(processedEvent.end, 'HH:mm')}`}
         {...cardHeaderStyleProps}
       />
       <CardContent sx={{ padding: '0.25rem' }} />

@@ -34,7 +34,7 @@ function TimeColumn() {
   );
 }
 
-export function TimetablePage() {
+export function TimetablePageV1() {
   const dispatch = useAppDispatch();
   const isMobile = useMediaQuery('(max-width: 767px)');
 
