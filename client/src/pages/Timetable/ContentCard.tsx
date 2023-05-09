@@ -7,7 +7,7 @@ import Stack, { StackProps } from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import GroupIcon from '@mui/icons-material/Group';
 import { differenceInMinutes } from 'date-fns';
-import { ContentCardPreview } from './PreviewCard';
+import { ContentCardPreview } from './ContentCardPreview';
 import { ILessonModel } from '../../shared/models/ILessonModel';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 
@@ -154,24 +154,25 @@ export function ContentCard({ lesson, step, date }: IContentCard) {
 
   return (
     <>
-    <Card
-      onClick={showPreview}
-      onDoubleClick={goVisitsPage}
-      variant="outlined"
-      sx={{ ...formattedContent.style, ...CARD_STYLE }}
-    >
-      <CardHeader
-        title={<TitleWithIcon title={title} amount={students} />}
-        subheader={`${timeStart} - ${timeEnd}`}
-        {...CARD_HEADER_PROPS}
+      <Card
+        onMouseEnter={showPreview}
+        onMouseLeave={handleClose}
+        onDoubleClick={goVisitsPage}
+        variant="outlined"
+        sx={{ ...formattedContent.style, ...CARD_STYLE }}
+      >
+        <CardHeader
+          title={<TitleWithIcon title={title} amount={students} />}
+          subheader={`${timeStart} - ${timeEnd}`}
+          {...CARD_HEADER_PROPS}
+        />
+        <CardContent sx={{ padding: '0.25rem' }} />
+      </Card>
+      <ContentCardPreview
+        anchorEl={anchorEl}
+        handleClose={handleClose}
+        content={lesson.students.map((student) => student.fullname)}
       />
-      <CardContent sx={{ padding: '0.25rem' }} />
-    </Card>
-    <ContentCardPreview
-      anchorEl={anchorEl}
-      handleClose={handleClose}
-      content={lesson.students.map((student) => student.fullname)}
-    />
     </>
   );
 }

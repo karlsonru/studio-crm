@@ -35,6 +35,8 @@ interface IContentCardPreview {
 export function ContentCardPreview({ anchorEl, content, handleClose }: IContentCardPreview) {
   const width = anchorEl?.offsetWidth;
 
+  if (!anchorEl) return null;
+
   return (
     <Popover
       open={Boolean(anchorEl)}
@@ -45,8 +47,11 @@ export function ContentCardPreview({ anchorEl, content, handleClose }: IContentC
         horizontal: 'center',
       }}
       transformOrigin={{
-        vertical: 'center',
+        vertical: 'top',
         horizontal: 'center',
+      }}
+      sx={{
+        pointerEvents: 'none',
       }}
     >
       <ContentList content={content} width={width ?? 0} />

@@ -17,7 +17,7 @@ import { timetablePageActions } from 'shared/reducers/timetablePageSlice';
 
 const getWeekStart = (date: Date) => format(startOfWeek(date, { weekStartsOn: 1 }), 'dd', { locale: ru });
 const getWeekEnd = (date: Date) => format(endOfWeek(date, { weekStartsOn: 1 }), 'dd MMMM yyyy', { locale: ru });
-const showDay = (date: Date) => format(date, 'dddd dd MMMM yyyy', { locale: ru });
+const showDay = (date: Date) => format(date, 'EEEE, dd MMMM', { locale: ru, weekStartsOn: 1 });
 
 interface ButtonFieldProps extends BaseSingleInputFieldProps<Date | null, FieldSection, any> {
   date?: Date;
@@ -55,10 +55,10 @@ export function DateSwitcher() {
   const currentDate = useAppSelector((state) => state.timetablePageReducer.currentDate);
   const actions = useActionCreators(timetablePageActions);
 
-  const isDayView = useMemo(() => view === 'day', [view]);
+  const isDayView = view === 'day';
 
   // на сколько сдвигать дату при изменении стрелками
-  const dateStep = useMemo(() => (isDayView ? 1 : 7), [isDayView, view]);
+  const dateStep = isDayView ? 1 : 7;
 
   const date = useMemo(() => new Date(currentDate), [currentDate]);
   const [open, setOpen] = useState(false);

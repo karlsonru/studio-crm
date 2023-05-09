@@ -3,7 +3,6 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface ITimetablePageState {
   currentDate: number;
   view: 'day' | 'week';
-  previewAnchor: Element | null;
 }
 
 const now = new Date();
@@ -15,7 +14,6 @@ now.setMilliseconds(0);
 const initialState: ITimetablePageState = {
   currentDate: now.getTime(),
   view: 'week',
-  previewAnchor: null,
 };
 
 const timetablePageState = createSlice({
@@ -27,10 +25,6 @@ const timetablePageState = createSlice({
     },
     setView: (state, action: PayloadAction<'day' | 'week'>) => {
       state.view = action.payload;
-    },
-    setPreviewAnchor: (state, action: PayloadAction<Element | null>) => {
-      // @ts-ignore
-      state.previewAnchor = action.payload;
     },
   },
 });
