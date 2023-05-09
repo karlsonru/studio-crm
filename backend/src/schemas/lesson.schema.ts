@@ -29,6 +29,11 @@ interface IStudents {
 как мы узнаем, этот студент "Новый?" или у него абонемент на 1 занятие (однократный) или это отработка? 
 */
 
+export class ITime {
+  hh: number;
+  min: number;
+}
+
 @Schema({
   timestamps: true,
 })
@@ -77,17 +82,15 @@ export class Lesson {
 
   @Prop({
     required: true,
-    min: 0,
-    max: 2359,
+    type: Object,
   })
-  timeStart: number;
+  timeStart: ITime;
 
   @Prop({
     required: true,
-    min: 0,
-    max: 2359,
+    type: Object,
   })
-  timeEnd: number;
+  timeEnd: ITime;
 
   @Prop({
     required: true,

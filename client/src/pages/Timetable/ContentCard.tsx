@@ -8,8 +8,9 @@ import Typography from '@mui/material/Typography';
 import GroupIcon from '@mui/icons-material/Group';
 import { differenceInMinutes } from 'date-fns';
 import { ContentCardPreview } from './ContentCardPreview';
-import { ILessonModel } from '../../shared/models/ILessonModel';
+import { ILessonModel, ITime } from '../../shared/models/ILessonModel';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
+import { convertTime } from '../../shared/helpers/convertTime';
 
 const CARD_STYLE = {
   left: 0,
@@ -51,10 +52,10 @@ const STACK_PROPS: StackProps = {
   spacing: 1,
 };
 
-function calculateDuration(timeStart: number, timeEnd: number) {
+function calculateDuration(timeStart: ITime, timeEnd: ITime) {
   return differenceInMinutes(
-    new Date(1970, 0, 1, Math.floor(timeStart / 100), Math.floor(timeStart % 100)),
-    new Date(1970, 0, 1, Math.floor(timeEnd / 100), Math.floor(timeEnd % 100)),
+    new Date(1970, 0, 1, timeStart.hh, timeStart.min),
+    new Date(1970, 0, 1, timeEnd.hh, timeEnd.min),
   );
 }
 
@@ -80,13 +81,10 @@ function TitleWithIcon({ title, amount }: ITitleWithIcon) {
 }
 
 function formatCardContent(lesson: ILessonModel, step: number, view: 'day' | 'week') {
-  const timeStart = `${Math.floor(lesson.timeStart / 100).toString().padStart(2, '0')}:${(lesson.timeStart % 100).toString().padStart(2, '0')}`;
-  const timeEnd = `${Math.floor(lesson.timeEnd / 100).toString().padStart(2, '0')}:${(lesson.timeEnd % 100).toString().padStart(2, '0')}`;
-
   const content = {
     title: lesson.title,
-    timeStart,
-    timeEnd,
+    timeStart: convertTime(lesson.timeStart),
+    timeEnd: convertTime(lesson.timeEnd),
     students: lesson.students.length,
   };
 
@@ -105,8 +103,7 @@ function formatCardContent(lesson: ILessonModel, step: number, view: 'day' | 'we
   // мультипликатор насколько нужно смещать карточку в зависимости от шага времени
   const mul = Math.floor(60 / step);
 
-  const lessonStartMin = lesson.timeStart % 100;
-  const topMove = lessonStartMin >= step ? lessonStartMin - step : lessonStartMin;
+  const topMove = lesson.timeStart.min >= step ? lesson.timeStart.min - step : lesson.timeStart.min;
 
   return {
     content,

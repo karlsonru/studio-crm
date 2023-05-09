@@ -34,7 +34,12 @@ export function LessonsList() {
   return (
     <List sx={{ width: '100%', maxWidth: '360px' }}>
       { [...data.payload]
-        .sort((lessonA, lessonB) => lessonA.timeStart - lessonB.timeStart)
+        .sort((lessonA, lessonB) => {
+          if (lessonA.timeStart.hh !== lessonB.timeStart.hh) {
+            return lessonA.timeStart.hh - lessonB.timeStart.hh;
+          }
+          return lessonA.timeStart.min - lessonB.timeStart.min;
+        })
         .map(
           (lesson) => <ListItem
             key={lesson._id}

@@ -19,14 +19,17 @@ describe('LessonController', () => {
   const createDto: CreateLessonDto = {
     title: 'Test Lesson',
     teacher: new Types.ObjectId().toString(),
-    students: [
-      new Types.ObjectId().toString(),
-      new Types.ObjectId().toString(),
-    ],
+    students: [new Types.ObjectId().toString(), new Types.ObjectId().toString()],
     location: new Types.ObjectId().toString(),
     day: 1,
-    timeStart: 1215,
-    timeEnd: 1300,
+    timeStart: {
+      hh: 12,
+      min: 15,
+    },
+    timeEnd: {
+      hh: 13,
+      min: 0,
+    },
     dateFrom: 112342,
     dateTo: 112345454,
     isActive: true,
@@ -39,8 +42,14 @@ describe('LessonController', () => {
     students: [new StudentEntity(), new StudentEntity()],
     location: new LocationEntity(),
     day: 1,
-    timeStart: 1215,
-    timeEnd: 1300,
+    timeStart: {
+      hh: 12,
+      min: 15,
+    },
+    timeEnd: {
+      hh: 13,
+      min: 0,
+    },
     dateFrom: 112342,
     dateTo: 112345454,
     isActive: true,
@@ -102,9 +111,7 @@ describe('LessonController', () => {
     it('should return a lesson with the given id', async () => {
       jest.spyOn(service, 'findOne').mockResolvedValueOnce(mockEntity);
 
-      expect(
-        (await controller.findOne(mockEntity._id.toString())).payload,
-      ).toEqual(mockEntity);
+      expect((await controller.findOne(mockEntity._id.toString())).payload).toEqual(mockEntity);
     });
 
     it('should raise HttpException with NOT FOUND HttpStatus if no lesson is found with the given id', async () => {
@@ -113,9 +120,7 @@ describe('LessonController', () => {
       try {
         await controller.findOne(new Types.ObjectId().toString());
       } catch (err) {
-        expect(err).toEqual(
-          new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND),
-        );
+        expect(err).toEqual(new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND));
       }
     });
   });
@@ -137,8 +142,7 @@ describe('LessonController', () => {
       jest.spyOn(service, 'update').mockResolvedValueOnce(updatedLesson);
 
       expect(
-        (await controller.update(mockEntity._id.toString(), updatedMockEntity))
-          .payload,
+        (await controller.update(mockEntity._id.toString(), updatedMockEntity)).payload,
       ).toEqual(updatedLesson);
     });
 
@@ -146,14 +150,9 @@ describe('LessonController', () => {
       jest.spyOn(service, 'update').mockResolvedValueOnce(null);
 
       try {
-        await controller.update(
-          new Types.ObjectId().toString(),
-          updatedMockEntity,
-        );
+        await controller.update(new Types.ObjectId().toString(), updatedMockEntity);
       } catch (err) {
-        expect(err).toEqual(
-          new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND),
-        );
+        expect(err).toEqual(new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND));
       }
     });
   });
@@ -162,17 +161,13 @@ describe('LessonController', () => {
     it('should delete an existing lesson and return it', async () => {
       jest.spyOn(service, 'remove').mockResolvedValueOnce(undefined);
 
-      expect(await controller.remove(mockEntity._id.toString())).toEqual(
-        undefined,
-      );
+      expect(await controller.remove(mockEntity._id.toString())).toEqual(undefined);
     });
 
     it('should return a 404 error if no lesson is found with the given id', async () => {
       jest.spyOn(service, 'remove').mockResolvedValueOnce();
 
-      expect(await controller.remove(new Types.ObjectId().toString())).toEqual(
-        undefined,
-      );
+      expect(await controller.remove(new Types.ObjectId().toString())).toEqual(undefined);
     });
   });
 

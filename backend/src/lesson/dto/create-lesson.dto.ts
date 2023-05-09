@@ -5,7 +5,23 @@ import {
   IsMongoId,
   IsNumber,
   IsString,
+  Max,
+  Min,
+  ValidateNested,
 } from 'class-validator';
+import { ITime } from '../../schemas/lesson.schema';
+
+class Time implements ITime {
+  @IsNumber()
+  @Min(0)
+  @Max(59)
+  hh: number;
+
+  @IsNumber()
+  @Min(0)
+  @Max(59)
+  min: number;
+}
 
 export class CreateLessonDto {
   @IsString()
@@ -27,11 +43,13 @@ export class CreateLessonDto {
   @IsNumber()
   day: number;
 
-  @IsNumber()
-  timeStart: number;
+  @ValidateNested()
+  @Type(() => Time)
+  timeStart: Time;
 
-  @IsNumber()
-  timeEnd: number;
+  @ValidateNested()
+  @Type(() => Time)
+  timeEnd: Time;
 
   @IsNumber()
   dateFrom: number;

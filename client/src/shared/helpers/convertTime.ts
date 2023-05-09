@@ -1,5 +1,5 @@
-export function convertTime(time: number) {
-  const hh = Math.floor(time / 100).toString().padStart(2, '0');
-  const min = (time % 100).toString().padStart(2, '0');
-  return `${hh}:${min}`;
+import { ITime } from '../models/ILessonModel';
+
+export function convertTime(time: ITime) {
+  return `${time.hh.toString().padStart(2, '0')}:${time.min.toString().padStart(2, '0')}`;
 }

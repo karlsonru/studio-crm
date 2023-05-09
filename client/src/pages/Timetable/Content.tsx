@@ -52,13 +52,10 @@ function fillRowsWithContent(lessons: Array<ILessonModel>) {
   // для каждого занятия найдём интервал, к которому оно относится
   lessons.forEach((lesson) => {
     const lessonInterval = timeIntervals.find((interval) => {
-      const lessonStartHH = Math.floor(lesson.timeStart / 100);
-      const lessonStartMin = Math.floor(lesson.timeStart % 100);
-
       if (
-        lessonStartHH === interval.getHours()
-        && lessonStartMin - interval.getMinutes() < TIME_STEP
-        && lessonStartMin >= interval.getMinutes()
+        lesson.timeStart.hh === interval.getHours()
+        && lesson.timeStart.min - interval.getMinutes() < TIME_STEP
+        && lesson.timeStart.min >= interval.getMinutes()
       ) {
         return interval;
       }
@@ -139,7 +136,12 @@ export function TimetableContent({ lessons }: { lessons: Array<ILessonModel> }) 
     const currentDay = new Date(currentDate).getDay();
     const filteredLessons = lessons
       .filter((lesson) => lesson.day === currentDay)
-      .sort((lessonA, lessonB) => lessonA.timeStart - lessonB.timeStart);
+      .sort((lessonA, lessonB) => {
+        if (lessonA.timeStart.hh !== lessonB.timeStart.hh) {
+          return lessonA.timeStart.hh - lessonB.timeStart.hh;
+        }
+        return lessonA.timeStart.min - lessonB.timeStart.min;
+      });
     return filteredLessons;
   }, [currentDate, view]);
 

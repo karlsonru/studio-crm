@@ -87,13 +87,22 @@ export function CreateLessonModal() {
       return;
     }
 
+    const timeStart = (formData.timeStart as string).split(':');
+    const timeEnd = (formData.timeEnd as string).split(':');
+
     createLesson({
       title: formData.title as string,
       teacher: formData.teacher as string,
       location: formData.location as string,
       day: +formData.day,
-      timeStart: +(formData.timeStart as string).replace(':', ''),
-      timeEnd: +(formData.timeEnd as string).replace(':', ''),
+      timeStart: {
+        hh: +timeStart[0],
+        min: +timeStart[1],
+      },
+      timeEnd: {
+        hh: +timeEnd[0],
+        min: +timeEnd[1],
+      },
       activeStudents: 0,
       students: [],
       dateFrom: +Date.parse(formData.dateFrom as string),

@@ -12,13 +12,13 @@ import { useMobile } from '../../shared/hooks/useMobile';
 import { ILessonModel } from '../../shared/models/ILessonModel';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { getDayName } from '../../shared/helpers/getDayName';
-import { getReadbleTime } from '../../shared/helpers/getReadableTime';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { lessonsPageActions } from '../../shared/reducers/lessonsPageSlice';
 import { SearchParamsButton } from '../../shared/components/SearchParamsButton';
 import { CreateLessonModal } from '../../shared/components/CreateLessonModal';
 import { CustomGridToolbar } from '../../shared/components/CustomGridToolbar';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
+import { convertTime } from '../../shared/helpers/convertTime';
 
 function ExtendedToolbar() {
   const [deleteLesson] = useDeleteLessonMutation();
@@ -72,9 +72,7 @@ export function LessonsContent() {
       field: 'timeStart',
       headerName: 'Время',
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams<ILessonModel['timeStart']>) => (
-        getReadbleTime(params.value)
-      ),
+      valueFormatter: (params: GridValueFormatterParams<ILessonModel['timeStart']>) => convertTime(params.value),
     },
     /*
     {
