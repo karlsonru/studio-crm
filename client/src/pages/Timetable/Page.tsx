@@ -9,7 +9,7 @@ import { useMobile } from '../../shared/hooks/useMobile';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { timetablePageActions } from '../../shared/reducers/timetablePageSlice';
 
-export function TimetablePage3() {
+export function TimetablePage() {
   const view = useAppSelector((state) => state.timetablePageReducer.view);
   const currentDate = useAppSelector((state) => state.timetablePageReducer.currentDate);
   const currentMonth = new Date(currentDate).getMonth();

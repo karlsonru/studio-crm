@@ -7,10 +7,9 @@
     "build": "tsc",
     "start": "node -r dotenv/config --experimental-specifier-resolution=node .",
     "prestart": "npm run build",
-    "server": "npm run server --prefix backend",
-    "server_nest": "npm run start:dev --prefix backend_nest",
+    "server": "npm run start:dev --prefix backend",
     "client": "npm run start --prefix client",
-    "dev": "concurrently \"npm run server_nest\" \"npm run client\""
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "repository": {
     "type": "git",

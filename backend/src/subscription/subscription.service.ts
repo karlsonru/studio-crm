@@ -4,7 +4,7 @@ import { Model, QueryOptions, mongo } from 'mongoose';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { SubscriptionEntity } from './entities/subscription.entity';
-import { SubscriptionModel, SubscriptionDocument } from '../schemas/';
+import { SubscriptionModel, SubscriptionDocument } from '../schemas';
 import { IFilterQuery } from '../shared/IFilterQuery';
 
 @Injectable()
