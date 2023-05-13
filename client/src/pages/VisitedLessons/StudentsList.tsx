@@ -2,13 +2,16 @@ import { FormEvent } from 'react';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import Button from '@mui/material/Button';
 import { VisitStatusButton } from './VisitStatusButton';
+import { SuccessButton } from '../../shared/components/SuccessButton';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { IStudentModel } from '../../shared/models/IStudentModel';
 import { ILessonModel } from '../../shared/models/ILessonModel';
 import {
-  useGetLessonQuery, useCreateVisitMutation, useFindVisitsQuery, usePatchVisitMutation,
+  useGetLessonQuery,
+  useCreateVisitMutation,
+  useFindVisitsQuery,
+  usePatchVisitMutation,
 } from '../../shared/api';
 
 interface IStudentsListItem {
@@ -111,17 +114,7 @@ export function StudentsList({
       { isVisited && <StudentsListVisited lessonId={lesson._id} /> }
       { !isVisited && <StudentsListFuture lessonId={lesson._id} /> }
 
-      <Button
-        type='submit'
-        variant='contained'
-        color='success'
-        sx={{
-          float: 'right',
-          marginRight: '1rem',
-        }}
-      >
-        {isVisited ? 'Обновить' : 'Отметить'}
-      </Button>
+      <SuccessButton content={isVisited ? 'Обновить' : 'Отметить'} props={{ sx: { float: 'right', marginRight: '1rem' } }} />
     </form>
   );
 }
