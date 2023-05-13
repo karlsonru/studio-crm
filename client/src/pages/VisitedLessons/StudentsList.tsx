@@ -3,7 +3,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import { VisitStatusButton } from './VisitStatusButton';
-import { SuccessButton } from '../../shared/components/SuccessButton';
+import { SubmitButton } from '../../shared/components/SubmitButton';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { IStudentModel } from '../../shared/models/IStudentModel';
 import { ILessonModel } from '../../shared/models/ILessonModel';
@@ -114,7 +114,7 @@ export function StudentsList({
       { isVisited && <StudentsListVisited lessonId={lesson._id} /> }
       { !isVisited && <StudentsListFuture lessonId={lesson._id} /> }
 
-      <SuccessButton content={isVisited ? 'Обновить' : 'Отметить'} props={{ sx: { float: 'right', marginRight: '1rem' } }} />
+      <SubmitButton content={isVisited ? 'Обновить' : 'Отметить'} props={{ sx: { float: 'right', marginRight: '1rem' } }} />
     </form>
   );
 }

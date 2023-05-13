@@ -11,9 +11,10 @@ import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/system/Stack';
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
-import { useCreateSubscriptionTemplateMutation } from '../api';
-import { useMobile } from '../hooks/useMobile';
 import { NumberField } from './NumberField';
+import { FormContentColumn } from './FormContentColumn';
+import { SubmitButton } from './SubmitButton';
+import { useCreateSubscriptionTemplateMutation } from '../api';
 
 function validateForm(formData: { [key: string]: FormDataEntryValue }) {
   if (!formData.title || (formData.title as string).trim().length < 3) {
@@ -28,7 +29,6 @@ function validateForm(formData: { [key: string]: FormDataEntryValue }) {
 }
 
 export function CreateSubscriptionTemplateModal() {
-  const isMobile = useMobile();
   const [searchParams, setSearchParams] = useSearchParams();
   const [
     createSubscriptionTemplate,
@@ -93,9 +93,10 @@ export function CreateSubscriptionTemplateModal() {
   return (
     <Dialog open={searchParams.has('create-subscription-template')} onClose={() => setSearchParams('')}>
       <DialogTitle>Добавить шаблон</DialogTitle>
+
       <DialogContent>
         <form onSubmit={submitHandler}>
-          <Stack py={1} direction="column" spacing={2} width={isMobile ? 'auto' : 500}>
+          <FormContentColumn>
             <TextField
               variant="outlined"
               name="title"
@@ -129,7 +130,11 @@ export function CreateSubscriptionTemplateModal() {
                   minValue={1}
                 />
 
-                <Select name="period" defaultValue="month" sx={{ flexGrow: 1, minWidth: '115px' }}>
+                <Select
+                  name="period"
+                  defaultValue="month"
+                  sx={{ flexGrow: 1, minWidth: '115px' }}
+                >
                   <MenuItem value="day">Дней</MenuItem>
                   <MenuItem value="week">Недель</MenuItem>
                   <MenuItem value="month">Месяцев</MenuItem>
@@ -138,15 +143,17 @@ export function CreateSubscriptionTemplateModal() {
 
             </FormControl>
 
-            </Stack>
+          </FormContentColumn>
+
           <DialogActions sx={{ paddingRight: '0' }}>
             <Button autoFocus variant='contained' color='error' onClick={() => setSearchParams('')}>
               Закрыть
             </Button>
-            <Button type='submit' variant='contained' color='success'>Подтвердить</Button>
+            <SubmitButton content='Подтвердить' />
           </DialogActions>
+
         </form>
       </DialogContent>
-    </Dialog>
+   </Dialog>
   );
 }

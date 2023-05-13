@@ -16,8 +16,9 @@ import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import DialogActions from '@mui/material/DialogActions';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import IconButton from '@mui/material/IconButton';
+import { SubmitButton } from './SubmitButton';
+import { FormContentColumn } from './FormContentColumn';
 import { useCreateStudentMutation } from '../api';
 
 function NewContact({ idx, handler }: { idx: number, handler: () => void }) {
@@ -52,7 +53,6 @@ function validateForm(formData: { [key: string]: FormDataEntryValue }) {
 }
 
 export function CreateStudentModal() {
-  const isMobile = useMediaQuery('(max-width: 767px)');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [createStudent, { isSuccess, isError, data }] = useCreateStudentMutation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -114,9 +114,10 @@ export function CreateStudentModal() {
   return (
     <Dialog open={searchParams.has('create-student')} onClose={() => setSearchParams('')}>
       <DialogTitle>Добавить ученика</DialogTitle>
+
       <DialogContent>
         <form onSubmit={submitHandler}>
-          <Stack py={1} direction="column" spacing={2} width={isMobile ? 'auto' : 500}>
+          <FormContentColumn>
             <TextField
               variant="outlined"
               name="fullname"
@@ -146,24 +147,31 @@ export function CreateStudentModal() {
 
             <hr/>
             {contacts.map((idx) => <NewContact key={`contact${idx}`} idx={idx} handler={deleteContact} />)}
-            {!formValidation.hasContacts && <FormHelperText error>
-              Заполните хотя бы один контакт</FormHelperText>}
-            {!formValidation.validPhone && <FormHelperText error>
-              Проверьте введённый телефон</FormHelperText>}
+
+            {!formValidation.hasContacts && <FormHelperText error children={'Заполните хотя бы один контакт'} />}
+            {!formValidation.validPhone && <FormHelperText error children={'Проверьте введённый телефон'} />}
+
             <Button variant="outlined" onClick={addContact}>Добавить контакт</Button>
             <hr/>
 
             <InputLabel>Комментарий</InputLabel>
             <TextareaAutosize name="comment" minRows={5} />
-          </Stack>
+
+          </FormContentColumn>
 
           <DialogActions sx={{ paddingRight: '0' }}>
-            <Button autoFocus variant='contained' color='error' onClick={() => setSearchParams('')}>
+            <Button
+              autoFocus
+              variant='contained'
+              color='error'
+              onClick={() => setSearchParams('')}
+            >
               Закрыть
             </Button>
-            <Button type='submit' variant='contained' color='success'>Подтвердить</Button>
+            <SubmitButton content={'Подтвердить'} />
           </DialogActions>
         </form>
+
       </DialogContent>
     </Dialog>
   );

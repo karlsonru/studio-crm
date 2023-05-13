@@ -12,8 +12,9 @@ import Stack from '@mui/system/Stack';
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import { usePatchSubscriptionTemplateMutation, useGetSubscriptionTemplatesQuery } from '../api';
-import { useMobile } from '../hooks/useMobile';
 import { NumberField } from './NumberField';
+import { SubmitButton } from './SubmitButton';
+import { FormContentColumn } from './FormContentColumn';
 
 function validateForm(formData: { [key: string]: FormDataEntryValue }) {
   if (!formData.title || (formData.title as string).trim().length < 3) {
@@ -28,7 +29,7 @@ function validateForm(formData: { [key: string]: FormDataEntryValue }) {
 }
 
 function calculateDuration(period: string, duration: number) {
-  const day = 86400000; // длительность дня в милисекундах
+  const day = 86_400_000; // длительность дня в милисекундах
   switch (period) {
     case 'month':
       return duration * day * 30;
@@ -42,7 +43,6 @@ function calculateDuration(period: string, duration: number) {
 }
 
 export function UpdateSubscriptionTemplateModal() {
-  const isMobile = useMobile();
   const [searchParams, setSearchParams] = useSearchParams();
   const { data: templateEdit } = useGetSubscriptionTemplatesQuery(undefined, {
     selectFromResult: ({ data }) => ({
@@ -105,7 +105,7 @@ export function UpdateSubscriptionTemplateModal() {
       <DialogTitle>Редактировать шаблон</DialogTitle>
       <DialogContent>
         <form onSubmit={submitHandler}>
-          <Stack py={1} direction="column" spacing={2} width={isMobile ? 'auto' : 500}>
+          <FormContentColumn>
             <TextField
               variant="outlined"
               name="title"
@@ -140,10 +140,14 @@ export function UpdateSubscriptionTemplateModal() {
                   label="Длительность"
                   error={!formValidation.duration}
                   minValue={1}
-                  defaultValue={Math.floor(templateEdit.duration / 86400000)}
+                  defaultValue={Math.floor(templateEdit.duration / 86_400_000)}
                 />
 
-                <Select name="period" defaultValue="day" sx={{ flexGrow: 1, minWidth: '115px' }}>
+                <Select
+                  name="period"
+                  defaultValue="day"
+                  sx={{ flexGrow: 1, minWidth: '115px' }}
+                >
                   <MenuItem value="day">Дней</MenuItem>
                   <MenuItem value="week">Недель</MenuItem>
                   <MenuItem value="month">Месяцев</MenuItem>
@@ -152,13 +156,15 @@ export function UpdateSubscriptionTemplateModal() {
 
             </FormControl>
 
-            </Stack>
+          </FormContentColumn>
+
           <DialogActions sx={{ paddingRight: '0' }}>
             <Button autoFocus variant='contained' color='error' onClick={() => setSearchParams('')}>
               Закрыть
             </Button>
-            <Button type='submit' variant='contained' color='success'>Подтвердить</Button>
+            <SubmitButton content='Подтвердить' />
           </DialogActions>
+
         </form>
       </DialogContent>
     </Dialog>

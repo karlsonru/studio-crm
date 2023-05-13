@@ -1,11 +1,11 @@
 import Button, { ButtonProps } from '@mui/material/Button';
 
-interface ISuccessButton {
+interface ISubmitButton {
   content: string;
   props?: ButtonProps;
 }
 
-export function SuccessButton({ content, props }: ISuccessButton) {
+export function SubmitButton({ content, props }: ISubmitButton) {
   return (
     <Button
       type='submit'

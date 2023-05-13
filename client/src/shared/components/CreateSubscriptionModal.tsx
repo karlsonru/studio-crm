@@ -1,12 +1,12 @@
 import { FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { format } from 'date-fns';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
-import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
@@ -14,20 +14,18 @@ import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Autocomplete from '@mui/material/Autocomplete';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { FormContentColumn } from './FormContentColumn';
+import { SubmitButton } from './SubmitButton';
 import {
   useCreateSubscriptionMutation,
   useGetStudentsQuery,
   useGetSubscriptionTemplatesQuery,
   useGetLessonsQuery,
 } from '../api';
-
-function getDefaultDate(now: Date, shift?: number) {
-  return `${now.getFullYear() + (shift ?? 0)}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
-}
+import { useMobile } from '../hooks/useMobile';
 
 export function CreateSubscriptionModal() {
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  const isMobile = useMobile();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [createSubsciption] = useCreateSubscriptionMutation();
@@ -71,9 +69,10 @@ export function CreateSubscriptionModal() {
   return (
     <Dialog open={searchParams.has('create-subscription')} onClose={() => setSearchParams('')}>
       <DialogTitle>Оформить абонемент</DialogTitle>
+
       <DialogContent>
         <form onSubmit={handleSubmit}>
-          <Stack py={1} direction="column" spacing={2} width={isMobile ? 'auto' : 500}>
+          <FormContentColumn>
             <Autocomplete
               options={templatesData.payload}
               getOptionLabel={(option) => option.title}
@@ -96,9 +95,9 @@ export function CreateSubscriptionModal() {
               <InputLabel>Способ оплаты</InputLabel>
               <Select
                 name="paymentMethod"
-                required
                 label="Способ оплаты"
                 defaultValue="card"
+                required
               >
                 <MenuItem value='cash'>Наличные</MenuItem>
                 <MenuItem value='card'>Карта</MenuItem>
@@ -111,9 +110,9 @@ export function CreateSubscriptionModal() {
               <TextField
                 name='dateFrom'
                 type='date'
-                required
-                defaultValue={getDefaultDate(new Date())}
                 label={isMobile ? 'Начало' : ''}
+                defaultValue={format(new Date(), 'Y-MM-dd')}
+                required
                 InputProps={{
                   endAdornment: <InputAdornment position='end'>{!isMobile && 'Начало'}</InputAdornment>,
                 }}
@@ -121,14 +120,15 @@ export function CreateSubscriptionModal() {
                 />
             </FormControl>
 
-            <DialogActions sx={{ paddingRight: '0' }}>
-              <Button autoFocus variant='contained' color='error' onClick={() => setSearchParams('')}>
-                Закрыть
-              </Button>
-              <Button type='submit' variant='contained' color='success'>Подтвердить</Button>
-            </DialogActions>
+          </FormContentColumn>
 
-          </Stack>
+          <DialogActions sx={{ paddingRight: '0' }}>
+            <Button autoFocus variant='contained' color='error' onClick={() => setSearchParams('')}>
+              Закрыть
+            </Button>
+            <SubmitButton content='Подтвердить' />
+          </DialogActions>
+
          </form>
        </DialogContent>
     </Dialog>

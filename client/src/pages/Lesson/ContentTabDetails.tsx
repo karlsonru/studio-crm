@@ -21,7 +21,7 @@ import {
   usePatchLessonMutation,
 } from '../../shared/api';
 import { useMobile } from '../../shared/hooks/useMobile';
-import { SuccessButton } from '../../shared/components/SuccessButton';
+import { SubmitButton } from '../../shared/components/SubmitButton';
 import { convertTime } from '../../shared/helpers/convertTime';
 
 function validateFrom(formData: { [key: string]: FormDataEntryValue }) {
@@ -65,8 +65,6 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
     teacher: true,
     dateTo: true,
   });
-
-  console.log(lessonDetails);
 
   if (!lessonDetails?.payload) {
     return null;
@@ -322,7 +320,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
           </Stack>
         </FormControl>
 
-        <SuccessButton
+        <SubmitButton
           content={'Подтвердить'}
           props={{
             disabled: !isEdit,
