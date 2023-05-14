@@ -7,6 +7,7 @@ import { LessonsPage } from './pages/Lessons';
 import { LessonPage } from './pages/Lesson';
 import { VisititedLessonsPage } from './pages/VisitedLessons';
 import { StudentsPage } from './pages/Students';
+import { StudentPage } from './pages/Student';
 import { SubscriptionsPageLayout, SubscriptionsTemplatePage, SubscriptionsPage } from './pages/Subscriptions';
 
 function Hello() {
@@ -25,7 +26,10 @@ export function Router() {
 
         <Route path='/visits' element={<VisititedLessonsPage />} />
 
-        <Route path='/students' element={<StudentsPage />} />
+        <Route path='/students'>
+          <Route index element={<StudentsPage />} />
+          <Route path=':studentId' element={<StudentPage />} />
+        </Route>
 
         <Route path='/lessons'>
           <Route index element={<LessonsPage />} />

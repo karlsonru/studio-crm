@@ -23,6 +23,7 @@ import {
 import { useMobile } from '../../shared/hooks/useMobile';
 import { SubmitButton } from '../../shared/components/SubmitButton';
 import { convertTime } from '../../shared/helpers/convertTime';
+import { FormContentColumn } from '../../shared/components/FormContentColumn';
 
 function validateFrom(formData: { [key: string]: FormDataEntryValue }) {
   if ((formData.title as string).trim().length < 3) {
@@ -122,12 +123,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack
-        py={1}
-        direction='column'
-        spacing={2}
-        width={isMobile ? 'auto' : 500}
-      >
+      <FormContentColumn>
         <Stack
           direction='row'
           justifyContent='end'
@@ -327,7 +323,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
           }}
         />
 
-      </Stack>
+      </FormContentColumn>
     </form>
   );
 }

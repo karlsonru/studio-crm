@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   DataGrid,
   GridActionsCellItem,
@@ -45,6 +46,7 @@ function ExtendedToolbar() {
 export function StudentsContent() {
   const isMobile = useMobile();
   const actions = useActionCreators(studentsPageActions);
+  const navigate = useNavigate();
 
   const { data, isLoading, error } = useGetStudentsQuery();
 
@@ -113,10 +115,11 @@ export function StudentsContent() {
   return (
     <DataGrid
       autoHeight
+      disableColumnMenu
       columns={isMobile ? [columns[0]] : columns}
       rows={data.payload}
       getRowId={(item) => item._id}
-      disableColumnMenu
+      onRowDoubleClick={((params: GridRowParams<IStudentModel>) => navigate(`./${params.id}`))}
       components={{
         Toolbar: ExtendedToolbar,
       }}
