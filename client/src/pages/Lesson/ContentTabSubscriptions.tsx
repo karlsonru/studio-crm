@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { format } from 'date-fns';
 import TableCell from '@mui/material/TableCell';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography/Typography';
@@ -7,7 +8,6 @@ import { BasicTable } from '../../shared/components/BasicTable';
 import { useMobile } from '../../shared/hooks/useMobile';
 import { useFindSubscriptionsQuery } from '../../shared/api';
 import { ISubscriptionModel } from '../../shared/models/ISubscriptionModel';
-import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
 import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 
 interface IContentSubscriptions {
@@ -20,7 +20,7 @@ interface IShowSubscriptions extends IContentSubscriptions {
 
 function CreateRowMobile(subscription: ISubscriptionModel) {
   return (
-    <TableRow key={subscription._id}>
+    <TableRow key={subscription._id} hover>
       <TableCell>
         {subscription.student.fullname}
       </TableCell>
@@ -44,7 +44,7 @@ function CreateRow(subscription: ISubscriptionModel) {
         {subscription.visitsLeft}
       </TableCell>
       <TableCell>
-        {dateValueFormatter(subscription.dateTo)}
+        {format(subscription.dateTo, 'Y-MM-dd')}
       </TableCell>
       <TableCell>
         {subscription.template.price}

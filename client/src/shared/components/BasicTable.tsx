@@ -4,12 +4,26 @@ import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
-import TableRow from '@mui/material/TableRow';
+import TableRow, { TableRowProps } from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 
 interface IBasicTable {
   headers: string[],
   rows: ReactNode[]
+}
+
+interface ICreateRow {
+  key: string;
+  content: Array<string | number | ReactNode>;
+  props?: TableRowProps;
+}
+
+export function CreateRow({ key, content, props }: ICreateRow) {
+  return (
+    <TableRow key={key} hover {...props}>
+      { content.map((item, idx) => <TableCell key={idx}>{item}</TableCell>) }
+    </TableRow>
+  );
 }
 
 export function BasicTable({ headers, rows }: IBasicTable) {

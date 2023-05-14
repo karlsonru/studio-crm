@@ -1,5 +1,7 @@
 export function getTodayTimestamp() {
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  return +today;
+  const today = new Date();
+  today.setHours(0);
+  today.setMinutes(0);
+  today.setMilliseconds(0);
+  return today.getTime();
 }
