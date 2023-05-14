@@ -25,7 +25,6 @@
     ]
   },
   "dependencies": {
-    "@aldabil/react-scheduler": "^2.7.9",
     "@fontsource/roboto": "^4.5.8",
     "@mui/icons-material": "^5.10.9",
     "@mui/lab": "^5.0.0-alpha.121",
