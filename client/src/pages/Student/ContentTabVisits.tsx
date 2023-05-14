@@ -8,17 +8,33 @@ import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import Stack from '@mui/material/Stack';
+import Divider from '@mui/material/Divider';
 import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 import { useFindSubscriptionsQuery, useFindVisitsQuery } from '../../shared/api';
 import { BasicTable, CreateRow } from '../../shared/components/BasicTable';
 import { PrimaryButton } from '../../shared/components/PrimaryButton';
 import { IVisitModel, VisitStatus, BillingStatus } from '../../shared/models/IVisitModel';
 import { MODAL_FORM_WIDTH } from '../../shared/constants';
+import { useMobile } from '../../shared/hooks/useMobile';
 
 interface IVisitsStatistic {
   visitedLessons: Array<IVisitModel>;
   studentId: string;
   startPeriod: number;
+}
+
+function CardContentItem({ title, value }: { title: string, value: string | number }) {
+  return (
+    <Stack direction="row" justifyContent="space-between" my={1} >
+      <Typography>
+        { title }
+      </Typography>
+      <Typography sx={{ fontWeight: 'bold' }}>
+        { value }
+      </Typography>
+  </Stack>
+  );
 }
 
 // TODO переделать статистику на всплываюшее окно при наведении на заголовок с именем? Popover?
@@ -76,6 +92,27 @@ function VisitsStatistic({ visitedLessons, studentId, startPeriod }: IVisitsStat
             </ListItem>
           )) }
         </List>
+      </CardContent>
+    </Card>
+  );
+
+  const isMobile = useMobile();
+
+  return (
+    <Card variant="outlined" sx={{ width: '325px', marginRight: isMobile ? 0 : '0.5rem', marginBottom: '0.5rem' }}>
+      <CardHeader
+        title={`Статистика ${studentName}`}
+        subheader={period}
+      />
+      <CardContent>
+        {
+          Object.values(statistic).map((parameter) => (
+              <>
+                <CardContentItem title={parameter.name} value={parameter.value} />
+                <Divider />
+              </>
+          ))
+        }
       </CardContent>
     </Card>
   );

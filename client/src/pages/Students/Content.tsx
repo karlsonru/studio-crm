@@ -19,6 +19,8 @@ import { CreateStudentModal } from '../../shared/components/CreateStudentModal';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { studentsPageActions } from '../../shared/reducers/studentsPageSlice';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
+import { Loading } from '../../shared/components/Loading';
+import { ShowError } from '../../shared/components/ShowError';
 
 function ExtendedToolbar() {
   const [deleteStudent] = useDeleteStudentMutation();
@@ -104,12 +106,16 @@ export function StudentsContent() {
     },
   ], [deleteStudentHandler, dateValueFormatter]);
 
-  if (isLoading || !data?.payload) {
-    return null;
+  if (isLoading) {
+    return <Loading />;
   }
 
   if (error) {
-    return <h1>Error!!! </h1>;
+    return <ShowError details={error} />;
+  }
+
+  if (!data?.payload) {
+    return null;
   }
 
   return (

@@ -23,10 +23,7 @@ export class StudentController {
     const created = await this.service.create(createStudentDto);
 
     if (created === null) {
-      throw new HttpException(
-        { message: 'Уже существует' },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
     }
 
     return {
@@ -37,6 +34,7 @@ export class StudentController {
 
   @Get()
   async findAll() {
+    throw new Error('Моя ошибка');
     return {
       message: 'success',
       payload: await this.service.findAll(),
