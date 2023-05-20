@@ -1,7 +1,8 @@
 import Button, { ButtonProps } from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import { set } from 'date-fns';
-import { DateSwitcher } from './DateSwitcher';
+// import { DateSwitcher } from './DateSwitcher';
+import { DateSwitcherTimetable } from './DateSwitcherTimetable';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { timetablePageActions } from '../../shared/reducers/timetablePageSlice';
@@ -30,7 +31,7 @@ export function PageHeader() {
 
   return (
     <Stack direction="row" justifyContent="space-between">
-      <DateSwitcher />
+      <DateSwitcherTimetable />
 
       <Stack direction="row">
         <TextButton

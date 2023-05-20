@@ -34,7 +34,6 @@ export class StudentController {
 
   @Get()
   async findAll() {
-    throw new Error('Моя ошибка');
     return {
       message: 'success',
       payload: await this.service.findAll(),

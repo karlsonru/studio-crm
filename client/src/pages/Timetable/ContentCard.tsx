@@ -14,9 +14,10 @@ import { convertTime } from '../../shared/helpers/convertTime';
 
 const CARD_STYLE = {
   left: 0,
-  width: '100%',
+  width: '98%',
   border: '1px solid black',
   cursor: 'pointer',
+  margin: '0.1rem',
 };
 
 const CARD_STYLE_MOBILE = {

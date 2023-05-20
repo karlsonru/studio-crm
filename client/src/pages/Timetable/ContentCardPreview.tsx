@@ -39,6 +39,7 @@ export function ContentCardPreview({ anchorEl, content, handleClose }: IContentC
 
   return (
     <Popover
+      disableAutoFocus
       open={Boolean(anchorEl)}
       anchorEl={anchorEl}
       onClose={handleClose}
