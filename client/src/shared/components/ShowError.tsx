@@ -45,9 +45,9 @@ interface IShowError {
 
 export function ShowError({ details }: IShowError) {
   const message = getErrorMsg(details);
+
   return (
     <Stack
-      justifyContent='center'
       alignItems='center'
       gap={1}
       height='100%'

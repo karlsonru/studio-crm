@@ -8,6 +8,7 @@ import { LessonPage } from './pages/Lesson';
 import { VisititedLessonsPage } from './pages/VisitedLessons';
 import { StudentsPage } from './pages/Students';
 import { StudentPage } from './pages/Student';
+import { NotFoundPage } from './pages/NotFound';
 import { SubscriptionsPageLayout, SubscriptionsTemplatePage, SubscriptionsPage } from './pages/Subscriptions';
 
 function Hello() {
@@ -44,6 +45,8 @@ export function Router() {
         <Route path='/collaborators' element={<Hello />} />
         <Route path='/finance' element={<Hello />} />
       </Route>
+
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   </BrowserRouter>
   );
