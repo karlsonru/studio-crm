@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ILessonModel } from '../models/ILessonModel';
+import { getTodayTimestamp } from '../helpers/getTodayTimestamp';
 
 export interface IVisit {
   _id?: string;
@@ -22,7 +23,7 @@ const initialState: IVisitPageState = {
   lessonsIds: [],
   currentLessonId: '',
   isCurrentLessonVisited: false,
-  currentDateTimestamp: 0,
+  currentDateTimestamp: getTodayTimestamp(),
   visits: [],
 };
 
