@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import Stack from '@mui/material/Stack';
+import Stack, { StackProps } from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
@@ -46,6 +46,7 @@ interface IDateSwitcher {
   onRightArrowClick: () => void;
   dateFormatter: (date: Date | number) => string;
   props?: DatePickerProps<Date>;
+  wrapperProps?: StackProps,
 }
 
 export function DateSwitcher({
@@ -55,11 +56,15 @@ export function DateSwitcher({
   onRightArrowClick,
   dateFormatter,
   props,
+  wrapperProps,
 }: IDateSwitcher) {
   const [open, setOpen] = useState(false);
 
   return (
-    <Stack direction="row">
+    <Stack
+      direction="row"
+      {...wrapperProps}
+    >
 
     <IconButton onClick={onLeftArrowClick}>
       <ArrowBackIosIcon />

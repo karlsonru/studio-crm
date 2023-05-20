@@ -1,21 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Input from '@mui/material/Input';
+import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import Stack from '@mui/system/Stack';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import Typography from '@mui/material/Typography';
 import { LessonsList } from './LessonsList';
 import { LessonInfo } from './LessonInfo';
-import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { visitsPageActions } from '../../shared/reducers/visitsPageSlice';
-import { getDayName } from '../../shared/helpers/getDayName';
 import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
+import { DateSwitcher } from '../../shared/components/DateSwitcher';
 
-function DaySwitcher() {
+function dateFormatterDay(date: Date | number) {
+  return format(date, 'EEEE, dd MMMM', { locale: ru, weekStartsOn: 1 });
+}
+
+function DateSwitcherVisitedLesson() {
   const actions = useActionCreators(visitsPageActions);
   const [searchParams, setSearchParams] = useSearchParams();
   const [date, setDate] = useState(+(searchParams.get('date') ?? getTodayTimestamp()));
@@ -25,36 +26,32 @@ function DaySwitcher() {
     setSearchParams({ date: date.toString() });
   }, [date]);
 
-  const nextDate = () => {
+  const goNextDate = () => {
     setDate(() => date + 86_400_000);
   };
 
-  const prevDate = () => {
+  const goPrevDate = () => {
     setDate(() => date - 86_400_000);
   };
 
-  const dateString = dateValueFormatter(date);
+  const goSelectedDate = (value: number | Date | null) => {
+    setDate(() => (value as Date).getTime());
+  };
 
   return (
-    <Stack direction="row" alignItems="center" justifyContent="start">
-      <ArrowBackIosNewIcon onClick={prevDate} fontSize="medium" />
-        <Input
-          value={dateString}
-          readOnly={true}
-          size="small"
-          inputProps={{
-            style: {
-              textAlign: 'center',
-              minWidth: '90px',
-              maxWidth: '7rem',
-            },
-          }}
-        />
-      <ArrowForwardIosIcon onClick={nextDate} fontSize="medium" />
-      <Typography variant="h6" marginLeft="1rem">
-        { getDayName(new Date(date).getDay()) }
-      </Typography>
-    </Stack>
+    <DateSwitcher
+      date={new Date(date)}
+      onChange={goSelectedDate}
+      onLeftArrowClick={goPrevDate}
+      onRightArrowClick={goNextDate}
+      dateFormatter={dateFormatterDay}
+      wrapperProps={{
+        justifyContent: 'space-between',
+        sx: {
+          width: '300px',
+        },
+      }}
+    />
   );
 }
 
@@ -83,7 +80,7 @@ export function VisititedLessonsPage() {
   return (
     <>
       <header style={{ margin: '1rem 0' }}>
-        <DaySwitcher />
+        <DateSwitcherVisitedLesson />
       </header>
       <Stack direction="row" flexWrap="wrap" spacing={2} >
         <LessonsList />
