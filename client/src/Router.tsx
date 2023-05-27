@@ -21,7 +21,6 @@ export function Router() {
     <Routes>
       <Route path='/' element={<Layout />} >
         <Route path='/auth' element={<AuthPage />} />
-        <Route path='/users' element={<UsersPage />} />
 
         <Route path='/timetable' element={<TimetablePage />} />
 
@@ -42,7 +41,7 @@ export function Router() {
           <Route path=':templates' element={<SubscriptionsTemplatePage />} />
         </Route>
 
-        <Route path='/collaborators' element={<Hello />} />
+        <Route path='/collaborators' element={<UsersPage />} />
         <Route path='/finance' element={<Hello />} />
       </Route>
 

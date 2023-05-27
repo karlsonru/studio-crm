@@ -1,76 +1,118 @@
-import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
+import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { format } from 'date-fns';
 import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import Card from '@mui/material/Card';
+import CardHeader from '@mui/material/CardHeader';
+import IconButton from '@mui/material/IconButton';
+import CardActionArea from '@mui/material/CardActionArea';
+import CardContent from '@mui/material/CardContent';
+import Divider from '@mui/material/Divider';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useMobile } from '../../shared/hooks/useMobile';
+import { useDocTitle } from '../../shared/hooks/useDocTitle';
+import { usePageTitle } from '../../shared/hooks/usePageTitle';
+import { useDeleteUserMutation, useGetUsersQuery } from '../../shared/api';
+import { IUserModel } from '../../shared/models/IUserModel';
+import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
+import { Loading } from '../../shared/components/Loading';
+import { ShowError } from '../../shared/components/ShowError';
+import { SearchParamsButton } from '../../shared/components/SearchParamsButton';
+import { CreateSubscriptionTemplateModal } from '../../shared/components/CreateSubscriptionTemplateModal';
+import { UpdateSubscriptionTemplateModal } from '../../shared/components/UpdateSubscriptionTemplateModal';
 
-const theme = createTheme();
+function CardContentItem({ title, value }: { title: string, value: string | number }) {
+  return (
+    <Stack direction="row" justifyContent="space-between" my={1} >
+      <Typography>
+        { title }
+      </Typography>
+      <Typography sx={{ fontWeight: 'bold' }}>
+        { value }
+      </Typography>
+  </Stack>
+  );
+}
 
-export default function UsersPage() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+function AddCard({ cardDetails }: { cardDetails: IUserModel }) {
+  const [, setSearchParams] = useSearchParams();
+  const isMobile = useMobile();
+
+  const [deleteCard] = useDeleteUserMutation();
+  const [isModalOpen, setModalOpen] = useState(false);
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  id="email"
-                  label="Электронная почта"
-                  name="email"
-                  autoComplete="email"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="Пароль"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                />
-              </Grid>
-            </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Войти
-            </Button>
-          </Box>
-        </Box>
-      </Container>
-    </ThemeProvider>
+    <>
+      <Card variant="outlined" sx={{ width: '325px', marginRight: isMobile ? 0 : '0.5rem', marginBottom: '0.5rem' }}>
+        <CardHeader title={cardDetails.fullname} action={
+          <IconButton onClick={() => setModalOpen(true)}>
+            <DeleteIcon />
+          </IconButton>
+          } />
+        <CardActionArea onClick={() => setSearchParams({ 'update-user': 'true', id: cardDetails._id })}>
+          <CardContent>
+            <CardContentItem title="Телефон" value={'XXX'} />
+            <Divider />
+            <CardContentItem title="Роль" value={cardDetails.role} />
+            <Divider />
+            <CardContentItem title="Ставка" value={500} />
+            <Divider />
+            <CardContentItem title="День рождения" value={format(cardDetails.birthday, 'dd-MM-yyyy')} />
+          </CardContent>
+        </CardActionArea>
+      </Card>
+
+      <ConfirmationDialog
+        title='Удалить сотрудника'
+        contentEl={<DeleteDialogText name={cardDetails.fullname} />}
+        isOpen={isModalOpen}
+        setModalOpen={setModalOpen}
+        callback={() => deleteCard(cardDetails._id)}
+      />
+    </>
+  );
+}
+
+export function UsersPage() {
+  useDocTitle('Сотрудники');
+  usePageTitle('Сотрудники');
+
+  const {
+    data: responseUsers,
+    isLoading,
+    isError,
+    error,
+  } = useGetUsersQuery();
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isError) {
+    return <ShowError details={error} />;
+  }
+
+  if (!responseUsers) {
+    return null;
+  }
+
+  const employeeCards = responseUsers.payload.map(
+    (user) => <AddCard key={user._id} cardDetails={user} />,
+  );
+
+  return (
+    <>
+      <header style={{ marginBottom: '1rem' }}>
+        <CreateSubscriptionTemplateModal />
+        <UpdateSubscriptionTemplateModal />
+        <SearchParamsButton title='Добавить' param='create-user'/>
+      </header>
+
+      <Grid container maxWidth='100%' margin={0}>
+        { employeeCards }
+      </Grid>
+    </>
   );
 }
