@@ -6,3 +6,4 @@ export * from './subscriptionApi';
 export * from './subscriptionTemplatesApi';
 export * from './visitsApi';
 export * from './visitStatusApi';
+export * from './statisticApi';
