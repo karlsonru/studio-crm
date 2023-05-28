@@ -129,7 +129,7 @@ export function ContentStudents({ lessonId }: { lessonId: string }) {
         <CardContent>
           <CardContentItem
             title="Телефон"
-            value={data.payload.teacher.login} />
+            value={data.payload.teacher.phone} />
         </CardContent>
 
       </Card>

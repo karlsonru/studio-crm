@@ -1,25 +1,14 @@
-import { IsString, IsNotEmpty, MinLength, IsMongoId, IsNumber } from 'class-validator';
-import { ObjectId } from 'mongodb';
+import { IsString, IsNotEmpty, MinLength, IsNumber, IsOptional } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
-  @MinLength(5)
-  login: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(5)
-  password: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(2)
+  @MinLength(3)
   fullname: string;
 
+  @IsString()
   @IsNotEmpty()
-  @IsMongoId()
-  role: ObjectId;
+  role: string;
 
   @IsNumber()
   @IsNotEmpty()
@@ -28,4 +17,20 @@ export class CreateUserDto {
   @IsNumber()
   @IsNotEmpty()
   phone: number;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(5)
+  @IsOptional()
+  login?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(10)
+  @IsOptional()
+  password?: string;
+
+  @IsOptional()
+  @IsNumber()
+  salary: number;
 }

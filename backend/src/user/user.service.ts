@@ -22,13 +22,14 @@ export class UserService {
       return null;
     }
 
-    const hash = createHash('sha-256');
-    const passHash = hash.update(createUserDto.password);
+    if (createUserDto.password) {
+      const hash = createHash('sha-256');
+      const passHash = hash.update(createUserDto.password);
+      createUserDto.password = passHash.digest('hex');
+    }
 
     const newUser = await this.userModel.create({
       ...createUserDto,
-      password: passHash,
-      birthday: createUserDto.birthday,
       isActive: true,
     });
 

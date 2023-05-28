@@ -12,7 +12,6 @@ export function MongooseClassSerializerInterceptor(
 ): typeof ClassSerializerInterceptor {
   return class Interceptor extends ClassSerializerInterceptor {
     private changePlainObjectToClass(document: PlainLiteralObject) {
-      console.log(document);
       if (!(document instanceof Document)) {
         return document;
       }

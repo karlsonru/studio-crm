@@ -25,7 +25,7 @@ export class User {
     required: true,
     unique: true,
     trim: true,
-    minLength: 2,
+    minLength: 3,
   })
   fullname: string;
 
@@ -59,22 +59,20 @@ export class User {
   @IsOptional()
   @Prop({
     type: String,
-    required: true,
     minLength: 5,
     unique: true,
     trim: true,
   })
-  login: string;
+  login?: string;
 
   @IsOptional()
   @Prop({
     type: String,
-    required: true,
-    minLength: 5,
+    minLength: 10,
     trim: true,
   })
   @Exclude()
-  password: string;
+  password?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
