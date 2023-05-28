@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, QueryOptions, mongo } from 'mongoose';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
-import { SubscriptionEntity } from './entities/subscription.entity';
 import { SubscriptionModel, SubscriptionDocument } from '../schemas';
 import { IFilterQuery } from '../shared/IFilterQuery';
 
@@ -18,7 +17,7 @@ export class SubscriptionService {
     this.populateQuery = ['student', 'template', 'lesson'];
   }
 
-  async create(createSubscriptionDto: CreateSubscriptionDto): Promise<SubscriptionEntity> {
+  async create(createSubscriptionDto: CreateSubscriptionDto): Promise<SubscriptionModel> {
     // можно ли как-то проверить на повтор? Как? Имя & дата начала & ID занятие && кол-во
 
     const created = await this.subscriptionModel.create(createSubscriptionDto);
@@ -27,22 +26,22 @@ export class SubscriptionService {
   }
 
   async findAll(
-    query?: IFilterQuery<SubscriptionEntity>,
+    query?: IFilterQuery<SubscriptionModel>,
     options?: QueryOptions,
-  ): Promise<Array<SubscriptionEntity>> {
+  ): Promise<Array<SubscriptionModel>> {
     return await this.subscriptionModel
       .find(query ?? {}, null, options)
       .populate(this.populateQuery);
   }
 
-  async findOne(id: string): Promise<SubscriptionEntity | null> {
+  async findOne(id: string): Promise<SubscriptionModel | null> {
     return await this.subscriptionModel.findById(id).populate(this.populateQuery);
   }
 
   async update(
     id: string,
     updateSubscriptionDto: UpdateSubscriptionDto,
-  ): Promise<SubscriptionEntity | null> {
+  ): Promise<SubscriptionModel | null> {
     const updated = await this.subscriptionModel.findByIdAndUpdate(id, updateSubscriptionDto, {
       new: true,
     });
@@ -51,8 +50,8 @@ export class SubscriptionService {
   }
 
   async updateMany(
-    ids: IFilterQuery<SubscriptionEntity>,
-    update: IFilterQuery<SubscriptionEntity>,
+    ids: IFilterQuery<SubscriptionModel>,
+    update: IFilterQuery<SubscriptionModel>,
   ): Promise<mongo.UpdateResult> {
     const updated = await this.subscriptionModel.updateMany(ids, update);
     return updated;

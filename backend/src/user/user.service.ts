@@ -4,7 +4,6 @@ import { Model } from 'mongoose';
 import { createHash } from 'crypto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserEntity } from './entities/user.entity';
 import { UserModel, UserDocument } from '../schemas';
 
 @Injectable()
@@ -14,7 +13,7 @@ export class UserService {
     private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async create(createUserDto: CreateUserDto): Promise<UserEntity | null> {
+  async create(createUserDto: CreateUserDto): Promise<UserModel | null> {
     const candidate = await this.userModel.find({
       login: createUserDto.login,
     });
@@ -36,15 +35,15 @@ export class UserService {
     return newUser;
   }
 
-  async findAll(): Promise<Array<UserEntity>> {
+  async findAll(): Promise<Array<UserModel>> {
     return await this.userModel.find({});
   }
 
-  async findOne(id: string): Promise<UserEntity | null> {
+  async findOne(id: string): Promise<UserModel | null> {
     return await this.userModel.findById(id);
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserEntity | null> {
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<UserModel | null> {
     const updated = await this.userModel.findByIdAndUpdate(id, updateUserDto, {
       new: true,
     });

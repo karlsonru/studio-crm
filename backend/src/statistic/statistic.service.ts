@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { IFilterQuery } from '../shared/IFilterQuery';
-import { VisitedLessonEntity } from '../visited-lesson/entities/visited-lesson.entity';
 import { VisitedLessonService } from '../visited-lesson/visited-lesson.service';
 import { BillingStatus, VisitStatus } from '../schemas/visitedLesson.schema';
+import { VisitedLessonModel } from '../schemas';
 
 export interface IFindVisitedByStudentWithStatistic {
-  visitedLessons: Array<VisitedLessonEntity>;
+  visitedLessons: Array<VisitedLessonModel>;
   statistic: Record<string, number>;
 }
 
@@ -14,7 +14,7 @@ export class StatisticService {
   constructor(private visitedLessonsService: VisitedLessonService) {}
 
   async calcVisitedLessonsByStudent(
-    query: IFilterQuery<VisitedLessonEntity>,
+    query: IFilterQuery<VisitedLessonModel>,
     studentId: string,
   ): Promise<IFindVisitedByStudentWithStatistic> {
     const visitedLessons = await this.visitedLessonsService.findAll(query);

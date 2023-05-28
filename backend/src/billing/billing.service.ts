@@ -3,11 +3,10 @@ import { logger } from '../shared/logger.middleware';
 import { VisitStatus, BillingStatus, VisitedStudent } from '../schemas/visitedLesson.schema';
 import { VisitedStudent as VisitedStudentDto } from '../visited-lesson/dto/create-visited-lesson.dto';
 import { SubscriptionService } from '../subscription/subscription.service';
-import { VisitedLessonEntity } from '../visited-lesson/entities/visited-lesson.entity';
-import { SubscriptionEntity } from '../subscription/entities/subscription.entity';
+import { VisitedLessonModel, SubscriptionModel } from '../schemas';
 
 interface IVisitedStudentDto extends Omit<VisitedStudentDto, 'subscription'> {
-  subscription: string | null | SubscriptionEntity;
+  subscription: string | null | SubscriptionModel;
 }
 
 interface IVisitedStudentEntity extends Omit<VisitedStudent, 'subscription'> {
@@ -156,7 +155,7 @@ export class BillingService {
 
   async changeBillingStatus(
     updatedVisitedStudents: VisitedStudentDto[],
-    visitedLesson: VisitedLessonEntity,
+    visitedLesson: VisitedLessonModel,
   ) {
     logger.debug(
       `Посещённое занятие: ${visitedLesson._id}. Проверяем обновлённый список посетивших студентов`,
@@ -191,7 +190,7 @@ export class BillingService {
     await this.chargeSubscriptions(updatedStudents, sourceLessonId);
   }
 
-  compareVisits(updatedVisitedStudents: VisitedStudentDto[], visitedLesson: VisitedLessonEntity) {
+  compareVisits(updatedVisitedStudents: VisitedStudentDto[], visitedLesson: VisitedLessonModel) {
     const studentsWithChangedStatuses: Array<IPrevAndUpdatedVisit> = [];
 
     updatedVisitedStudents.forEach((updatedVisitedStudent) => {

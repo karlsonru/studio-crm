@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model, PopulateOptions } from 'mongoose';
-import { VisitedLessonEntity } from './entities/visited-lesson.entity';
 import { CreateVisitedLessonDto } from './dto/create-visited-lesson.dto';
 import { UpdateVisitedLessonDto } from './dto/update-visited-lesson.dto';
 import { VisitedLessonModel, VisitedLessonDocument } from '../schemas';
@@ -31,9 +30,7 @@ export class VisitedLessonService {
     ];
   }
 
-  async create(
-    createVisitedLessonDto: CreateVisitedLessonDto,
-  ): Promise<VisitedLessonEntity | null> {
+  async create(createVisitedLessonDto: CreateVisitedLessonDto): Promise<VisitedLessonModel | null> {
     logger.debug(`
       Обрабатываем запрос на создание нового посещённого занятия по уроку с ID:
       ${createVisitedLessonDto.lesson} за дату 
@@ -84,20 +81,20 @@ export class VisitedLessonService {
     return created;
   }
 
-  async findAll(query?: IFilterQuery<VisitedLessonEntity>): Promise<Array<VisitedLessonEntity>> {
+  async findAll(query?: IFilterQuery<VisitedLessonModel>): Promise<Array<VisitedLessonModel>> {
     return await this.visitedLessonModel
       .find(query ?? {})
       .populate(this.populateQueryVisitedLesson);
   }
 
-  async findOne(id: string): Promise<VisitedLessonEntity | null> {
+  async findOne(id: string): Promise<VisitedLessonModel | null> {
     return await this.visitedLessonModel.findById(id).populate(this.populateQueryVisitedLesson);
   }
 
   async update(
     id: string,
     updateVisitedLessonDto: UpdateVisitedLessonDto,
-  ): Promise<VisitedLessonEntity | null> {
+  ): Promise<VisitedLessonModel | null> {
     logger.debug(`Посещённое занятие: ${id}}. Получен запрос на обновление. Ищем занятие`);
 
     // найдём занятие, которое нужно обновить

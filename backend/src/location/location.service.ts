@@ -4,7 +4,6 @@ import { Model, Types } from 'mongoose';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { LocationModel, LocationDocument } from '../schemas';
-import { LocationEntity } from './entities/location.entity';
 
 @Injectable()
 export class LocationService {
@@ -13,7 +12,7 @@ export class LocationService {
     private readonly locationModel: Model<LocationDocument>,
   ) {}
 
-  async create(createLocationDto: CreateLocationDto): Promise<LocationEntity | null> {
+  async create(createLocationDto: CreateLocationDto): Promise<LocationModel | null> {
     const candidate = await this.locationModel.find({
       $or: [
         {
@@ -38,15 +37,15 @@ export class LocationService {
     return await this.locationModel.create(createLocationDto);
   }
 
-  async findAll(): Promise<Array<LocationEntity>> {
+  async findAll(): Promise<Array<LocationModel>> {
     return await this.locationModel.find({});
   }
 
-  async findOne(id: string): Promise<LocationEntity | null> {
+  async findOne(id: string): Promise<LocationModel | null> {
     return await this.locationModel.findById(id);
   }
 
-  async update(id: string, updateLocationDto: UpdateLocationDto): Promise<LocationEntity | null> {
+  async update(id: string, updateLocationDto: UpdateLocationDto): Promise<LocationModel | null> {
     const updated = await this.locationModel.findOneAndUpdate(
       id as unknown as Types.ObjectId,
       updateLocationDto,

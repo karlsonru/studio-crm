@@ -3,7 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
-import { StudentEntity } from './entities/student.entity';
 import { StudentModel, StudentDocument } from '../schemas';
 
 @Injectable()
@@ -13,7 +12,7 @@ export class StudentService {
     private readonly studentModel: Model<StudentDocument>,
   ) {}
 
-  async create(createStudentDto: CreateStudentDto): Promise<StudentEntity | null> {
+  async create(createStudentDto: CreateStudentDto): Promise<StudentModel | null> {
     const isExists = await this.studentModel.findOne({
       fullname: createStudentDto.fullname.trim(),
     });
@@ -27,15 +26,15 @@ export class StudentService {
     return created;
   }
 
-  async findAll(): Promise<Array<StudentEntity>> {
+  async findAll(): Promise<Array<StudentModel>> {
     return await this.studentModel.find({});
   }
 
-  async findOne(id: string): Promise<StudentEntity | null> {
+  async findOne(id: string): Promise<StudentModel | null> {
     return await this.studentModel.findById(id);
   }
 
-  async update(id: string, updateStudentDto: UpdateStudentDto): Promise<StudentEntity | null> {
+  async update(id: string, updateStudentDto: UpdateStudentDto): Promise<StudentModel | null> {
     const updated = await this.studentModel.findByIdAndUpdate(id, updateStudentDto, {
       new: true,
     });
