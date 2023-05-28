@@ -4,7 +4,6 @@ import { AppService } from './app.service';
 import { LessonModule } from './lesson/lesson.module';
 import { StudentModule } from './student/student.module';
 import { UserModule } from './user/user.module';
-import { RoleModule } from './role/role.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { LocationModule } from './location/location.module';
 import { SubscriptionTemplateModule } from './subscription-template/subscription-template.module';
@@ -23,7 +22,6 @@ import { StatisticModule } from './statistic/statistic.module';
     UserModule,
     LessonModule,
     StudentModule,
-    RoleModule,
     LocationModule,
     SubscriptionTemplateModule,
     SubscriptionModule,

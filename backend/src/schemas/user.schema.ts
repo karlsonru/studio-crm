@@ -1,10 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { Role, RoleSchema } from './role.schema';
 import { IsOptional } from 'class-validator';
 import { Exclude, Transform, Type } from 'class-transformer';
 
 export type UserDocument = HydratedDocument<User>;
+
+export enum UserRole {
+  OWNER = 'owner',
+  ADMIN = 'admin',
+  TEACHER = 'teacher',
+  OTHER = 'other',
+}
 
 @Schema({
   timestamps: true,
@@ -23,9 +29,14 @@ export class User {
   })
   fullname: string;
 
-  @Prop({ type: RoleSchema })
-  @Type(() => Role)
-  role: Role;
+  @Prop({
+    type: String,
+    enum: UserRole,
+    default: UserRole.TEACHER,
+    trim: true,
+    required: true,
+  })
+  role: UserRole;
 
   @Prop({
     type: Number,
@@ -43,7 +54,7 @@ export class User {
   @Prop({
     type: Number,
   })
-  salaryRate: number;
+  salary: number;
 
   @IsOptional()
   @Prop({

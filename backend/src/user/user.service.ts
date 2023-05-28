@@ -6,15 +6,12 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserEntity } from './entities/user.entity';
 import { UserModel, UserDocument } from '../schemas';
-import { RoleModel, RoleDocument } from '../schemas';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(UserModel.name)
     private readonly userModel: Model<UserDocument>,
-    @InjectModel(RoleModel.name)
-    private readonly roleModel: Model<RoleDocument>,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserEntity | null> {
@@ -26,12 +23,6 @@ export class UserService {
       return null;
     }
 
-    const role = await this.roleModel.findOne({ value: createUserDto.role });
-
-    if (role === null) {
-      return null;
-    }
-
     const hash = createHash('sha-256');
     const passHash = hash.update(createUserDto.password);
 
@@ -39,7 +30,6 @@ export class UserService {
       ...createUserDto,
       password: passHash,
       birthday: createUserDto.birthday,
-      role: role.id,
       isActive: true,
     });
 
