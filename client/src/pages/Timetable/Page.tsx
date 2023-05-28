@@ -1,68 +1,53 @@
-import { useEffect, useState } from 'react';
-import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
+import { useEffect } from 'react';
+import { set } from 'date-fns';
 import CircularProgress from '@mui/material/CircularProgress';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { TimetableHeader } from './PageHeader';
-import { DayColumns } from './Content';
-import { useGetLessonsQuery } from '../../shared/api/lessonApi';
-import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
+import { PageHeader } from './PageHeader';
+import { TimetableContent } from './Content';
+import { useFindLessonsQuery } from '../../shared/api';
+import { useAppSelector } from '../../shared/hooks/useAppSelector';
+import { useMobile } from '../../shared/hooks/useMobile';
+import { useActionCreators } from '../../shared/hooks/useActionCreators';
+import { timetablePageActions } from '../../shared/reducers/timetablePageSlice';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
-import { ILessonModel } from '../../shared/models/ILessonModel';
-
-function structureLessons(lessons: ILessonModel[]) {
-  const lessonsObj = {} as { [index: number]: ILessonModel[] };
-
-  for (let i = 0; i < lessons.length; i++) {
-    if (lessonsObj[lessons[i].day]) {
-      lessonsObj[lessons[i].day].push(lessons[i]);
-    } else {
-      lessonsObj[lessons[i].day] = [lessons[i]];
-    }
-  }
-
-  return lessonsObj;
-}
-
-function TimeColumn() {
-  const time = ['09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21'];
-
-  return (
-    <Box p='4px' mt='44px'>
-      { time.map((hh) => <Box key={hh} height='120px'>{hh}:00</Box>) }
-    </Box>
-  );
-}
+import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 
 export function TimetablePage() {
   const dispatch = useAppDispatch();
-  const isMobile = useMediaQuery('(max-width: 767px)');
-  const [startDate, setStartDate] = useState(new Date());
-  const { isLoading, data, error } = useGetLessonsQuery();
+
+  const view = useAppSelector((state) => state.timetablePageReducer.view);
+  const currentDate = useAppSelector((state) => state.timetablePageReducer.currentDate);
+  const currentMonth = new Date(currentDate).getMonth();
+  const isMobile = useMobile();
+  const actions = useActionCreators(timetablePageActions);
 
   useEffect(() => {
-    if (startDate.getDay() === 1) return;
-
-    const monday = new Date();
-    const shift = monday.getDay() === 0 ? 1 : 1 - monday.getDay();
-    monday.setDate(monday.getDate() + shift);
-
-    setStartDate(monday);
-
     dispatch(setPageTitle('Расписание'));
-  }, []);
+  });
+
+  // запрашиваем занятия на +1 месяц от текущих и -1 месяц от текущих
+  const { data, isFetching } = useFindLessonsQuery({
+    dateFrom: { $lte: set(currentDate, { month: currentMonth - 1, date: 1 }).getTime() },
+    dateTo: { $gte: set(currentDate, { month: currentMonth + 1, date: 1 }).getTime() },
+  });
+
+  useEffect(() => {
+    if (isMobile) {
+      actions.setView('day');
+    } else if (view === undefined) {
+      actions.setView('week');
+    }
+  }, [view, isMobile]);
+
+  if (isFetching) {
+    return <CircularProgress />;
+  }
+
+  if (!data?.payload) return null;
 
   return (
     <>
-      <TimetableHeader startDate={startDate} setDateHandler={setStartDate} />
-      <Stack direction='row'>
-        {!isMobile && <TimeColumn />}
-        {isLoading && <CircularProgress />}
-        {error && <span>Произошла ошибка!</span>}
-        {data?.payload
-          && <DayColumns startDate={startDate} lessons={structureLessons(data.payload)} />
-        }
-      </Stack>
+      <PageHeader />
+      <TimetableContent lessons={data.payload} />
     </>
   );
 }

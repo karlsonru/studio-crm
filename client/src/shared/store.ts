@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import menuReducer from './reducers/appMenuSlice';
+import { timetablePageReducer } from './reducers/timetablePageSlice';
 import { lessonsPageReducer } from './reducers/lessonsPageSlice';
 import { studentsPageReducer } from './reducers/studentsPageSlice';
 import { subscriptionsPageReducer } from './reducers/subscriptionsPageSlice';
@@ -9,6 +10,7 @@ import { basicApi } from './api/basicApi';
 const store = configureStore({
   reducer: {
     menuReducer,
+    timetablePageReducer,
     lessonsPageReducer,
     studentsPageReducer,
     subscriptionsPageReducer,

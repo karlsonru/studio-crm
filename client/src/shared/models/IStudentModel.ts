@@ -1,4 +1,4 @@
-interface IStudentModelContact {
+export interface IStudentModelContact {
   name: string;
   phone: number;
 }

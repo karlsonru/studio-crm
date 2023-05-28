@@ -1,133 +1,120 @@
-import { FormEvent, useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { FormEvent } from 'react';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import Button from '@mui/material/Button';
-import CircleIcon from '@mui/icons-material/Circle';
+import { VisitStatusButton } from './VisitStatusButton';
+import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
-import { useActionCreators } from '../../shared/hooks/useActionCreators';
-import { visitsPageActions } from '../../shared/reducers/visitsPageSlice';
-import { useGetLessonQuery } from '../../shared/api';
-import { useCreateVisitMutation } from '../../shared/api/visitsApi';
+import { IStudentModel } from '../../shared/models/IStudentModel';
+import { ILessonModel } from '../../shared/models/ILessonModel';
+import {
+  useGetLessonQuery,
+  useCreateVisitMutation,
+  useFindVisitsQuery,
+  usePatchVisitMutation,
+} from '../../shared/api';
 
-function StatusButton({ studentId }: { studentId: string }) {
-  const [defaultStatus] = useState(1);
-  const actions = useActionCreators(visitsPageActions);
+interface IStudentsListItem {
+  student: IStudentModel;
+  defaultStatus?: string;
+}
 
-  useEffect(() => {
-    actions.setVisits({
-      student: studentId,
-      visitStatus: defaultStatus,
-    });
-  }, []);
-
-  const changeHandler = (event: SelectChangeEvent<number>) => {
-    actions.setVisits({
-      student: studentId,
-      visitStatus: event.target.value,
-    });
-  };
-
+function StudentsListItem({ student, defaultStatus }: IStudentsListItem) {
   return (
-    <FormControl sx={{ width: '180px' }}>
-      <InputLabel>Сатус</InputLabel>
-      <Select
-        defaultValue={defaultStatus}
-        label="Статус"
-        onChange={changeHandler}
-      >
-        <MenuItem value={1}>
-          <CircleIcon color="success" fontSize="small" sx={{ marginRight: '0.5rem' }} />
-          Посетил
-        </MenuItem>
-        <MenuItem value={2}>
-          <CircleIcon color="error" fontSize="small" sx={{ marginRight: '0.5rem' }} />
-          Пропустил
-        </MenuItem>
-        <MenuItem value={3}>
-          <CircleIcon color="info" fontSize="small" sx={{ marginRight: '0.5rem' }} />
-          Болел
-        </MenuItem>
-        <MenuItem value={4}>
-          <CircleIcon color="warning" fontSize="small" sx={{ marginRight: '0.5rem' }} />
-          К отработке
-        </MenuItem>
-      </Select>
-    </FormControl>
+    <ListItem divider={true}>
+      <ListItemText primary={student.fullname} />
+      <VisitStatusButton studentId={student._id} defaultStatus={defaultStatus} />
+    </ListItem>
   );
 }
 
-export function StudentsList() {
+function StudentsListVisited({ lessonId }: { lessonId: string }) {
   const date = useAppSelector(
     (state) => state.visitsPageReducer.currentDateTimestamp,
   );
-  const visits = useAppSelector(
-    (state) => state.visitsPageReducer.visits,
-  );
 
-  const [createVisit] = useCreateVisitMutation();
-  const [searchParams] = useSearchParams('');
-  const lessonId = searchParams.get('lessonId') ?? '';
-
-  // если это будущее - показываем кто должен прийти (кто записан в группы)
-  // иначе покажем кто должен был прийти в день date
-  const isFuture = date > Date.now();
-
-  // если нет id или это прошедшее занятие - не делаем запрос к занятиям
-  const {
-    data, isFetching, isError, error,
-  } = useGetLessonQuery(lessonId, {
-    skip: !lessonId || !isFuture,
-    selectFromResult: ((response) => response),
+  const { data } = useFindVisitsQuery({
+    $and: [
+      { lesson: lessonId },
+      { date },
+    ],
+  }, {
+    selectFromResult: (result) => ({ data: result.data?.payload[0] }),
   });
 
-  if (isFetching || !data?.payload || !lessonId) return null;
+  if (!data) return null;
 
-  if (isError) {
-    console.error(error);
-    return <h3>Не удалось получить список студентов</h3>;
-  }
+  return (
+    <List>
+      {data.students.map(
+        (visit) => <StudentsListItem
+          key={visit.student._id}
+          student={visit.student}
+          defaultStatus={visit.visitStatus}
+        />,
+      )}
+    </List>
+  );
+}
+
+function StudentsListFuture({ lessonId }: { lessonId: string }) {
+  const { data } = useGetLessonQuery(lessonId, {
+    selectFromResult: (result) => ({ data: result.data?.payload }),
+  });
+
+  if (!data) return null;
+
+  return (
+    <List>
+      {data.students.map(
+        (student) => <StudentsListItem key={student._id} student={student} />,
+      )}
+    </List>
+  );
+}
+
+interface IStudentsList {
+  lesson: ILessonModel,
+  isVisited: boolean;
+  visitedLessonId?: string;
+  dateTimestamp: number;
+}
+
+export function StudentsList({
+  lesson, isVisited, visitedLessonId, dateTimestamp,
+}: IStudentsList) {
+  const [updateVisit] = usePatchVisitMutation();
+  const [createVisit] = useCreateVisitMutation();
+
+  const visits = useAppSelector((state) => state.visitsPageReducer.visits);
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    createVisit({
-      lesson: lessonId,
-      teacher: data.payload.teacher._id,
-      day: data.payload.day,
-      date,
-      students: visits,
-    });
+    if (isVisited && visitedLessonId) {
+      updateVisit({
+        id: visitedLessonId,
+        newItem: {
+          students: visits,
+        },
+      });
+    } else {
+      createVisit({
+        lesson: lesson._id,
+        teacher: lesson.teacher._id,
+        day: lesson.day,
+        date: dateTimestamp,
+        students: visits,
+      });
+    }
   };
 
   return (
     <form onSubmit={submitHandler} style={{ width: '100%', maxWidth: '600px' }}>
-      <List>
-        {
-          data.payload.students.map((student) => (
-          <ListItem key={student._id} divider={true}>
-            <ListItemText primary={student.fullname} />
-            <StatusButton studentId={student._id} />
-          </ListItem>
-          ))
-        }
-      </List>
-      <Button
-        type='submit'
-        variant='contained'
-        color='success'
-        sx={{
-          float: 'right',
-          marginRight: '1rem',
-        }}
-      >
-        Отметить
-      </Button>
+      { isVisited && <StudentsListVisited lessonId={lesson._id} /> }
+      { !isVisited && <StudentsListFuture lessonId={lesson._id} /> }
+
+      <SubmitButton content={isVisited ? 'Обновить' : 'Отметить'} props={{ sx: { float: 'right', marginRight: '1rem' } }} />
     </form>
   );
 }

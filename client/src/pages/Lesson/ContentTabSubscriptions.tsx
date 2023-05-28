@@ -1,62 +1,24 @@
 import { useState } from 'react';
-import TableCell from '@mui/material/TableCell';
-import TableRow from '@mui/material/TableRow';
+import { format } from 'date-fns';
 import Typography from '@mui/material/Typography/Typography';
-import Button from '@mui/material/Button/Button';
-import { BasicTable } from '../../shared/components/BasicTable';
+import { BasicTable, CreateRow } from '../../shared/components/BasicTable';
 import { useMobile } from '../../shared/hooks/useMobile';
 import { useFindSubscriptionsQuery } from '../../shared/api';
-import { ISubscriptionModel } from '../../shared/models/ISubscriptionModel';
-import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
+import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
+import { PrimaryButton } from '../../shared/components/buttons/PrimaryButton';
 
 interface IContentSubscriptions {
   lessonId: string;
 }
 
-function CreateRowMobile(subscription: ISubscriptionModel) {
-  return (
-    <TableRow key={subscription._id}>
-      <TableCell>
-        {subscription.student.fullname}
-      </TableCell>
-      <TableCell>
-        {subscription.visitsLeft}
-      </TableCell>
-    </TableRow>
-  );
-}
-
-function CreateRow(subscription: ISubscriptionModel) {
-  return (
-    <TableRow key={subscription._id} hover>
-      <TableCell>
-        {subscription.student.fullname}
-      </TableCell>
-      <TableCell>
-        {subscription.visits}
-      </TableCell>
-      <TableCell>
-        {subscription.visitsLeft}
-      </TableCell>
-      <TableCell>
-        {dateValueFormatter(subscription.dateTo)}
-      </TableCell>
-      <TableCell>
-        {subscription.price}
-      </TableCell>
-    </TableRow>
-  );
-}
-
-interface IShowSubscriptions {
-  lessonId: string;
+interface IShowSubscriptions extends IContentSubscriptions {
   isActive: boolean;
-  dateTo?: number;
 }
 
-function ShowSubscriptions({ lessonId, isActive, dateTo }: IShowSubscriptions) {
+function ShowSubscriptions({ lessonId, isActive }: IShowSubscriptions) {
   const isMobile = useMobile();
-  const query = isActive ? { isActive } : { dateTo: { $lte: dateTo } };
+  const today = getTodayTimestamp();
+  const query = { dateTo: isActive ? { $gte: today } : { $lte: today } };
 
   const { data, isError, isLoading } = useFindSubscriptionsQuery({
     lesson: lessonId,
@@ -76,12 +38,35 @@ function ShowSubscriptions({ lessonId, isActive, dateTo }: IShowSubscriptions) {
   }
 
   const headers = isMobile ? ['Ученик', 'Остаток'] : ['Ученик', 'Длительность', 'Остаток', 'Действует до', 'Стоимость'];
-  const rows = data?.payload.map(isMobile ? CreateRowMobile : CreateRow);
-  const title = isActive ? 'Активные абонементы' : 'Прошлые абонементы';
+  const rows = data?.payload.map((subscription) => (
+    <CreateRow
+      key={subscription._id}
+      content={
+        isMobile
+          ? [
+            subscription.student.fullname,
+            subscription.visitsLeft,
+          ]
+          : [
+            subscription.student.fullname,
+            subscription.template.visits,
+            subscription.visitsLeft,
+            format(subscription.dateTo, 'Y-MM-dd'),
+            subscription.template.price,
+          ]
+      }
+    />
+  ));
 
   return (
     <>
-      <Typography variant="h5" component={'h5'}>{title}</Typography>
+      <Typography
+        variant="h5"
+        component={'h5'}
+      >
+        {isActive ? 'Активные абонементы' : 'Прошлые абонементы'}
+      </Typography>
+
       <BasicTable headers={headers} rows={rows} />
     </>
   );
@@ -94,20 +79,18 @@ export function ContentSubscriptions({ lessonId }: IContentSubscriptions) {
     setShowAll((isShowAll) => !isShowAll);
   };
 
-  const dateTo = Date.now();
-
   return (
     <>
       <ShowSubscriptions lessonId={lessonId} isActive={true} />
 
-      <Button
-        variant="outlined"
-        onClick={showAllHandler}
-        sx={{ m: '1rem 0' }}
-      >
-        {showAll ? 'Скрыть' : 'Показать'} прошлые абонементы
-      </Button>
-      {showAll && <ShowSubscriptions lessonId={lessonId} dateTo={dateTo} isActive={false} />}
+      <PrimaryButton
+        content={showAll ? 'Скрыть прошлые абонементы' : 'Показать прошлые абонементы'}
+        props={{
+          onClick: showAllHandler,
+          sx: { marginY: '1rem' },
+        }}
+      />
+      {showAll && <ShowSubscriptions lessonId={lessonId} isActive={false} />}
     </>
   );
 }

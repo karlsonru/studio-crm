@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   DataGrid,
   GridActionsCellItem,
@@ -13,11 +14,13 @@ import { IStudentModel } from '../../shared/models/IStudentModel';
 import { useMobile } from '../../shared/hooks/useMobile';
 import { CustomGridToolbar } from '../../shared/components/CustomGridToolbar';
 import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
-import { SearchParamsButton } from '../../shared/components/SearchParamsButton';
-import { CreateStudentModal } from '../../shared/components/CreateStudentModal';
+import { SearchParamsButton } from '../../shared/components/buttons/SearchParamsButton';
+import { CreateStudentModal } from '../../shared/components/modals/CreateStudentModal';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { studentsPageActions } from '../../shared/reducers/studentsPageSlice';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
+import { Loading } from '../../shared/components/Loading';
+import { ShowError } from '../../shared/components/ShowError';
 
 function ExtendedToolbar() {
   const [deleteStudent] = useDeleteStudentMutation();
@@ -45,8 +48,9 @@ function ExtendedToolbar() {
 export function StudentsContent() {
   const isMobile = useMobile();
   const actions = useActionCreators(studentsPageActions);
+  const navigate = useNavigate();
 
-  const { data, isLoading, error } = useGetStudentsQuery();
+  const { data, isFetching, error } = useGetStudentsQuery();
 
   const deleteStudentHandler = useCallback((currentStudent: IStudentModel) => {
     actions.setCurrentStudent(currentStudent);
@@ -102,21 +106,26 @@ export function StudentsContent() {
     },
   ], [deleteStudentHandler, dateValueFormatter]);
 
-  if (isLoading || !data?.payload) {
-    return null;
+  if (isFetching) {
+    return <Loading />;
   }
 
   if (error) {
-    return <h1>Error!!! </h1>;
+    return <ShowError details={error} />;
+  }
+
+  if (!data) {
+    return null;
   }
 
   return (
     <DataGrid
       autoHeight
+      disableColumnMenu
       columns={isMobile ? [columns[0]] : columns}
       rows={data.payload}
       getRowId={(item) => item._id}
-      disableColumnMenu
+      onRowDoubleClick={((params: GridRowParams<IStudentModel>) => navigate(`./${params.id}`))}
       components={{
         Toolbar: ExtendedToolbar,
       }}

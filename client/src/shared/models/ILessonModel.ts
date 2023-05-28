@@ -2,14 +2,19 @@ import { IUserModel } from './IUserModel';
 import { ILocationModel } from './ILocationModel';
 import { IStudentModel } from './IStudentModel';
 
+export interface ITime {
+  hh: number;
+  min: number;
+}
+
 export interface ILessonModel {
   _id: string;
   title: string;
   teacher: IUserModel;
   location: ILocationModel;
   day: number;
-  timeStart: number;
-  timeEnd: number;
+  timeStart: ITime;
+  timeEnd: ITime;
   activeStudents: number;
   students: Array<IStudentModel>,
   dateFrom: number;

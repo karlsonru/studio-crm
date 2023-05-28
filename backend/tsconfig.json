@@ -1,31 +1,21 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-
-    "baseUrl": ".",
-    "outDir": "dist-backend",
-
-    "esModuleInterop": true,
-    "sourceMap": true,
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    
-    "strict": true,
-    "noImplicitAny": true,
+    "target": "es2017",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
     "skipLibCheck": true,
-  },
-  "ts-node": {
-    "esm": true,
-    "experimentalSpecifierResolution": "node",
-  },
-  "include": [
-    "*.ts",
-  ],
-  "exclude": [
-    "node_modules", 
-    "dist", 
-    "*.d.ts"
-  ]
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true
+  }
 }

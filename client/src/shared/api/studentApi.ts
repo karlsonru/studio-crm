@@ -1,5 +1,11 @@
 import {
-  basicApi, injectGetOne, injectGetAll, injectCreate, injectPatch, injectDelete, injectFind,
+  basicApi,
+  injectGetOne,
+  injectGetAll,
+  injectCreate,
+  injectPatch,
+  injectDelete,
+  injectFind,
 } from './basicApi';
 import { IStudentModel, IStudentModalCreate } from '../models/IStudentModel';
 

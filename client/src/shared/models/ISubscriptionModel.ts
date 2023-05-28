@@ -17,10 +17,7 @@ export interface ISubscriptionModel {
   student: IStudentModel;
   template: ISubscriptionTemplateModel;
   lesson: string;
-  price: number;
-  visits: number;
   visitsLeft: number;
-  duration: number;
   dateFrom: number;
   dateTo: number;
   paymentMethod: string;

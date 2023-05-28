@@ -7,6 +7,8 @@ import { LessonsPage } from './pages/Lessons';
 import { LessonPage } from './pages/Lesson';
 import { VisititedLessonsPage } from './pages/VisitedLessons';
 import { StudentsPage } from './pages/Students';
+import { StudentPage } from './pages/Student';
+import { NotFoundPage } from './pages/NotFound';
 import { SubscriptionsPageLayout, SubscriptionsTemplatePage, SubscriptionsPage } from './pages/Subscriptions';
 
 function Hello() {
@@ -19,13 +21,15 @@ export function Router() {
     <Routes>
       <Route path='/' element={<Layout />} >
         <Route path='/auth' element={<AuthPage />} />
-        <Route path='/users' element={<UsersPage />} />
 
         <Route path='/timetable' element={<TimetablePage />} />
 
         <Route path='/visits' element={<VisititedLessonsPage />} />
 
-        <Route path='/students' element={<StudentsPage />} />
+        <Route path='/students'>
+          <Route index element={<StudentsPage />} />
+          <Route path=':studentId' element={<StudentPage />} />
+        </Route>
 
         <Route path='/lessons'>
           <Route index element={<LessonsPage />} />
@@ -37,9 +41,11 @@ export function Router() {
           <Route path=':templates' element={<SubscriptionsTemplatePage />} />
         </Route>
 
-        <Route path='/collaborators' element={<Hello />} />
+        <Route path='/collaborators' element={<UsersPage />} />
         <Route path='/finance' element={<Hello />} />
       </Route>
+
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   </BrowserRouter>
   );

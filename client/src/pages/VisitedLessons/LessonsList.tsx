@@ -6,29 +6,26 @@ import ListItemText from '@mui/material/ListItemText';
 import Divider from '@mui/material/Divider';
 import { useFindLessonsQuery } from '../../shared/api';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
-
-function convertTime(time: number) {
-  const hh = Math.floor(time / 100).toString().padStart(2, '0');
-  const min = (time % 100).toString().padStart(2, '0');
-  return `${hh}:${min}`;
-}
+import { convertTime } from '../../shared/helpers/convertTime';
 
 export function LessonsList() {
   const currentDateTimestamp = useAppSelector(
     (state) => state.visitsPageReducer.currentDateTimestamp,
   );
 
+  const [searchParams, setSearchParams] = useSearchParams();
+  const date = searchParams.get('date');
+  const selectedLessonId = searchParams.get('lessonId');
+
   const { data, isFetching } = useFindLessonsQuery({
     day: new Date(currentDateTimestamp).getDay(),
     dateTo: { $gte: currentDateTimestamp },
     dateFrom: { $lte: currentDateTimestamp },
+  }, {
+    skip: !date,
   });
 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const selectedLessonId = searchParams.get('lessonId');
-  const date = searchParams.get('date') ?? 'unknown';
-
-  if (isFetching || !data?.payload) return null;
+  if (!date || isFetching || !data?.payload) return null;
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, lessonId: string) => {
     setSearchParams({ date, lessonId });
@@ -37,7 +34,12 @@ export function LessonsList() {
   return (
     <List sx={{ width: '100%', maxWidth: '360px' }}>
       { [...data.payload]
-        .sort((lessonA, lessonB) => lessonA.timeStart - lessonB.timeStart)
+        .sort((lessonA, lessonB) => {
+          if (lessonA.timeStart.hh !== lessonB.timeStart.hh) {
+            return lessonA.timeStart.hh - lessonB.timeStart.hh;
+          }
+          return lessonA.timeStart.min - lessonB.timeStart.min;
+        })
         .map(
           (lesson) => <ListItem
             key={lesson._id}
