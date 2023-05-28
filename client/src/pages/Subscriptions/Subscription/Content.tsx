@@ -3,8 +3,8 @@ import { useMobile } from '../../../shared/hooks/useMobile';
 import { useGetSubscriptionsQuery } from '../../../shared/api';
 import { CustomGridToolbar } from '../../../shared/components/CustomGridToolbar';
 import { dateValueFormatter } from '../../../shared/helpers/dateValueFormatter';
-import { SearchParamsButton } from '../../../shared/components/SearchParamsButton';
-import { CreateSubscriptionModal } from '../../../shared/components/CreateSubscriptionModal';
+import { SearchParamsButton } from '../../../shared/components/buttons/SearchParamsButton';
+import { CreateSubscriptionModal } from '../../../shared/components/modals/CreateSubscriptionModal';
 import { ISubscriptionModel } from '../../../shared/models/ISubscriptionModel';
 
 const leftAlignNumberColumn: Partial<GridColDef> = {

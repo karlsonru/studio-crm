@@ -11,8 +11,8 @@ import { useGetLessonQuery } from '../../shared/api';
 import { ContentTabDetails } from './ContentTabDetails';
 import { ContentSubscriptions } from './ContentTabSubscriptions';
 import { ContentStudents } from './ContentTabStudents';
-import { CreateSubscriptionModal } from '../../shared/components/CreateSubscriptionModal';
-import { SearchParamsButton } from '../../shared/components/SearchParamsButton';
+import { CreateSubscriptionModal } from '../../shared/components/modals/CreateSubscriptionModal';
+import { SearchParamsButton } from '../../shared/components/buttons/SearchParamsButton';
 
 export function LessonPage() {
   const dispatch = useAppDispatch();

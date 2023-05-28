@@ -17,11 +17,11 @@ import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import FormHelperText from '@mui/material/FormHelperText';
-import { FormContentColumn } from './FormContentColumn';
-import { SubmitButton } from './SubmitButton';
-import { getDayName } from '../helpers/getDayName';
-import { useCreateLessonMutation, useGetLocationsQuery, useGetUsersQuery } from '../api';
-import { useMobile } from '../hooks/useMobile';
+import { FormContentColumn } from '../FormContentColumn';
+import { SubmitButton } from '../buttons/SubmitButton';
+import { getDayName } from '../../helpers/getDayName';
+import { useCreateLessonMutation, useGetLocationsQuery, useGetUsersQuery } from '../../api';
+import { useMobile } from '../../hooks/useMobile';
 
 function validateFrom(formData: { [key: string]: FormDataEntryValue }) {
   if ((formData.title as string).trim().length < 3) {

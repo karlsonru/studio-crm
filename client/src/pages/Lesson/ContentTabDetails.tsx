@@ -21,7 +21,7 @@ import {
   usePatchLessonMutation,
 } from '../../shared/api';
 import { useMobile } from '../../shared/hooks/useMobile';
-import { SubmitButton } from '../../shared/components/SubmitButton';
+import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { convertTime } from '../../shared/helpers/convertTime';
 import { FormContentColumn } from '../../shared/components/FormContentColumn';
 

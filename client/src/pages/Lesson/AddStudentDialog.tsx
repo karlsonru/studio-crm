@@ -33,7 +33,11 @@ function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudentsDialog)
       $nin: [...lesson.students.map((student) => student._id)],
     },
   });
-  const [updateLesson, { isSuccess }] = usePatchLessonMutation();
+  const [updateLesson, { isSuccess, isError, error }] = usePatchLessonMutation();
+
+  if (isError) {
+    console.error(error);
+  }
 
   useEffect(() => {
     setModalOpen(false);

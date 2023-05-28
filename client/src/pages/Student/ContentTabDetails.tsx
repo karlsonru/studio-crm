@@ -15,7 +15,7 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import { useGetStudentQuery, usePatchStudentMutation } from '../../shared/api';
-import { SubmitButton } from '../../shared/components/SubmitButton';
+import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { FormContentColumn } from '../../shared/components/FormContentColumn';
 import { IStudentModelContact } from '../../shared/models/IStudentModel';
 

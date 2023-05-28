@@ -15,8 +15,8 @@ import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/Co
 import { getDayName } from '../../shared/helpers/getDayName';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { lessonsPageActions } from '../../shared/reducers/lessonsPageSlice';
-import { SearchParamsButton } from '../../shared/components/SearchParamsButton';
-import { CreateLessonModal } from '../../shared/components/CreateLessonModal';
+import { SearchParamsButton } from '../../shared/components/buttons/SearchParamsButton';
+import { CreateLessonModal } from '../../shared/components/modals/CreateLessonModal';
 import { CustomGridToolbar } from '../../shared/components/CustomGridToolbar';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { convertTime } from '../../shared/helpers/convertTime';

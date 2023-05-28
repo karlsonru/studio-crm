@@ -3,7 +3,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import { VisitStatusButton } from './VisitStatusButton';
-import { SubmitButton } from '../../shared/components/SubmitButton';
+import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { IStudentModel } from '../../shared/models/IStudentModel';
 import { ILessonModel } from '../../shared/models/ILessonModel';

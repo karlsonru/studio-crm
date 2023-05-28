@@ -11,10 +11,10 @@ import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/system/Stack';
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
-import { NumberField } from './NumberField';
-import { FormContentColumn } from './FormContentColumn';
-import { SubmitButton } from './SubmitButton';
-import { useCreateSubscriptionTemplateMutation } from '../api';
+import { NumberField } from '../fields/NumberField';
+import { FormContentColumn } from '../FormContentColumn';
+import { SubmitButton } from '../buttons/SubmitButton';
+import { useCreateSubscriptionTemplateMutation } from '../../api';
 
 function validateForm(formData: { [key: string]: FormDataEntryValue }) {
   if (!formData.title || (formData.title as string).trim().length < 3) {

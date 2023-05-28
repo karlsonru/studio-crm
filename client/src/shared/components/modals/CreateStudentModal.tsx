@@ -17,9 +17,9 @@ import Button from '@mui/material/Button';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
-import { SubmitButton } from './SubmitButton';
-import { FormContentColumn } from './FormContentColumn';
-import { useCreateStudentMutation } from '../api';
+import { SubmitButton } from '../buttons/SubmitButton';
+import { FormContentColumn } from '../FormContentColumn';
+import { useCreateStudentMutation } from '../../api';
 
 function NewContact({ idx, handler }: { idx: number, handler: () => void }) {
   return (

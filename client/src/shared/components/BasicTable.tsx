@@ -10,7 +10,7 @@ import Collapse from '@mui/material/Collapse';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Typography from '@mui/material/Typography';
-import { PrimaryButton } from './PrimaryButton';
+import { PrimaryButton } from './buttons/PrimaryButton';
 
 interface IBasicTable {
   headers: string[],

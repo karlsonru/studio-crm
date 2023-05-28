@@ -12,16 +12,15 @@ import CardContent from '@mui/material/CardContent';
 import Divider from '@mui/material/Divider';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useMobile } from '../../shared/hooks/useMobile';
-import { useDocTitle } from '../../shared/hooks/useDocTitle';
-import { usePageTitle } from '../../shared/hooks/usePageTitle';
+import { useTitle } from '../../shared/hooks/useTitle';
 import { useDeleteUserMutation, useGetUsersQuery } from '../../shared/api';
 import { IUserModel } from '../../shared/models/IUserModel';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
-import { SearchParamsButton } from '../../shared/components/SearchParamsButton';
-import { CreateSubscriptionTemplateModal } from '../../shared/components/CreateSubscriptionTemplateModal';
-import { UpdateSubscriptionTemplateModal } from '../../shared/components/UpdateSubscriptionTemplateModal';
+import { SearchParamsButton } from '../../shared/components/buttons/SearchParamsButton';
+import { CreateSubscriptionTemplateModal } from '../../shared/components/modals/CreateSubscriptionTemplateModal';
+import { UpdateSubscriptionTemplateModal } from '../../shared/components/modals/UpdateSubscriptionTemplateModal';
 
 function CardContentItem({ title, value }: { title: string, value: string | number }) {
   return (
@@ -76,8 +75,7 @@ function AddCard({ cardDetails }: { cardDetails: IUserModel }) {
 }
 
 export function UsersPage() {
-  useDocTitle('Сотрудники');
-  usePageTitle('Сотрудники');
+  useTitle('Сотрудники');
 
   const {
     data: responseUsers,

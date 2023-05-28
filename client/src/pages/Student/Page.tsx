@@ -10,8 +10,8 @@ import { ContentTabDetails } from './ContentTabDetails';
 import { ContentTabVisits } from './ContentTabVisits';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
-import { SearchParamsButton } from '../../shared/components/SearchParamsButton';
-import { CreateSubscriptionModal } from '../../shared/components/CreateSubscriptionModal';
+import { SearchParamsButton } from '../../shared/components/buttons/SearchParamsButton';
+import { CreateSubscriptionModal } from '../../shared/components/modals/CreateSubscriptionModal';
 
 export function StudentPage() {
   const dispatch = useAppDispatch();

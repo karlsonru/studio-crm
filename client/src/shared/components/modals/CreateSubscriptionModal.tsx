@@ -14,15 +14,15 @@ import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Autocomplete from '@mui/material/Autocomplete';
-import { FormContentColumn } from './FormContentColumn';
-import { SubmitButton } from './SubmitButton';
+import { FormContentColumn } from '../FormContentColumn';
+import { SubmitButton } from '../buttons/SubmitButton';
 import {
   useCreateSubscriptionMutation,
   useGetStudentsQuery,
   useGetSubscriptionTemplatesQuery,
   useGetLessonsQuery,
-} from '../api';
-import { useMobile } from '../hooks/useMobile';
+} from '../../api';
+import { useMobile } from '../../hooks/useMobile';
 
 export function CreateSubscriptionModal() {
   const isMobile = useMobile();

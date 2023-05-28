@@ -5,7 +5,7 @@ import { BasicTable, CreateRow } from '../../shared/components/BasicTable';
 import { useMobile } from '../../shared/hooks/useMobile';
 import { useFindSubscriptionsQuery } from '../../shared/api';
 import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
-import { PrimaryButton } from '../../shared/components/PrimaryButton';
+import { PrimaryButton } from '../../shared/components/buttons/PrimaryButton';
 
 interface IContentSubscriptions {
   lessonId: string;
