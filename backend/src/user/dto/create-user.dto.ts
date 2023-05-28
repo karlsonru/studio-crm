@@ -24,10 +24,10 @@ export class CreateUserDto {
   @IsOptional()
   login?: string;
 
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   @MinLength(10)
-  @IsOptional()
   password?: string;
 
   @IsOptional()
