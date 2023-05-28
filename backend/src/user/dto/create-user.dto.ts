@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsNotEmpty,
-  MinLength,
-  IsMongoId,
-  IsNumber,
-} from 'class-validator';
+import { IsString, IsNotEmpty, MinLength, IsMongoId, IsNumber } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
 export class CreateUserDto {

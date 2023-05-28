@@ -8,13 +8,17 @@ import {
   Delete,
   HttpException,
   HttpStatus,
+  UseInterceptors,
 } from '@nestjs/common';
 import { LocationService } from './location.service';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
-import { ValidateIdPipe } from 'src/shared/validaitonPipe';
+import { ValidateIdPipe } from '../shared/validaitonPipe';
+import { LocationModel } from '../schemas';
+import { MongooseClassSerializerInterceptor } from '../shared/mongooseClassSerializer.interceptor';
 
 @Controller('location')
+@UseInterceptors(MongooseClassSerializerInterceptor(LocationModel))
 export class LocationController {
   constructor(private readonly service: LocationService) {}
 
@@ -23,10 +27,7 @@ export class LocationController {
     const created = await this.service.create(createLocationDto);
 
     if (created === null) {
-      throw new HttpException(
-        { message: 'Уже существует' },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
     }
 
     return {

@@ -9,13 +9,17 @@ import {
   HttpException,
   HttpStatus,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 import { ValidateIdPipe } from '../shared/validaitonPipe';
+import { LessonModel } from '../schemas';
+import { MongooseClassSerializerInterceptor } from 'src/shared/mongooseClassSerializer.interceptor';
 
 @Controller('lesson')
+@UseInterceptors(MongooseClassSerializerInterceptor(LessonModel))
 export class LessonController {
   constructor(private readonly service: LessonService) {}
 

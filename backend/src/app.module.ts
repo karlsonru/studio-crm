@@ -9,7 +9,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { LocationModule } from './location/location.module';
 import { SubscriptionTemplateModule } from './subscription-template/subscription-template.module';
 import { SubscriptionModule } from './subscription/subscription.module';
-import { VisitStatusModule } from './visit-status/visit-status.module';
 import { VisitedLessonModule } from './visited-lesson/visited-lesson.module';
 import { BillingService } from './billing/billing.service';
 import { StatisticModule } from './statistic/statistic.module';
@@ -28,7 +27,6 @@ import { StatisticModule } from './statistic/statistic.module';
     LocationModule,
     SubscriptionTemplateModule,
     SubscriptionModule,
-    VisitStatusModule,
     VisitedLessonModule,
     StatisticModule,
   ],

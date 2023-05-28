@@ -3,6 +3,7 @@ import { HydratedDocument, Types } from 'mongoose';
 import { Lesson } from './lesson.schema';
 import { User } from './user.schema';
 import { Student } from './student.schema';
+import { Transform, Type } from 'class-transformer';
 
 export type VisitedLessonDocument = HydratedDocument<VisitedLesson>;
 
@@ -31,6 +32,8 @@ export class VisitedStudent {
   timestamps: true,
 })
 export class VisitedLesson {
+  @Transform(({ value }) => value.toString())
+  @Type(() => String)
   _id: Types.ObjectId;
 
   @Prop({
@@ -39,6 +42,7 @@ export class VisitedLesson {
     required: true,
     index: true,
   })
+  @Type(() => Lesson)
   lesson: Lesson;
 
   @Prop({
@@ -61,6 +65,7 @@ export class VisitedLesson {
     ref: 'User',
     required: true,
   })
+  @Type(() => User)
   teacher: User;
 
   @Prop({

@@ -3,6 +3,7 @@ import { HydratedDocument, Types } from 'mongoose';
 import { Lesson } from './lesson.schema';
 import { Student } from './student.schema';
 import { SubscriptionTemplate } from './subscriptionTemplate.schema';
+import { Transform, Type } from 'class-transformer';
 
 export type SubscriptionDocument = HydratedDocument<Subscription>;
 
@@ -10,6 +11,8 @@ export type SubscriptionDocument = HydratedDocument<Subscription>;
   timestamps: true,
 })
 export class Subscription {
+  @Transform(({ value }) => value.toString())
+  @Type(() => String)
   _id: Types.ObjectId;
 
   @Prop({
@@ -18,6 +21,7 @@ export class Subscription {
     required: true,
     index: true,
   })
+  @Type(() => Student)
   student: Student;
 
   @Prop({
@@ -25,6 +29,7 @@ export class Subscription {
     ref: 'SubscriptionTemplate',
     required: true,
   })
+  @Type(() => SubscriptionTemplate)
   template: SubscriptionTemplate;
 
   @Prop({
@@ -34,6 +39,7 @@ export class Subscription {
     index: true,
     nullable: true,
   })
+  @Type(() => Lesson)
   lesson: Lesson;
 
   @Prop({

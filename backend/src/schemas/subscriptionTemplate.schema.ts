@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Transform, Type } from 'class-transformer';
 import { HydratedDocument, Types } from 'mongoose';
 
 export type SubscriptionTemplateDocument = HydratedDocument<SubscriptionTemplate>;
@@ -7,6 +8,8 @@ export type SubscriptionTemplateDocument = HydratedDocument<SubscriptionTemplate
   timestamps: true,
 })
 export class SubscriptionTemplate {
+  @Transform(({ value }) => value.toString())
+  @Type(() => String)
   _id: Types.ObjectId;
 
   @Prop({

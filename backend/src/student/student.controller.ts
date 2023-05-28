@@ -8,13 +8,17 @@ import {
   Delete,
   HttpException,
   HttpStatus,
+  UseInterceptors,
 } from '@nestjs/common';
 import { StudentService } from './student.service';
-import { ValidateIdPipe } from 'src/shared/validaitonPipe';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
+import { ValidateIdPipe } from '../shared/validaitonPipe';
+import { StudentModel } from '../schemas';
+import { MongooseClassSerializerInterceptor } from '../shared/mongooseClassSerializer.interceptor';
 
 @Controller('student')
+@UseInterceptors(MongooseClassSerializerInterceptor(StudentModel))
 export class StudentController {
   constructor(private readonly service: StudentService) {}
 

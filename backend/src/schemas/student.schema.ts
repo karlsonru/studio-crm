@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Transform, Type } from 'class-transformer';
 import { HydratedDocument, Types } from 'mongoose';
 
 export type StudentDocument = HydratedDocument<Student>;
@@ -12,6 +13,8 @@ export interface IStudentContact {
   timestamps: true,
 })
 export class Student {
+  @Transform(({ value }) => value.toString())
+  @Type(() => String)
   _id: Types.ObjectId;
 
   @Prop({

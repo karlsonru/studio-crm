@@ -3,6 +3,7 @@ import { HydratedDocument, Types } from 'mongoose';
 import { User } from './user.schema';
 import { Student } from './student.schema';
 import { Location } from './location.schema';
+import { Transform, Type } from 'class-transformer';
 
 export type LessonDocument = HydratedDocument<Lesson>;
 
@@ -38,6 +39,8 @@ export class ITime {
   timestamps: true,
 })
 export class Lesson {
+  @Transform(({ value }) => value.toString())
+  @Type(() => String)
   _id: Types.ObjectId;
 
   @Prop({
@@ -49,9 +52,10 @@ export class Lesson {
   @Prop({
     type: Types.ObjectId,
     ref: 'User',
-    required: true,
     trim: true,
+    required: true,
   })
+  @Type(() => User)
   teacher: User;
 
   @Prop({
@@ -62,6 +66,7 @@ export class Lesson {
       },
     ],
   })
+  @Type(() => Student)
   students: Student[];
 
   @Prop({
@@ -70,6 +75,7 @@ export class Lesson {
     required: true,
     trim: true,
   })
+  @Type(() => Location)
   location: Location;
 
   @Prop({
