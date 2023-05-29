@@ -14,9 +14,11 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserModel | null> {
-    const candidate = await this.userModel.find({
-      login: createUserDto.login,
-    });
+    const candidatQuery = createUserDto.login
+      ? { $or: [{ login: createUserDto.login }, { fullname: createUserDto.fullname }] }
+      : { fullname: createUserDto.fullname };
+
+    const candidate = await this.userModel.find(candidatQuery);
 
     if (candidate.length) {
       return null;

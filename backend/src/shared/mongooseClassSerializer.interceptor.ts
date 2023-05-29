@@ -28,10 +28,14 @@ export function MongooseClassSerializerInterceptor(
     }
 
     serialize(response: IResponse, options: ClassTransformOptions) {
-      return {
-        message: response.message,
-        payload: super.serialize(this.prepareResponse(response.payload), options),
-      };
+      if (response && response.message && response.payload) {
+        return {
+          message: response.message,
+          payload: super.serialize(this.prepareResponse(response.payload), options),
+        };
+      }
+
+      return response;
     }
   };
 }

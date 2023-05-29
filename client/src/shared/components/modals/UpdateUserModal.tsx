@@ -1,4 +1,4 @@
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import Dialog from '@mui/material/Dialog';
@@ -18,13 +18,14 @@ import { SubmitButton } from '../buttons/SubmitButton';
 import { FormContentColumn } from '../FormContentColumn';
 import { usePatchUserMutation, useGetUsersQuery } from '../../api';
 import { NumberField } from '../fields/NumberField';
+import Typography from '@mui/material/Typography';
 
 function validateForm(formData: { [key: string]: FormDataEntryValue }) {
   if (!formData.fullname || (formData.fullname as string).trim().length < 3) {
     return 'fullname';
   }
 
-  if (!formData.phone || (formData.phone as string).trim().length !== 11) {
+  if (!formData.phone || !(/^(79)\d{9}/g).test(formData.phone as string)) {
     return 'phone';
   }
 
@@ -38,7 +39,7 @@ function validateForm(formData: { [key: string]: FormDataEntryValue }) {
       return 'password';
     }
 
-    if (!(/^.*(?=.{10,})(?=.*[a-zA-Z])(?=.*\d)(?=.*[!#$%&? "]).*$/g).test(password)) {
+    if (!(/^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{10,}$/g).test(password)) {
       return 'password';
     }
   }
@@ -55,7 +56,7 @@ export function UpdateUserModal() {
   });
 
   const [canAuthorize, setCanAuthorize] = useState(false);
-  const [updateUser] = usePatchUserMutation();
+  const [updateUser, { isSuccess, isError, error }] = usePatchUserMutation();
   const [formValidation, setFormValidation] = useState({
     fullname: true,
     phone: true,
@@ -63,12 +64,20 @@ export function UpdateUserModal() {
     password: true,
   });
 
+  useEffect(() => {
+    if (!userEdit?.login) return;
+
+    setCanAuthorize(true);
+  }, [userEdit]);
+
   if (!userEdit) {
     return null;
   }
 
-  if (userEdit?.login) {
-    setCanAuthorize(true);
+  const closeHandler = () => setSearchParams(undefined);
+
+  if (isSuccess) {
+    closeHandler();
   }
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
@@ -93,7 +102,7 @@ export function UpdateUserModal() {
     }
 
     updateUser({
-      id: '',
+      id: userEdit._id,
       newItem: {
         fullname: (formData.fullname as string).trim(),
         birthday: +Date.parse(formData.birthday as string),
@@ -109,12 +118,19 @@ export function UpdateUserModal() {
     form.reset();
   };
 
+  console.log(error);
+
   return (
-    <Dialog open={searchParams.has('update-user')} onClose={() => setSearchParams('')}>
+    <Dialog open={searchParams.has('update-user')} onClose={closeHandler}>
       <DialogTitle>Редактировать сотрудника</DialogTitle>
 
       <DialogContent>
         <form onSubmit={submitHandler}>
+          {isError && <Typography variant='h6' color='error'>
+            Произошла ошибка. Детали:
+            </Typography>
+          }
+
           <FormContentColumn>
             <TextField
               variant="outlined"
@@ -132,7 +148,7 @@ export function UpdateUserModal() {
               variant="outlined"
               name="birthday"
               label="Дата рождения"
-              defaultValue={format(userEdit.birthday, 'dd-MM-yyyy')}
+              defaultValue={format(userEdit.birthday, 'yyyy-MM-dd')}
               InputLabelProps={{ shrink: true }}
               fullWidth
               required
@@ -161,7 +177,6 @@ export function UpdateUserModal() {
               name="phone"
               label="Телефон"
               error={!formValidation.phone}
-              minValue={7_900_000_00_00}
               defaultValue={userEdit.phone}
               helperText='Проверьте введённый телефон'
             />
@@ -227,7 +242,7 @@ export function UpdateUserModal() {
               autoFocus
               variant='contained'
               color='error'
-              onClick={() => setSearchParams('')}
+              onClick={closeHandler}
             >
               Закрыть
             </Button>
