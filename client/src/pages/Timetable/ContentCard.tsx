@@ -161,7 +161,7 @@ export function ContentCard({ lesson, step, date }: IContentCard) {
       >
         <CardHeader
           title={<TitleWithIcon title={title} amount={students} />}
-          subheader={`${timeStart} - ${timeEnd}`}
+          subheader={`${timeStart} - ${timeEnd} ${lesson.teacher.fullname}`}
           {...CARD_HEADER_PROPS}
         />
         <CardContent sx={{ padding: '0.25rem' }} />

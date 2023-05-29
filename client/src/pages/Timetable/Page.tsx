@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { set } from 'date-fns';
-import CircularProgress from '@mui/material/CircularProgress';
 import { PageHeader } from './PageHeader';
 import { TimetableContent } from './Content';
 import { useFindLessonsQuery } from '../../shared/api';
@@ -10,6 +9,7 @@ import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { timetablePageActions } from '../../shared/reducers/timetablePageSlice';
 import { setPageTitle } from '../../shared/reducers/appMenuSlice';
 import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
+import { Loading } from '../../shared/components/Loading';
 
 export function TimetablePage() {
   const dispatch = useAppDispatch();
@@ -25,7 +25,7 @@ export function TimetablePage() {
   });
 
   // запрашиваем занятия на +1 месяц от текущих и -1 месяц от текущих
-  const { data, isFetching } = useFindLessonsQuery({
+  const { data, isLoading } = useFindLessonsQuery({
     dateFrom: { $lte: set(currentDate, { month: currentMonth - 1, date: 1 }).getTime() },
     dateTo: { $gte: set(currentDate, { month: currentMonth + 1, date: 1 }).getTime() },
   });
@@ -38,8 +38,8 @@ export function TimetablePage() {
     }
   }, [view, isMobile]);
 
-  if (isFetching) {
-    return <CircularProgress />;
+  if (isLoading) {
+    return <Loading />;
   }
 
   if (!data?.payload) return null;
