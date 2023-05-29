@@ -18,7 +18,7 @@ import { ValidateIdPipe } from '../shared/validaitonPipe';
 import { MongooseClassSerializerInterceptor } from '../shared/mongooseClassSerializer.interceptor';
 import { SubscriptionTemplateModel } from '../schemas';
 
-@Controller('subscription/templates')
+@Controller('subscription-templates')
 @UseInterceptors(MongooseClassSerializerInterceptor(SubscriptionTemplateModel))
 export class SubscriptionTemplateController {
   constructor(private readonly service: SubscriptionTemplateService) {}

@@ -13,12 +13,12 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
+import Typography from '@mui/material/Typography';
 import { UserRole, userRoleLocal } from '../../models/IUserModel';
 import { SubmitButton } from '../buttons/SubmitButton';
 import { FormContentColumn } from '../FormContentColumn';
 import { usePatchUserMutation, useGetUsersQuery } from '../../api';
 import { NumberField } from '../fields/NumberField';
-import Typography from '@mui/material/Typography';
 
 function validateForm(formData: { [key: string]: FormDataEntryValue }) {
   if (!formData.fullname || (formData.fullname as string).trim().length < 3) {
