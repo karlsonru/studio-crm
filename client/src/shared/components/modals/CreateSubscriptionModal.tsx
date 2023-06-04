@@ -10,6 +10,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Autocomplete from '@mui/material/Autocomplete';
 import { DialogFormWrapper } from '../DialogFormWrapper';
+// import { Loading } from '../Loading';
 import {
   useCreateSubscriptionMutation,
   useGetStudentsQuery,
@@ -17,7 +18,6 @@ import {
   useGetLessonsQuery,
 } from '../../api';
 import { useMobile } from '../../hooks/useMobile';
-import { Loading } from '../Loading';
 
 export function CreateSubscriptionModal() {
   const isMobile = useMobile();
@@ -30,7 +30,7 @@ export function CreateSubscriptionModal() {
 
   const handleClose = () => setSearchParams(undefined);
 
-  if (!templatesData || !studentsData || !lessonsData) return <Loading />;
+  if (!templatesData || !studentsData || !lessonsData) return null;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

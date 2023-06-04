@@ -109,8 +109,8 @@ export function ContentTabDetails({ userId }: { userId: string }) {
         salary: parseInt(formData.salary as string, 10),
         canAuth: canAuthorize,
         login: (formData.login as string),
-        password: (formData.password as string),
-        newPassword: (formData.newPassword as string),
+        password: (formData.password as string) || undefined,
+        newPassword: (formData.newPassword as string) || undefined,
         isActive: true,
       },
     });

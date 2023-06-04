@@ -53,8 +53,12 @@ export function UpdateSubscriptionTemplateModal() {
     duration: true,
   });
 
-  if (!templateEdit) {
+  if (searchParams.has('update-template') && !templateEdit) {
     return <Loading />;
+  }
+
+  if (!templateEdit) {
+    return null;
   }
 
   const handleClose = () => setSearchParams(undefined);
