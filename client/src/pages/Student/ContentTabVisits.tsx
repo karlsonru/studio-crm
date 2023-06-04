@@ -238,16 +238,16 @@ export function ContentTabVisits({ studentId }: { studentId: string }) {
         tableTitle='Посещения'
         headers={headersVisits}
         rows={rowsVisits}
-        buttonTitle={showMoreVisits ? 'Скрыть' : 'Показать ещё'}
-        buttonAction={() => setShowMoreVisits((prev) => !prev)}
+        buttomTitle={showMoreVisits ? 'Скрыть' : 'Показать ещё'}
+        buttomAction={() => setShowMoreVisits((prev) => !prev)}
       />
 
       <BasicTableWithTitleAndButton
         tableTitle='Посещения'
         headers={headersSubscriptions}
         rows={rowsSubscriptions}
-        buttonTitle={showMoreSubscriptions ? 'Скрыть' : 'Показать ещё'}
-        buttonAction={() => setShowMoreSubscriptions((prev) => !prev)}
+        buttomTitle={showMoreSubscriptions ? 'Скрыть' : 'Показать ещё'}
+        buttomAction={() => setShowMoreSubscriptions((prev) => !prev)}
       />
     </>
   );

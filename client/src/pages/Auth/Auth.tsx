@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
@@ -8,6 +7,8 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { PasswordField } from '../../shared/components/fields/PasswordField';
+import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 
 const theme = createTheme();
 
@@ -42,32 +43,32 @@ export default function AuthPage() {
                 <TextField
                   required
                   fullWidth
-                  id="email"
-                  label="Электронная почта"
-                  name="email"
-                  autoComplete="email"
+                  id="login"
+                  label="Логин"
+                  name="login"
+                  autoComplete="login"
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
+                <PasswordField
                   name="password"
-                  label="Пароль"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
+                  props={{
+                    id: 'password',
+                    type: 'password',
+                    label: 'Пароль',
+                    required: true,
+                    fullWidth: true,
+                  }}
                 />
               </Grid>
             </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Войти
-            </Button>
+            <SubmitButton
+              content='Войти'
+              props={{
+                fullWidth: true,
+                sx: { mt: 3, mb: 2 },
+              }}
+            />
           </Box>
         </Box>
       </Container>
