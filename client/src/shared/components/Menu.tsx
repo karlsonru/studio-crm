@@ -98,7 +98,7 @@ function createMenuList() {
       icon: <CurrencyRubleIcon />,
     },
     {
-      path: 'collaborators',
+      path: 'users',
       title: 'Сотрудники',
       icon: <AccountBoxIcon />,
     },

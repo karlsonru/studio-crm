@@ -60,8 +60,12 @@ export class User {
   @Prop({
     type: String,
     minLength: 5,
-    unique: true,
     trim: true,
+    index: {
+      unique: true,
+      partialFilterExpression: { login: { $type: 'string' } },
+    },
+    default: null,
   })
   login?: string;
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
@@ -18,7 +18,7 @@ import { ShowError } from '../../shared/components/ShowError';
 import { CardContentItem } from '../../shared/components/CardContentItem';
 
 function AddCard({ cardDetails }: { cardDetails: IUserModel }) {
-  const navigate = useNavigate();
+  const [, setSearchParams] = useSearchParams();
   const isMobile = useMobile();
 
   const [deleteCard] = useDeleteUserMutation();
@@ -32,7 +32,7 @@ function AddCard({ cardDetails }: { cardDetails: IUserModel }) {
             <DeleteIcon />
           </IconButton>
           } />
-        <CardActionArea onClick={() => navigate(`./${cardDetails._id}`)}>
+        <CardActionArea onClick={() => setSearchParams({ 'update-user': 'true', id: cardDetails._id })}>
           <CardContent>
             <CardContentItem title="Телефон" value={cardDetails.phone} />
             <Divider />

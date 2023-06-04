@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from './pages/BasicLayout';
 import { AuthPage } from './pages/Auth';
 import { UsersPage } from './pages/Users';
+import { UserPage } from './pages/User';
 import { TimetablePage } from './pages/Timetable';
 import { LessonsPage } from './pages/Lessons';
 import { LessonPage } from './pages/Lesson';
@@ -41,7 +42,11 @@ export function Router() {
           <Route path=':templates' element={<SubscriptionsTemplatePage />} />
         </Route>
 
-        <Route path='/collaborators' element={<UsersPage />} />
+        <Route path='/users'>
+          <Route index element={<UsersPage />} />
+          <Route path=':userId' element={<UserPage />} />
+        </Route>
+
         <Route path='/finance' element={<Hello />} />
       </Route>
 

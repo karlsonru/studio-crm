@@ -8,5 +8,5 @@ export function useTitle(title: string) {
   useEffect(() => {
     document.title = title;
     dispatch(setPageTitle(title));
-  }, []);
+  }, [title]);
 }
