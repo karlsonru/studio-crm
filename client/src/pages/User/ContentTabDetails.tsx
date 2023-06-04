@@ -13,6 +13,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { FormContentColumn } from '../../shared/components/FormContentColumn';
 import { NumberField } from '../../shared/components/fields/NumberField';
+import { PasswordField } from '../../shared/components/fields/PasswordField';
 import { UserRole, userRoleLocal } from '../../shared/models/IUserModel';
 import { useGetUsersQuery, usePatchUserMutation } from '../../shared/api';
 import { isPasswordStrong } from '../../shared/helpers/isPasswordStrong';
@@ -44,7 +45,7 @@ export function ContentTabDetails({ userId }: { userId: string }) {
       data: data?.payload.find((user) => user._id === userId),
     }),
   });
-  const [updateUser] = usePatchUserMutation();
+  const [updateUser, { isSuccess }] = usePatchUserMutation();
   const [canAuthorize, setCanAuthorize] = useState(false);
   const [isEdit, setEdit] = useState(false);
 
@@ -53,10 +54,21 @@ export function ContentTabDetails({ userId }: { userId: string }) {
     phone: true,
     login: true,
     password: true,
+    newPassword: true,
   });
 
+  // отключаем форму успешном завершении
   useEffect(() => {
-    if (!userEdit?.login) return;
+    if (!isSuccess) return;
+
+    const timerId = setTimeout(() => setEdit(false));
+
+    return () => clearTimeout(timerId);
+  }, [isSuccess]);
+
+  // установим стартовые показатели может ли пользователь проходить аутентификацию
+  useEffect(() => {
+    if (!userEdit?.canAuth) return;
 
     setCanAuthorize(true);
   }, [userEdit]);
@@ -66,6 +78,9 @@ export function ContentTabDetails({ userId }: { userId: string }) {
     const form = event.currentTarget as HTMLFormElement;
     const formData = Object.fromEntries(new FormData(form).entries());
 
+    // на время выполнения отключим редактироание формы
+    setEdit(false);
+
     validateForm(formData);
 
     setFormValidation({
@@ -73,6 +88,7 @@ export function ContentTabDetails({ userId }: { userId: string }) {
       phone: true,
       login: true,
       password: true,
+      newPassword: true,
     });
 
     const errorName = validateForm(formData);
@@ -90,10 +106,11 @@ export function ContentTabDetails({ userId }: { userId: string }) {
         fullname: (formData.fullname as string).trim(),
         birthday: +Date.parse(formData.birthday as string),
         phone: +(formData.phone as string),
-        salary: +(formData.rate as string),
+        salary: parseInt(formData.salary as string, 10),
+        canAuth: canAuthorize,
         login: (formData.login as string),
         password: (formData.password as string),
-        newPassword: (formData.password as string),
+        newPassword: (formData.newPassword as string),
         isActive: true,
       },
     });
@@ -193,6 +210,7 @@ export function ContentTabDetails({ userId }: { userId: string }) {
           disabled={!isEdit}
           control={
             <Checkbox
+              name="canAuth"
               checked={canAuthorize}
               onChange={() => setCanAuthorize((prev) => !prev)}
             />
@@ -212,27 +230,29 @@ export function ContentTabDetails({ userId }: { userId: string }) {
         />
         }
 
-        {canAuthorize && <TextField
-          variant="outlined"
-          name="password"
-          type="password"
-          label="Старый пароль"
-          fullWidth
-          required
-          error={!formValidation.password}
-          helperText={!formValidation.password && 'Пароль не должен быть пустым или простым. 10 знаков, буквы, цифры и специальный символ.'}
+        {canAuthorize && <PasswordField
+          name='password'
+          props={{
+            label: 'Старый пароль',
+            fullWidth: true,
+            defaultValue: undefined,
+            disabled: !isEdit,
+            error: !formValidation.password,
+            helperText: !formValidation.password && 'Пароль не должен быть пустым или простым. 10 знаков, буквы, цифры и специальный символ.',
+          }}
         />
         }
 
-        {canAuthorize && <TextField
-          variant="outlined"
-          name="newPassword"
-          type="newPassword"
-          label="Новый пароль"
-          fullWidth
-          required
-          error={!formValidation.password}
-          helperText={!formValidation.password && 'Пароль не должен быть пустым или простым. 10 знаков, буквы, цифры и специальный символ.'}
+        {canAuthorize && <PasswordField
+          name='newPassword'
+          props={{
+            label: 'Новый пароль',
+            defaultValue: undefined,
+            fullWidth: true,
+            disabled: !isEdit,
+            error: !formValidation.newPassword,
+            helperText: !formValidation.password && 'Пароль не должен быть пустым или простым. 10 знаков, буквы, цифры и специальный символ.',
+          }}
         />
         }
 

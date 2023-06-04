@@ -1,8 +1,5 @@
 import { FormEvent, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
@@ -15,11 +12,10 @@ import TextareaAutosize from '@mui/material/TextareaAutosize';
 import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import DialogActions from '@mui/material/DialogActions';
 import IconButton from '@mui/material/IconButton';
-import { SubmitButton } from '../buttons/SubmitButton';
-import { FormContentColumn } from '../FormContentColumn';
 import { useCreateStudentMutation } from '../../api';
+import { DialogFormWrapper } from '../DialogFormWrapper';
+import { isValidPhone } from '../../helpers/isValidPhone';
 
 function NewContact({ idx, handler }: { idx: number, handler: () => void }) {
   return (
@@ -45,7 +41,7 @@ function validateForm(formData: { [key: string]: FormDataEntryValue }) {
     return 'hasContacts';
   }
 
-  if (!formData.contactPhone1 || (formData.contactPhone1 as string).trim().length !== 11) {
+  if (!formData.contactPhone1 || !isValidPhone(formData.contactPhone1 as string)) {
     return 'validPhone';
   }
 
@@ -62,6 +58,8 @@ export function CreateStudentModal() {
     hasContacts: true,
     validPhone: true,
   });
+
+  const handleClose = () => setSearchParams(undefined);
 
   const addContact = () => {
     setContacts((prevState) => [...prevState, prevState.length]);
@@ -112,67 +110,51 @@ export function CreateStudentModal() {
   };
 
   return (
-    <Dialog open={searchParams.has('create-student')} onClose={() => setSearchParams('')}>
-      <DialogTitle>Добавить ученика</DialogTitle>
+    <DialogFormWrapper
+      title='Добавить ученика'
+      isOpen={searchParams.has('create-student')}
+      onClose={handleClose}
+      onSubmit={submitHandler}
+    >
+      <TextField
+        variant="outlined"
+        name="fullname"
+        label="ФИО"
+        fullWidth
+        required
+        error={!formValidation.fullname}
+        helperText={!formValidation.fullname && 'Имя не должно быть пустым или слишком короткий'}
+      />
+      <TextField
+        type="date"
+        variant="outlined"
+        name="birthday"
+        label="Дата рождения"
+        InputLabelProps={{ shrink: true }}
+        fullWidth
+        required
+      />
 
-      <DialogContent>
-        <form onSubmit={submitHandler}>
-          <FormContentColumn>
-            <TextField
-              variant="outlined"
-              name="fullname"
-              label="ФИО"
-              fullWidth
-              required
-              error={!formValidation.fullname}
-              helperText={!formValidation.fullname && 'Имя не должно быть пустым или слишком короткий'}
-            />
-            <TextField
-              type="date"
-              variant="outlined"
-              name="birthday"
-              label="Дата рождения"
-              InputLabelProps={{ shrink: true }}
-              fullWidth
-              required
-            />
+      <FormControl required>
+        <FormLabel id="sex-label">Пол</FormLabel>
+        <RadioGroup row aria-labelledby="sex-label" name="sex">
+          <FormControlLabel value="female" control={<Radio />} label="Девочка" />
+          <FormControlLabel value="male" control={<Radio />} label="Мальчик" />
+        </RadioGroup>
+      </FormControl>
 
-            <FormControl required>
-              <FormLabel id="sex-label">Пол</FormLabel>
-              <RadioGroup row aria-labelledby="sex-label" name="sex">
-                <FormControlLabel value="female" control={<Radio />} label="Девочка" />
-                <FormControlLabel value="male" control={<Radio />} label="Мальчик" />
-              </RadioGroup>
-            </FormControl>
+      <hr/>
+      {contacts.map((idx) => <NewContact key={`contact${idx}`} idx={idx} handler={deleteContact} />)}
 
-            <hr/>
-            {contacts.map((idx) => <NewContact key={`contact${idx}`} idx={idx} handler={deleteContact} />)}
+      {!formValidation.hasContacts && <FormHelperText error children={'Заполните хотя бы один контакт'} />}
+      {!formValidation.validPhone && <FormHelperText error children={'Проверьте введённый телефон'} />}
 
-            {!formValidation.hasContacts && <FormHelperText error children={'Заполните хотя бы один контакт'} />}
-            {!formValidation.validPhone && <FormHelperText error children={'Проверьте введённый телефон'} />}
+      <Button variant="outlined" onClick={addContact}>Добавить контакт</Button>
+      <hr/>
 
-            <Button variant="outlined" onClick={addContact}>Добавить контакт</Button>
-            <hr/>
+      <InputLabel>Комментарий</InputLabel>
+      <TextareaAutosize name="comment" minRows={5} />
 
-            <InputLabel>Комментарий</InputLabel>
-            <TextareaAutosize name="comment" minRows={5} />
-
-          </FormContentColumn>
-
-          <DialogActions sx={{ paddingRight: '0' }}>
-            <Button
-              autoFocus
-              variant='contained'
-              color='error'
-              onClick={() => setSearchParams('')}
-            >
-              Закрыть
-            </Button>
-            <SubmitButton content={'Подтвердить'} />
-          </DialogActions>
-        </form>
-
-      </DialogContent>
-    </Dialog>
+    </DialogFormWrapper>
   );
 }

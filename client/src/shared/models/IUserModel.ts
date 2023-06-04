@@ -17,10 +17,11 @@ export interface IUserModel {
   fullname: string;
   role: UserRole,
   birthday: number;
+  phone: number;
+  salary?: number;
+  canAuth: boolean;
   login?: string,
   password?: string;
-  salary?: number;
-  phone: number;
   isActive: boolean;
 }
 
