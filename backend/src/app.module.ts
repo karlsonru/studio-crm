@@ -11,6 +11,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
 import { VisitedLessonModule } from './visited-lesson/visited-lesson.module';
 import { BillingService } from './billing/billing.service';
 import { StatisticModule } from './statistic/statistic.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { StatisticModule } from './statistic/statistic.module';
     SubscriptionTemplateModule,
     SubscriptionModule,
     StatisticModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, BillingService],

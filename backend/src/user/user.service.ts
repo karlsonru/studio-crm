@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import * as bcrypt from 'bcrypt';
 import { createHash } from 'crypto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserModel, UserDocument } from '../schemas';
 import { logger } from '../shared/logger.middleware';
+import { IFilterQuery } from 'src/shared/IFilterQuery';
 
 @Injectable()
 export class UserService {
@@ -34,7 +36,7 @@ export class UserService {
     }
 
     if (createUserDto.password) {
-      createUserDto.password = await this.#createPasswordHash(createUserDto.password);
+      createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
     }
 
     const newUser = await this.userModel.create({
@@ -49,8 +51,8 @@ export class UserService {
     return newUser;
   }
 
-  async findAll(): Promise<Array<UserModel>> {
-    return await this.userModel.find({});
+  async findAll(query?: IFilterQuery<UserModel>): Promise<Array<UserModel>> {
+    return await this.userModel.find(query ?? {});
   }
 
   async findOne(id: string): Promise<UserModel | null> {
@@ -61,6 +63,13 @@ export class UserService {
     logger.info(
       `Обновление пользователя ${updateUserDto.fullname}. Авторизация: ${updateUserDto.canAuth}. ID: ${id}`,
     );
+
+    const user = await this.findOne(id);
+
+    if (!user) {
+      logger.debug(`Пользователь для обновления не найден. ID: ${id}`);
+      return null;
+    }
 
     // тем, кому запрещено входить - при обновлении всегда пароль и логин установим в null
     if (!updateUserDto.canAuth) {
@@ -75,13 +84,6 @@ export class UserService {
 
     // если можно входить и передан новый пароль - обновим только после сравнения со старым (если он есть)
     if (updateUserDto.canAuth && updateUserDto.newPassword) {
-      const user = await this.findOne(id);
-
-      if (!user) {
-        logger.debug(`Пользователь для обновления не найден. ID: ${id}`);
-        return null;
-      }
-
       if (!updateUserDto.password) {
         logger.debug(
           `Не передан пароль для обновления пользователя ${updateUserDto.fullname}. ID: ${id}`,
@@ -89,16 +91,19 @@ export class UserService {
         return null;
       }
 
-      const passwordHash = await this.#createPasswordHash(updateUserDto.password);
+      // если у пользователя уже установлен пароль - проверяем его на валидность
+      if (user.password) {
+        const isValidPassword = await bcrypt.compare(updateUserDto.password, user.password);
 
-      if (user.password && user.password !== passwordHash) {
-        logger.debug(
-          `Пользователь ${updateUserDto.fullname}. Старый и новый пароль не совпадают. Отказано в обновлении. ID: ${id}`,
-        );
-        return null;
+        if (!isValidPassword) {
+          logger.debug(
+            `Пользователь ${updateUserDto.fullname}. Старый и новый пароль не совпадают. Отказано в обновлении. ID: ${id}`,
+          );
+          return null;
+        }
       }
 
-      const newPassword = await this.#createPasswordHash(updateUserDto.newPassword);
+      const newPassword = await bcrypt.hash(updateUserDto.newPassword, 10);
 
       logger.info(`Пользователь ${updateUserDto.fullname}. Установлен новый пароль. ID: ${id}`);
 
@@ -114,11 +119,10 @@ export class UserService {
     logger.info(`Пользователь ${updateUserDto.fullname}. Выполнено обновление. ID: ${id}`);
 
     // в остальных случаях обновим, но без обновления логина и пароля
-    const { login, password, ...rest } = updateUserDto;
+    delete updateUserDto.login;
+    delete updateUserDto.password;
 
-    const updated = await this.userModel.findByIdAndUpdate(id, rest, {
-      new: true,
-    });
+    const updated = await this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true });
 
     return updated;
   }
