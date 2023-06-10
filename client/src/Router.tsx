@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Layout } from './pages/BasicLayout';
+import { ProtectedLayout } from './pages/BasicLayout';
 import { AuthPage } from './pages/Auth';
 import { UsersPage } from './pages/Users';
 import { UserPage } from './pages/User';
@@ -18,40 +18,41 @@ function Hello() {
 
 export function Router() {
   return (
-  <BrowserRouter>
-    <Routes>
-      <Route path='/' element={<Layout />} >
+    <BrowserRouter>
+      <Routes>
         <Route path='/auth' element={<AuthPage />} />
 
-        <Route path='/timetable' element={<TimetablePage />} />
+        <Route path='/' element={<ProtectedLayout />} >
 
-        <Route path='/visits' element={<VisititedLessonsPage />} />
+          <Route path='/timetable' element={<TimetablePage />} />
 
-        <Route path='/students'>
-          <Route index element={<StudentsPage />} />
-          <Route path=':studentId' element={<StudentPage />} />
+          <Route path='/visits' element={<VisititedLessonsPage />} />
+
+          <Route path='/students'>
+            <Route index element={<StudentsPage />} />
+            <Route path=':studentId' element={<StudentPage />} />
+          </Route>
+
+          <Route path='/lessons'>
+            <Route index element={<LessonsPage />} />
+            <Route path=':lessonId' element={<LessonPage />} />
+          </Route>
+
+          <Route path='/subscriptions' element={<SubscriptionsPageLayout />} >
+            <Route index element={<SubscriptionsPage />} />
+            <Route path=':templates' element={<SubscriptionsTemplatePage />} />
+          </Route>
+
+          <Route path='/users'>
+            <Route index element={<UsersPage />} />
+            <Route path=':userId' element={<UserPage />} />
+          </Route>
+
+          <Route path='/finance' element={<Hello />} />
         </Route>
 
-        <Route path='/lessons'>
-          <Route index element={<LessonsPage />} />
-          <Route path=':lessonId' element={<LessonPage />} />
-        </Route>
-
-        <Route path='/subscriptions' element={<SubscriptionsPageLayout />} >
-          <Route index element={<SubscriptionsPage />} />
-          <Route path=':templates' element={<SubscriptionsTemplatePage />} />
-        </Route>
-
-        <Route path='/users'>
-          <Route index element={<UsersPage />} />
-          <Route path=':userId' element={<UserPage />} />
-        </Route>
-
-        <Route path='/finance' element={<Hello />} />
-      </Route>
-
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
-  </BrowserRouter>
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
