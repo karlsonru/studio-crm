@@ -8,7 +8,8 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { DatePicker, DatePickerProps } from '@mui/x-date-pickers/DatePicker';
 import { BaseSingleInputFieldProps, FieldSection } from '@mui/x-date-pickers';
 
-interface ButtonFieldProps extends BaseSingleInputFieldProps<Date | null, FieldSection, any> {
+// eslint-disable-next-line max-len
+interface ButtonFieldProps extends BaseSingleInputFieldProps<Date | null, Date, FieldSection, any> {
   date?: Date;
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   dateFormatter?: (date: Date | number) => string;
