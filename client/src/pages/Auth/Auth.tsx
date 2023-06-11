@@ -88,15 +88,13 @@ export default function AuthPage() {
             <PasswordField
               name="password"
               props={{
-                id: 'password',
-                type: 'password',
                 label: 'Пароль',
                 required: true,
                 fullWidth: true,
               }}
             />
-            {hasError && <FormHelperText color='error'>
-              Не удалось. Попробуйте ещё раз.
+            {hasError && <FormHelperText error>
+              Не удалось. Проверьте правильность и попробуйте ещё раз.
             </FormHelperText>
             }
             <SubmitButton
