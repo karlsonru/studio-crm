@@ -12,22 +12,22 @@ export class AuthService {
   async signIn(createAuthDto: CreateAuthDto): Promise<null | string> {
     console.log(createAuthDto);
     logger.info(`Пользователь: ${createAuthDto.login}. Аутентификация.`);
-    const user = await this.userService.findAll({ login: createAuthDto.login });
+    const user = await this.userService.findOne({ login: createAuthDto.login });
 
     // если пользователь не найден или у него нет права на вход
-    if (!user[0] || !user[0].canAuth || !user[0].password) {
+    if (!user || !user.canAuth || !user.password) {
       logger.info(`Пользователь ${createAuthDto} не найден или вход не разрешён.`);
       return null;
     }
 
-    const isValidPassword = await bcrypt.compare(createAuthDto.password, user[0].password);
+    const isValidPassword = await bcrypt.compare(createAuthDto.password, user.password);
 
     if (!isValidPassword) {
       logger.debug(`Пользователь ${createAuthDto.login}. Неправильный пароль.`);
       return null;
     }
 
-    const payload = { sub: user[0]._id, login: user[0].login };
+    const payload = { sub: user._id, login: user.login };
     const token = await this.jwtService.signAsync(payload);
 
     logger.info(`Пользователь ${createAuthDto.login}. Успешная аутентификация. Выпущен токен.`);

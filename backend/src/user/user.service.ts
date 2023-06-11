@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
-import { createHash } from 'crypto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserModel, UserDocument } from '../schemas';
@@ -15,11 +14,6 @@ export class UserService {
     @InjectModel(UserModel.name)
     private readonly userModel: Model<UserDocument>,
   ) {}
-  async #createPasswordHash(password: string) {
-    const hash = createHash('sha-256');
-    const passHash = hash.update(password);
-    return passHash.digest('hex');
-  }
 
   async create(createUserDto: CreateUserDto): Promise<UserModel | null> {
     const candidatQuery = createUserDto.login
@@ -55,8 +49,8 @@ export class UserService {
     return await this.userModel.find(query ?? {});
   }
 
-  async findOne(id: string): Promise<UserModel | null> {
-    return await this.userModel.findById(id);
+  async findOne(query: IFilterQuery<UserModel>): Promise<UserModel | null> {
+    return await this.userModel.findOne(query);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<UserModel | null> {
@@ -64,7 +58,7 @@ export class UserService {
       `Обновление пользователя ${updateUserDto.fullname}. Авторизация: ${updateUserDto.canAuth}. ID: ${id}`,
     );
 
-    const user = await this.findOne(id);
+    const user = await this.findOne({ id });
 
     if (!user) {
       logger.debug(`Пользователь для обновления не найден. ID: ${id}`);

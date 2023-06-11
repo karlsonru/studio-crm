@@ -11,8 +11,6 @@ interface IPasswordField {
 export function PasswordField({ name, props }: IPasswordField) {
   const [showPassword, setShowPassword] = useState(false);
 
-  console.log(`showPassword: ${showPassword}`);
-
   return (
     <TextField
       variant="outlined"
