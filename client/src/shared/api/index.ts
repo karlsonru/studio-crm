@@ -1,3 +1,4 @@
+export * from './authApi';
 export * from './locationApi';
 export * from './lessonApi';
 export * from './userApi';

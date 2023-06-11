@@ -19,7 +19,9 @@ export class AuthController {
 
     return {
       message: 'success',
-      token: token,
+      payload: {
+        token,
+      },
     };
   }
 }

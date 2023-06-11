@@ -5,10 +5,12 @@ import { lessonsPageReducer } from './reducers/lessonsPageSlice';
 import { studentsPageReducer } from './reducers/studentsPageSlice';
 import { subscriptionsPageReducer } from './reducers/subscriptionsPageSlice';
 import { visitsPageReducer } from './reducers/visitsPageSlice';
+import { authReducer } from './reducers/authSlice';
 import { basicApi } from './api/basicApi';
 
 const store = configureStore({
   reducer: {
+    authReducer,
     menuReducer,
     timetablePageReducer,
     lessonsPageReducer,

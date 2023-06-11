@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { RootState } from 'shared/store';
 
 export interface IResponse<T> {
   message: string;
@@ -9,7 +10,18 @@ const BASE_URL = 'http://localhost:5000/api/';
 
 export const basicApi = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: BASE_URL,
+    prepareHeaders: (headers, { getState }) => {
+      const { token } = (getState() as RootState).authReducer;
+
+      if (token) {
+        headers.set('authorization', `Bearer ${token}`);
+      }
+
+      return headers;
+    },
+  }),
   endpoints: () => ({}),
 });
 
