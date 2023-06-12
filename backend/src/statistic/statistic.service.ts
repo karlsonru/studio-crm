@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { IFilterQuery } from '../shared/IFilterQuery';
 import { VisitedLessonService } from '../visited-lesson/visited-lesson.service';
 import { BillingStatus, VisitStatus } from '../schemas/visitedLesson.schema';
-import { VisitedLessonModel } from '../schemas';
+import { VisitedLessonModel, SubscriptionModel } from '../schemas';
+import { SubscriptionService } from '../subscription/subscription.service';
 
 export interface IFindVisitedByStudentWithStatistic {
   visitedLessons: Array<VisitedLessonModel>;
@@ -11,7 +12,10 @@ export interface IFindVisitedByStudentWithStatistic {
 
 @Injectable()
 export class StatisticService {
-  constructor(private visitedLessonsService: VisitedLessonService) {}
+  constructor(
+    private visitedLessonsService: VisitedLessonService,
+    private subscribtionService: SubscriptionService,
+  ) {}
 
   async calcVisitedLessonsByStudent(
     query: IFilterQuery<VisitedLessonModel>,
@@ -59,4 +63,43 @@ export class StatisticService {
       statistic,
     };
   }
+
+  async calcIncome(filter: IFilterQuery<SubscriptionModel>, locationId?: string) {
+    const subscriptions = await this.subscribtionService.findAll({
+      dateFrom: { $gte: filter.dateFrom },
+    });
+
+    const incomeByMonth: Record<number, number> = {};
+    const amountByMonth: Record<number, number> = {};
+
+    // найдём общий доход и кол-во абонементов по каждому месяцу
+    subscriptions.forEach((subscription) => {
+      if (locationId && locationId !== subscription.lesson.location._id.toString()) return;
+
+      const month = new Date(subscription.dateFrom).getMonth();
+
+      if (month in incomeByMonth) {
+        incomeByMonth[month] += subscription.template.price;
+      } else {
+        incomeByMonth[month] = subscription.template.price;
+      }
+
+      if (month in amountByMonth) {
+        amountByMonth[month] += 1;
+      } else {
+        amountByMonth[month] = 1;
+      }
+    });
+
+    // сортируем по возрастанию - последние месяцы будут в конце
+    const incomeKeys = Object.keys(incomeByMonth).sort((a, b) => +a - +b);
+    const amountKeys = Object.keys(amountByMonth).sort((a, b) => +a - +b);
+
+    return {
+      income: incomeKeys.map((key) => incomeByMonth[+key]),
+      amount: amountKeys.map((key) => amountByMonth[+key]),
+    };
+  }
+
+  async calcOutcome(filter: IFilterQuery<SubscriptionModel>, locationId?: string) {}
 }

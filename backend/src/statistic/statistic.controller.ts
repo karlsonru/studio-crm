@@ -20,4 +20,34 @@ export class StatisticController {
       payload: statistic,
     };
   }
+
+  @Get('/finance/income/:locationId')
+  async statFinanceIncome(
+    @Query('filter') filter: string,
+    @Param('locationId') locationId: string,
+  ) {
+    const query = JSON.parse(filter);
+
+    const statistic = await this.statisticService.calcIncome(query, locationId);
+
+    return {
+      message: 'success',
+      payload: statistic,
+    };
+  }
+
+  @Get('/finance/outcome/:locationId')
+  async statFinanceOutcome(
+    @Query('filter') filter: string,
+    @Param('locationId') locationId: string,
+  ) {
+    const query = JSON.parse(filter);
+
+    const statistic = await this.statisticService.calcOutcome(query, locationId);
+
+    return {
+      message: 'success',
+      payload: statistic,
+    };
+  }
 }

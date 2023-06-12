@@ -14,20 +14,43 @@ interface IVisitedLessonsWithStatistic {
   statistic: Record<string, number>;
 }
 
-interface IVisitedLessonsWithStatisticArgs {
+interface IStatisticArgs {
   query: Record<string, unknown>;
-  studentId: string;
+  id?: string;
 }
 
 export const { useGetVisitedLessonsStatisticByStudentQuery } = basicApi.injectEndpoints({
   endpoints: (build) => ({
     getVisitedLessonsStatisticByStudent:
       build
-        .query<IResponse<IVisitedLessonsWithStatistic>, IVisitedLessonsWithStatisticArgs>(
+        .query<IResponse<IVisitedLessonsWithStatistic>, IStatisticArgs>(
         {
-          query: ({ query, studentId }) => (
+          query: ({ query, id }) => (
             {
-              url: `${route}/visited-lessons/${studentId}`,
+              url: `${route}/visited-lessons/${id}`,
+              params: { filter: JSON.stringify(query) },
+            }
+          ),
+          providesTags: [tag as any],
+        },
+      ),
+  }),
+});
+
+interface IIncomeStatistic {
+  income: Array<number>;
+  outcome: Array<number>;
+}
+
+export const { useGetIncomeStatisticQuery } = basicApi.injectEndpoints({
+  endpoints: (build) => ({
+    getIncomeStatistic:
+      build
+        .query<IResponse<IIncomeStatistic>, IStatisticArgs>(
+        {
+          query: ({ query, id }) => (
+            {
+              url: `${route}/finance/income/${id}`,
               params: { filter: JSON.stringify(query) },
             }
           ),

@@ -138,7 +138,7 @@ export function ContentTabVisits({ studentId }: { studentId: string }) {
         { date: { $gte: startPeriodLessons } },
       ],
     },
-    studentId,
+    id: studentId,
   });
 
   // найдём все абонементы студента за последние 3 мес

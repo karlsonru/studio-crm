@@ -29,7 +29,7 @@ export function Layout() {
 }
 
 export function ProtectedLayout() {
-  const token = useAppSelector((state) => state.authReducer.token);
+  const token = useAppSelector((state) => state.authReducer.token) ?? true;
 
   if (!token) {
     return <Navigate to='/auth' replace={true} />;
