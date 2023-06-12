@@ -12,6 +12,7 @@ import { VisitedLessonModule } from './visited-lesson/visited-lesson.module';
 import { BillingService } from './billing/billing.service';
 import { StatisticModule } from './statistic/statistic.module';
 import { AuthModule } from './auth/auth.module';
+import { FinanceModule } from './finance/finance.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AuthModule } from './auth/auth.module';
     SubscriptionModule,
     StatisticModule,
     AuthModule,
+    FinanceModule,
   ],
   controllers: [AppController],
   providers: [AppService, BillingService],

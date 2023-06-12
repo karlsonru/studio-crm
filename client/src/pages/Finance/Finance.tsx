@@ -46,13 +46,13 @@ export function FinancePage() {
             sx={{ marginBottom: '1rem' }}
           >
             <Tab label="Доходы" value="income" />
-            <Tab label="Расходы" value="outcome" />
+            <Tab label="Расходы" value="expenses" />
           </Tabs>
         </Stack>
         <TabPanel value="income">
           <ContentTabIncome />
         </TabPanel>
-        <TabPanel value="outcome">
+        <TabPanel value="expenses">
           <ContentTabOutcome />
         </TabPanel>
       </TabContext>

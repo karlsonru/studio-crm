@@ -101,5 +101,5 @@ export class StatisticService {
     };
   }
 
-  async calcOutcome(filter: IFilterQuery<SubscriptionModel>, locationId?: string) {}
+  async calcExpenses(filter: IFilterQuery<SubscriptionModel>, locationId?: string) {}
 }

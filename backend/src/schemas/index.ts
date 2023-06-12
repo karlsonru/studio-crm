@@ -6,6 +6,8 @@ export { Lesson as LessonModel, LessonSchema, LessonDocument } from './lesson.sc
 
 export { Location as LocationModel, LocationSchema, LocationDocument } from './location.schema';
 
+export { Finance as FinanceModel, FinanceSchema, FinanceDocument } from './finance.schema';
+
 export {
   Subscription as SubscriptionModel,
   SubscriptionSchema,

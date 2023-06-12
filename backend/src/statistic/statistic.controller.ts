@@ -36,14 +36,14 @@ export class StatisticController {
     };
   }
 
-  @Get('/finance/outcome/:locationId')
-  async statFinanceOutcome(
+  @Get('/finance/expenses/:locationId')
+  async statFinanceExpenses(
     @Query('filter') filter: string,
     @Param('locationId') locationId: string,
   ) {
     const query = JSON.parse(filter);
 
-    const statistic = await this.statisticService.calcOutcome(query, locationId);
+    const statistic = await this.statisticService.calcExpenses(query, locationId);
 
     return {
       message: 'success',

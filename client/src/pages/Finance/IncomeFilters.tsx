@@ -14,6 +14,10 @@ export function IncomeFilters() {
   const isMobile = useMobile();
   const { data: responseLocations, isLoading } = useGetLocationsQuery();
 
+  const handleSubmit = () => {
+    
+  }
+
   return (
     <Box component="form" noValidate>
       <FormContentColumn>
