@@ -6,6 +6,7 @@ import { UpdateFinanceDto } from './dto/update-finance.dto';
 import { FinanceDocument, FinanceModel } from '../schemas';
 import { IFilterQuery } from '../shared/IFilterQuery';
 import { logger } from '../shared/logger.middleware';
+import { isMongoId } from 'class-validator';
 
 @Injectable()
 export class FinanceService {
@@ -26,6 +27,10 @@ export class FinanceService {
   }
 
   async findAll(query?: IFilterQuery<FinanceModel>) {
+    if (query?.location && !isMongoId(query.location)) {
+      delete query.location;
+    }
+
     return await this.financeModel.find(query ?? {});
   }
 

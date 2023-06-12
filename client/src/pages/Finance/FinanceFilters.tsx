@@ -23,15 +23,18 @@ export function FinanceFilters({ tabName }: { tabName: string }) {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const form = event.currentTarget as HTMLFormElement;
+    const form = new FormData(event.currentTarget as HTMLFormElement);
+
+    const period = (form.get('period') ?? FINANCE_PERIOD_DEFAULT) as number;
+    const location = (form.get('location') ?? 'all') as string;
 
     // узнаем первый день месяца за период
-    const dateFrom = startOfMonth(subMonths(getTodayTimestamp(), form.get('period') + 1)).getTime();
+    const dateFrom = startOfMonth(subMonths(getTodayTimestamp(), period + 1)).getTime();
 
     const filters = {
       dateFrom,
-      period: form.get('period'),
-      location: form.get('location'),
+      period,
+      location,
     };
 
     if (tabName === 'expenses') {
@@ -81,7 +84,7 @@ export function FinanceFilters({ tabName }: { tabName: string }) {
                 >
                   <MenuItem value={'all'}>Все</MenuItem>
                   { responseLocations?.payload.map((location) => (
-                    <MenuItem value={location._id}>{ location.title }</MenuItem>
+                    <MenuItem key={location._id} value={location._id}>{ location.title }</MenuItem>
                   )) }
                 </Select>
             </FormControl>
