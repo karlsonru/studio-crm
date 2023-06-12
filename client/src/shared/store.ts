@@ -6,6 +6,7 @@ import { studentsPageReducer } from './reducers/studentsPageSlice';
 import { subscriptionsPageReducer } from './reducers/subscriptionsPageSlice';
 import { visitsPageReducer } from './reducers/visitsPageSlice';
 import { authReducer } from './reducers/authSlice';
+import { financeReducer } from './reducers/financeSlice';
 import { basicApi } from './api/basicApi';
 
 const store = configureStore({
@@ -17,6 +18,7 @@ const store = configureStore({
     studentsPageReducer,
     subscriptionsPageReducer,
     visitsPageReducer,
+    financeReducer,
     [basicApi.reducerPath]: basicApi.reducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(basicApi.middleware),

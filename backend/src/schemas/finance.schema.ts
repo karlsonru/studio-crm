@@ -23,6 +23,7 @@ export class Finance {
   @Prop({
     type: Number,
     required: true,
+    index: true,
     trim: true,
   })
   date: number;

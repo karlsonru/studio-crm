@@ -1,3 +1,5 @@
+import { FormEvent } from 'react';
+import { startOfMonth, subMonths } from 'date-fns';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Select from '@mui/material/Select';
@@ -6,20 +8,41 @@ import FormLabel from '@mui/material/FormLabel';
 import MenuItem from '@mui/material/MenuItem';
 import { useMobile } from '../../shared/hooks/useMobile';
 import { useGetLocationsQuery } from '../../shared/api';
-// import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { FormContentColumn } from '../../shared/components/FormContentColumn';
+import { useActionCreators } from '../../shared/hooks/useActionCreators';
+import { financeActions } from '../../shared/reducers/financeSlice';
+import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
+import { FINANCE_PERIOD_DEFAULT } from '../../shared/constants';
 
-export function IncomeFilters() {
+export function FinanceFilters({ tabName }: { tabName: string }) {
   const isMobile = useMobile();
   const { data: responseLocations, isLoading } = useGetLocationsQuery();
 
-  const handleSubmit = () => {
-    
-  }
+  const actions = useActionCreators(financeActions);
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget as HTMLFormElement;
+
+    // узнаем первый день месяца за период
+    const dateFrom = startOfMonth(subMonths(getTodayTimestamp(), form.get('period') + 1)).getTime();
+
+    const filters = {
+      dateFrom,
+      period: form.get('period'),
+      location: form.get('location'),
+    };
+
+    if (tabName === 'expenses') {
+      actions.setExpensesFilters(filters);
+    } else if (tabName === 'income') {
+      actions.setIncomeFilters(filters);
+    }
+  };
 
   return (
-    <Box component="form" noValidate>
+    <Box component="form" noValidate onSubmit={handleSubmit}>
       <FormContentColumn>
         <></>
         <Grid container spacing={1.5}>
@@ -29,7 +52,7 @@ export function IncomeFilters() {
                 <Select
                   labelId="period"
                   name="period"
-                  defaultValue={3}
+                  defaultValue={FINANCE_PERIOD_DEFAULT}
                   label="period"
                   disabled={isMobile}
                   sx={{
@@ -65,7 +88,7 @@ export function IncomeFilters() {
           </Grid>
 
           <Grid item xs={6}>
-            <SubmitButton content='Показать' props={{ sx: { minWidth: '135px' } }}/>
+            <SubmitButton content='Показать' props={{ sx: { minWidth: '135px' } }} />
           </Grid>
         </Grid>
       </FormContentColumn>

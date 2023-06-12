@@ -5,7 +5,8 @@ import Tab from '@mui/material/Tab';
 import TabPanel from '@mui/lab/TabPanel';
 import Stack from '@mui/material/Stack';
 import { ContentTabIncome } from './ContentTabIncome';
-import { ContentTabOutcome } from './ContentTabOutcome';
+import { FinanceFilters } from './FinanceFilters';
+import { ContentTabExpenses } from './ContentTabExpenses';
 import { useTitle } from '../../shared/hooks/useTitle';
 
 /*
@@ -28,7 +29,7 @@ import { useTitle } from '../../shared/hooks/useTitle';
 export function FinancePage() {
   useTitle('Финансы');
 
-  const [value, setValue] = useState('income');
+  const [value, setValue] = useState('expenses');
 
   return (
     <>
@@ -50,10 +51,12 @@ export function FinancePage() {
           </Tabs>
         </Stack>
         <TabPanel value="income">
+          <FinanceFilters tabName="income" />
           <ContentTabIncome />
         </TabPanel>
         <TabPanel value="expenses">
-          <ContentTabOutcome />
+          <FinanceFilters tabName="expenses" />
+          <ContentTabExpenses />
         </TabPanel>
       </TabContext>
 

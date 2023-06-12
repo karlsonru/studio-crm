@@ -11,7 +11,6 @@ import { Bar } from 'react-chartjs-2';
 import { eachMonthOfInterval, format, subMonths } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import Box from '@mui/material/Box';
-import { IncomeFilters } from './IncomeFilters';
 import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 import { useMobile } from '../../shared/hooks/useMobile';
 
@@ -39,8 +38,6 @@ export function ContentTabIncome() {
 
   // костыль с <div>&nbsp;</div> для нормального resize Bar https://github.com/chartjs/Chart.js/issues/11005
   return (
-    <>
-    <IncomeFilters />
     <Box component='div'>
       <div>&nbsp;</div>
       <Bar
@@ -72,6 +69,5 @@ export function ContentTabIncome() {
         }}
       />
     </Box>
-    </>
   );
 }
