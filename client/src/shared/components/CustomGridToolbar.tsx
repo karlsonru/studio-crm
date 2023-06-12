@@ -19,7 +19,7 @@ export function CustomGridToolbar(elements: React.ReactNode[]) {
     }}>
 
       <Box>
-        <GridToolbarQuickFilter placeholder="Поиск" size="small" variant="outlined" />
+        <GridToolbarQuickFilter placeholder="Поиск" size="small" variant="outlined" inputProps={{ sx: { height: '25.5px' } }}/>
 
         {!isMobile && <GridToolbarFilterButton componentsProps={{
           button: {
