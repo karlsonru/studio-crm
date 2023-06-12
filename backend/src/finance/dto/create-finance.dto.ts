@@ -15,7 +15,7 @@ export class CreateFinanceDto {
   type?: string;
 
   @IsOptional()
-  @IsMongoId()
+  @IsString()
   location?: string;
 
   @IsOptional()

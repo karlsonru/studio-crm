@@ -13,12 +13,13 @@ import { useMobile } from '../../shared/hooks/useMobile';
 import { IFinanceModel } from '../../shared/models/IFinanceModel';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
-// import { SearchParamsButton } from '../../shared/components/buttons/SearchParamsButton';
+import { SearchParamsButton } from '../../shared/components/buttons/SearchParamsButton';
 import { CustomGridToolbar } from '../../shared/components/CustomGridToolbar';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { ShowError } from '../../shared/components/ShowError';
 import { Loading } from '../../shared/components/Loading';
 import { financeActions } from '../../shared/reducers/financeSlice';
+import { CreateFinanceExpenseModal } from '../../shared/components/modals/CreateFinanceExpenseModal';
 
 function ExtendedToolbar() {
   const [deleteFinanceRecord] = useDeleteFinanceMutation();
@@ -36,6 +37,8 @@ function ExtendedToolbar() {
       setModalOpen={actions.setConfirmationDialog}
       callback={() => deleteFinanceRecord(currentFinanceRecord?._id ?? '')}
     />,
+    <SearchParamsButton title="Добавить" param="create-expense" />,
+    <CreateFinanceExpenseModal />,
   ]);
 }
 

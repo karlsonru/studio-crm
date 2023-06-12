@@ -15,6 +15,7 @@ import { FinanceService } from './finance.service';
 import { CreateFinanceDto } from './dto/create-finance.dto';
 import { UpdateFinanceDto } from './dto/update-finance.dto';
 import { ValidateIdPipe } from '../shared/validaitonPipe';
+import { isMongoId } from 'class-validator';
 
 @Controller('finance')
 export class FinanceController {
@@ -22,6 +23,11 @@ export class FinanceController {
 
   @Post()
   async create(@Body() createFinanceDto: CreateFinanceDto) {
+    // если передан общий тип, то не добавляем его как локацию
+    if (!isMongoId(createFinanceDto.location)) {
+      delete createFinanceDto.location;
+    }
+
     const created = await this.financeService.create(createFinanceDto);
 
     return {
