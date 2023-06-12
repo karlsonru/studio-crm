@@ -1,7 +1,6 @@
 import { FormEvent } from 'react';
 import { startOfMonth, subMonths } from 'date-fns';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
@@ -46,54 +45,54 @@ export function FinanceFilters({ tabName }: { tabName: string }) {
 
   return (
     <Box component="form" noValidate onSubmit={handleSubmit}>
-      <FormContentColumn>
-        <></>
-        <Grid container spacing={1.5}>
-          <Grid item xs={4}>
-            <FormControl>
-              <FormLabel>Период</FormLabel>
-                <Select
-                  labelId="period"
-                  name="period"
-                  defaultValue={FINANCE_PERIOD_DEFAULT}
-                  label="period"
-                  disabled={isMobile}
-                  sx={{
-                    minWidth: '135px',
-                  }}
-                >
-                  <MenuItem value={3}>3 месяца</MenuItem>
-                  <MenuItem value={6}>6 месяцев</MenuItem>
-                  <MenuItem value={12}>12 месяцев</MenuItem>
-                </Select>
-            </FormControl>
-          </Grid>
+      <FormContentColumn props={{ direction: 'row', flexWrap: 'wrap', alignItems: 'center' }}>
+        <FormControl>
+          <FormLabel>Период</FormLabel>
+            <Select
+              labelId="period"
+              name="period"
+              defaultValue={FINANCE_PERIOD_DEFAULT}
+              label="period"
+              disabled={isMobile}
+              sx={{
+                minWidth: '135px',
+              }}
+            >
+              <MenuItem value={3}>3 месяца</MenuItem>
+              <MenuItem value={6}>6 месяцев</MenuItem>
+              <MenuItem value={12}>12 месяцев</MenuItem>
+            </Select>
+        </FormControl>
 
-          <Grid item xs={4}>
-            <FormControl>
-              <FormLabel>Студия</FormLabel>
-                <Select
-                  labelId="location"
-                  name="location"
-                  defaultValue={'all'}
-                  label="location"
-                  disabled={isLoading}
-                  sx={{
-                    minWidth: '135px',
-                  }}
-                >
-                  <MenuItem value={'all'}>Все</MenuItem>
-                  { responseLocations?.payload.map((location) => (
-                    <MenuItem key={location._id} value={location._id}>{ location.title }</MenuItem>
-                  )) }
-                </Select>
-            </FormControl>
-          </Grid>
+        <FormControl>
+          <FormLabel>Помещение</FormLabel>
+            <Select
+              labelId="location"
+              name="location"
+              defaultValue={'all'}
+              label="location"
+              disabled={isLoading}
+              sx={{
+                minWidth: '135px',
+              }}
+            >
+              <MenuItem value={'all'}>Все</MenuItem>
+              { responseLocations?.payload.map((location) => (
+                <MenuItem key={location._id} value={location._id}>{ location.title }</MenuItem>
+              )) }
+            </Select>
+        </FormControl>
 
-          <Grid item xs={6}>
-            <SubmitButton content='Показать' props={{ sx: { minWidth: '135px' } }} />
-          </Grid>
-        </Grid>
+        <SubmitButton
+          content='Показать'
+          props={{
+            sx: {
+              minWidth: '135px',
+              ml: `${(isMobile ? 0 : '16px')}!important`,
+              mt: `${isMobile ? '0.5rem' : 0}!important`,
+            },
+          }}
+        />
       </FormContentColumn>
     </Box>
   );

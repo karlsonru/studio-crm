@@ -50,11 +50,11 @@ export function FinancePage() {
             <Tab label="Расходы" value="expenses" />
           </Tabs>
         </Stack>
-        <TabPanel value="income">
+        <TabPanel value="income" sx={{ padding: 1 }} >
           <FinanceFilters tabName="income" />
           <ContentTabIncome />
         </TabPanel>
-        <TabPanel value="expenses">
+        <TabPanel value="expenses" sx={{ padding: 1 }}>
           <FinanceFilters tabName="expenses" />
           <ContentTabExpenses />
         </TabPanel>

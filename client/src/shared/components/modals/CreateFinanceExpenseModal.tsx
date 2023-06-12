@@ -125,6 +125,7 @@ export function CreateFinanceExpenseModal() {
         placeholder='Комментарий'
         autoFocus
         fullWidth
+        multiline
         minRows={3}
         inputProps={{
           minLength: 3,

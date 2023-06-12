@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, PopulateOptions } from 'mongoose';
 import { CreateFinanceDto } from './dto/create-finance.dto';
 import { UpdateFinanceDto } from './dto/update-finance.dto';
 import { FinanceDocument, FinanceModel } from '../schemas';
@@ -10,10 +10,14 @@ import { isMongoId } from 'class-validator';
 
 @Injectable()
 export class FinanceService {
+  private readonly populateQuery: Array<PopulateOptions>;
+
   constructor(
     @InjectModel(FinanceModel.name)
     private readonly financeModel: Model<FinanceDocument>,
-  ) {}
+  ) {
+    this.populateQuery = [{ path: 'location', select: '_id title' }];
+  }
 
   async create(createFinanceDto: CreateFinanceDto) {
     const record = await this.financeModel.create(createFinanceDto);
@@ -31,11 +35,11 @@ export class FinanceService {
       delete query.location;
     }
 
-    return await this.financeModel.find(query ?? {});
+    return await this.financeModel.find(query ?? {}).populate(this.populateQuery);
   }
 
   async findOne(query: IFilterQuery<FinanceModel>) {
-    return await this.financeModel.findOne(query);
+    return await this.financeModel.findOne(query).populate(this.populateQuery);
   }
 
   async update(id: string, updateFinanceDto: UpdateFinanceDto) {

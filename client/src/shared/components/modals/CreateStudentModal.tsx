@@ -8,7 +8,6 @@ import FormHelperText from '@mui/material/FormHelperText';
 import RadioGroup from '@mui/material/RadioGroup';
 import Radio from '@mui/material/Radio';
 import Stack from '@mui/system/Stack';
-import TextareaAutosize from '@mui/material/TextareaAutosize';
 import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -149,8 +148,14 @@ export function CreateStudentModal() {
       <Button variant="outlined" onClick={addContact}>Добавить контакт</Button>
       <hr/>
 
-      <InputLabel>Комментарий</InputLabel>
-      <TextareaAutosize name="comment" minRows={5} />
+      <TextField
+        variant="outlined"
+        name="comment"
+        label="Комментарий"
+        multiline
+        minRows={5}
+        fullWidth
+      />
 
     </DialogFormWrapper>
   );

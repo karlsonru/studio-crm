@@ -83,7 +83,7 @@ export function ContentTabExpenses() {
       headerName: 'Локация',
       flex: 1,
       valueFormatter: (params: GridValueFormatterParams<IFinanceModel['location']>) => (
-        params.value ?? 'Общий'
+        params.value?.title ?? 'Общий'
       ),
     },
     {

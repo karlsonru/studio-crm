@@ -1,9 +1,14 @@
 import { ReactNode } from 'react';
-import Stack from '@mui/material/Stack';
+import Stack, { StackProps } from '@mui/material/Stack';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { MODAL_FORM_WIDTH, MOBILE_WIDTH_BREAKPOINT } from '../constants';
 
-export function FormContentColumn({ children }: { children: Array<ReactNode> }) {
+interface IFormContentColumn {
+  children: Array<ReactNode> | ReactNode;
+  props?: StackProps;
+}
+
+export function FormContentColumn({ children, props }: IFormContentColumn) {
   const isMobile = useMediaQuery(`(max-width: ${MOBILE_WIDTH_BREAKPOINT})`);
   return (
     <Stack
@@ -11,6 +16,7 @@ export function FormContentColumn({ children }: { children: Array<ReactNode> }) 
       direction='column'
       spacing={2}
       width={isMobile ? 'auto' : MODAL_FORM_WIDTH}
+      {...props}
     >
       { children }
     </Stack>
