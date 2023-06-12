@@ -65,6 +65,11 @@ export class FinanceController {
     @Param('id', ValidateIdPipe) id: string,
     @Body() updateFinanceDto: UpdateFinanceDto,
   ) {
+    // если передан общий тип, то не добавляем его как локацию
+    if (!isMongoId(updateFinanceDto.location)) {
+      delete updateFinanceDto.location;
+    }
+
     const updated = await this.financeService.update(id, updateFinanceDto);
 
     if (!updated) {

@@ -51,15 +51,13 @@ function validateForm(formData: { [key: string]: FormDataEntryValue }) {
 export function CreateStudentModal() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [createStudent, { isSuccess, isError, data }] = useCreateStudentMutation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [contacts, setContacts] = useState<Array<number>>([0]);
   const [formValidation, setFormValidation] = useState({
     fullname: true,
     hasContacts: true,
     validPhone: true,
   });
-
-  const handleClose = () => setSearchParams(undefined);
 
   const addContact = () => {
     setContacts((prevState) => [...prevState, prevState.length]);
@@ -113,7 +111,6 @@ export function CreateStudentModal() {
     <DialogFormWrapper
       title='Добавить ученика'
       isOpen={searchParams.has('create-student')}
-      onClose={handleClose}
       onSubmit={submitHandler}
     >
       <TextField

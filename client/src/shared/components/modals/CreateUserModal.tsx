@@ -46,12 +46,10 @@ export function CreateUserModal() {
     password: true,
   });
 
-  const handleClose = () => setSearchParams(undefined);
-
   useEffect(() => {
     if (!isSuccess) return;
 
-    const timerId = setTimeout(handleClose, 500);
+    const timerId = setTimeout(() => setSearchParams(undefined), 500);
 
     return () => clearTimeout(timerId);
   }, [isSuccess]);
@@ -96,7 +94,6 @@ export function CreateUserModal() {
     <DialogFormWrapper
       title="Добавить сотрудника"
       isOpen={searchParams.has('create-user')}
-      onClose={handleClose}
       onSubmit={submitHandler}
     >
       <TextField

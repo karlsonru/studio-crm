@@ -21,14 +21,12 @@ import { useMobile } from '../../hooks/useMobile';
 
 export function CreateSubscriptionModal() {
   const isMobile = useMobile();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const [createSubsciption] = useCreateSubscriptionMutation();
   const { data: studentsData } = useGetStudentsQuery();
   const { data: templatesData } = useGetSubscriptionTemplatesQuery();
   const { data: lessonsData } = useGetLessonsQuery();
-
-  const handleClose = () => setSearchParams(undefined);
 
   if (!templatesData || !studentsData || !lessonsData) return null;
 
@@ -59,7 +57,6 @@ export function CreateSubscriptionModal() {
       isActive: true,
     });
 
-    console.log('reset');
     form.reset();
   };
 
@@ -67,7 +64,6 @@ export function CreateSubscriptionModal() {
     <DialogFormWrapper
       title='Оформить абонемент'
       isOpen={searchParams.has('create-subscription')}
-      onClose={handleClose}
       onSubmit={handleSubmit}
     >
       <Autocomplete

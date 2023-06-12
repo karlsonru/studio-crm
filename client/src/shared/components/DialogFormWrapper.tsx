@@ -1,4 +1,5 @@
-import React, { FormEvent, ReactNode } from 'react';
+import { FormEvent, ReactNode } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -11,16 +12,18 @@ import { SubmitButton } from './buttons/SubmitButton';
 interface IForm {
   title: string;
   isOpen: boolean;
-  onClose: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   children: Array<ReactNode>;
 }
 
 export function DialogFormWrapper({
-  title, isOpen, onClose, onSubmit, children,
+  title, isOpen, onSubmit, children,
 }: IForm) {
+  const [, setSearchParams] = useSearchParams();
+  const closeHandler = () => setSearchParams(undefined);
+
   return (
-    <Dialog open={isOpen} onClose={onClose}>
+    <Dialog open={isOpen} onClose={closeHandler}>
       <DialogTitle>{title}</DialogTitle>
 
       <DialogContent>
@@ -34,7 +37,7 @@ export function DialogFormWrapper({
               autoFocus
               variant='contained'
               color='error'
-              onClick={onClose}
+              onClick={closeHandler}
             >
               Закрыть
             </Button>

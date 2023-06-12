@@ -45,13 +45,11 @@ function validateFrom(formData: { [key: string]: FormDataEntryValue }) {
 
 export function CreateLessonModal() {
   const isMobile = useMobile();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const [createLesson] = useCreateLessonMutation();
   const { data: locationsData, isSuccess: isLocationsSuccess } = useGetLocationsQuery();
   const { data: usersData, isSuccess: isUsersSuccess } = useGetUsersQuery();
-
-  const closeHandler = () => setSearchParams(undefined);
 
   const [formValidation, setFormValidation] = useState({
     title: true,
@@ -112,7 +110,6 @@ export function CreateLessonModal() {
     <DialogFormWrapper
       title='Добавить занятие'
       isOpen={searchParams.has('create-lesson')}
-      onClose={closeHandler}
       onSubmit={handleSubmit}
     >
       <TextField

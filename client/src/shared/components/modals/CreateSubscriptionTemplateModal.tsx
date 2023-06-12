@@ -23,7 +23,7 @@ function validateForm(formData: { [key: string]: FormDataEntryValue }) {
 }
 
 export function CreateSubscriptionTemplateModal() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [
     createSubscriptionTemplate,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -35,8 +35,6 @@ export function CreateSubscriptionTemplateModal() {
     visits: true,
     duration: true,
   });
-
-  const handleClose = () => setSearchParams(undefined);
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -90,7 +88,6 @@ export function CreateSubscriptionTemplateModal() {
     <DialogFormWrapper
       title='Добавить шаблон'
       isOpen={searchParams.has('create-subscription-template')}
-      onClose={handleClose}
       onSubmit={submitHandler}
     >
       <TextField

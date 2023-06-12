@@ -38,7 +38,7 @@ function calculateDuration(period: string, duration: number) {
 }
 
 export function UpdateSubscriptionTemplateModal() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const { data: templateEdit } = useGetSubscriptionTemplatesQuery(undefined, {
     selectFromResult: ({ data }) => ({
       data: data?.payload.find((template) => template._id === searchParams.get('id')),
@@ -60,8 +60,6 @@ export function UpdateSubscriptionTemplateModal() {
   if (!templateEdit) {
     return null;
   }
-
-  const handleClose = () => setSearchParams(undefined);
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -103,7 +101,6 @@ export function UpdateSubscriptionTemplateModal() {
     <DialogFormWrapper
       title='Редактировать шаблон'
       isOpen={searchParams.has('update-template')}
-      onClose={handleClose}
       onSubmit={submitHandler}
     >
       <TextField

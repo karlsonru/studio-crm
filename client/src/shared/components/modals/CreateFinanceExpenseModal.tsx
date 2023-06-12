@@ -20,12 +20,10 @@ function validateFrom(formData: { [key: string]: FormDataEntryValue }) {
 }
 
 export function CreateFinanceExpenseModal() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const [createExpense] = useCreateFinanceMutation();
   const { data: locationsData, isSuccess: isLocationsSuccess } = useGetLocationsQuery();
-
-  const closeHandler = () => setSearchParams(undefined);
 
   const [formValidation, setFormValidation] = useState({
     title: true,
@@ -51,8 +49,6 @@ export function CreateFinanceExpenseModal() {
       return;
     }
 
-    console.log(formData.date);
-
     createExpense({
       title: formData.title as string,
       amount: +formData.amount,
@@ -68,7 +64,6 @@ export function CreateFinanceExpenseModal() {
     <DialogFormWrapper
       title='Добавить расходы'
       isOpen={searchParams.has('create-expense')}
-      onClose={closeHandler}
       onSubmit={handleSubmit}
     >
       <TextField
