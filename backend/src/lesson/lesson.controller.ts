@@ -17,6 +17,7 @@ import { UpdateLessonDto } from './dto/update-lesson.dto';
 import { ValidateIdPipe } from '../shared/validaitonPipe';
 import { LessonModel } from '../schemas';
 import { MongooseClassSerializerInterceptor } from 'src/shared/mongooseClassSerializer.interceptor';
+import { IFilterQuery } from 'src/shared/IFilterQuery';
 
 @Controller('lesson')
 @UseInterceptors(MongooseClassSerializerInterceptor(LessonModel))
@@ -70,8 +71,11 @@ export class LessonController {
   }
 
   @Patch(':id')
-  async update(@Param('id', ValidateIdPipe) id: string, @Body() updateLessonDto: UpdateLessonDto) {
-    const updated = await this.service.update(id, updateLessonDto);
+  async update(
+    @Param('id', ValidateIdPipe) id: string,
+    @Body() updateLessonDto: UpdateLessonDto | IFilterQuery<LessonModel>,
+  ) {
+    const updated = await this.service.update(id, updateLessonDto as UpdateLessonDto);
 
     if (updated === null) {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);

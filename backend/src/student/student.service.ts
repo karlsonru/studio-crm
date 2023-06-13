@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { StudentModel, StudentDocument } from '../schemas';
+import { IFilterQuery } from 'src/shared/IFilterQuery';
 
 @Injectable()
 export class StudentService {
@@ -26,8 +27,8 @@ export class StudentService {
     return created;
   }
 
-  async findAll(): Promise<Array<StudentModel>> {
-    return await this.studentModel.find({});
+  async findAll(query: IFilterQuery<StudentModel>): Promise<Array<StudentModel>> {
+    return await this.studentModel.find(query);
   }
 
   async findOne(id: string): Promise<StudentModel | null> {

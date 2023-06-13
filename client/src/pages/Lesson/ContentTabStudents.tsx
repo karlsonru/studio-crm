@@ -9,12 +9,14 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import SyncIcon from '@mui/icons-material/Sync';
+import { Loading } from 'shared/components/Loading';
+import { ShowError } from 'shared/components/ShowError';
 import { ChangeTeacherDialog } from './ChangeTeacherDialog';
 import { useMobile } from '../../shared/hooks/useMobile';
 import { useGetLessonQuery, usePatchLessonMutation } from '../../shared/api';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { IStudentModel } from '../../shared/models/IStudentModel';
-import { AddStudentButton } from './AddStudentDialog';
+import { AddStudentButton, AddStudentsDialog } from './AddStudentDialog';
 
 function CardContentItem({ title, value }: { title: string, value: string | number }) {
   return (
@@ -81,18 +83,23 @@ function AddCard({ lessonId, student }: IAddCard) {
 
 export function ContentStudents({ lessonId }: { lessonId: string }) {
   const isMobile = useMobile();
-  const [isModalOpen, setModalOpen] = useState(false);
-  const { data, isError, isFetching } = useGetLessonQuery(lessonId);
+  const [isChangeTeacher, setChangeTeacher] = useState(false);
+  const [isAddStudent, setAddStudent] = useState(false);
+  const {
+    data, isError, isLoading, error,
+  } = useGetLessonQuery(lessonId);
 
   if (isError) {
-    return <h3>Ошибка при запросе!</h3>;
+    return <ShowError details={error}/>;
   }
 
-  if (isFetching || !data?.payload) {
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (!data?.payload) {
     return null;
   }
-
-  // TODO - добавить телефон педагога и выводить его в карточке
 
   return (
     <>
@@ -103,11 +110,10 @@ export function ContentStudents({ lessonId }: { lessonId: string }) {
             (student) => <AddCard key={student._id} lessonId={lessonId} student={student} />,
           )
         }
-        <AddStudentButton lessonId={lessonId} />
+        <AddStudentButton setModalOpen={setAddStudent} />
       </Grid>
 
       <Divider sx={{ m: '1rem 0' }} />
-
       <Typography mb="1rem" variant="h5" component={'h5'}>Педагог</Typography>
 
       <Card
@@ -121,7 +127,7 @@ export function ContentStudents({ lessonId }: { lessonId: string }) {
         <CardHeader
           title={data.payload.teacher.fullname}
           action={
-            <IconButton onClick={() => setModalOpen(true)}>
+            <IconButton onClick={() => setChangeTeacher(true)}>
               <SyncIcon />
             </IconButton>
           } />
@@ -134,10 +140,16 @@ export function ContentStudents({ lessonId }: { lessonId: string }) {
 
       </Card>
 
+      <AddStudentsDialog
+        lesson={data.payload}
+        isOpen={isAddStudent}
+        setModalOpen={setAddStudent}
+      />
+
       <ChangeTeacherDialog
         lesson={data.payload}
-        isOpen={isModalOpen}
-        setModalOpen={setModalOpen}
+        isOpen={isChangeTeacher}
+        setModalOpen={setChangeTeacher}
       />
 
     </>

@@ -9,6 +9,7 @@ import {
   HttpException,
   HttpStatus,
   UseInterceptors,
+  Query,
 } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { CreateStudentDto } from './dto/create-student.dto';
@@ -37,10 +38,13 @@ export class StudentController {
   }
 
   @Get()
-  async findAll() {
+  async findAll(@Query('filter') filter?: string) {
+    console.log(`Получен запрос: ${filter ?? 'empty'}`);
+    if (filter) console.log(JSON.parse(filter));
+
     return {
       message: 'success',
-      payload: await this.service.findAll(),
+      payload: await this.service.findAll(filter ? JSON.parse(filter) : {}),
     };
   }
 

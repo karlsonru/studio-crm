@@ -50,7 +50,7 @@ export function StudentsContent() {
   const actions = useActionCreators(studentsPageActions);
   const navigate = useNavigate();
 
-  const { data, isFetching, error } = useGetStudentsQuery();
+  const { data, isLoading, error } = useGetStudentsQuery();
 
   const deleteStudentHandler = useCallback((currentStudent: IStudentModel) => {
     actions.setCurrentStudent(currentStudent);
@@ -106,7 +106,7 @@ export function StudentsContent() {
     },
   ], [deleteStudentHandler, dateValueFormatter]);
 
-  if (isFetching) {
+  if (isLoading) {
     return <Loading />;
   }
 

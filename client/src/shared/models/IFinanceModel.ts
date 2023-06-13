@@ -6,7 +6,7 @@ export interface IFinanceModel {
   date: number;
   amount: number;
   type?: string;
-  location?: ILocationModel;
+  location?: Pick<ILocationModel, '_id' | 'title'>;
   comment?: string;
 }
 
