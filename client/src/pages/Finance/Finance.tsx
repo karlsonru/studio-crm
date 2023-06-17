@@ -29,7 +29,7 @@ import { useTitle } from '../../shared/hooks/useTitle';
 export function FinancePage() {
   useTitle('Финансы');
 
-  const [value, setValue] = useState('expenses');
+  const [value, setValue] = useState('income');
 
   return (
     <>

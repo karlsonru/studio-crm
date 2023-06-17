@@ -35,19 +35,4 @@ export class StatisticController {
       payload: statistic,
     };
   }
-
-  @Get('/finance/expenses/:locationId')
-  async statFinanceExpenses(
-    @Query('filter') filter: string,
-    @Param('locationId') locationId: string,
-  ) {
-    const query = JSON.parse(filter);
-
-    const statistic = await this.statisticService.calcExpenses(query, locationId);
-
-    return {
-      message: 'success',
-      payload: statistic,
-    };
-  }
 }

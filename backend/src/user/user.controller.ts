@@ -46,7 +46,7 @@ export class UserController {
 
   @Get(':id')
   async findOne(@Param('id', ValidateIdPipe) id: string) {
-    const candidate = await this.service.findOne({ id });
+    const candidate = await this.service.findOne({ _id: id });
 
     if (candidate === null) {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);

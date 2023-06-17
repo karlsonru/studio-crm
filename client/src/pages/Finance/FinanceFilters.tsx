@@ -25,7 +25,7 @@ export function FinanceFilters({ tabName }: { tabName: string }) {
     const form = new FormData(event.currentTarget as HTMLFormElement);
 
     const period = (form.get('period') ?? FINANCE_PERIOD_DEFAULT) as number;
-    const location = (form.get('location') ?? 'all') as string;
+    const location = (form.get('location') ?? 'common') as string;
 
     // узнаем первый день месяца за период
     const dateFrom = startOfMonth(subMonths(getTodayTimestamp(), period + 1)).getTime();
@@ -69,14 +69,14 @@ export function FinanceFilters({ tabName }: { tabName: string }) {
             <Select
               labelId="location"
               name="location"
-              defaultValue={'all'}
+              defaultValue={'common'}
               label="location"
               disabled={isLoading}
               sx={{
                 minWidth: '135px',
               }}
             >
-              <MenuItem value={'all'}>Все</MenuItem>
+              <MenuItem value={'common'}>Все</MenuItem>
               { responseLocations?.payload.map((location) => (
                 <MenuItem key={location._id} value={location._id}>{ location.title }</MenuItem>
               )) }

@@ -14,7 +14,7 @@ interface IVisitedLessonsWithStatistic {
   statistic: Record<string, number>;
 }
 
-interface IStatisticArgs {
+export interface IStatisticArgs {
   query: Record<string, unknown>;
   id?: string;
 }
@@ -39,7 +39,8 @@ export const { useGetVisitedLessonsStatisticByStudentQuery } = basicApi.injectEn
 
 interface IIncomeStatistic {
   income: Array<number>;
-  outcome: Array<number>;
+  amount: Array<number>;
+  expenses: Array<number>;
 }
 
 export const { useGetIncomeStatisticQuery } = basicApi.injectEndpoints({

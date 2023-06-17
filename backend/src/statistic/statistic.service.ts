@@ -4,6 +4,8 @@ import { VisitedLessonService } from '../visited-lesson/visited-lesson.service';
 import { BillingStatus, VisitStatus } from '../schemas/visitedLesson.schema';
 import { VisitedLessonModel, SubscriptionModel } from '../schemas';
 import { SubscriptionService } from '../subscription/subscription.service';
+import { FinanceService } from '../finance/finance.service';
+import { isMongoId } from 'class-validator';
 
 export interface IFindVisitedByStudentWithStatistic {
   visitedLessons: Array<VisitedLessonModel>;
@@ -15,6 +17,7 @@ export class StatisticService {
   constructor(
     private visitedLessonsService: VisitedLessonService,
     private subscribtionService: SubscriptionService,
+    private financeService: FinanceService,
   ) {}
 
   async calcVisitedLessonsByStudent(
@@ -68,38 +71,41 @@ export class StatisticService {
     const subscriptions = await this.subscribtionService.findAll({
       dateFrom: { $gte: filter.dateFrom },
     });
+    const expenses = await this.financeService.findAll({
+      date: { $gte: filter.dateFrom },
+    });
 
-    const incomeByMonth: Record<number, number> = {};
-    const amountByMonth: Record<number, number> = {};
+    const incomeByMonth: Array<number> = Array(12).fill(0);
+    const amountByMonth: Array<number> = Array(12).fill(0);
+    const expensesByMonth: Array<number> = Array(12).fill(0);
+
+    const isCheckLocation = isMongoId(locationId);
 
     // найдём общий доход и кол-во абонементов по каждому месяцу
     subscriptions.forEach((subscription) => {
-      if (locationId && locationId !== subscription.lesson.location._id.toString()) return;
+      if (isCheckLocation && locationId !== subscription.lesson.location._id.toString()) return;
 
       const month = new Date(subscription.dateFrom).getMonth();
 
-      if (month in incomeByMonth) {
-        incomeByMonth[month] += subscription.template.price;
-      } else {
-        incomeByMonth[month] = subscription.template.price;
-      }
-
-      if (month in amountByMonth) {
-        amountByMonth[month] += 1;
-      } else {
-        amountByMonth[month] = 1;
-      }
+      incomeByMonth[month] += subscription.template.price;
+      amountByMonth[month] += 1;
     });
 
-    // сортируем по возрастанию - последние месяцы будут в конце
-    const incomeKeys = Object.keys(incomeByMonth).sort((a, b) => +a - +b);
-    const amountKeys = Object.keys(amountByMonth).sort((a, b) => +a - +b);
+    expenses.forEach((expense) => {
+      if (isCheckLocation && locationId !== expense.location?._id.toString()) return;
+
+      const month = new Date(expense.date).getMonth();
+
+      expensesByMonth[month] += expense.amount;
+    });
 
     return {
-      income: incomeKeys.map((key) => incomeByMonth[+key]),
-      amount: amountKeys.map((key) => amountByMonth[+key]),
+      income: incomeByMonth,
+      amount: amountByMonth,
+      expenses: expensesByMonth,
     };
   }
 
-  async calcExpenses(filter: IFilterQuery<SubscriptionModel>, locationId?: string) {}
+  async calcMonthIncomeByUser(filter: IFilterQuery<SubscriptionModel>, userId: string) {
+  }
 }

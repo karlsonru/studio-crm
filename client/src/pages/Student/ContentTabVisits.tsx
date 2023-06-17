@@ -170,9 +170,10 @@ export function ContentTabVisits({ studentId }: { studentId: string }) {
   let studentFullname = '';
 
   const headersVisits = isMobile ? ['Занятие', 'Дата занятия'] : ['Занятие', 'Дата занятия', 'Статус посещения', 'Статус оплаты'];
-  const rowsVisits = responseVisitedLessonsStatisticByStudent
+  const rowsVisits = [...responseVisitedLessonsStatisticByStudent
     .payload
-    .visitedLessons
+    .visitedLessons]
+    .sort((a, b) => (b.date - a.date))
     .map((visitedLesson) => {
       // с backend'а всегда возвращается массив с 1 студентом по которому делали запрос
       const studentVisit = visitedLesson.students[0];

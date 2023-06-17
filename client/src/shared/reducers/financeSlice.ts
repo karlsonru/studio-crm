@@ -25,12 +25,12 @@ const initialState: IFinanceState = {
   income: {
     period: FINANCE_PERIOD_DEFAULT,
     dateFrom,
-    location: 'all',
+    location: 'common',
   },
   expenses: {
     period: FINANCE_PERIOD_DEFAULT,
     dateFrom,
-    location: 'all',
+    location: 'common',
   },
   isConfirmationDialog: false,
   currentFinanceRecord: null,
