@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { VisitedLessonModel, VisitedLessonSchema } from '../schemas';
 import { SubscriptionModel, SubscriptionSchema } from '../schemas';
 import { SubscriptionModule } from '../subscription/subscription.module';
-import { BillingModulde } from '../billing/billing.module';
+import { BillingModulde } from '../subscription-charge/subscriptionCharge.module';
 
 @Module({
   imports: [

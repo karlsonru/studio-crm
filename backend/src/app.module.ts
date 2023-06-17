@@ -9,7 +9,7 @@ import { LocationModule } from './location/location.module';
 import { SubscriptionTemplateModule } from './subscription-template/subscription-template.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { VisitedLessonModule } from './visited-lesson/visited-lesson.module';
-import { BillingService } from './billing/billing.service';
+import { SubscriptionChargeService } from './subscription-charge/subscriptionCharge.service';
 import { StatisticModule } from './statistic/statistic.module';
 import { AuthModule } from './auth/auth.module';
 import { FinanceModule } from './finance/finance.module';
@@ -33,6 +33,6 @@ import { FinanceModule } from './finance/finance.module';
     FinanceModule,
   ],
   controllers: [AppController],
-  providers: [AppService, BillingService],
+  providers: [AppService, SubscriptionChargeService],
 })
 export class AppModule {}

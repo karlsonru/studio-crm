@@ -108,11 +108,11 @@ export class StatisticService {
 
   async calcIncomeByUser(filter: IFilterQuery<SubscriptionModel>, userId: string) {
     const subscriptions = await this.subscribtionService.findAll({
-      $and: [{ dateFrom: { $gte: filter.dateFrom } }, { dateTo: { $lte: filter.dateTo } }],
+      dateFrom: { $gte: filter.dateFrom },
     });
 
     return subscriptions
-      .filter((subscription) => (subscription.lesson.teacher as unknown as string) === userId)
+      .filter((subscription) => (subscription.lesson?.teacher as unknown as string) === userId)
       .reduce((prev, curr) => prev + curr.template.price, 0);
   }
 }

@@ -1,5 +1,4 @@
 import { FormEvent, useState } from 'react';
-import { endOfMonth } from 'date-fns';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Select from '@mui/material/Select';
@@ -35,7 +34,6 @@ export function IncomeByUser() {
   } = useGetIncomeByUserQuery({
     query: {
       dateFrom: new Date(now.getFullYear(), +month, 1).getTime(),
-      dateTo: endOfMonth(new Date(now.getFullYear(), +month)).getTime(),
     },
     id: userId,
   }, {

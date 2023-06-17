@@ -28,7 +28,7 @@ interface IChargeBackSubscription {
 }
 
 @Injectable()
-export class BillingService {
+export class SubscriptionChargeService {
   constructor(private readonly subscriptionService: SubscriptionService) {}
 
   async addSubscription(visitedStudents: IVisitedStudentDto[], lessonId: string, date: number) {

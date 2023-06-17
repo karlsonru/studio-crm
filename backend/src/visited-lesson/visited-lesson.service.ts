@@ -4,7 +4,7 @@ import { ClientSession, Model, PopulateOptions } from 'mongoose';
 import { CreateVisitedLessonDto } from './dto/create-visited-lesson.dto';
 import { UpdateVisitedLessonDto } from './dto/update-visited-lesson.dto';
 import { VisitedLessonModel, VisitedLessonDocument } from '../schemas';
-import { BillingService } from '../billing/billing.service';
+import { SubscriptionChargeService } from '../subscription-charge/subscriptionCharge.service';
 import { IFilterQuery } from '../shared/IFilterQuery';
 import { withTransaction } from '../shared/withTransaction';
 import { logger } from '../shared/logger.middleware';
@@ -16,7 +16,7 @@ export class VisitedLessonService {
   constructor(
     @InjectModel(VisitedLessonModel.name)
     private readonly visitedLessonModel: Model<VisitedLessonDocument>,
-    private readonly billingService: BillingService,
+    private readonly subscriptionChargeService: SubscriptionChargeService,
   ) {
     this.populateQueryVisitedLesson = [
       'lesson',
@@ -48,23 +48,23 @@ export class VisitedLessonService {
 
     const transaction = async (session: ClientSession) => {
       // для каждого студента добавим абонемент с которго нужно списать
-      await this.billingService.addSubscription(
+      await this.subscriptionChargeService.addSubscription(
         createVisitedLessonDto.students,
         createVisitedLessonDto.lesson,
         createVisitedLessonDto.date,
       );
 
       // для каждого студента добавим биллинг статус
-      await this.billingService.addBillingStatus(
+      await this.subscriptionChargeService.addBillingStatus(
         createVisitedLessonDto.students,
         createVisitedLessonDto.lesson,
       );
 
       // конвертируем объекты с подписками в обычные текстовые строки с id
-      this.billingService.normalizeSubscriptionIds(createVisitedLessonDto.students);
+      this.subscriptionChargeService.normalizeSubscriptionIds(createVisitedLessonDto.students);
 
       // после проставления статусов спишем занятия с найденных абонементов
-      await this.billingService.chargeSubscriptions(
+      await this.subscriptionChargeService.chargeSubscriptions(
         createVisitedLessonDto.students,
         createVisitedLessonDto.lesson,
       );
@@ -108,7 +108,7 @@ export class VisitedLessonService {
     // добавлям транзакцию для обновления различных статусов абонементов
     const transaction = async (session: ClientSession) => {
       if (updateVisitedLessonDto.students) {
-        await this.billingService.changeBillingStatus(
+        await this.subscriptionChargeService.changeBillingStatus(
           updateVisitedLessonDto.students,
           visitedLesson,
         );
