@@ -1,4 +1,4 @@
-export function getDayName(month: number) {
+export function getMonthName(month: number) {
   const monthNames: { [code: number]: string } = {
     0: 'Январь',
     1: 'Февраль',

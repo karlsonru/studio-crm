@@ -60,3 +60,21 @@ export const { useGetIncomeStatisticQuery } = basicApi.injectEndpoints({
       ),
   }),
 });
+
+export const { useGetIncomeByUserQuery } = basicApi.injectEndpoints({
+  endpoints: (build) => ({
+    getIncomeByUser:
+      build
+        .query<IResponse<number>, IStatisticArgs>(
+        {
+          query: ({ query, id }) => (
+            {
+              url: `${route}/finance/income/user/${id}`,
+              params: { filter: JSON.stringify(query) },
+            }
+          ),
+          providesTags: [tag as any],
+        },
+      ),
+  }),
+});

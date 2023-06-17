@@ -8,6 +8,7 @@ import { ContentTabIncome } from './ContentTabIncome';
 import { FinanceFilters } from './FinanceFilters';
 import { ContentTabExpenses } from './ContentTabExpenses';
 import { useTitle } from '../../shared/hooks/useTitle';
+import { IncomeByUser } from './IncomeByUser';
 
 /*
 Как я сам себе это представляю:
@@ -53,6 +54,8 @@ export function FinancePage() {
         <TabPanel value="income" sx={{ padding: 1 }} >
           <FinanceFilters tabName="income" />
           <ContentTabIncome />
+          <hr />
+          <IncomeByUser />
         </TabPanel>
         <TabPanel value="expenses" sx={{ padding: 1 }}>
           <FinanceFilters tabName="expenses" />

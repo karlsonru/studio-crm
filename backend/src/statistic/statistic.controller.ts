@@ -35,4 +35,22 @@ export class StatisticController {
       payload: statistic,
     };
   }
+
+  @Get('/finance/income/user/:userId')
+  async statFinanceIncomeByUser(
+    @Query('filter') filter: string,
+    @Param('userId', ValidateIdPipe) userId: string,
+  ) {
+    const query = JSON.parse(filter);
+
+    console.log('userId');
+    console.log(userId);
+
+    const statistic = await this.statisticService.calcIncomeByUser(query, userId);
+
+    return {
+      message: 'success',
+      payload: statistic,
+    };
+  }
 }
