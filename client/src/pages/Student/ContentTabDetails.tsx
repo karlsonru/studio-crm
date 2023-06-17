@@ -8,7 +8,6 @@ import FormHelperText from '@mui/material/FormHelperText';
 import RadioGroup from '@mui/material/RadioGroup';
 import Radio from '@mui/material/Radio';
 import Stack from '@mui/system/Stack';
-import TextareaAutosize from '@mui/material/TextareaAutosize';
 import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
@@ -238,12 +237,15 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
 
         <hr/>
 
-        <InputLabel>Комментарий</InputLabel>
-        <TextareaAutosize
+        <TextField
+          variant="outlined"
           name="comment"
+          label="Комментарий"
           defaultValue={studentDetails.payload.comment}
-          minRows={5}
           disabled={!isEdit}
+          fullWidth
+          multiline
+          minRows={3}
         />
 
       <SubmitButton content={'Подтвердить'} props={{ disabled: !isEdit }} />

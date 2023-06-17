@@ -58,6 +58,11 @@ export class Student {
     type: String,
   })
   source?: string;
+
+  @Prop({
+    type: String,
+  })
+  comment?: string;
 }
 
 export const StudentSchema = SchemaFactory.createForClass(Student);
