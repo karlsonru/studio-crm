@@ -47,14 +47,15 @@ export function CreateSubscriptionModal() {
     const dateFromTimestamp = Date.parse(formData.dateFrom as string);
 
     createSubsciption({
-      template: template._id,
-      visitsLeft: template.visits,
       student: student._id,
-      lesson: lesson._id,
-      paymentMethod: formData.paymentMethod as string,
+      lessons: [lesson._id],
+      price: template.price,
+      visitsTotal: template.visits,
+      visitsPostponed: template.visits,
+      visitsLeft: template.visits,
       dateFrom: dateFromTimestamp,
       dateTo: dateFromTimestamp + template.duration,
-      isActive: true,
+      paymentMethod: formData.paymentMethod as string,
     });
 
     form.reset();

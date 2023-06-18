@@ -49,10 +49,10 @@ function ShowSubscriptions({ lessonId, isActive }: IShowSubscriptions) {
           ]
           : [
             subscription.student.fullname,
-            subscription.template.visits,
+            subscription.visitsTotal,
             subscription.visitsLeft,
             format(subscription.dateTo, 'Y-MM-dd'),
-            subscription.template.price,
+            subscription.price,
           ]
       }
     />

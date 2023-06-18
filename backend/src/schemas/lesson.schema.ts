@@ -58,6 +58,7 @@ export class Lesson {
   @Type(() => User)
   teacher: User;
 
+  /*
   @Prop({
     type: [
       {
@@ -67,7 +68,37 @@ export class Lesson {
     ],
   })
   @Type(() => Student)
-  students: Student[];
+  students: [{
+    type: 'permament' | 'temporary';
+    student: Student;
+  }];
+  */
+
+  @Prop({
+    type: {
+      permament: {
+        type: [
+          {
+            type: Types.ObjectId,
+            ref: 'Student',
+          },
+        ],
+      },
+      temporary: {
+        type: [
+          {
+            type: Types.ObjectId,
+            ref: 'Student',
+          },
+        ],
+      },
+    },
+  })
+  @Type(() => Student)
+  students: {
+    permament: Student[];
+    temporary: Student[];
+  };
 
   @Prop({
     type: Types.ObjectId,
@@ -107,11 +138,6 @@ export class Lesson {
     required: true,
   })
   dateTo: number;
-
-  @Prop({
-    required: true,
-  })
-  isActive: boolean;
 }
 
 export const LessonSchema = SchemaFactory.createForClass(Lesson);

@@ -73,16 +73,11 @@ export function SubscriptionsTemplatesContent() {
   const titleFilter = useAppSelector(
     (state) => state.subscriptionsPageReducer.templates.filters.title,
   );
-  const statusFilter = useAppSelector(
-    (state) => state.subscriptionsPageReducer.templates.filters.status,
-  );
 
-  if (!data) return <></>;
+  if (!data) return null;
 
   const filteredData = data.payload.filter((template: ISubscriptionTemplateModel) => {
     if (titleFilter && !template.title.includes(titleFilter)) return false;
-    if (statusFilter === 'active' && !template.isActive) return false;
-    if (statusFilter === 'archived' && template.isActive) return false;
     return true;
   });
 

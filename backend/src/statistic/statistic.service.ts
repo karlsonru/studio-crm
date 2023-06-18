@@ -83,11 +83,15 @@ export class StatisticService {
 
     // найдём общий доход и кол-во абонементов по каждому месяцу
     subscriptions.forEach((subscription) => {
-      if (isCheckLocation && locationId !== subscription.lesson.location._id.toString()) return;
+      if (
+        isCheckLocation &&
+        !subscription.lessons.some((lesson) => lesson.location._id.toString() === locationId)
+      )
+        return;
 
       const month = new Date(subscription.dateFrom).getMonth();
 
-      incomeByMonth[month] += subscription.template.price;
+      incomeByMonth[month] += subscription.price;
       amountByMonth[month] += 1;
     });
 
@@ -112,7 +116,9 @@ export class StatisticService {
     });
 
     return subscriptions
-      .filter((subscription) => (subscription.lesson?.teacher as unknown as string) === userId)
-      .reduce((prev, curr) => prev + curr.template.price, 0);
+      .filter((subscription) =>
+        subscription.lessons?.some((lesson) => (lesson.teacher as unknown as string) === userId),
+      )
+      .reduce((prev, curr) => prev + curr.price, 0);
   }
 }

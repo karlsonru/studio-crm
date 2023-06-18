@@ -14,12 +14,11 @@ export class SubscriptionService {
     @InjectModel(SubscriptionModel.name)
     private readonly subscriptionModel: Model<SubscriptionDocument>,
   ) {
-    this.populateQuery = ['student', 'template', 'lesson'];
+    this.populateQuery = ['student', 'lessons'];
   }
 
   async create(createSubscriptionDto: CreateSubscriptionDto): Promise<SubscriptionModel> {
     // можно ли как-то проверить на повтор? Как? Имя & дата начала & ID занятие && кол-во
-
     const created = await this.subscriptionModel.create(createSubscriptionDto);
 
     return created;

@@ -78,7 +78,6 @@ export function CreateSubscriptionTemplateModal() {
       price: +formData.price as number,
       visits: +formData.visits as number,
       duration: calculateDuration(),
-      isActive: true,
     });
 
     form.reset();

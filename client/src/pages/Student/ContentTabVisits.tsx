@@ -209,18 +209,18 @@ export function ContentTabVisits({ studentId }: { studentId: string }) {
     .map((subscription) => <CreateRows
       key={subscription._id}
       contentDesktop={[
-        subscription.template.visits,
+        subscription.visitsTotal,
         subscription.visitsLeft,
         format(subscription.dateTo, 'dd-MM-YYY'),
-        subscription.template.price,
+        subscription.price,
       ]}
       contentMobile={[
         subscription.visitsLeft,
         format(subscription.dateTo, 'dd-MM-YYY'),
       ]}
       contentCollapsed={[
-        <CardContentItem title={'Всего визитов'} value={subscription.template.visits} />,
-        <CardContentItem title={'Стоимость'} value={subscription.template.price} />,
+        <CardContentItem title={'Всего визитов'} value={subscription.visitsTotal} />,
+        <CardContentItem title={'Стоимость'} value={subscription.price} />,
       ]}
     />);
 
