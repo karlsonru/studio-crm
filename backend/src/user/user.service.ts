@@ -58,7 +58,7 @@ export class UserService {
       `Обновление пользователя ${updateUserDto.fullname}. Авторизация: ${updateUserDto.canAuth}. ID: ${id}`,
     );
 
-    const user = await this.findOne({ id });
+    const user = await this.findOne({ _id: id });
 
     if (!user) {
       logger.debug(`Пользователь для обновления не найден. ID: ${id}`);
@@ -110,8 +110,6 @@ export class UserService {
       return updated;
     }
 
-    logger.info(`Пользователь ${updateUserDto.fullname}. Выполнено обновление. ID: ${id}`);
-
     // в остальных случаях обновим, но без обновления логина и пароля
     delete updateUserDto.login;
     delete updateUserDto.password;
@@ -122,7 +120,7 @@ export class UserService {
   }
 
   async remove(id: string) {
-    await this.userModel.findByIdAndRemove(id);
-    return;
+    const deleted = await this.userModel.findByIdAndRemove(id);
+    return deleted;
   }
 }

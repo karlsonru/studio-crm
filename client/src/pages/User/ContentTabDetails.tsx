@@ -106,6 +106,7 @@ export function ContentTabDetails({ userId }: { userId: string }) {
         fullname: (formData.fullname as string).trim(),
         birthday: +Date.parse(formData.birthday as string),
         phone: +(formData.phone as string),
+        role: formData.role as UserRole,
         salary: parseInt(formData.salary as string, 10),
         canAuth: canAuthorize,
         login: (formData.login as string),

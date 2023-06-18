@@ -64,6 +64,10 @@ export class UserController {
   @Delete(':id')
   @HttpCode(204)
   async remove(@Param('id', ValidateIdPipe) id: string) {
-    return await this.service.remove(id);
+    const deleted = await this.service.remove(id);
+
+    if (!deleted) {
+      throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
+    }
   }
 }
