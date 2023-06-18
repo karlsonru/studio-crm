@@ -1,18 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { getTodayTimestamp } from '../helpers/getTodayTimestamp';
 
 interface ITimetablePageState {
   currentDate: number;
   view: 'day' | 'week';
 }
 
-const now = new Date();
-now.setHours(0);
-now.setMinutes(0);
-now.setSeconds(0);
-now.setMilliseconds(0);
-
 const initialState: ITimetablePageState = {
-  currentDate: now.getTime(),
+  currentDate: getTodayTimestamp(),
   view: 'week',
 };
 

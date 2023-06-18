@@ -1,5 +1,12 @@
-import { FormEvent, ReactNode } from 'react';
+import {
+  FormEvent,
+  ReactNode,
+  useEffect,
+  useRef,
+} from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { SerializedError } from '@reduxjs/toolkit';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -8,26 +15,51 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { FormContentColumn } from './FormContentColumn';
 import { SubmitButton } from './buttons/SubmitButton';
+import { getErrorMessage } from '../helpers/getErrorMessage';
 
 interface IForm {
   title: string;
   isOpen: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  isSuccess?: boolean;
+  isError?: boolean;
+  error?: FetchBaseQueryError | string | SerializedError;
   children: Array<ReactNode>;
 }
 
 export function DialogFormWrapper({
-  title, isOpen, onSubmit, children,
+  title, isOpen, onSubmit, children, isSuccess, isError, error,
 }: IForm) {
+  const ref = useRef<HTMLFormElement>();
   const [, setSearchParams] = useSearchParams();
   const closeHandler = () => setSearchParams(undefined);
 
+  useEffect(() => {
+    if (!isSuccess) return;
+
+    ref.current?.reset();
+  }, [isSuccess]);
+
   return (
     <Dialog open={isOpen} onClose={closeHandler}>
-      <DialogTitle>{title}</DialogTitle>
+      <DialogTitle pb={1}>{title}</DialogTitle>
+
+      {isSuccess && <DialogTitle color="success.main" variant='subtitle1' sx={{ py: 1 }}>
+          Успешно!
+        </DialogTitle>
+      }
+
+      {isError && <DialogTitle color="error" variant='subtitle1'>
+          {`Не удалось :( ${getErrorMessage(error)}`}
+        </DialogTitle>
+      }
 
       <DialogContent>
-        <Box component='form' onSubmit={onSubmit}>
+        <Box
+          component='form'
+          onSubmit={onSubmit}
+          ref={ref}
+        >
           <FormContentColumn>
             { children }
           </FormContentColumn>

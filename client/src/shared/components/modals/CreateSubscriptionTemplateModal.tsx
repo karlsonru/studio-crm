@@ -26,8 +26,7 @@ export function CreateSubscriptionTemplateModal() {
   const [searchParams] = useSearchParams();
   const [
     createSubscriptionTemplate,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    { isSuccess, isError },
+    { isSuccess, isError, error },
   ] = useCreateSubscriptionTemplateMutation();
   const [formValidation, setFormValidation] = useState({
     title: true,
@@ -79,8 +78,6 @@ export function CreateSubscriptionTemplateModal() {
       visits: +formData.visits as number,
       duration: calculateDuration(),
     });
-
-    form.reset();
   };
 
   return (
@@ -88,6 +85,9 @@ export function CreateSubscriptionTemplateModal() {
       title='Добавить шаблон'
       isOpen={searchParams.has('create-subscription-template')}
       onSubmit={submitHandler}
+      isSuccess={isSuccess}
+      isError={isError}
+      error={error}
     >
       <TextField
         variant="outlined"

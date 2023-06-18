@@ -14,10 +14,10 @@ import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
 
 export function IncomeByUser() {
-  const [month, setMonth] = useState(new Date().getMonth());
+  const now = new Date();
+  const [month, setMonth] = useState(now.getMonth());
   const [userId, setUserId] = useState('none');
   const isMobile = useMobile();
-  const now = new Date();
 
   const {
     data: usersResponse,
