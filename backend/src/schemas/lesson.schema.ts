@@ -4,6 +4,7 @@ import { User } from './user.schema';
 import { Student } from './student.schema';
 import { Location } from './location.schema';
 import { Transform, Type } from 'class-transformer';
+import { VisitType } from './visitedLesson.schema';
 
 export type LessonDocument = HydratedDocument<Lesson>;
 
@@ -35,6 +36,29 @@ export class ITime {
   min: number;
 }
 
+class VisitingStudent {
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'Student',
+  })
+  @Type(() => Student)
+  student: Student;
+
+  @Prop({
+    type: Number,
+    required: true,
+    default: null,
+  })
+  date: number | null;
+
+  @Prop({
+    type: String,
+    enum: VisitType,
+    default: VisitType.PERMANENT,
+  })
+  visitType: VisitType;
+}
+
 @Schema({
   timestamps: true,
 })
@@ -58,47 +82,12 @@ export class Lesson {
   @Type(() => User)
   teacher: User;
 
-  /*
   @Prop({
-    type: [
-      {
-        type: Types.ObjectId,
-        ref: 'Student',
-      },
-    ],
+    type: Object,
+    required: true,
   })
   @Type(() => Student)
-  students: [{
-    type: 'permament' | 'temporary';
-    student: Student;
-  }];
-  */
-
-  @Prop({
-    type: {
-      permament: {
-        type: [
-          {
-            type: Types.ObjectId,
-            ref: 'Student',
-          },
-        ],
-      },
-      temporary: {
-        type: [
-          {
-            type: Types.ObjectId,
-            ref: 'Student',
-          },
-        ],
-      },
-    },
-  })
-  @Type(() => Student)
-  students: {
-    permament: Student[];
-    temporary: Student[];
-  };
+  students: VisitingStudent[];
 
   @Prop({
     type: Types.ObjectId,

@@ -169,7 +169,7 @@ export function ContentCard({ lesson, step, date }: IContentCard) {
       <ContentCardPreview
         anchorEl={anchorEl}
         handleClose={handleClose}
-        content={lesson.students.map((student) => student.fullname)}
+        content={lesson.students.map((visiting) => visiting.student.fullname)}
       />
     </>
   );

@@ -67,7 +67,7 @@ function StudentsListFuture({ lessonId }: { lessonId: string }) {
   return (
     <List>
       {data.students.map(
-        (student) => <StudentsListItem key={student._id} student={student} />,
+        (visiting) => <StudentsListItem key={visiting.student._id} student={visiting.student} />,
       )}
     </List>
   );

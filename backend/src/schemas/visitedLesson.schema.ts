@@ -21,11 +21,17 @@ export enum BillingStatus {
   UNCHARGED = 'uncharged',
 }
 
+export enum VisitType {
+  PERMANENT = 'permament',
+  TEMPORARY = 'temporary',
+}
+
 export class VisitedStudent {
   student: Student;
   visitStatus: VisitStatus;
   billingStatus: BillingStatus;
   subscription: string | null;
+  visitType: VisitType;
 }
 
 @Schema({
@@ -95,6 +101,13 @@ export class VisitedLesson {
           type: String,
           trim: true,
           default: null,
+        },
+        visitType: {
+          type: String,
+          enum: VisitType,
+          default: VisitType.PERMANENT,
+          trim: true,
+          required: true,
         },
       },
     ],

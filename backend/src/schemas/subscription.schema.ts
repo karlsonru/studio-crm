@@ -30,7 +30,6 @@ export class Subscription {
         ref: 'Lesson',
         required: true,
         index: true,
-        nullable: true,
       },
     ],
   })

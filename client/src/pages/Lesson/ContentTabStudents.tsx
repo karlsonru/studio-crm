@@ -106,10 +106,14 @@ export function ContentStudents({ lessonId }: { lessonId: string }) {
       <Typography mb="1rem" variant="h5" component={'h5'}>Ученики</Typography>
       <Grid container direction="row">
         {
-          data?.payload.students.map(
-            (student) => <AddCard key={student._id} lessonId={lessonId} student={student} />,
-          )
-        }
+          data?.payload
+            .students
+            .map((visiting) => <AddCard
+              key={visiting.student._id}
+              lessonId={lessonId}
+              student={visiting.student}
+            />)
+        };
         <AddStudentButton setModalOpen={setAddStudent} />
       </Grid>
 

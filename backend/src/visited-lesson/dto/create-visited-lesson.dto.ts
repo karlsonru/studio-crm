@@ -10,7 +10,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { BillingStatus, VisitStatus } from '../../schemas/visitedLesson.schema';
+import { BillingStatus, VisitStatus, VisitType } from '../../schemas/visitedLesson.schema';
 
 export class VisitedStudent {
   @IsMongoId()
@@ -26,6 +26,9 @@ export class VisitedStudent {
   @IsOptional()
   @IsString()
   subscription: string | null;
+
+  @IsString()
+  visitType: VisitType;
 }
 
 export class CreateVisitedLessonDto {

@@ -10,6 +10,7 @@ import {
   HttpStatus,
   Query,
   UseInterceptors,
+  HttpCode,
 } from '@nestjs/common';
 import { LessonService } from './lesson.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
@@ -26,6 +27,7 @@ export class LessonController {
 
   @Post()
   async create(@Body() createLessonDto: CreateLessonDto) {
+    console.log('Create lesson dto');
     console.log(createLessonDto);
     const created = await this.service.create(createLessonDto);
 
@@ -88,6 +90,7 @@ export class LessonController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
   async remove(@Param('id', ValidateIdPipe) id: string) {
     return await this.service.remove(id);
   }

@@ -30,7 +30,7 @@ interface IAddStudentsDialog {
 export function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudentsDialog) {
   const [selectedOptions, setSelected] = useState<IStudentModel[]>([]);
   const { data: possibleStudents } = useFindStudentsQuery({
-    _id: { $nin: lesson.students.map((student) => student._id) },
+    _id: { $nin: lesson.students.map((visiting) => visiting.student._id) },
   });
   const [updateLesson, { isSuccess, isError, error }] = usePatchLessonMutation();
 
