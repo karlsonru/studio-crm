@@ -22,7 +22,7 @@ export function UserPage() {
     skip: !userId,
   });
 
-  useTitle(userResponse?.payload.fullname ?? 'Сотрудники');
+  useTitle(userResponse?.fullname ?? 'Сотрудники');
 
   if (isLoading) {
     return <Loading />;
@@ -32,7 +32,7 @@ export function UserPage() {
     return <ShowError details={error} />;
   }
 
-  if (!userResponse?.payload || !userId) {
+  if (!userResponse || !userId) {
     return null;
   }
 

@@ -15,10 +15,7 @@ export class StatisticController {
 
     const statistic = await this.statisticService.calcVisitedLessonsByStudent(query, studentId);
 
-    return {
-      message: 'success',
-      payload: statistic,
-    };
+    return statistic;
   }
 
   @Get('/finance/income/:locationId')
@@ -30,10 +27,7 @@ export class StatisticController {
 
     const statistic = await this.statisticService.calcIncome(query, locationId);
 
-    return {
-      message: 'success',
-      payload: statistic,
-    };
+    return statistic;
   }
 
   @Get('/finance/income/user/:userId')
@@ -43,14 +37,8 @@ export class StatisticController {
   ) {
     const query = JSON.parse(filter);
 
-    console.log('userId');
-    console.log(userId);
-
     const statistic = await this.statisticService.calcIncomeByUser(query, userId);
 
-    return {
-      message: 'success',
-      payload: statistic,
-    };
+    return statistic;
   }
 }

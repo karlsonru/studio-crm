@@ -8,13 +8,11 @@ import TabPanel from '@mui/lab/TabPanel';
 import Stack from '@mui/material/Stack';
 import { ContentTabDetails } from './ContentTabDetails';
 import { ContentTabVisits } from './ContentTabVisits';
-import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
-import { setPageTitle } from '../../shared/reducers/appMenuSlice';
 import { SearchParamsButton } from '../../shared/components/buttons/SearchParamsButton';
 import { CreateSubscriptionModal } from '../../shared/components/modals/CreateSubscriptionModal';
+import { useTitle } from '../../shared/hooks/useTitle';
 
 export function StudentPage() {
-  const dispatch = useAppDispatch();
   const [value, setValue] = useState('details');
 
   const { studentId } = useParams();
@@ -22,9 +20,9 @@ export function StudentPage() {
   const { data } = useGetStudentQuery(studentId ?? '');
 
   useEffect(() => {
-    if (!data?.payload) return;
+    if (!data) return;
 
-    dispatch(setPageTitle(data.payload.fullname));
+    useTitle(data.fullname);
   }, [data]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {

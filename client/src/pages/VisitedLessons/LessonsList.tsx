@@ -25,7 +25,7 @@ export function LessonsList() {
     skip: !date,
   });
 
-  if (!date || isFetching || !data?.payload) return null;
+  if (!date || isFetching || !data) return null;
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, lessonId: string) => {
     setSearchParams({ date, lessonId });
@@ -33,7 +33,7 @@ export function LessonsList() {
 
   return (
     <List sx={{ width: '100%', maxWidth: '360px' }}>
-      { [...data.payload]
+      { [...data]
         .sort((lessonA, lessonB) => {
           if (lessonA.timeStart.hh !== lessonB.timeStart.hh) {
             return lessonA.timeStart.hh - lessonB.timeStart.hh;

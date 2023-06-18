@@ -76,7 +76,7 @@ export function UsersContent() {
     return null;
   }
 
-  const employeeCards = responseUsers.payload.map(
+  const employeeCards = responseUsers.map(
     (user) => <AddCard key={user._id} cardDetails={user} />,
   );
 

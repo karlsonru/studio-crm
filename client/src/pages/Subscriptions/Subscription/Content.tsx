@@ -86,7 +86,7 @@ export function SubscriptionContent() {
   return <DataGrid
     autoHeight
     columns={columns}
-    rows={data.payload}
+    rows={data}
     getRowId={(item) => item._id}
     disableColumnMenu
     components={{

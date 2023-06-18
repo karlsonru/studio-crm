@@ -30,20 +30,14 @@ export class FinanceController {
 
     const created = await this.financeService.create(createFinanceDto);
 
-    return {
-      message: 'success',
-      paylod: created,
-    };
+    return created;
   }
 
   @Get()
   async findAll(@Query('filter') filter?: string) {
     const query = filter ? JSON.parse(filter) : {};
 
-    return {
-      message: 'success',
-      payload: await this.financeService.findAll(query),
-    };
+    return await this.financeService.findAll(query);
   }
 
   @Get(':id')
@@ -54,10 +48,7 @@ export class FinanceController {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
     }
 
-    return {
-      message: 'success',
-      payload: record,
-    };
+    return record;
   }
 
   @Patch(':id')
@@ -76,15 +67,16 @@ export class FinanceController {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
     }
 
-    return {
-      message: 'success',
-      payload: updated,
-    };
+    return updated;
   }
 
   @HttpCode(204)
   @Delete(':id')
   async remove(@Param('id', ValidateIdPipe) id: string) {
-    await this.financeService.remove(id);
+    const deleted = await this.financeService.remove(id);
+
+    if (!deleted) {
+      throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
+    }
   }
 }

@@ -42,7 +42,7 @@ function validateForm(formData: { [key: string]: FormDataEntryValue }) {
 export function ContentTabDetails({ userId }: { userId: string }) {
   const { data: userEdit } = useGetUsersQuery(undefined, {
     selectFromResult: ({ data }) => ({
-      data: data?.payload.find((user) => user._id === userId),
+      data: data?.find((user) => user._id === userId),
     }),
   });
   const [updateUser, { isSuccess }] = usePatchUserMutation();

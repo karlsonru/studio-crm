@@ -97,7 +97,7 @@ export function ContentStudents({ lessonId }: { lessonId: string }) {
     return <Loading />;
   }
 
-  if (!data?.payload) {
+  if (!data) {
     return null;
   }
 
@@ -106,7 +106,7 @@ export function ContentStudents({ lessonId }: { lessonId: string }) {
       <Typography mb="1rem" variant="h5" component={'h5'}>Ученики</Typography>
       <Grid container direction="row">
         {
-          data?.payload
+          data
             .students
             .map((visiting) => <AddCard
               key={visiting.student._id}
@@ -129,7 +129,7 @@ export function ContentStudents({ lessonId }: { lessonId: string }) {
         }}>
 
         <CardHeader
-          title={data.payload.teacher.fullname}
+          title={data.teacher.fullname}
           action={
             <IconButton onClick={() => setChangeTeacher(true)}>
               <SyncIcon />
@@ -139,19 +139,19 @@ export function ContentStudents({ lessonId }: { lessonId: string }) {
         <CardContent>
           <CardContentItem
             title="Телефон"
-            value={data.payload.teacher.phone} />
+            value={data.teacher.phone} />
         </CardContent>
 
       </Card>
 
       <AddStudentsDialog
-        lesson={data.payload}
+        lesson={data}
         isOpen={isAddStudent}
         setModalOpen={setAddStudent}
       />
 
       <ChangeTeacherDialog
-        lesson={data.payload}
+        lesson={data}
         isOpen={isChangeTeacher}
         setModalOpen={setChangeTeacher}
       />

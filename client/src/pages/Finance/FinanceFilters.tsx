@@ -77,7 +77,7 @@ export function FinanceFilters({ tabName }: { tabName: string }) {
               }}
             >
               <MenuItem value={'common'}>Все</MenuItem>
-              { responseLocations?.payload.map((location) => (
+              { responseLocations?.map((location) => (
                 <MenuItem key={location._id} value={location._id}>{ location.title }</MenuItem>
               )) }
             </Select>

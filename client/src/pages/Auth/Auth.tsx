@@ -25,8 +25,8 @@ export default function AuthPage() {
   }] = useLoginMutation();
 
   useEffect(() => {
-    if (isSuccess && responseLogin?.payload.token) {
-      actions.setToken(responseLogin?.payload.token);
+    if (isSuccess && responseLogin?.token) {
+      actions.setToken(responseLogin?.token);
 
       navigate('/');
     }

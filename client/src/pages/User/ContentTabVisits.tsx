@@ -39,7 +39,6 @@ export function ContentTabVisits({ userId }: { userId: string }) {
 
   const headersVisits = isMobile ? ['Дата', 'Название'] : ['Дата', 'Название', 'Учеников', 'Посетило'];
   const rowsVisits = visitedLessonsResponse
-    .payload
     .map((visit) => <CreateRow
       key={visit._id}
       content={

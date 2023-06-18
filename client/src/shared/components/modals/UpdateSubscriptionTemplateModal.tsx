@@ -41,7 +41,7 @@ export function UpdateSubscriptionTemplateModal() {
   const [searchParams] = useSearchParams();
   const { data: templateEdit } = useGetSubscriptionTemplatesQuery(undefined, {
     selectFromResult: ({ data }) => ({
-      data: data?.payload.find((template) => template._id === searchParams.get('id')),
+      data: data?.find((template) => template._id === searchParams.get('id')),
     }),
   });
 

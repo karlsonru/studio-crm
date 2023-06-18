@@ -23,7 +23,7 @@ export function LessonPage() {
   const { data, isError } = useGetLessonQuery(lessonId ?? 'null');
 
   useEffect(() => {
-    dispatch(setPageTitle(data?.payload.title ?? 'Занятия'));
+    dispatch(setPageTitle(data?.title ?? 'Занятия'));
   }, [data]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {

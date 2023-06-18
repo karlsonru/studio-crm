@@ -26,8 +26,8 @@ interface IListTeachers {
 function ListTeachers({ lessonTeacherId, setSelected }: IListTeachers) {
   const { data: teachers } = useGetUsersQuery();
 
-  if (!teachers?.payload) {
-    return <></>;
+  if (!teachers) {
+    return null;
   }
 
   return (
@@ -35,7 +35,7 @@ function ListTeachers({ lessonTeacherId, setSelected }: IListTeachers) {
       onChange={(event: React.ChangeEvent<HTMLInputElement>, value: string) => setSelected(value)}
     >
       {
-        teachers.payload
+        teachers
           .filter((teacher) => teacher._id !== lessonTeacherId)
           .map((teacher) => <FormControlLabel
             key={teacher._id}

@@ -39,14 +39,14 @@ function StudentsListVisited({ lessonId }: { lessonId: string }) {
       { date },
     ],
   }, {
-    selectFromResult: (result) => ({ data: result.data?.payload[0] }),
+    selectFromResult: (result) => ({ data: result.data }),
   });
 
   if (!data) return null;
 
   return (
     <List>
-      {data.students.map(
+      {data[0].students.map(
         (visit) => <StudentsListItem
           key={visit.student._id}
           student={visit.student}
@@ -59,7 +59,7 @@ function StudentsListVisited({ lessonId }: { lessonId: string }) {
 
 function StudentsListFuture({ lessonId }: { lessonId: string }) {
   const { data } = useGetLessonQuery(lessonId, {
-    selectFromResult: (result) => ({ data: result.data?.payload }),
+    selectFromResult: (result) => ({ data: result.data }),
   });
 
   if (!data) return null;

@@ -67,7 +67,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
     dateTo: true,
   });
 
-  if (!lessonDetails?.payload) {
+  if (!lessonDetails) {
     return null;
   }
 
@@ -142,7 +142,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
           name='title'
           label='Занятие'
           placeholder='Занятие'
-          defaultValue={lessonDetails.payload.title}
+          defaultValue={lessonDetails.title}
           disabled={!isEdit}
           autoFocus
           fullWidth
@@ -177,7 +177,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
           <Select
             name='day'
             label='День недели'
-            defaultValue={lessonDetails.payload.day}
+            defaultValue={lessonDetails.day}
             disabled={!isEdit}
             fullWidth
             required
@@ -210,7 +210,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
                 step: 300,
                 min: '09:00',
                 max: '21:55',
-                defaultValue: convertTime(lessonDetails.payload.timeStart),
+                defaultValue: convertTime(lessonDetails.timeStart),
               }}
               InputLabelProps={{
                 shrink: true,
@@ -236,7 +236,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
                 step: 300,
                 min: '09:05',
                 max: '22:00',
-                defaultValue: convertTime(lessonDetails.payload.timeEnd),
+                defaultValue: convertTime(lessonDetails.timeEnd),
               }}
               InputLabelProps={{
                 shrink: true,
@@ -254,13 +254,13 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
           <Select
             name='location'
             label='Помещение'
-            defaultValue={lessonDetails.payload.location._id}
+            defaultValue={lessonDetails.location._id}
             disabled={!isEdit}
             fullWidth
             required
           >
           { isLocationsSuccess
-              && locationsData.payload.map((location) => (
+              && locationsData.map((location) => (
                 <MenuItem key={location._id} value={location._id}>{location.title}</MenuItem>
               ))}
           </Select>
@@ -271,13 +271,13 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
           <Select
             name='teacher'
             label='Педагог'
-            defaultValue={lessonDetails.payload.teacher._id}
+            defaultValue={lessonDetails.teacher._id}
             disabled={!isEdit}
             required
           >
             <MenuItem value={''}><em>Укажите педагога</em></MenuItem>
             { isUsersSuccess
-              && usersData.payload.map((user) => (
+              && usersData.map((user) => (
                 <MenuItem key={user._id} value={user._id}>{user.fullname}</MenuItem>
               ))}
           </Select>
@@ -291,7 +291,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
               name='dateFrom'
               label={isMobile ? 'Начало' : ''}
               type='date'
-              defaultValue={format(lessonDetails.payload.dateFrom, 'Y-MM-dd')}
+              defaultValue={format(lessonDetails.dateFrom, 'Y-MM-dd')}
               disabled={!isEdit}
               required
               InputProps={{
@@ -303,7 +303,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
               name='dateTo'
               label={isMobile ? 'Конец' : ''}
               type='date'
-              defaultValue={format(lessonDetails.payload.dateTo, 'Y-MM-dd')}
+              defaultValue={format(lessonDetails.dateTo, 'Y-MM-dd')}
               disabled={!isEdit}
               required
               error={!formValidation.dateTo}

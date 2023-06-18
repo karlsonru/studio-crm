@@ -35,9 +35,9 @@ export function CreateSubscriptionModal() {
     const form = event.currentTarget as HTMLFormElement;
     const formData = Object.fromEntries(new FormData(form).entries());
 
-    const template = templatesData.payload.find((temp) => temp.title === formData.template);
-    const student = studentsData.payload.find((std) => std.fullname === formData.student);
-    const lesson = lessonsData.payload.find((les) => les.title === formData.lesson);
+    const template = templatesData.find((temp) => temp.title === formData.template);
+    const student = studentsData.find((std) => std.fullname === formData.student);
+    const lesson = lessonsData.find((les) => les.title === formData.lesson);
 
     if (!template || !student || !lesson) {
       console.error('template or student not found');
@@ -68,19 +68,19 @@ export function CreateSubscriptionModal() {
       onSubmit={handleSubmit}
     >
       <Autocomplete
-        options={templatesData.payload}
+        options={templatesData}
         getOptionLabel={(option) => option.title}
         renderInput={(params) => <TextField {...params} required name="template" label="Шаблон" />}
       />
 
       <Autocomplete
-        options={studentsData.payload}
+        options={studentsData}
         getOptionLabel={(option) => option.fullname}
         renderInput={(params) => <TextField {...params} required name="student" label="Студент" />}
       />
 
       <Autocomplete
-        options={lessonsData.payload}
+        options={lessonsData}
         getOptionLabel={(option) => option.title}
         renderInput={(params) => <TextField {...params} required name="lesson" label="Занятие" />}
       />

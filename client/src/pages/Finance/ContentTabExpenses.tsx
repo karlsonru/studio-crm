@@ -107,7 +107,7 @@ export function ContentTabExpenses() {
     return <ShowError details={error} />;
   }
 
-  if (!data?.payload) {
+  if (!data) {
     return null;
   }
 
@@ -115,7 +115,7 @@ export function ContentTabExpenses() {
     <DataGrid
       autoHeight
       columns={isMobile ? columns.slice(0, 3) : columns}
-      rows={data.payload}
+      rows={data}
       getRowId={(item) => item._id}
       disableColumnMenu
       density="comfortable"

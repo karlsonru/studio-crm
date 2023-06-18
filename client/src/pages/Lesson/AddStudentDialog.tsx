@@ -43,7 +43,7 @@ export function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudents
     setModalOpen(false);
   }, [isSuccess]);
 
-  if (!possibleStudents?.payload) {
+  if (!possibleStudents) {
     return null;
   }
 
@@ -67,7 +67,7 @@ export function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudents
     setSelected(() => value);
   };
 
-  const hasAvailableStudents = possibleStudents.payload.length > 0;
+  const hasAvailableStudents = possibleStudents.length > 0;
 
   return (
     <Dialog open={isOpen} maxWidth='xl' transitionDuration={500} onClose={() => setModalOpen(false)}>
@@ -83,7 +83,7 @@ export function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudents
 
         {hasAvailableStudents && <Autocomplete
           multiple
-          options={possibleStudents.payload}
+          options={possibleStudents}
           getOptionLabel={(option) => option.fullname}
           onChange={changeHandler}
           renderOption={(props, option, { selected }) => (

@@ -102,7 +102,7 @@ describe('LessonController', () => {
       /*  
       jest.spyOn(service, 'findAll').mockResolvedValueOnce([mockEntity]);
 
-      expect((await controller.findAll()).payload).toContainEqual(mockEntity);
+      expect((await controller.findAll())).toContainEqual(mockEntity);
       */
     });
   });
@@ -111,7 +111,7 @@ describe('LessonController', () => {
     it('should return a lesson with the given id', async () => {
       jest.spyOn(service, 'findOne').mockResolvedValueOnce(mockEntity);
 
-      expect((await controller.findOne(mockEntity._id.toString())).payload).toEqual(mockEntity);
+      expect((await controller.findOne(mockEntity._id.toString()))).toEqual(mockEntity);
     });
 
     it('should raise HttpException with NOT FOUND HttpStatus if no lesson is found with the given id', async () => {
@@ -130,7 +130,7 @@ describe('LessonController', () => {
       jest.spyOn(service, 'create').mockResolvedValueOnce(mockEntity);
 
       const create = await controller.create(createDto);
-      expect(create.payload).toEqual(mockEntity);
+      expect(create).toEqual(mockEntity);
     });
   });
 
@@ -142,7 +142,7 @@ describe('LessonController', () => {
       jest.spyOn(service, 'update').mockResolvedValueOnce(updatedLesson);
 
       expect(
-        (await controller.update(mockEntity._id.toString(), updatedMockEntity)).payload,
+        (await controller.update(mockEntity._id.toString(), updatedMockEntity)),
       ).toEqual(updatedLesson);
     });
 

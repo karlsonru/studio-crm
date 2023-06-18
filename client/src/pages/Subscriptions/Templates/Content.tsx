@@ -76,7 +76,7 @@ export function SubscriptionsTemplatesContent() {
 
   if (!data) return null;
 
-  const filteredData = data.payload.filter((template: ISubscriptionTemplateModel) => {
+  const filteredData = data.filter((template: ISubscriptionTemplateModel) => {
     if (titleFilter && !template.title.includes(titleFilter)) return false;
     return true;
   });

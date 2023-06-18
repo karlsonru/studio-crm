@@ -1,11 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from 'shared/store';
 
-export interface IResponse<T> {
-  message: string;
-  payload: T;
-}
-
 const BASE_URL = 'http://localhost:5000/api/';
 
 export const basicApi = createApi({
@@ -28,7 +23,7 @@ export const basicApi = createApi({
 export function injectGetAll<T>(name: string, tag: any, route: string) {
   const extendedApi = basicApi.injectEndpoints({
     endpoints: (build) => ({
-      [name]: build.query<IResponse<Array<T>>, void>({
+      [name]: build.query<Array<T>, void>({
         query: () => route,
         providesTags: [tag],
       }),
@@ -40,7 +35,7 @@ export function injectGetAll<T>(name: string, tag: any, route: string) {
 export function injectGetOne<T>(name: string, tag: any, route: string) {
   const extendedApi = basicApi.injectEndpoints({
     endpoints: (build) => ({
-      [name]: build.query<IResponse<T>, string>({
+      [name]: build.query<T, string>({
         query: (id) => ({ url: `${route}/${id}` }),
         providesTags: [tag],
       }),
@@ -52,7 +47,7 @@ export function injectGetOne<T>(name: string, tag: any, route: string) {
 export function injectFind<T>(name: string, tag: any, route: string) {
   const extendedApi = basicApi.injectEndpoints({
     endpoints: (build) => ({
-      [name]: build.query<IResponse<Array<T>>, Partial<T> | Record<string, unknown> >({
+      [name]: build.query<Array<T>, Partial<T> | Record<string, unknown> >({
         query: (query) => ({ url: `${route}`, params: { filter: JSON.stringify(query) } }),
         providesTags: [tag],
       }),
@@ -64,7 +59,7 @@ export function injectFind<T>(name: string, tag: any, route: string) {
 export function injectCreate<T, K>(name: string, tag: any, route: string) {
   const extendedApi = basicApi.injectEndpoints({
     endpoints: (build) => ({
-      [name]: build.mutation<IResponse<T>, K>({
+      [name]: build.mutation<T, K>({
         query: (newItem) => ({ url: route, method: 'POST', body: newItem }),
         invalidatesTags: [tag],
       }),
@@ -76,7 +71,7 @@ export function injectCreate<T, K>(name: string, tag: any, route: string) {
 export function injectPatch<T, K>(name: string, tag: any, route: string) {
   const extendedApi = basicApi.injectEndpoints({
     endpoints: (build) => ({
-      [name]: build.mutation<IResponse<T>, { id: string, newItem: Partial<K> }>({
+      [name]: build.mutation<T, { id: string, newItem: Partial<K> }>({
         query: ({ id, newItem }) => ({ url: `${route}/${id}`, method: 'PATCH', body: newItem }),
         invalidatesTags: [tag],
       }),

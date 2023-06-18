@@ -53,5 +53,6 @@ export class FinanceService {
   async remove(id: string) {
     const deleted = await this.financeModel.findByIdAndDelete(id);
     logger.info(`Финансы. Удалена запись ${deleted?.title} с ID: ${deleted?._id}`);
+    return deleted;
   }
 }

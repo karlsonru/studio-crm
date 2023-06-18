@@ -31,18 +31,12 @@ export class SubscriptionTemplateController {
       throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
     }
 
-    return {
-      message: 'success',
-      payload: created,
-    };
+    return created;
   }
 
   @Get()
   async findAll() {
-    return {
-      message: 'success',
-      payload: await this.service.findAll(),
-    };
+    return await this.service.findAll();
   }
 
   @Get(':id')
@@ -53,10 +47,7 @@ export class SubscriptionTemplateController {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
     }
 
-    return {
-      message: 'success',
-      payload: candidate,
-    };
+    return candidate;
   }
 
   @Patch(':id')
@@ -70,10 +61,7 @@ export class SubscriptionTemplateController {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
     }
 
-    return {
-      message: 'success',
-      payload: updated,
-    };
+    return updated;
   }
 
   @Delete(':id')

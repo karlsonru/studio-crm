@@ -18,11 +18,6 @@ export class AuthController {
       throw new UnauthorizedException();
     }
 
-    return {
-      message: 'success',
-      payload: {
-        token,
-      },
-    };
+    return token;
   }
 }

@@ -20,6 +20,8 @@ import { CreateLessonModal } from '../../shared/components/modals/CreateLessonMo
 import { CustomGridToolbar } from '../../shared/components/CustomGridToolbar';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { convertTime } from '../../shared/helpers/convertTime';
+import { Loading } from '../../shared/components/Loading';
+import { ShowError } from '../../shared/components/ShowError';
 
 function ExtendedToolbar() {
   const [deleteLesson] = useDeleteLessonMutation();
@@ -49,7 +51,9 @@ export function LessonsContent() {
   const navigate = useNavigate();
   const actions = useActionCreators(lessonsPageActions);
 
-  const { data, isLoading, error } = useGetLessonsQuery();
+  const {
+    data, isLoading, isError, error,
+  } = useGetLessonsQuery();
 
   const deleteLessonHandler = useCallback((currentLesson: ILessonModel) => {
     actions.setCurrentLesson(currentLesson);
@@ -109,19 +113,23 @@ export function LessonsContent() {
     },
   ], [deleteLessonHandler]);
 
-  if (isLoading || !data?.payload) {
-    return null;
+  if (isLoading) {
+    return <Loading />;
   }
 
-  if (error) {
-    return <h1>Error!!! </h1>;
+  if (isError) {
+    return <ShowError details={error} />;
+  }
+
+  if (!data) {
+    return null;
   }
 
   return (
     <DataGrid
       autoHeight
       columns={isMobile ? [columns[0]] : columns}
-      rows={data.payload}
+      rows={data}
       getRowId={(item) => item._id}
       disableColumnMenu
       density="comfortable"

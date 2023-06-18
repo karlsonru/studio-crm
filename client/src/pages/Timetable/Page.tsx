@@ -7,22 +7,17 @@ import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useMobile } from '../../shared/hooks/useMobile';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { timetablePageActions } from '../../shared/reducers/timetablePageSlice';
-import { setPageTitle } from '../../shared/reducers/appMenuSlice';
-import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
 import { Loading } from '../../shared/components/Loading';
+import { useTitle } from '../../shared/hooks/useTitle';
 
 export function TimetablePage() {
-  const dispatch = useAppDispatch();
+  useTitle('Расписание');
 
   const view = useAppSelector((state) => state.timetablePageReducer.view);
   const currentDate = useAppSelector((state) => state.timetablePageReducer.currentDate);
   const currentMonth = new Date(currentDate).getMonth();
   const isMobile = useMobile();
   const actions = useActionCreators(timetablePageActions);
-
-  useEffect(() => {
-    dispatch(setPageTitle('Расписание'));
-  });
 
   // запрашиваем занятия на +1 месяц от текущих и -1 месяц от текущих
   const { data, isLoading } = useFindLessonsQuery({
@@ -42,12 +37,12 @@ export function TimetablePage() {
     return <Loading />;
   }
 
-  if (!data?.payload) return null;
+  if (!data) return null;
 
   return (
     <>
       <PageHeader />
-      <TimetableContent lessons={data.payload} />
+      <TimetableContent lessons={data} />
     </>
   );
 }

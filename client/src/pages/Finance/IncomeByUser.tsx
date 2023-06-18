@@ -48,7 +48,7 @@ export function IncomeByUser() {
     return <ShowError details={errorUsers ?? errorStatistic} />;
   }
 
-  if (!usersResponse?.payload) {
+  if (!usersResponse) {
     return null;
   }
 
@@ -79,7 +79,7 @@ export function IncomeByUser() {
               }}
             >
               <MenuItem value="none">Не выбран</MenuItem>
-              {usersResponse.payload.map((user) => (
+              {usersResponse.map((user) => (
                 <MenuItem key={user._id} value={user._id}>{user.fullname}</MenuItem>
               ))}
             </Select>
@@ -115,7 +115,7 @@ export function IncomeByUser() {
       </Box>
 
       <Typography component="h3" fontWeight="bold">
-        { statisticResponse?.payload }
+        { statisticResponse }
       </Typography>
     </Box>
   );

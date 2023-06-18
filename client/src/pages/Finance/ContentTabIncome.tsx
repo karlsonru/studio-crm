@@ -47,7 +47,7 @@ export function ContentTabIncome() {
     return <ShowError details={error} />;
   }
 
-  if (!statisticResponse?.payload) {
+  if (!statisticResponse) {
     return null;
   }
 
@@ -72,21 +72,21 @@ export function ContentTabIncome() {
           datasets: [
             {
               label: 'Расходы',
-              data: monthes.map((date) => statisticResponse.payload.expenses[date.getMonth()]),
+              data: monthes.map((date) => statisticResponse.expenses[date.getMonth()]),
               backgroundColor: '#1E90FF',
               stack: 'income',
               minBarLength: 5,
             },
             {
               label: 'Доходы',
-              data: monthes.map((date) => statisticResponse.payload.income[date.getMonth()]),
+              data: monthes.map((date) => statisticResponse.income[date.getMonth()]),
               backgroundColor: 'rgba(255, 99, 132, 0.5)',
               stack: 'outcome',
               minBarLength: 5,
             },
             {
               label: 'Абонементы',
-              data: monthes.map((date) => statisticResponse.payload.amount[date.getMonth()]),
+              data: monthes.map((date) => statisticResponse.amount[date.getMonth()]),
               backgroundColor: '#FFA500',
               stack: 'subscriptions',
               minBarLength: 10,

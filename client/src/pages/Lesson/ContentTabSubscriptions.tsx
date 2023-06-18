@@ -33,12 +33,12 @@ function ShowSubscriptions({ lessonId, isActive }: IShowSubscriptions) {
     return <h3>Ошибка при запросе!</h3>;
   }
 
-  if (!data?.payload.length) {
+  if (!data?.length) {
     return <h3>Не найдено</h3>;
   }
 
   const headers = isMobile ? ['Ученик', 'Остаток'] : ['Ученик', 'Длительность', 'Остаток', 'Действует до', 'Стоимость'];
-  const rows = data?.payload.map((subscription) => (
+  const rows = data?.map((subscription) => (
     <CreateRow
       key={subscription._id}
       content={

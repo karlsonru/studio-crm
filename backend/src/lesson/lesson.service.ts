@@ -53,7 +53,7 @@ export class LessonService {
   }
 
   async remove(id: string) {
-    await this.lessonModel.findByIdAndRemove(id);
-    return;
+    const deleted = await this.lessonModel.findByIdAndRemove(id);
+    return deleted;
   }
 }

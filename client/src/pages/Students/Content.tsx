@@ -123,7 +123,7 @@ export function StudentsContent() {
       autoHeight
       disableColumnMenu
       columns={isMobile ? [columns[0]] : columns}
-      rows={data.payload}
+      rows={data}
       getRowId={(item) => item._id}
       onRowDoubleClick={((params: GridRowParams<IStudentModel>) => navigate(`./${params.id}`))}
       components={{

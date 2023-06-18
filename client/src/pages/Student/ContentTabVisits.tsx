@@ -171,7 +171,6 @@ export function ContentTabVisits({ studentId }: { studentId: string }) {
 
   const headersVisits = isMobile ? ['Занятие', 'Дата занятия'] : ['Занятие', 'Дата занятия', 'Статус посещения', 'Статус оплаты'];
   const rowsVisits = [...responseVisitedLessonsStatisticByStudent
-    .payload
     .visitedLessons]
     .sort((a, b) => (b.date - a.date))
     .map((visitedLesson) => {
@@ -205,7 +204,6 @@ export function ContentTabVisits({ studentId }: { studentId: string }) {
 
   const headersSubscriptions = isMobile ? ['Осталось', 'Действует до'] : ['Занятий всего', 'Осталось', 'Действует до', 'Стоимость'];
   const rowsSubscriptions = responseSubscriptions
-    .payload
     .map((subscription) => <CreateRows
       key={subscription._id}
       contentDesktop={[
@@ -229,10 +227,7 @@ export function ContentTabVisits({ studentId }: { studentId: string }) {
       <VisitsStatistic
         studentFullname={studentFullname}
         startPeriod={startPeriodLessons}
-        statistic={responseVisitedLessonsStatisticByStudent
-          .payload
-          .statistic
-        }
+        statistic={responseVisitedLessonsStatisticByStudent.statistic}
       />
 
       <BasicTableWithTitleAndButton

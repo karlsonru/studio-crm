@@ -27,28 +27,12 @@ export class VisitedLessonController {
       throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
     }
 
-    return {
-      message: 'success',
-      payload: created,
-    };
+    return created;
   }
 
   @Get()
   async findAll(@Query('filter') filter?: string) {
-    console.log(`filter: ${filter}`);
-    if (filter) {
-      const query = JSON.parse(filter);
-
-      return {
-        message: 'success',
-        payload: await this.service.findAll(query),
-      };
-    }
-
-    return {
-      message: 'success',
-      payload: await this.service.findAll(),
-    };
+    return await this.service.findAll(filter ? JSON.parse(filter) : {});
   }
 
   @Get(':id')
@@ -59,10 +43,7 @@ export class VisitedLessonController {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
     }
 
-    return {
-      message: 'success',
-      payload: candidate,
-    };
+    return candidate;
   }
 
   @Patch(':id')
@@ -76,10 +57,7 @@ export class VisitedLessonController {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
     }
 
-    return {
-      message: 'success',
-      payload: updated,
-    };
+    return updated;
   }
 
   @Delete(':id')

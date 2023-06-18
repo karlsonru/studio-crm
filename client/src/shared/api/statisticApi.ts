@@ -1,7 +1,4 @@
-import {
-  basicApi,
-  IResponse,
-} from './basicApi';
+import { basicApi } from './basicApi';
 import { IVisitModel } from '../models/IVisitModel';
 
 const tag = 'statistic';
@@ -23,7 +20,7 @@ export const { useGetVisitedLessonsStatisticByStudentQuery } = basicApi.injectEn
   endpoints: (build) => ({
     getVisitedLessonsStatisticByStudent:
       build
-        .query<IResponse<IVisitedLessonsWithStatistic>, IStatisticArgs>(
+        .query<IVisitedLessonsWithStatistic, IStatisticArgs>(
         {
           query: ({ query, id }) => (
             {
@@ -47,7 +44,7 @@ export const { useGetIncomeStatisticQuery } = basicApi.injectEndpoints({
   endpoints: (build) => ({
     getIncomeStatistic:
       build
-        .query<IResponse<IIncomeStatistic>, IStatisticArgs>(
+        .query<IIncomeStatistic, IStatisticArgs>(
         {
           query: ({ query, id }) => (
             {
@@ -65,7 +62,7 @@ export const { useGetIncomeByUserQuery } = basicApi.injectEndpoints({
   endpoints: (build) => ({
     getIncomeByUser:
       build
-        .query<IResponse<number>, IStatisticArgs>(
+        .query<number, IStatisticArgs>(
         {
           query: ({ query, id }) => (
             {

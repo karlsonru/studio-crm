@@ -84,16 +84,16 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
   });
 
   useEffect(() => {
-    if (!studentDetails?.payload) return;
+    if (!studentDetails) return;
 
-    const contactsNum = new Array(studentDetails.payload.contacts.length)
+    const contactsNum = new Array(studentDetails.contacts.length)
       .fill(0)
       .map((val, idx) => idx);
 
     setContacts(contactsNum);
   }, [studentDetails]);
 
-  if (!studentDetails?.payload) {
+  if (!studentDetails) {
     return <>'Не удалось получить информацию по студенту'</>;
   }
 
@@ -167,7 +167,7 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
           variant="outlined"
           name="fullname"
           label="ФИО"
-          defaultValue={studentDetails.payload.fullname}
+          defaultValue={studentDetails.fullname}
           disabled={!isEdit}
           fullWidth
           required
@@ -179,7 +179,7 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
           type="date"
           name="birthday"
           label="Дата рождения"
-          defaultValue={format(studentDetails.payload.birthday, 'Y-MM-dd')}
+          defaultValue={format(studentDetails.birthday, 'Y-MM-dd')}
           disabled={!isEdit}
           InputLabelProps={{ shrink: true }}
           fullWidth
@@ -191,7 +191,7 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
           <RadioGroup
             row
             name="sex"
-            defaultValue={studentDetails.payload.sex}
+            defaultValue={studentDetails.sex}
             aria-labelledby="sex-label"
           >
             <FormControlLabel
@@ -212,7 +212,7 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
         <hr/>
 
         {contacts.map((idx) => {
-          const contactDetails = studentDetails.payload.contacts[idx];
+          const contactDetails = studentDetails.contacts[idx];
           return (
             <NewContact
               key={`contact${idx}`}
@@ -241,7 +241,7 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
           variant="outlined"
           name="comment"
           label="Комментарий"
-          defaultValue={studentDetails.payload.comment}
+          defaultValue={studentDetails.comment}
           disabled={!isEdit}
           fullWidth
           multiline

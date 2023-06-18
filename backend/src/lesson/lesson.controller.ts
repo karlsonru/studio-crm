@@ -35,10 +35,7 @@ export class LessonController {
       throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
     }
 
-    return {
-      message: 'success',
-      payload: created,
-    };
+    return created;
   }
 
   @Get()
@@ -46,30 +43,21 @@ export class LessonController {
     if (filter) {
       const query = JSON.parse(filter);
 
-      return {
-        message: 'success',
-        payload: await this.service.findAll(query),
-      };
+      return await this.service.findAll(query);
     }
 
-    return {
-      message: 'success',
-      payload: await this.service.findAll(),
-    };
+    return await this.service.findAll();
   }
 
   @Get(':id')
   async findOne(@Param('id', ValidateIdPipe) id: string) {
-    const candidate = await this.service.findOne(id);
+    const lesson = await this.service.findOne(id);
 
-    if (candidate === null) {
+    if (lesson === null) {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
     }
 
-    return {
-      message: 'success',
-      payload: candidate,
-    };
+    return lesson;
   }
 
   @Patch(':id')
@@ -83,15 +71,16 @@ export class LessonController {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
     }
 
-    return {
-      message: 'success',
-      payload: updated,
-    };
+    return updated;
   }
 
   @Delete(':id')
   @HttpCode(204)
   async remove(@Param('id', ValidateIdPipe) id: string) {
-    return await this.service.remove(id);
+    const deleted = await this.service.remove(id);
+
+    if (!deleted) {
+      throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
+    }
   }
 }

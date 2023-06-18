@@ -213,7 +213,7 @@ export function CreateLessonModal() {
           required
         >
         { isLocationsSuccess
-            && locationsData.payload.map((location) => (
+            && locationsData.map((location) => (
               <MenuItem key={location._id} value={location._id}>{location.title}</MenuItem>
             ))}
         </Select>
@@ -229,7 +229,7 @@ export function CreateLessonModal() {
         >
           <MenuItem value={''}><em>Укажите педагога</em></MenuItem>
           { isUsersSuccess
-            && usersData.payload.map((user) => (
+            && usersData.map((user) => (
               <MenuItem key={user._id} value={user._id}>{user.fullname}</MenuItem>
             ))}
         </Select>
