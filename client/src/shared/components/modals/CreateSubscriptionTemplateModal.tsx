@@ -26,7 +26,9 @@ export function CreateSubscriptionTemplateModal() {
   const [searchParams] = useSearchParams();
   const [
     createSubscriptionTemplate,
-    { isSuccess, isError, error },
+    {
+      isSuccess, isLoading, isError, error, reset,
+    },
   ] = useCreateSubscriptionTemplateMutation();
   const [formValidation, setFormValidation] = useState({
     title: true,
@@ -85,9 +87,11 @@ export function CreateSubscriptionTemplateModal() {
       title='Добавить шаблон'
       isOpen={searchParams.has('create-subscription-template')}
       onSubmit={submitHandler}
+      isLoading={isLoading}
       isSuccess={isSuccess}
       isError={isError}
       error={error}
+      resetCache={reset}
     >
       <TextField
         variant="outlined"

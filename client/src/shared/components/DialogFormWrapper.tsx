@@ -21,14 +21,16 @@ interface IForm {
   title: string;
   isOpen: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  isLoading?: boolean;
   isSuccess?: boolean;
   isError?: boolean;
   error?: FetchBaseQueryError | string | SerializedError;
+  resetCache?: () => void;
   children: Array<ReactNode>;
 }
 
 export function DialogFormWrapper({
-  title, isOpen, onSubmit, children, isSuccess, isError, error,
+  title, isOpen, onSubmit, children, isSuccess, isError, error, resetCache, isLoading,
 }: IForm) {
   const ref = useRef<HTMLFormElement>();
   const [, setSearchParams] = useSearchParams();
@@ -40,16 +42,30 @@ export function DialogFormWrapper({
     ref.current?.reset();
   }, [isSuccess]);
 
+  useEffect(() => {
+    if (resetCache) {
+      const timerId = setTimeout(resetCache, 1500);
+      return () => clearTimeout(timerId);
+    }
+  }, [resetCache]);
+
   return (
     <Dialog open={isOpen} onClose={closeHandler}>
       <DialogTitle pb={1}>{title}</DialogTitle>
 
-      {isSuccess && <DialogTitle color="success.main" variant='subtitle1' sx={{ py: 1 }}>
+      {isSuccess && <DialogTitle
+        color="success.main"
+        variant='subtitle1'
+        sx={{ py: 1 }}
+        >
           Успешно!
         </DialogTitle>
       }
 
-      {isError && <DialogTitle color="error" variant='subtitle1'>
+      {isError && <DialogTitle
+          color="error"
+          variant='subtitle1'
+        >
           {`Не удалось :( ${getErrorMessage(error)}`}
         </DialogTitle>
       }
@@ -73,7 +89,12 @@ export function DialogFormWrapper({
             >
               Закрыть
             </Button>
-            <SubmitButton content={'Подтвердить'} />
+            <SubmitButton
+              content={'Подтвердить'}
+              props={{
+                disabled: isLoading,
+              }}
+            />
           </DialogActions>
         </Box>
       </DialogContent>
