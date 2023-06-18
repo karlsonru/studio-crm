@@ -5,16 +5,16 @@ import Tab from '@mui/material/Tab';
 import TabPanel from '@mui/lab/TabPanel';
 import Stack from '@mui/material/Stack';
 
+interface ITabContent {
+  value: string;
+  label: string;
+  content: Array<ReactNode> | ReactNode;
+  conditionally?: ReactNode;
+}
+
 interface ITabsWrapper {
   defaultTab: string;
-  tabsContent: [
-    {
-      value: string;
-      label: string;
-      content: Array<ReactNode> | ReactNode;
-      conditionally?: ReactNode;
-    },
-  ]
+  tabsContent: Array<ITabContent>;
 }
 
 export function TabsWrapper({

@@ -13,10 +13,10 @@ import Button from '@mui/material/Button';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
-import { useGetStudentQuery, usePatchStudentMutation } from '../../shared/api';
+import { usePatchStudentMutation } from '../../shared/api';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { FormContentColumn } from '../../shared/components/FormContentColumn';
-import { IStudentModelContact } from '../../shared/models/IStudentModel';
+import { IStudentModel, IStudentModelContact } from '../../shared/models/IStudentModel';
 
 interface IContact {
   idx: number;
@@ -71,8 +71,7 @@ function validateForm(formData: { [key: string]: FormDataEntryValue }) {
   return '';
 }
 
-export function ContentTabDetails({ studentId }: { studentId: string }) {
-  const { data: studentDetails } = useGetStudentQuery(studentId);
+export function ContentTabDetails({ student }: { student: IStudentModel }) {
   const [updadateStudent] = usePatchStudentMutation();
   const [contacts, setContacts] = useState<Array<number>>([0]);
   const [isEdit, setEdit] = useState(false);
@@ -84,18 +83,12 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
   });
 
   useEffect(() => {
-    if (!studentDetails) return;
-
-    const contactsNum = new Array(studentDetails.contacts.length)
+    const contactsNum = new Array(student.contacts.length)
       .fill(0)
       .map((val, idx) => idx);
 
     setContacts(contactsNum);
-  }, [studentDetails]);
-
-  if (!studentDetails) {
-    return <>'Не удалось получить информацию по студенту'</>;
-  }
+  }, [student]);
 
   const addContact = () => {
     setContacts((prevState) => [...prevState, prevState.length]);
@@ -133,7 +126,7 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
     }));
 
     updadateStudent({
-      id: studentId,
+      id: student._id,
       newItem: {
         fullname: (formData.fullname as string).trim(),
         sex: formData.sex as string,
@@ -167,7 +160,7 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
           variant="outlined"
           name="fullname"
           label="ФИО"
-          defaultValue={studentDetails.fullname}
+          defaultValue={student.fullname}
           disabled={!isEdit}
           fullWidth
           required
@@ -179,7 +172,7 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
           type="date"
           name="birthday"
           label="Дата рождения"
-          defaultValue={format(studentDetails.birthday, 'Y-MM-dd')}
+          defaultValue={format(student.birthday, 'Y-MM-dd')}
           disabled={!isEdit}
           InputLabelProps={{ shrink: true }}
           fullWidth
@@ -191,7 +184,7 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
           <RadioGroup
             row
             name="sex"
-            defaultValue={studentDetails.sex}
+            defaultValue={student.sex}
             aria-labelledby="sex-label"
           >
             <FormControlLabel
@@ -212,7 +205,7 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
         <hr/>
 
         {contacts.map((idx) => {
-          const contactDetails = studentDetails.contacts[idx];
+          const contactDetails = student.contacts[idx];
           return (
             <NewContact
               key={`contact${idx}`}
@@ -241,7 +234,7 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
           variant="outlined"
           name="comment"
           label="Комментарий"
-          defaultValue={studentDetails.comment}
+          defaultValue={student.comment}
           disabled={!isEdit}
           fullWidth
           multiline

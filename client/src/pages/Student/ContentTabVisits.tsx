@@ -13,6 +13,7 @@ import { BasicTableWithTitleAndButton, CreateRow, CreateRowWithCollapse } from '
 import { useMobile } from '../../shared/hooks/useMobile';
 import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
+import { IStudentModel } from '../../shared/models/IStudentModel';
 
 interface IVisitsStatistic {
   statistic?: Record<string, number>;
@@ -117,7 +118,7 @@ function CreateRows({
   );
 }
 
-export function ContentTabVisits({ studentId }: { studentId: string }) {
+export function ContentTabVisits({ student }: { student: IStudentModel }) {
   const isMobile = useMobile();
   const today = getTodayTimestamp();
   const [showMoreVisits, setShowMoreVisits] = useState(false);
@@ -134,11 +135,11 @@ export function ContentTabVisits({ studentId }: { studentId: string }) {
   } = useGetVisitedLessonsStatisticByStudentQuery({
     query: {
       $and: [
-        { students: { $elemMatch: { student: studentId } } },
+        { students: { $elemMatch: { student: student._id } } },
         { date: { $gte: startPeriodLessons } },
       ],
     },
-    id: studentId,
+    id: student._id,
   });
 
   // найдём все абонементы студента за последние 3 мес
@@ -149,7 +150,7 @@ export function ContentTabVisits({ studentId }: { studentId: string }) {
     error: errorSubscriptions,
   } = useFindSubscriptionsQuery({
     $and: [
-      { student: studentId },
+      { student: student._id },
       { dateTo: { $gte: showMoreSubscriptions ? 0 : subMonths(today, 3).getTime() } },
     ],
   });

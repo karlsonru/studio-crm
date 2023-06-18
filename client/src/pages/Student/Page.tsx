@@ -1,53 +1,60 @@
-import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useGetStudentQuery } from 'shared/api';
-import TabContext from '@mui/lab/TabContext';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import TabPanel from '@mui/lab/TabPanel';
-import Stack from '@mui/material/Stack';
 import { ContentTabDetails } from './ContentTabDetails';
 import { ContentTabVisits } from './ContentTabVisits';
 import { SearchParamsButton } from '../../shared/components/buttons/SearchParamsButton';
 import { CreateSubscriptionModal } from '../../shared/components/modals/CreateSubscriptionModal';
 import { useTitle } from '../../shared/hooks/useTitle';
+import { Loading } from '../../shared/components/Loading';
+import { ShowError } from '../../shared/components/ShowError';
+import { TabsWrapper } from '../../shared/components/TabsWrapper';
 
 export function StudentPage() {
-  const [value, setValue] = useState('details');
-
   const { studentId } = useParams();
 
-  const { data } = useGetStudentQuery(studentId ?? '');
+  const {
+    data: student, isLoading, isError, error,
+  } = useGetStudentQuery(studentId ?? '', {
+    skip: !studentId,
+  });
 
-  useEffect(() => {
-    if (!data) return;
+  useTitle(student?.fullname ?? 'Ученики');
 
-    useTitle(data.fullname);
-  }, [data]);
+  if (isLoading) {
+    return <Loading />;
+  }
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-    setValue(newValue);
-  };
+  if (isError) {
+    return <ShowError details={error} />;
+  }
 
-  if (!studentId) return null;
+  if (!studentId || !student) {
+    return null;
+  }
 
   return (
-    <TabContext value={value}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" paddingX={3}>
-        <Tabs value={value} onChange={handleChange} sx={{ marginBottom: '1rem' }}>
-          <Tab label="Детали" value="details" />
-          <Tab label="Посещения" value="visits" />
-        </Tabs>
-        {value === 'visits' && <SearchParamsButton title="Оформить абонемент" param="create-subscription" />}
-      </Stack>
-      <TabPanel value="details">
-        <ContentTabDetails studentId={studentId} />
-      </TabPanel>
-      <TabPanel value="visits">
-        <ContentTabVisits studentId={studentId} />
-      </TabPanel>
-
-      <CreateSubscriptionModal />
-    </TabContext>
+    <>
+    <TabsWrapper
+      defaultTab='details'
+      tabsContent={[
+        {
+          label: 'Детали',
+          value: 'details',
+          content: [
+            <ContentTabDetails student={student} />,
+          ],
+        },
+        {
+          label: 'Посещения',
+          value: 'visits',
+          content: [
+            <ContentTabVisits student={student} />,
+          ],
+          conditionally: <SearchParamsButton title="Оформить абонемент" param="create-subscription" />,
+        },
+      ]}
+    />
+    <CreateSubscriptionModal />
+    </>
   );
 }

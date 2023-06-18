@@ -23,7 +23,7 @@ export function CreateSubscriptionModal() {
   const isMobile = useMobile();
   const [searchParams] = useSearchParams();
 
-  const [createSubsciption] = useCreateSubscriptionMutation();
+  const [createSubsciption, requestStatus] = useCreateSubscriptionMutation();
   const { data: studentsData } = useGetStudentsQuery();
   const { data: templatesData } = useGetSubscriptionTemplatesQuery();
   const { data: lessonsData } = useGetLessonsQuery();
@@ -66,6 +66,7 @@ export function CreateSubscriptionModal() {
       title='Оформить абонемент'
       isOpen={searchParams.has('create-subscription')}
       onSubmit={handleSubmit}
+      requestStatus={requestStatus}
     >
       <Autocomplete
         options={templatesData}
