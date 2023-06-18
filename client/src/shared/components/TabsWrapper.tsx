@@ -11,8 +11,8 @@ interface ITabsWrapper {
     {
       value: string;
       label: string;
+      content: Array<ReactNode> | ReactNode;
       conditionally?: ReactNode;
-      childrens: Array<ReactNode> | ReactNode;
     },
   ]
 }
@@ -41,7 +41,7 @@ export function TabsWrapper({
       </Stack>
       { tabsContent.map((tab) => (
         <TabPanel value={tab.value}>
-            {tab.childrens}
+            {tab.content}
         </TabPanel>
       )) }
     </TabContext>

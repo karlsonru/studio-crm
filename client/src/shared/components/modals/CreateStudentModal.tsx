@@ -48,8 +48,7 @@ function validateForm(formData: { [key: string]: FormDataEntryValue }) {
 }
 
 export function CreateStudentModal() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [createStudent, { isSuccess, isError, data }] = useCreateStudentMutation();
+  const [createStudent, mutationStatus] = useCreateStudentMutation();
   const [searchParams] = useSearchParams();
   const [contacts, setContacts] = useState<Array<number>>([0]);
   const [formValidation, setFormValidation] = useState({
@@ -111,6 +110,7 @@ export function CreateStudentModal() {
       title='Добавить ученика'
       isOpen={searchParams.has('create-student')}
       onSubmit={submitHandler}
+      requestStatus={mutationStatus}
     >
       <TextField
         variant="outlined"

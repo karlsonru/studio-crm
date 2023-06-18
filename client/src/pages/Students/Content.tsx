@@ -8,6 +8,7 @@ import {
   GridValueFormatterParams,
 } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { useGetStudentsQuery, useDeleteStudentMutation } from '../../shared/api/studentApi';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { IStudentModel } from '../../shared/models/IStudentModel';
@@ -97,6 +98,14 @@ export function StudentsContent() {
       field: 'actions',
       type: 'actions',
       getActions: (params: GridRowParams<IStudentModel>) => [
+        <GridActionsCellItem
+          label="WhatsApp"
+          icon={<WhatsAppIcon />}
+          onClick={() => window.open(
+            `https://api.whatsapp.com/send/?phone=${params.row.contacts[0].phone}&text&type=phone_number`,
+            '_blank',
+          )}
+        />,
         <GridActionsCellItem
           label="Delete"
           icon={<DeleteIcon />}

@@ -45,7 +45,7 @@ export function UpdateSubscriptionTemplateModal() {
     }),
   });
 
-  const [updateSubscriptionTemplate] = usePatchSubscriptionTemplateMutation();
+  const [updateSubscriptionTemplate, requestStatus] = usePatchSubscriptionTemplateMutation();
   const [formValidation, setFormValidation] = useState({
     title: true,
     price: true,
@@ -89,7 +89,6 @@ export function UpdateSubscriptionTemplateModal() {
       price: +formData.price as number,
       visits: +formData.visits as number,
       duration: calculateDuration(formData.period as string, +formData.duration),
-      isActive: true,
     };
 
     updateSubscriptionTemplate({ id: templateEdit._id, newItem: payload });
@@ -102,6 +101,7 @@ export function UpdateSubscriptionTemplateModal() {
       title='Редактировать шаблон'
       isOpen={searchParams.has('update-template')}
       onSubmit={submitHandler}
+      requestStatus={requestStatus}
     >
       <TextField
         variant="outlined"

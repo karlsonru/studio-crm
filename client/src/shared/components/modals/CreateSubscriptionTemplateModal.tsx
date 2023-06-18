@@ -24,12 +24,7 @@ function validateForm(formData: { [key: string]: FormDataEntryValue }) {
 
 export function CreateSubscriptionTemplateModal() {
   const [searchParams] = useSearchParams();
-  const [
-    createSubscriptionTemplate,
-    {
-      isSuccess, isLoading, isError, error, reset,
-    },
-  ] = useCreateSubscriptionTemplateMutation();
+  const [createSubscriptionTemplate, requestStatus] = useCreateSubscriptionTemplateMutation();
   const [formValidation, setFormValidation] = useState({
     title: true,
     price: true,
@@ -87,11 +82,7 @@ export function CreateSubscriptionTemplateModal() {
       title='Добавить шаблон'
       isOpen={searchParams.has('create-subscription-template')}
       onSubmit={submitHandler}
-      isLoading={isLoading}
-      isSuccess={isSuccess}
-      isError={isError}
-      error={error}
-      resetCache={reset}
+      requestStatus={requestStatus}
     >
       <TextField
         variant="outlined"

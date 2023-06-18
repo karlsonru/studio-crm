@@ -32,7 +32,6 @@ export function StudentPage() {
   if (!studentId) return null;
 
   return (
-
     <TabContext value={value}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" paddingX={3}>
         <Tabs value={value} onChange={handleChange} sx={{ marginBottom: '1rem' }}>

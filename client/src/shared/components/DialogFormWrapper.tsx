@@ -21,17 +21,23 @@ interface IForm {
   title: string;
   isOpen: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  isLoading?: boolean;
-  isSuccess?: boolean;
-  isError?: boolean;
-  error?: FetchBaseQueryError | string | SerializedError;
-  resetCache?: () => void;
   children: Array<ReactNode>;
+  requestStatus?: {
+    isLoading: boolean;
+    isSuccess: boolean;
+    isError: boolean;
+    error?: FetchBaseQueryError | string | SerializedError | undefined;
+    reset: () => void;
+  };
 }
 
 export function DialogFormWrapper({
-  title, isOpen, onSubmit, children, isSuccess, isError, error, resetCache, isLoading,
+  title, isOpen, onSubmit, children, requestStatus,
 }: IForm) {
+  const {
+    isSuccess, isError, error, reset, isLoading,
+  } = requestStatus ?? {};
+
   const ref = useRef<HTMLFormElement>();
   const [, setSearchParams] = useSearchParams();
   const closeHandler = () => setSearchParams(undefined);
@@ -43,11 +49,11 @@ export function DialogFormWrapper({
   }, [isSuccess]);
 
   useEffect(() => {
-    if (resetCache) {
-      const timerId = setTimeout(resetCache, 1500);
+    if (reset) {
+      const timerId = setTimeout(reset, 1500);
       return () => clearTimeout(timerId);
     }
-  }, [resetCache]);
+  }, [reset]);
 
   return (
     <Dialog open={isOpen} onClose={closeHandler}>
