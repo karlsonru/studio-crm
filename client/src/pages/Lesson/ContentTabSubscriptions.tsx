@@ -6,12 +6,16 @@ import { useMobile } from '../../shared/hooks/useMobile';
 import { useFindSubscriptionsQuery } from '../../shared/api';
 import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 import { PrimaryButton } from '../../shared/components/buttons/PrimaryButton';
+import { Loading } from '../../shared/components/Loading';
+import { ShowError } from '../../shared/components/ShowError';
+import { ILessonModel } from '../../shared/models/ILessonModel';
 
 interface IContentSubscriptions {
-  lessonId: string;
+  lesson: ILessonModel;
 }
 
-interface IShowSubscriptions extends IContentSubscriptions {
+interface IShowSubscriptions {
+  lessonId: string;
   isActive: boolean;
 }
 
@@ -20,17 +24,19 @@ function ShowSubscriptions({ lessonId, isActive }: IShowSubscriptions) {
   const today = getTodayTimestamp();
   const query = { dateTo: isActive ? { $gte: today } : { $lte: today } };
 
-  const { data, isError, isLoading } = useFindSubscriptionsQuery({
+  const {
+    data, isLoading, isError, error,
+  } = useFindSubscriptionsQuery({
     lesson: lessonId,
     ...query,
   });
 
   if (isLoading) {
-    return <h3>Идёт загрузка...</h3>;
+    return <Loading />;
   }
 
   if (isError) {
-    return <h3>Ошибка при запросе!</h3>;
+    return <ShowError details={error} />;
   }
 
   if (!data?.length) {
@@ -72,7 +78,7 @@ function ShowSubscriptions({ lessonId, isActive }: IShowSubscriptions) {
   );
 }
 
-export function ContentSubscriptions({ lessonId }: IContentSubscriptions) {
+export function ContentSubscriptions({ lesson }: IContentSubscriptions) {
   const [showAll, setShowAll] = useState(false);
 
   const showAllHandler = () => {
@@ -81,7 +87,7 @@ export function ContentSubscriptions({ lessonId }: IContentSubscriptions) {
 
   return (
     <>
-      <ShowSubscriptions lessonId={lessonId} isActive={true} />
+      <ShowSubscriptions lessonId={lesson._id} isActive={true} />
 
       <PrimaryButton
         content={showAll ? 'Скрыть прошлые абонементы' : 'Показать прошлые абонементы'}
@@ -90,7 +96,7 @@ export function ContentSubscriptions({ lessonId }: IContentSubscriptions) {
           sx: { marginY: '1rem' },
         }}
       />
-      {showAll && <ShowSubscriptions lessonId={lessonId} isActive={false} />}
+      {showAll && <ShowSubscriptions lessonId={lesson._id} isActive={false} />}
     </>
   );
 }

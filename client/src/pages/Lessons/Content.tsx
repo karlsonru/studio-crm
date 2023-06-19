@@ -10,7 +10,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useGetLessonsQuery, useDeleteLessonMutation } from '../../shared/api/lessonApi';
 import { useMobile } from '../../shared/hooks/useMobile';
-import { ILessonModel } from '../../shared/models/ILessonModel';
+import { ILessonModel, VisitType } from '../../shared/models/ILessonModel';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { getDayName } from '../../shared/helpers/getDayName';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
@@ -88,12 +88,15 @@ export function LessonsContent() {
     },
     */
     {
-      field: 'activeStudents',
+      field: 'students',
       type: 'number',
       headerName: 'Ученики',
       flex: 1,
       align: 'left',
       headerAlign: 'left',
+      valueFormatter: (params: GridValueFormatterParams<ILessonModel['students']>) => (
+        params.value.filter((student) => student.visitType === VisitType.PERMANENT).length
+      ),
     },
     {
       field: 'isActive',

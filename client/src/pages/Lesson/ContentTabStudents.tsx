@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import Typography from '@mui/material/Typography/Typography';
-import Stack from '@mui/system/Stack';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -9,27 +8,14 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import SyncIcon from '@mui/icons-material/Sync';
-import { Loading } from 'shared/components/Loading';
-import { ShowError } from 'shared/components/ShowError';
 import { ChangeTeacherDialog } from './ChangeTeacherDialog';
 import { useMobile } from '../../shared/hooks/useMobile';
-import { useGetLessonQuery, usePatchLessonMutation } from '../../shared/api';
+import { usePatchLessonMutation } from '../../shared/api';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { IStudentModel } from '../../shared/models/IStudentModel';
 import { AddStudentButton, AddStudentsDialog } from './AddStudentDialog';
-
-function CardContentItem({ title, value }: { title: string, value: string | number }) {
-  return (
-    <Stack direction="row" justifyContent="space-between" my={1} >
-      <Typography>
-        { title }
-      </Typography>
-      <Typography sx={{ fontWeight: 'bold' }}>
-        { value }
-      </Typography>
-  </Stack>
-  );
-}
+import { ILessonModel } from '../../shared/models/ILessonModel';
+import { CardContentItem } from '../../shared/components/CardContentItem';
 
 interface IAddCard {
   lessonId: string;
@@ -81,36 +67,21 @@ function AddCard({ lessonId, student }: IAddCard) {
   );
 }
 
-export function ContentStudents({ lessonId }: { lessonId: string }) {
+export function ContentStudents({ lesson }: { lesson: ILessonModel }) {
   const isMobile = useMobile();
   const [isChangeTeacher, setChangeTeacher] = useState(false);
   const [isAddStudent, setAddStudent] = useState(false);
-  const {
-    data, isError, isLoading, error,
-  } = useGetLessonQuery(lessonId);
-
-  if (isError) {
-    return <ShowError details={error}/>;
-  }
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (!data) {
-    return null;
-  }
 
   return (
     <>
       <Typography mb="1rem" variant="h5" component={'h5'}>Ученики</Typography>
       <Grid container direction="row">
         {
-          data
+          lesson
             .students
             .map((visiting) => <AddCard
               key={visiting.student._id}
-              lessonId={lessonId}
+              lessonId={lesson._id}
               student={visiting.student}
             />)
         };
@@ -129,7 +100,7 @@ export function ContentStudents({ lessonId }: { lessonId: string }) {
         }}>
 
         <CardHeader
-          title={data.teacher.fullname}
+          title={lesson.teacher.fullname}
           action={
             <IconButton onClick={() => setChangeTeacher(true)}>
               <SyncIcon />
@@ -139,19 +110,19 @@ export function ContentStudents({ lessonId }: { lessonId: string }) {
         <CardContent>
           <CardContentItem
             title="Телефон"
-            value={data.teacher.phone} />
+            value={lesson.teacher.phone} />
         </CardContent>
 
       </Card>
 
       <AddStudentsDialog
-        lesson={data}
+        lesson={lesson}
         isOpen={isAddStudent}
         setModalOpen={setAddStudent}
       />
 
       <ChangeTeacherDialog
-        lesson={data}
+        lesson={lesson}
         isOpen={isChangeTeacher}
         setModalOpen={setChangeTeacher}
       />
