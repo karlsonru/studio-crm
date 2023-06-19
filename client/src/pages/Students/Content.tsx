@@ -100,6 +100,7 @@ export function StudentsContent() {
       getActions: (params: GridRowParams<IStudentModel>) => [
         <GridActionsCellItem
           label="WhatsApp"
+          color="success"
           icon={<WhatsAppIcon />}
           onClick={() => window.open(
             `https://api.whatsapp.com/send/?phone=${params.row.contacts[0].phone}&text&type=phone_number`,

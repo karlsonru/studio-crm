@@ -24,7 +24,12 @@ export class StatisticService {
     query: IFilterQuery<VisitedLessonModel>,
     studentId: string,
   ): Promise<IFindVisitedByStudentWithStatistic> {
-    const visitedLessons = await this.visitedLessonsService.findAll(query);
+    const visitedLessons = await this.visitedLessonsService.findAll({
+      $and: [
+        { date: { $gte: query.startPeriod } },
+        { students: { $elemMatch: { student: studentId } } },
+      ],
+    });
 
     const statistic = {
       visited: 0,

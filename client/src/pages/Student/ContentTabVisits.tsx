@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { format, subMonths } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import CardContent from '@mui/material/CardContent';
 import List from '@mui/material/List';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 import { useFindSubscriptionsQuery, useGetVisitedLessonsStatisticByStudentQuery } from '../../shared/api';
 import { BasicTableWithTitleAndButton, CreateRow, CreateRowWithCollapse } from '../../shared/components/BasicTable';
@@ -15,13 +17,13 @@ import { IStudentModel } from '../../shared/models/IStudentModel';
 import { CardContentItem } from '../../shared/components/CardContentItem';
 
 interface IVisitsStatistic {
-  statistic?: Record<string, number>;
-  studentFullname: string;
+  statistic: Record<string, number>;
   startPeriod: number;
 }
 
-function VisitsStatistic({ statistic, studentFullname, startPeriod }: IVisitsStatistic) {
+function VisitsStatistic({ statistic, startPeriod }: IVisitsStatistic) {
   const isMobile = useMobile();
+  const [isExpanded, setExpanded] = useState(false);
 
   const statisticFieldsName = {
     visited: 'Посещено',
@@ -30,45 +32,33 @@ function VisitsStatistic({ statistic, studentFullname, startPeriod }: IVisitsSta
     unpaid: 'Не оплачено',
   };
 
-  const period = startPeriod === 0 ? 'за всё время' : `с ${format(startPeriod, 'dd-MM-Y')}`;
-
   return (
-    <Card sx={{
-      width: isMobile ? '100%' : '20%',
-      maxWidth: '325px',
-    }}
+    <Accordion
+      expanded={isExpanded}
+      onChange={() => setExpanded((prev) => !prev)}
+      sx={{ width: isMobile ? '100%' : '25%' }}
     >
-      <CardHeader
-        title={studentFullname}
-        subheader={`Статистика ${period}`}
-        sx={{
-          padding: '0.5rem',
-        }}
-      />
-
-      <CardContent
-        sx={{
-          padding: '0.5rem',
-          paddingBottom: '0.5rem!important',
-        }}
-      >
+      <AccordionSummary expandIcon={<ExpandMoreIcon />} >
+        <Typography>Показать статистику</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <Typography>{`${startPeriod === 0 ? 'Всё время' : 'Последние 3 месяца'}`}</Typography>
         <List dense>
-          {Object.entries(statisticFieldsName)
-            .map((parameters) => (
-              <CardContentItem
-                key={parameters[0]}
-                title={parameters[1]}
-                value={statistic?.[parameters[0]] ?? 'Неизвестно'}
-                props={{
-                  width: '100%',
-                }}
-              />
-            ))
-          }
+            {Object.entries(statisticFieldsName)
+              .map((parameters) => (
+                <CardContentItem
+                  key={parameters[0]}
+                  title={parameters[1]}
+                  value={statistic[parameters[0]] ?? 'Неизвестно'}
+                  props={{
+                    width: '100%',
+                  }}
+                />
+              ))
+            }
         </List>
-      </CardContent>
-
-    </Card>
+      </AccordionDetails>
+    </Accordion>
   );
 }
 
@@ -118,10 +108,7 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
     error: errorVisitedLessons,
   } = useGetVisitedLessonsStatisticByStudentQuery({
     query: {
-      $and: [
-        { students: { $elemMatch: { student: student._id } } },
-        { date: { $gte: startPeriodLessons } },
-      ],
+      startPeriod: startPeriodLessons,
     },
     id: student._id,
   });
@@ -152,8 +139,6 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
     return <ShowError details={'Не удалось запросить данные'} />;
   }
 
-  let studentFullname = '';
-
   const headersVisits = isMobile ? ['Занятие', 'Дата занятия'] : ['Занятие', 'Дата занятия', 'Статус посещения', 'Статус оплаты'];
   const rowsVisits = [...responseVisitedLessonsStatisticByStudent
     .visitedLessons]
@@ -161,10 +146,6 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
     .map((visitedLesson) => {
       // с backend'а всегда возвращается массив с 1 студентом по которому делали запрос
       const studentVisit = visitedLesson.students[0];
-
-      if (!studentFullname) {
-        studentFullname = studentVisit.student.fullname;
-      }
 
       return (
         <CreateRows
@@ -210,9 +191,8 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
   return (
     <>
       <VisitsStatistic
-        studentFullname={studentFullname}
-        startPeriod={startPeriodLessons}
         statistic={responseVisitedLessonsStatisticByStudent.statistic}
+        startPeriod={startPeriodLessons}
       />
 
       <BasicTableWithTitleAndButton

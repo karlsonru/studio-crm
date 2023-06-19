@@ -1,13 +1,28 @@
 import { useParams } from 'react-router-dom';
-import { useGetStudentQuery } from 'shared/api';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { ContentTabDetails } from './ContentTabDetails';
 import { ContentTabVisits } from './ContentTabVisits';
+import { useGetStudentQuery } from '../../shared/api';
 import { SearchParamsButton } from '../../shared/components/buttons/SearchParamsButton';
 import { CreateSubscriptionModal } from '../../shared/components/modals/CreateSubscriptionModal';
 import { useTitle } from '../../shared/hooks/useTitle';
+import { useMobile } from '../../shared/hooks/useMobile';
 import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
 import { TabsWrapper } from '../../shared/components/TabsWrapper';
+
+function ContactTab() {
+  const isMobile = useMobile();
+
+  return (
+    <Stack direction="row">
+      <WhatsAppIcon color="success" />
+      {!isMobile && <Typography variant="subtitle1">Связаться</Typography>}
+    </Stack>
+  );
+}
 
 export function StudentPage() {
   const { studentId } = useParams();
@@ -32,6 +47,11 @@ export function StudentPage() {
     return null;
   }
 
+  const goWhatsApp = () => window.open(
+    `https://api.whatsapp.com/send/?phone=${student.contacts[0].phone}&text&type=phone_number`,
+    '_blank',
+  );
+
   return (
     <>
       <TabsWrapper
@@ -41,16 +61,22 @@ export function StudentPage() {
             label: 'Детали',
             value: 'details',
             content: [
-              <ContentTabDetails student={student} />,
+              <ContentTabDetails key="details" student={student} />,
             ],
           },
           {
             label: 'Посещения',
             value: 'visits',
             content: [
-              <ContentTabVisits student={student} />,
+              <ContentTabVisits key="visits" student={student} />,
             ],
             conditionally: <SearchParamsButton title="Оформить абонемент" param="create-subscription" />,
+          },
+          {
+            label: <ContactTab key={student.contacts[0].phone} />,
+            value: '',
+            content: [],
+            tabProps: { onClick: goWhatsApp },
           },
         ]}
       />
