@@ -34,27 +34,27 @@ export function StudentPage() {
 
   return (
     <>
-    <TabsWrapper
-      defaultTab='details'
-      tabsContent={[
-        {
-          label: 'Детали',
-          value: 'details',
-          content: [
-            <ContentTabDetails student={student} />,
-          ],
-        },
-        {
-          label: 'Посещения',
-          value: 'visits',
-          content: [
-            <ContentTabVisits student={student} />,
-          ],
-          conditionally: <SearchParamsButton title="Оформить абонемент" param="create-subscription" />,
-        },
-      ]}
-    />
-    <CreateSubscriptionModal />
+      <TabsWrapper
+        defaultTab='details'
+        tabsContent={[
+          {
+            label: 'Детали',
+            value: 'details',
+            content: [
+              <ContentTabDetails student={student} />,
+            ],
+          },
+          {
+            label: 'Посещения',
+            value: 'visits',
+            content: [
+              <ContentTabVisits student={student} />,
+            ],
+            conditionally: <SearchParamsButton title="Оформить абонемент" param="create-subscription" />,
+          },
+        ]}
+      />
+      <CreateSubscriptionModal />
     </>
   );
 }

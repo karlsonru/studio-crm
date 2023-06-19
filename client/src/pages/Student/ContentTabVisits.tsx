@@ -4,9 +4,7 @@ import { ru } from 'date-fns/locale';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
-import Stack from '@mui/material/Stack';
 import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 import { useFindSubscriptionsQuery, useGetVisitedLessonsStatisticByStudentQuery } from '../../shared/api';
 import { BasicTableWithTitleAndButton, CreateRow, CreateRowWithCollapse } from '../../shared/components/BasicTable';
@@ -14,29 +12,12 @@ import { useMobile } from '../../shared/hooks/useMobile';
 import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
 import { IStudentModel } from '../../shared/models/IStudentModel';
+import { CardContentItem } from '../../shared/components/CardContentItem';
 
 interface IVisitsStatistic {
   statistic?: Record<string, number>;
   studentFullname: string;
   startPeriod: number;
-}
-
-function CardContentItem({ title, value }: { title: string, value: string | number }) {
-  return (
-    <Stack
-      direction="row"
-      justifyContent="space-between"
-      my={1}
-      width='100%'
-    >
-      <Typography>
-        { title }
-      </Typography>
-      <Typography sx={{ fontWeight: 'bold' }}>
-        { value }
-      </Typography>
-  </Stack>
-  );
 }
 
 function VisitsStatistic({ statistic, studentFullname, startPeriod }: IVisitsStatistic) {
@@ -78,6 +59,9 @@ function VisitsStatistic({ statistic, studentFullname, startPeriod }: IVisitsSta
                 key={parameters[0]}
                 title={parameters[1]}
                 value={statistic?.[parameters[0]] ?? 'Неизвестно'}
+                props={{
+                  width: '100%',
+                }}
               />
             ))
           }
@@ -196,8 +180,8 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
             format(visitedLesson.date, 'EEEE, dd-MM-YYY', { locale: ru }),
           ]}
           contentCollapsed={[
-            <CardContentItem title={'Посещение'} value={studentVisit.visitStatus} />,
-            <CardContentItem title={'Оплата'} value={studentVisit.billingStatus} />,
+            <CardContentItem title={'Посещение'} value={studentVisit.visitStatus} props={{ width: '100%' }} />,
+            <CardContentItem title={'Оплата'} value={studentVisit.billingStatus} props={{ width: '100%' }} />,
           ]}
         />
       );
@@ -218,8 +202,8 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
         format(subscription.dateTo, 'dd-MM-YYY'),
       ]}
       contentCollapsed={[
-        <CardContentItem title={'Всего визитов'} value={subscription.visitsTotal} />,
-        <CardContentItem title={'Стоимость'} value={subscription.price} />,
+        <CardContentItem title={'Всего визитов'} value={subscription.visitsTotal} props={{ width: '100%' }} />,
+        <CardContentItem title={'Стоимость'} value={subscription.price} props={{ width: '100%' }} />,
       ]}
     />);
 
@@ -240,7 +224,7 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
       />
 
       <BasicTableWithTitleAndButton
-        tableTitle='Посещения'
+        tableTitle='Абонементы'
         headers={headersSubscriptions}
         rows={rowsSubscriptions}
         buttomTitle={showMoreSubscriptions ? 'Скрыть' : 'Показать ещё'}

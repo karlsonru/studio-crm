@@ -40,20 +40,20 @@ export function DialogFormWrapper({
 
   const ref = useRef<HTMLFormElement>();
   const [, setSearchParams] = useSearchParams();
-  const closeHandler = () => setSearchParams(undefined);
+  const closeHandler = () => {
+    // сбросим кэш запроса перед закрытием
+    if (reset) {
+      reset();
+    }
+
+    setSearchParams(undefined);
+  };
 
   useEffect(() => {
     if (!isSuccess) return;
 
     ref.current?.reset();
   }, [isSuccess]);
-
-  useEffect(() => {
-    if (reset) {
-      const timerId = setTimeout(reset, 1500);
-      return () => clearTimeout(timerId);
-    }
-  }, [reset]);
 
   return (
     <Dialog open={isOpen} onClose={closeHandler}>
