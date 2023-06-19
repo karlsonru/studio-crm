@@ -1,5 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { format } from 'date-fns';
+import { TwitterPicker } from 'react-color';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select/Select';
@@ -24,6 +25,7 @@ import { useMobile } from '../../shared/hooks/useMobile';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { convertTime } from '../../shared/helpers/convertTime';
 import { FormContentColumn } from '../../shared/components/FormContentColumn';
+import { Loading } from '../../shared/components/Loading';
 
 function validateFrom(formData: { [key: string]: FormDataEntryValue }) {
   if ((formData.title as string).trim().length < 3) {
@@ -54,8 +56,9 @@ function validateFrom(formData: { [key: string]: FormDataEntryValue }) {
 export function ContentTabDetails({ lessonId }: { lessonId: string }) {
   const isMobile = useMobile();
   const [isEdit, setEdit] = useState(false);
+  const [color, setColor] = useState<string>();
 
-  const { data: lessonDetails } = useGetLessonQuery(lessonId);
+  const { data: lessonDetails, isLoading } = useGetLessonQuery(lessonId);
   const [updateLesson] = usePatchLessonMutation();
   const { data: locationsData, isSuccess: isLocationsSuccess } = useGetLocationsQuery();
   const { data: usersData, isSuccess: isUsersSuccess } = useGetUsersQuery();
@@ -66,6 +69,10 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
     teacher: true,
     dateTo: true,
   });
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   if (!lessonDetails) {
     return null;
@@ -113,6 +120,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
         students: [],
         dateFrom: +Date.parse(formData.dateFrom as string),
         dateTo: +Date.parse(formData.dateTo as string),
+        color,
       },
     });
 
@@ -312,6 +320,15 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
               InputLabelProps={{ shrink: true }}
               />
           </Stack>
+        </FormControl>
+
+        <FormControl>
+          <TwitterPicker
+            color={color ?? lessonDetails.color}
+            colors={['#FF6900', '#FCB900', '#7BDCB5', '#00D084', '#8ED1FC', '#0693E3', '#ABB8C3']}
+            width="100%"
+            onChangeComplete={(colorResult) => setColor(colorResult.hex)}
+          />
         </FormControl>
 
         <SubmitButton
