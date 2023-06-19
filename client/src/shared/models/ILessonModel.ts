@@ -26,11 +26,10 @@ export interface ILessonModel {
   day: number;
   timeStart: ITime;
   timeEnd: ITime;
-  activeStudents: number;
   students: Array<IVisitingStudent>,
   dateFrom: number;
   dateTo: number;
-  isActive: boolean;
+  color?: string;
 }
 
 interface IVisitingStudentCreate extends Omit<IVisitingStudent, 'student'> {

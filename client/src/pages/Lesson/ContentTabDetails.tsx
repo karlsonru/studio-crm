@@ -110,11 +110,9 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
           hh: +timeEnd[0],
           min: +timeEnd[1],
         },
-        activeStudents: 0,
         students: [],
         dateFrom: +Date.parse(formData.dateFrom as string),
         dateTo: +Date.parse(formData.dateTo as string),
-        isActive: true,
       },
     });
 

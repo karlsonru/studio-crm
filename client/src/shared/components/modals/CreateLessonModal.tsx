@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { addYears, format } from 'date-fns';
+import { TwitterPicker } from 'react-color';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select/Select';
@@ -46,8 +47,9 @@ function validateFrom(formData: { [key: string]: FormDataEntryValue }) {
 export function CreateLessonModal() {
   const isMobile = useMobile();
   const [searchParams] = useSearchParams();
+  const [color, setColor] = useState<string>();
 
-  const [createLesson] = useCreateLessonMutation();
+  const [createLesson, requestStatus] = useCreateLessonMutation();
   const { data: locationsData, isSuccess: isLocationsSuccess } = useGetLocationsQuery();
   const { data: usersData, isSuccess: isUsersSuccess } = useGetUsersQuery();
 
@@ -95,13 +97,11 @@ export function CreateLessonModal() {
         hh: +timeEnd[0],
         min: +timeEnd[1],
       },
-      activeStudents: 0,
       students: [],
       dateFrom: +Date.parse(formData.dateFrom as string),
       dateTo: +Date.parse(formData.dateTo as string),
-      isActive: true,
+      color,
     });
-    form.reset();
   };
 
   const now = new Date();
@@ -111,6 +111,7 @@ export function CreateLessonModal() {
       title='Добавить занятие'
       isOpen={searchParams.has('create-lesson')}
       onSubmit={handleSubmit}
+      requestStatus={requestStatus}
     >
       <TextField
         name='title'
@@ -208,10 +209,11 @@ export function CreateLessonModal() {
         <Select
           name='location'
           label='Помещение'
-          defaultValue='location 1'
+          defaultValue=''
           fullWidth
           required
         >
+          <MenuItem value={''}><em>Выберите помещение</em></MenuItem>
         { isLocationsSuccess
             && locationsData.map((location) => (
               <MenuItem key={location._id} value={location._id}>{location.title}</MenuItem>
@@ -264,6 +266,15 @@ export function CreateLessonModal() {
             InputLabelProps={{ shrink: true }}
           />
         </Stack>
+      </FormControl>
+
+      <FormControl>
+        <TwitterPicker
+          color={color}
+          colors={['#FF6900', '#FCB900', '#7BDCB5', '#00D084', '#8ED1FC', '#0693E3', '#ABB8C3']}
+          width="100%"
+          onChangeComplete={(colorResult) => setColor(colorResult.hex)}
+        />
       </FormControl>
 
     </DialogFormWrapper>

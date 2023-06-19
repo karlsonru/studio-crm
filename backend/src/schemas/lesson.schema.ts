@@ -127,6 +127,11 @@ export class Lesson {
     required: true,
   })
   dateTo: number;
+
+  @Prop({
+    type: String,
+  })
+  color?: string;
 }
 
 export const LessonSchema = SchemaFactory.createForClass(Lesson);

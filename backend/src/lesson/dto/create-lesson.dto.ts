@@ -3,6 +3,7 @@ import {
   IsEnum,
   IsMongoId,
   IsNumber,
+  IsOptional,
   IsString,
   Max,
   Min,
@@ -70,4 +71,8 @@ export class CreateLessonDto {
 
   @IsNumber()
   dateTo: number;
+
+  @IsOptional()
+  @IsString()
+  color?: number;
 }
