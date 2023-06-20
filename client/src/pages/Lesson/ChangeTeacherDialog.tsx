@@ -80,9 +80,7 @@ export function ChangeTeacherDialog(
       isOpen={isOpen}
       onSubmit={handleSubmit}
       requestStatus={requestStatus}
-      dialogProps={{
-        onClose: () => setModalOpen(false),
-      }}
+      onClose={() => setModalOpen(false)}
     >
       <DialogContentText>
         Вы хотите заменить педагога {''}

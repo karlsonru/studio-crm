@@ -36,6 +36,7 @@ export class ITime {
   min: number;
 }
 
+@Schema({ _id: false })
 class VisitingStudent {
   @Prop({
     type: Types.ObjectId,
@@ -59,9 +60,7 @@ class VisitingStudent {
   visitType: VisitType;
 }
 
-@Schema({
-  timestamps: true,
-})
+@Schema({ timestamps: true })
 export class Lesson {
   @Transform(({ value }) => value.toString())
   @Type(() => String)
@@ -83,7 +82,8 @@ export class Lesson {
   teacher: User;
 
   @Prop({
-    type: Object,
+    type: Types.ObjectId,
+    ref: 'Student',
     required: true,
   })
   @Type(() => Student)

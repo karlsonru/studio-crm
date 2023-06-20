@@ -15,7 +15,7 @@ export class LessonService {
     @InjectModel(LessonModel.name)
     private readonly lessonModel: Model<LessonDocument>,
   ) {
-    this.populateQuery = ['teacher', 'students', 'location'];
+    this.populateQuery = ['teacher', 'location', 'students.student'];
   }
 
   async create(createLessonDto: CreateLessonDto): Promise<LessonModel | null> {

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import Typography from '@mui/material/Typography/Typography';
-import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import IconButton from '@mui/material/IconButton';
@@ -9,12 +8,12 @@ import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import SyncIcon from '@mui/icons-material/Sync';
 import { ChangeTeacherDialog } from './ChangeTeacherDialog';
-import { useMobile } from '../../shared/hooks/useMobile';
 import { usePatchLessonMutation } from '../../shared/api';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { IStudentModel } from '../../shared/models/IStudentModel';
 import { AddStudentButton, AddStudentsDialog } from './AddStudentDialog';
 import { ILessonModel } from '../../shared/models/ILessonModel';
+import { CardWrapper } from '../../shared/components/CardWrapper';
 import { CardContentItem } from '../../shared/components/CardContentItem';
 
 interface IAddCard {
@@ -23,7 +22,6 @@ interface IAddCard {
 }
 
 function AddCard({ lessonId, student }: IAddCard) {
-  const isMobile = useMobile();
   const [updateLesson] = usePatchLessonMutation();
 
   const excludeHandler = () => {
@@ -42,19 +40,22 @@ function AddCard({ lessonId, student }: IAddCard) {
 
   return (
     <>
-      <Card variant="outlined" sx={{ width: '325px', marginRight: isMobile ? 0 : '0.5rem', marginBottom: '0.5rem' }}>
-        <CardHeader title={student.fullname} action={
-          <IconButton onClick={() => setModalOpen(true)}>
-            <RemoveCircleOutlineIcon />
-          </IconButton>
-          } />
+      <CardWrapper>
+        <CardHeader
+          title={student.fullname}
+          action={
+            <IconButton onClick={() => setModalOpen(true)}>
+              <RemoveCircleOutlineIcon />
+            </IconButton>
+            }
+          />
         <CardContent>
           <CardContentItem title="Контакт" value={student.contacts[0].name} />
           <Divider />
           <CardContentItem title="Телефон" value={student.contacts[0].phone} />
           <Divider />
         </CardContent>
-      </Card>
+      </CardWrapper>
 
       <ConfirmationDialog
         title='Исключить из группы'
@@ -68,7 +69,6 @@ function AddCard({ lessonId, student }: IAddCard) {
 }
 
 export function ContentStudents({ lesson }: { lesson: ILessonModel }) {
-  const isMobile = useMobile();
   const [isChangeTeacher, setChangeTeacher] = useState(false);
   const [isAddStudent, setAddStudent] = useState(false);
 
@@ -79,25 +79,28 @@ export function ContentStudents({ lesson }: { lesson: ILessonModel }) {
         {
           lesson
             .students
-            .map((visiting) => <AddCard
-              key={visiting.student._id}
-              lessonId={lesson._id}
-              student={visiting.student}
-            />)
+            .map((visiting) => (
+              <AddCard
+                key={visiting.student._id}
+                lessonId={lesson._id}
+                student={visiting.student}
+              />
+            ))
         };
+
         <AddStudentButton setModalOpen={setAddStudent} />
+
+        <AddStudentsDialog
+          lesson={lesson}
+          isOpen={isAddStudent}
+          setModalOpen={setAddStudent}
+        />
       </Grid>
 
       <Divider sx={{ m: '1rem 0' }} />
       <Typography mb="1rem" variant="h5" component={'h5'}>Педагог</Typography>
 
-      <Card variant="outlined"
-        sx={{
-          width: isMobile ? 'auto' : '325px',
-          marginRight: isMobile ? 0 : '0.5rem',
-          marginBottom: '0.5rem',
-        }}>
-
+      <CardWrapper>
         <CardHeader
           title={lesson.teacher.fullname}
           action={
@@ -111,21 +114,13 @@ export function ContentStudents({ lesson }: { lesson: ILessonModel }) {
             title="Телефон"
             value={lesson.teacher.phone} />
         </CardContent>
-
-      </Card>
-
-      <AddStudentsDialog
-        lesson={lesson}
-        isOpen={isAddStudent}
-        setModalOpen={setAddStudent}
-      />
+      </CardWrapper>
 
       <ChangeTeacherDialog
         lesson={lesson}
         isOpen={isChangeTeacher}
         setModalOpen={setChangeTeacher}
       />
-
     </>
   );
 }

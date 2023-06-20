@@ -22,6 +22,7 @@ interface IForm {
   isOpen: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   children: Array<ReactNode>;
+  onClose?: () => void;
   requestStatus?: {
     isLoading: boolean;
     isSuccess: boolean;
@@ -33,7 +34,7 @@ interface IForm {
 }
 
 export function DialogFormWrapper({
-  title, isOpen, onSubmit, children, requestStatus, dialogProps,
+  title, isOpen, onSubmit, children, requestStatus, dialogProps, onClose,
 }: IForm) {
   const {
     isSuccess, isError, error, reset, isLoading,
@@ -41,10 +42,16 @@ export function DialogFormWrapper({
 
   const ref = useRef<HTMLFormElement>();
   const [, setSearchParams] = useSearchParams();
+
   const closeHandler = () => {
     // сбросим кэш запроса перед закрытием
     if (reset) {
       reset();
+    }
+
+    // если передан кастомынй close handler - вызываем его
+    if (onClose) {
+      onClose();
     }
 
     setSearchParams(undefined);

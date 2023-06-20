@@ -11,7 +11,7 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { useFindStudentsQuery, usePatchLessonMutation } from '../../shared/api';
 import { IStudentModel } from '../../shared/models/IStudentModel';
-import { ILessonModel } from '../../shared/models/ILessonModel';
+import { ILessonModel, VisitType } from '../../shared/models/ILessonModel';
 import { CardWrapper } from '../../shared/components/CardWrapper';
 import { DialogFormWrapper } from '../../shared/components/DialogFormWrapper';
 import { ShowError } from '../../shared/components/ShowError';
@@ -47,7 +47,11 @@ export function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudents
         // @ts-ignore
         $addToSet: {
           students: {
-            $each: [...selectedOptions.map((student) => student._id)],
+            $each: [...selectedOptions.map((student) => ({
+              student: student._id,
+              date: null,
+              visitType: VisitType.PERMANENT,
+            }))],
           },
         },
       },
@@ -62,8 +66,8 @@ export function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudents
       isOpen={isOpen}
       onSubmit={handleSubmit}
       requestStatus={requestStatus}
+      onClose={() => setModalOpen(false)}
       dialogProps={{
-        onClose: () => setModalOpen(false),
         maxWidth: 'xl',
         // transitionDuration: 250,
       }}
