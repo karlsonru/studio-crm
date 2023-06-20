@@ -15,6 +15,7 @@ import { ILessonModel } from '../../shared/models/ILessonModel';
 import { CardWrapper } from '../../shared/components/CardWrapper';
 import { DialogFormWrapper } from '../../shared/components/DialogFormWrapper';
 import { ShowError } from '../../shared/components/ShowError';
+// import { Loading } from '../../shared/components/Loading';
 
 interface IAddStudentsDialog {
   lesson: ILessonModel;
@@ -64,7 +65,7 @@ export function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudents
       dialogProps={{
         onClose: () => setModalOpen(false),
         maxWidth: 'xl',
-        transitionDuration: 500,
+        // transitionDuration: 250,
       }}
     >
       <DialogContentText>
