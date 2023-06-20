@@ -11,38 +11,21 @@ function ContentListItem({ item }: { item: string }) {
   );
 }
 
-interface IContentList {
-  content: Array<string>;
-  width: number;
-}
-
-function ContentList({ content, width }: IContentList) {
-  return (
-    <List sx={{ width }}>
-      { content.map(
-        (item) => <ContentListItem key={item} item={item} />,
-      ) }
-    </List>
-  );
-}
-
 interface IContentCardPreview {
   anchorEl: HTMLDivElement | null;
-  handleClose: () => void;
   content: Array<string>;
 }
 
-export function ContentCardPreview({ anchorEl, content, handleClose }: IContentCardPreview) {
-  const width = anchorEl?.offsetWidth;
-
+export function ContentCardPreview({ anchorEl, content }: IContentCardPreview) {
   if (!anchorEl) return null;
+
+  const width = anchorEl.offsetWidth;
 
   return (
     <Popover
       disableAutoFocus
-      open={Boolean(anchorEl)}
+      open={!!anchorEl}
       anchorEl={anchorEl}
-      onClose={handleClose}
       anchorOrigin={{
         vertical: 'bottom',
         horizontal: 'center',
@@ -55,7 +38,9 @@ export function ContentCardPreview({ anchorEl, content, handleClose }: IContentC
         pointerEvents: 'none',
       }}
     >
-      <ContentList content={content} width={width ?? 0} />
+      <List sx={{ width }}>
+        { content.map((item) => <ContentListItem key={item} item={item} />) }
+      </List>
     </Popover>
   );
 }

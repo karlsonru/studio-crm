@@ -98,7 +98,6 @@ function formatCardContent(lesson: ILessonModel, step: number, view: 'day' | 'we
   }
 
   // для размещения в виде Недели вычисляем размещение каждой карточки
-
   const duration = calculateDuration(lesson.timeEnd, lesson.timeStart);
 
   // мультипликатор насколько нужно смещать карточку в зависимости от шага времени
@@ -133,7 +132,7 @@ export function ContentCard({ lesson, step, date }: IContentCard) {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const hidePreview = () => {
     setAnchorEl(null);
   };
 
@@ -154,21 +153,28 @@ export function ContentCard({ lesson, step, date }: IContentCard) {
     <>
       <Card
         onMouseEnter={showPreview}
-        onMouseLeave={handleClose}
+        onMouseLeave={hidePreview}
         onDoubleClick={goVisitsPage}
         variant="outlined"
         sx={{ ...formattedContent.style, ...CARD_STYLE }}
       >
         <CardHeader
-          title={<TitleWithIcon title={title} amount={students} />}
-          subheader={`${timeStart} - ${timeEnd} ${lesson.teacher.fullname}`}
+          title={
+            <TitleWithIcon title={title} amount={students} />
+          }
+          subheader={
+            `${timeStart} - ${timeEnd} ${lesson.teacher.fullname}`
+          }
           {...CARD_HEADER_PROPS}
+          sx={{
+            backgroundColor: lesson.color,
+          }}
         />
         <CardContent sx={{ padding: '0.25rem' }} />
       </Card>
+
       <ContentCardPreview
         anchorEl={anchorEl}
-        handleClose={handleClose}
         content={lesson.students.map((visiting) => visiting.student.fullname)}
       />
     </>

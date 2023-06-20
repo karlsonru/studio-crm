@@ -41,17 +41,17 @@ export function LessonPage() {
         {
           label: 'Участники',
           value: 'students',
-          content: [<ContentStudents lesson={lesson} />],
+          content: [<ContentStudents key="students" lesson={lesson} />],
         },
         {
           label: 'Детали',
           value: 'details',
-          content: [<ContentTabDetails lesson={lesson} />],
+          content: [<ContentTabDetails key="details" lesson={lesson} />],
         },
         {
           label: 'Абонементы',
           value: 'subscriptions',
-          content: [<ContentSubscriptions lesson={lesson} />],
+          content: [<ContentSubscriptions key="subscriptions" lesson={lesson} />],
           conditionally: [<SearchParamsButton title="Оформить" param="create-subscription" />],
         },
       ]}

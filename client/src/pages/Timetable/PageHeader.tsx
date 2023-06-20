@@ -1,11 +1,11 @@
 import Button, { ButtonProps } from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
-import { set } from 'date-fns';
 import { DateSwitcherTimetable } from './DateSwitcherTimetable';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { timetablePageActions } from '../../shared/reducers/timetablePageSlice';
 import { useMobile } from '../../shared/hooks/useMobile';
+import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 
 function TextButton({ title, props }: { title: string, props: ButtonProps }) {
   return <Button variant='text' {...props}>{title}</Button>;
@@ -16,13 +16,7 @@ export function PageHeader() {
   const isMobile = useMobile();
   const actions = useActionCreators(timetablePageActions);
 
-  const goToday = () => {
-    actions.setCurrentDate(
-      set(Date.now(), {
-        hours: 0, minutes: 0, seconds: 0, milliseconds: 0,
-      }).getTime(),
-    );
-  };
+  const goToday = () => actions.setCurrentDate(getTodayTimestamp());
 
   const changeView = (value: 'day' | 'week') => {
     actions.setView(value);

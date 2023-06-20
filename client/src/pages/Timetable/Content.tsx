@@ -109,12 +109,14 @@ function Row({ content, dates }: IRow) {
 
   return (
     <TableRow>
-      { content.map((item, idx) => <Cell
+      { content.map((item, idx) => (
+        <Cell
           key={time + idx}
           content={item}
           idx={idx}
           date={idx === 0 ? 0 : dates[idx - 1]}
-        />)
+        />
+      ))
       }
     </TableRow>
   );

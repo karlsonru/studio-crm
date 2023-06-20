@@ -35,7 +35,7 @@ const NavItem = ({ path, menuItem }: INavItem) => {
   const activeStyle = {
     color: 'inherit',
     textDecoration: 'underline',
-    background: '#fff77f',
+    background: 'lightgrey',
   };
 
   const regularStyle = {
@@ -73,14 +73,14 @@ function createMenuList() {
       icon: <CalendarMonthIcon />,
     },
     {
-      path: 'lessons',
-      title: 'Занятия',
-      icon: <ListAltIcon />,
-    },
-    {
       path: 'visits',
       title: 'Посещения',
       icon: <DomainVerificationIcon />,
+    },
+    {
+      path: 'lessons',
+      title: 'Занятия',
+      icon: <ListAltIcon />,
     },
     {
       path: 'students',

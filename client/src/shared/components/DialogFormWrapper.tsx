@@ -7,7 +7,7 @@ import {
 import { useSearchParams } from 'react-router-dom';
 import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { SerializedError } from '@reduxjs/toolkit';
-import Dialog from '@mui/material/Dialog';
+import Dialog, { DialogProps } from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
@@ -29,10 +29,11 @@ interface IForm {
     error?: FetchBaseQueryError | string | SerializedError | undefined;
     reset: () => void;
   };
+  dialogProps?: Partial<DialogProps>;
 }
 
 export function DialogFormWrapper({
-  title, isOpen, onSubmit, children, requestStatus,
+  title, isOpen, onSubmit, children, requestStatus, dialogProps,
 }: IForm) {
   const {
     isSuccess, isError, error, reset, isLoading,
@@ -56,7 +57,7 @@ export function DialogFormWrapper({
   }, [isSuccess]);
 
   return (
-    <Dialog open={isOpen} onClose={closeHandler}>
+    <Dialog open={isOpen} onClose={closeHandler} {...dialogProps}>
       <DialogTitle pb={1}>{title}</DialogTitle>
 
       {isSuccess && <DialogTitle

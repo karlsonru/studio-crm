@@ -7,20 +7,24 @@ import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useMobile } from '../../shared/hooks/useMobile';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { timetablePageActions } from '../../shared/reducers/timetablePageSlice';
-import { Loading } from '../../shared/components/Loading';
 import { useTitle } from '../../shared/hooks/useTitle';
+import { Loading } from '../../shared/components/Loading';
+import { ShowError } from '../../shared/components/ShowError';
 
 export function TimetablePage() {
   useTitle('Расписание');
+  const isMobile = useMobile();
 
   const view = useAppSelector((state) => state.timetablePageReducer.view);
   const currentDate = useAppSelector((state) => state.timetablePageReducer.currentDate);
-  const currentMonth = new Date(currentDate).getMonth();
-  const isMobile = useMobile();
   const actions = useActionCreators(timetablePageActions);
 
+  const currentMonth = new Date(currentDate).getMonth();
+
   // запрашиваем занятия на +1 месяц от текущих и -1 месяц от текущих
-  const { data, isLoading } = useFindLessonsQuery({
+  const {
+    data, isLoading, isError, error,
+  } = useFindLessonsQuery({
     dateFrom: { $lte: set(currentDate, { month: currentMonth - 1, date: 1 }).getTime() },
     dateTo: { $gte: set(currentDate, { month: currentMonth + 1, date: 1 }).getTime() },
   });
@@ -35,6 +39,10 @@ export function TimetablePage() {
 
   if (isLoading) {
     return <Loading />;
+  }
+
+  if (isError) {
+    return <ShowError details={error} />;
   }
 
   if (!data) return null;

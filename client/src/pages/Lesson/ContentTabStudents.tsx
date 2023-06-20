@@ -91,10 +91,9 @@ export function ContentStudents({ lesson }: { lesson: ILessonModel }) {
       <Divider sx={{ m: '1rem 0' }} />
       <Typography mb="1rem" variant="h5" component={'h5'}>Педагог</Typography>
 
-      <Card
-        variant="outlined"
+      <Card variant="outlined"
         sx={{
-          width: '325px',
+          width: isMobile ? 'auto' : '325px',
           marginRight: isMobile ? 0 : '0.5rem',
           marginBottom: '0.5rem',
         }}>
