@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsEnum,
   IsMongoId,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -11,7 +12,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { ITime } from '../../schemas/lesson.schema';
-import { VisitType } from 'src/schemas/visitedLesson.schema';
+import { VisitType } from '../../schemas/visitedLesson.schema';
 
 class Time implements ITime {
   @IsNumber()
@@ -25,11 +26,13 @@ class Time implements ITime {
   min: number;
 }
 
-class VisitingStudent {
+export class VisitingStudent {
   @IsString()
+  @IsNotEmpty()
   @IsMongoId()
   student: string;
 
+  @IsNotEmpty()
   @IsEnum(VisitType)
   visitType: VisitType;
 
@@ -47,7 +50,7 @@ export class CreateLessonDto {
   @IsMongoId()
   teacher: string;
 
-  @ValidateNested()
+  @ValidateNested({ each: true })
   @Type(() => VisitingStudent)
   students: VisitingStudent[];
 

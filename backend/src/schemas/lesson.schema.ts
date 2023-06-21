@@ -41,14 +41,15 @@ class VisitingStudent {
   @Prop({
     type: Types.ObjectId,
     ref: 'Student',
+    required: true,
   })
   @Type(() => Student)
   student: Student;
 
   @Prop({
     type: Number,
-    required: true,
     default: null,
+    required: true,
   })
   date: number | null;
 
@@ -56,6 +57,7 @@ class VisitingStudent {
     type: String,
     enum: VisitType,
     default: VisitType.PERMANENT,
+    required: true,
   })
   visitType: VisitType;
 }
@@ -86,7 +88,7 @@ export class Lesson {
     ref: 'Student',
     required: true,
   })
-  @Type(() => Student)
+  @Type(() => VisitingStudent)
   students: VisitingStudent[];
 
   @Prop({

@@ -44,16 +44,11 @@ export function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudents
     updateLesson({
       id: lesson._id,
       newItem: {
-        // @ts-ignore
-        $addToSet: {
-          students: {
-            $each: [...selectedOptions.map((student) => ({
-              student: student._id,
-              date: null,
-              visitType: VisitType.PERMANENT,
-            }))],
-          },
-        },
+        students: [...selectedOptions.map((student) => ({
+          student: student._id,
+          date: null,
+          visitType: VisitType.PERMANENT,
+        }))],
       },
     });
   };
