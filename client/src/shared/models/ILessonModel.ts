@@ -8,8 +8,10 @@ export interface ITime {
 }
 
 export enum VisitType {
-  PERMANENT = 'permament',
-  TEMPORARY = 'temporary',
+  REGULAR = 'regular',
+  MISSED_REGULAR = 'missedRegular',
+  SINGLE = 'single',
+  NEW = 'new',
 }
 
 export interface IVisitingStudent {

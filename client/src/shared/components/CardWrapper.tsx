@@ -12,6 +12,9 @@ export function CardWrapper({ children }: { children: ReactNode | Array<ReactNod
         width: isMobile ? 'auto' : '325px',
         marginRight: isMobile ? 0 : '0.5rem',
         marginBottom: '0.5rem',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
       }}
     >
       { children }

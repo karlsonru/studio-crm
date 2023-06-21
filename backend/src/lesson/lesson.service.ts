@@ -88,12 +88,9 @@ export class LessonService {
 
   async update(id: string, updateLessonDto: UpdateLessonDto): Promise<LessonModel | null> {
     logger.info(`Получен запрос на обновление занятия с ID ${id}`);
-    console.log(updateLessonDto);
     const updated = await this.lessonModel.findByIdAndUpdate(id, updateLessonDto, {
       new: true,
     });
-
-    console.log(updated);
 
     return updated;
   }

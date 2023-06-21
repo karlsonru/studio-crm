@@ -22,8 +22,10 @@ export enum BillingStatus {
 }
 
 export enum VisitType {
-  PERMANENT = 'permament',
-  TEMPORARY = 'temporary',
+  REGULAR = 'regular',
+  MISSED_REGULAR = 'missedRegular',
+  SINGLE = 'single',
+  NEW = 'new',
 }
 
 export class VisitedStudent {
@@ -105,7 +107,7 @@ export class VisitedLesson {
         visitType: {
           type: String,
           enum: VisitType,
-          default: VisitType.PERMANENT,
+          default: VisitType.REGULAR,
           trim: true,
           required: true,
         },

@@ -8,7 +8,7 @@ import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import SyncIcon from '@mui/icons-material/Sync';
 import { ChangeTeacherDialog } from './ChangeTeacherDialog';
-import { usePatchLessonMutation } from '../../shared/api';
+import { usePatchLessonStudentsMutation } from '../../shared/api';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { IStudentModel } from '../../shared/models/IStudentModel';
 import { AddStudentButton, AddStudentsDialog } from './AddStudentDialog';
@@ -22,16 +22,14 @@ interface IAddCard {
 }
 
 function AddCard({ lessonId, student }: IAddCard) {
-  const [updateLesson] = usePatchLessonMutation();
+  const [updateLessonStudents] = usePatchLessonStudentsMutation();
 
   const excludeHandler = () => {
-    updateLesson({
+    updateLessonStudents({
       id: lessonId,
+      action: 'remove',
       newItem: {
-        // @ts-ignore
-        $pull: {
-          students: student._id,
-        },
+        students: [student._id],
       },
     });
   };

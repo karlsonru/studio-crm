@@ -95,7 +95,7 @@ export function LessonsContent() {
       align: 'left',
       headerAlign: 'left',
       valueFormatter: (params: GridValueFormatterParams<ILessonModel['students']>) => (
-        params.value.filter((student) => student.visitType === VisitType.PERMANENT).length
+        params.value.filter((student) => student.visitType === VisitType.REGULAR).length
       ),
     },
     {

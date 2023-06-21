@@ -9,7 +9,7 @@ import TextField from '@mui/material/TextField';
 import Checkbox from '@mui/material/Checkbox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { useFindStudentsQuery, usePatchLessonMutation } from '../../shared/api';
+import { useFindStudentsQuery, usePatchLessonStudentsMutation } from '../../shared/api';
 import { IStudentModel } from '../../shared/models/IStudentModel';
 import { ILessonModel, VisitType } from '../../shared/models/ILessonModel';
 import { CardWrapper } from '../../shared/components/CardWrapper';
@@ -28,7 +28,7 @@ export function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudents
   const { data: possibleStudents, isError, error } = useFindStudentsQuery({
     _id: { $nin: lesson.students.map((visiting) => visiting.student._id) },
   });
-  const [updateLesson, requestStatus] = usePatchLessonMutation();
+  const [updateLessonStudents, requestStatus] = usePatchLessonStudentsMutation();
 
   if (!possibleStudents) {
     return null;
@@ -41,16 +41,19 @@ export function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudents
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    updateLesson({
+    updateLessonStudents({
       id: lesson._id,
+      action: 'add',
       newItem: {
         students: [...selectedOptions.map((student) => ({
           student: student._id,
           date: null,
-          visitType: VisitType.PERMANENT,
+          visitType: VisitType.REGULAR,
         }))],
       },
     });
+
+    setSelected([]);
   };
 
   const hasAvailableStudents = possibleStudents.length > 0;

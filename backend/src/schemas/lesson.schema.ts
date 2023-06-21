@@ -56,7 +56,7 @@ class VisitingStudent {
   @Prop({
     type: String,
     enum: VisitType,
-    default: VisitType.PERMANENT,
+    default: VisitType.REGULAR,
     required: true,
   })
   visitType: VisitType;
