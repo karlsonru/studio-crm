@@ -129,22 +129,14 @@ export function TimetableContent({ lessons }: { lessons: Array<ILessonModel> }) 
 
   // запоминаем какой установлен вид отображения
   const isDayView = view === 'day';
+  const currentDay = new Date(currentDate).getDay();
 
   // отфильтруем все занятия для этого дня недели и отсортируем их по времени начала
   const dayLessons = useMemo(() => {
     // не проводим фильтрацию если режим отображения Неделя
     if (!isDayView) return [];
 
-    const currentDay = new Date(currentDate).getDay();
-    const filteredLessons = lessons
-      .filter((lesson) => lesson.day === currentDay)
-      .sort((lessonA, lessonB) => {
-        if (lessonA.timeStart.hh !== lessonB.timeStart.hh) {
-          return lessonA.timeStart.hh - lessonB.timeStart.hh;
-        }
-        return lessonA.timeStart.min - lessonB.timeStart.min;
-      });
-    return filteredLessons;
+    return lessons.filter((lesson) => lesson.day === currentDay);
   }, [currentDate, view]);
 
   // запомним дату, с которой нужно рисовать даты в заголовках
@@ -161,7 +153,7 @@ export function TimetableContent({ lessons }: { lessons: Array<ILessonModel> }) 
     }).map((date) => date.getTime());
 
     setDates(interval);
-  }, [startDate, setDates]);
+  }, [startDate]);
 
   // для вида День рисуем просто одну колонку с занятиями
   if (isDayView) {
@@ -180,6 +172,7 @@ export function TimetableContent({ lessons }: { lessons: Array<ILessonModel> }) 
   }
 
   // поделим все занятия по ячейкам и строкам
+  // const rowsContent = useMemo(() => fillRowsWithContent(lessons), [lessons]);
   const rowsContent = fillRowsWithContent(lessons);
 
   const dateNames = [null, ...dates.map((intervalDate) => format(intervalDate, 'dd EEEE', { locale: ru }))];

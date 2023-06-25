@@ -1,3 +1,4 @@
+import React from 'react';
 import Button, { ButtonProps } from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import { DateSwitcherTimetable } from './DateSwitcherTimetable';
@@ -11,7 +12,7 @@ function TextButton({ title, props }: { title: string, props: ButtonProps }) {
   return <Button variant='text' {...props}>{title}</Button>;
 }
 
-export function PageHeader() {
+export const PageHeader = React.memo(() => {
   const view = useAppSelector((state) => state.timetablePageReducer.view);
   const isMobile = useMobile();
   const actions = useActionCreators(timetablePageActions);
@@ -55,4 +56,4 @@ export function PageHeader() {
       </Stack>
     </Stack>
   );
-}
+});

@@ -38,7 +38,7 @@ export class LessonService {
     return await this.lessonModel
       .find(query ?? {})
       .populate(this.populateQuery)
-      .sort({ 'timeStart.hh': 1, 'timeStart.min': 1 });
+      .sort({ day: 1, 'timeStart.hh': 1, 'timeStart.min': 1 });
   }
 
   async findOne(id: string): Promise<LessonModel | null> {
