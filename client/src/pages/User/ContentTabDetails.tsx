@@ -18,6 +18,7 @@ import { UserRole, userRoleLocal } from '../../shared/models/IUserModel';
 import { useGetUsersQuery, usePatchUserMutation } from '../../shared/api';
 import { isPasswordStrong } from '../../shared/helpers/isPasswordStrong';
 import { isValidPhone } from '../../shared/helpers/isValidPhone';
+import { DateField } from '../../shared/components/fields/DateField';
 
 function validateForm(formData: { [key: string]: FormDataEntryValue }) {
   if (!formData.fullname || (formData.fullname as string).trim().length < 3) {
@@ -152,16 +153,11 @@ export function ContentTabDetails({ userId }: { userId: string }) {
           helperText={!formValidation.fullname && 'Имя не должно быть пустым или слишком короткий'}
         />
 
-        <TextField
-          type="date"
-          variant="outlined"
+        <DateField
           name="birthday"
           label="Дата рождения"
           defaultValue={format(userEdit.birthday, 'yyyy-MM-dd')}
           disabled={!isEdit}
-          InputLabelProps={{ shrink: true }}
-          fullWidth
-          required
         />
 
         <FormControl>

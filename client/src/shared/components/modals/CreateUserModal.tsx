@@ -13,6 +13,7 @@ import { isValidPhone } from '../../helpers/isValidPhone';
 import { isPasswordStrong } from '../../helpers/isPasswordStrong';
 import { NumberField } from '../fields/NumberField';
 import { PasswordField } from '../fields/PasswordField';
+import { DateField } from '../fields/DateField';
 import { DialogFormWrapper } from '../DialogFormWrapper';
 
 function validateForm(formData: { [key: string]: FormDataEntryValue }) {
@@ -106,14 +107,9 @@ export function CreateUserModal() {
         helperText={!formValidation.fullname && 'Имя не должно быть пустым или слишком короткий'}
       />
 
-      <TextField
-        type="date"
-        variant="outlined"
+      <DateField
         name="birthday"
         label="Дата рождения"
-        InputLabelProps={{ shrink: true }}
-        fullWidth
-        required
       />
 
       <FormControl>

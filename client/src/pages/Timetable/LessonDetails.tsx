@@ -87,6 +87,7 @@ export const LessonDetails = React.memo((
         <LessonInfo lesson={lesson} />
 
         <Button
+          size="large"
           color="primary"
           onClick={goAttendancePage}
           fullWidth
@@ -100,6 +101,7 @@ export const LessonDetails = React.memo((
         <StudentsList lesson={lesson} />
 
         <Button
+          size="large"
           color="success"
           onClick={() => setAddStudent(true)}
           fullWidth

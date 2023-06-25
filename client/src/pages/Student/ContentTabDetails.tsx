@@ -17,6 +17,7 @@ import { usePatchStudentMutation } from '../../shared/api';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { FormContentColumn } from '../../shared/components/FormContentColumn';
 import { IStudentModel, IStudentModelContact } from '../../shared/models/IStudentModel';
+import { DateField } from '../../shared/components/fields/DateField';
 
 interface IContact {
   idx: number;
@@ -167,16 +168,11 @@ export function ContentTabDetails({ student }: { student: IStudentModel }) {
           error={!formValidation.fullname}
           helperText={!formValidation.fullname && 'Имя не должно быть пустым или слишком короткий'}
         />
-        <TextField
-          variant="outlined"
-          type="date"
+        <DateField
           name="birthday"
           label="Дата рождения"
           defaultValue={format(student.birthday, 'Y-MM-dd')}
           disabled={!isEdit}
-          InputLabelProps={{ shrink: true }}
-          fullWidth
-          required
         />
 
         <FormControl required>

@@ -15,6 +15,7 @@ import IconButton from '@mui/material/IconButton';
 import { useCreateStudentMutation } from '../../api';
 import { DialogFormWrapper } from '../DialogFormWrapper';
 import { isValidPhone } from '../../helpers/isValidPhone';
+import { DateField } from '../fields/DateField';
 
 function NewContact({ idx, handler }: { idx: number, handler: () => void }) {
   return (
@@ -121,14 +122,10 @@ export function CreateStudentModal() {
         error={!formValidation.fullname}
         helperText={!formValidation.fullname && 'Имя не должно быть пустым или слишком короткий'}
       />
-      <TextField
-        type="date"
-        variant="outlined"
+
+      <DateField
         name="birthday"
         label="Дата рождения"
-        InputLabelProps={{ shrink: true }}
-        fullWidth
-        required
       />
 
       <FormControl required>
