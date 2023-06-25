@@ -33,7 +33,7 @@ export function StudentPage() {
     skip: !studentId,
   });
 
-  useTitle(student?.fullname ?? 'Ученики');
+  useTitle(student?.fullname);
 
   if (isLoading) {
     return <Loading />;

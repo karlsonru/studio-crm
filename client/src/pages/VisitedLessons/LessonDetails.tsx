@@ -1,4 +1,4 @@
-import Card from '@mui/material/Card';
+// import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import List from '@mui/material/List';
@@ -11,6 +11,7 @@ import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined
 import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
 import { convertTime } from '../../shared/helpers/convertTime';
 import { ILessonModel } from '../../shared/models/ILessonModel';
+import { CardWrapper } from '../../shared/components/CardWrapper';
 
 function AddListItem({ text, icon }: { text: string, icon: React.ReactElement }) {
   return (
@@ -18,7 +19,7 @@ function AddListItem({ text, icon }: { text: string, icon: React.ReactElement })
       <ListItemIcon>
         {icon}
       </ListItemIcon>
-    <ListItemText primary={text} />
+      <ListItemText primary={text} />
     </ListItem>
   );
 }
@@ -33,15 +34,16 @@ export function LessonDetails({ lesson, dateTimestamp, visitedStudents }: ILesso
   const dateField = `${dateValueFormatter(dateTimestamp)} c ${convertTime(lesson.timeStart)} до ${convertTime(lesson.timeEnd)}`;
 
   return (
-    <Card sx={{ maxHeight: '250px' }}>
+    // <Card sx={{ maxHeight: '250px' }}>
+    <CardWrapper>
       <CardHeader title={lesson.title} />
       <CardContent>
         <List>
           <AddListItem text={lesson.location.address} icon={<LocationOnOutlinedIcon />} />
           <AddListItem text={dateField} icon={<ScheduleOutlinedIcon />} />
-          <AddListItem text={`Посетило ${visitedStudents} из ${lesson.students.length}`} icon={<PersonOutlineOutlinedIcon />} />
+          <AddListItem text={`Посетило ${visitedStudents ?? 0} из ${lesson.students.length}`} icon={<PersonOutlineOutlinedIcon />} />
         </List>
       </CardContent>
-    </Card>
+    </CardWrapper>
   );
 }

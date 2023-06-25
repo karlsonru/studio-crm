@@ -1,4 +1,5 @@
 import { FormEvent } from 'react';
+import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -13,6 +14,7 @@ import {
   useFindVisitsQuery,
   usePatchVisitMutation,
 } from '../../shared/api';
+import { MODAL_FORM_WIDTH } from '../../shared/constants';
 
 interface IStudentsListItem {
   student: IStudentModel;
@@ -75,13 +77,12 @@ function StudentsListFuture({ lessonId }: { lessonId: string }) {
 
 interface IStudentsList {
   lesson: ILessonModel,
-  isVisited: boolean;
   visitedLessonId?: string;
   dateTimestamp: number;
 }
 
 export function StudentsList({
-  lesson, isVisited, visitedLessonId, dateTimestamp,
+  lesson, visitedLessonId, dateTimestamp,
 }: IStudentsList) {
   const [updateVisit] = usePatchVisitMutation();
   const [createVisit] = useCreateVisitMutation();
@@ -91,7 +92,7 @@ export function StudentsList({
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (isVisited && visitedLessonId) {
+    if (visitedLessonId) {
       updateVisit({
         id: visitedLessonId,
         newItem: {
@@ -110,11 +111,20 @@ export function StudentsList({
   };
 
   return (
-    <form onSubmit={submitHandler} style={{ width: '100%', maxWidth: '600px' }}>
-      { isVisited && <StudentsListVisited lessonId={lesson._id} /> }
-      { !isVisited && <StudentsListFuture lessonId={lesson._id} /> }
+    <Box component="form" onSubmit={submitHandler} width="100%" maxWidth={MODAL_FORM_WIDTH}>
 
-      <SubmitButton content={isVisited ? 'Обновить' : 'Отметить'} props={{ sx: { float: 'right', marginRight: '1rem' } }} />
-    </form>
+      { visitedLessonId && <StudentsListVisited lessonId={lesson._id} /> }
+      { !visitedLessonId && <StudentsListFuture lessonId={lesson._id} /> }
+
+      <SubmitButton
+        content={visitedLessonId ? 'Обновить' : 'Отметить'}
+        props={{
+          sx: {
+            float: 'right',
+            marginRight: '1rem',
+          },
+        }}
+      />
+    </Box>
   );
 }

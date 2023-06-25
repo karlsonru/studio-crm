@@ -1,23 +1,35 @@
-import { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import Box from '@mui/material/Box';
 import Stack from '@mui/system/Stack';
 import { LessonsList } from './LessonsList';
 import { LessonInfo } from './LessonInfo';
-import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
-import { setPageTitle } from '../../shared/reducers/appMenuSlice';
+import { DateSwitcherVisitedLesson } from './DateSwitcherVisitedLesson';
+import { Loading } from '../../shared/components/Loading';
+import { useTitle } from '../../shared/hooks/useTitle';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { visitsPageActions } from '../../shared/reducers/visitsPageSlice';
 import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
-import { DateSwitcherVisitedLesson } from './DateSwitcherVisitedLesson';
+import { useFindLessonsQuery } from '../../shared/api';
+import { ShowError } from '../../shared/components/ShowError';
+import { useAppSelector } from '../../shared/hooks/useAppSelector';
+
+const Header = React.memo(() => (
+  <Box component='header' mx='1rem'>
+    <DateSwitcherVisitedLesson />
+  </Box>
+));
 
 export function VisititedLessonsPage() {
-  const dispatch = useAppDispatch();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const actions = useActionCreators(visitsPageActions);
+  useTitle('Посещения');
 
-  useEffect(() => {
-    dispatch(setPageTitle('Учёт посещений'));
-  }, []);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedLessonId = searchParams.get('lessonId');
+
+  const actions = useActionCreators(visitsPageActions);
+  const currentDateTimestamp = useAppSelector(
+    (state) => state.visitsPageReducer.currentDateTimestamp,
+  );
 
   useEffect(() => {
     const date = searchParams.get('date');
@@ -27,28 +39,44 @@ export function VisititedLessonsPage() {
       setSearchParams({ date: getTodayTimestamp().toString() });
       actions.setCurrentDateTimestamp(getTodayTimestamp());
     // если есть - обновим state чтобы дата в state соответствовала дате в params
-    } else {
+    } else if (+date !== currentDateTimestamp) {
       actions.setCurrentDateTimestamp(+date);
     }
   });
 
+  const {
+    data: lessons, isLoading, isError, error,
+  } = useFindLessonsQuery({
+    day: new Date(currentDateTimestamp).getDay(),
+    dateTo: { $gte: currentDateTimestamp },
+    dateFrom: { $lte: currentDateTimestamp },
+  });
+
+  console.log('VisitedLesson page component rerender');
+
+  const selectedLesson = useMemo(
+    () => lessons?.find((lesson) => lesson._id === selectedLessonId),
+    [selectedLessonId, lessons],
+  );
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isError) {
+    return <ShowError details={error} />;
+  }
+
+  if (!lessons) {
+    return null;
+  }
+
   return (
     <>
-      <header
-        style={{
-          margin: '1rem 0',
-        }}
-      >
-        <DateSwitcherVisitedLesson />
-      </header>
-
-      <Stack
-        direction="row"
-        flexWrap="wrap"
-        spacing={2}
-      >
-        <LessonsList />
-        <LessonInfo />
+      <Header />
+      <Stack direction="row" flexWrap="wrap" spacing={2}>
+        <LessonsList lessons={lessons} />
+        {selectedLesson && <LessonInfo selectedLesson={selectedLesson} />}
       </Stack>
     </>
   );

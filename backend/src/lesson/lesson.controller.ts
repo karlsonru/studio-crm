@@ -39,13 +39,7 @@ export class LessonController {
 
   @Get()
   async findAll(@Query('filter') filter?: string) {
-    if (filter) {
-      const query = JSON.parse(filter);
-
-      return await this.service.findAll(query);
-    }
-
-    return await this.service.findAll();
+    return await this.service.findAll(filter ? JSON.parse(filter) : {});
   }
 
   @Get(':id')

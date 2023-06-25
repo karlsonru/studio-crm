@@ -22,7 +22,7 @@ export function UserPage() {
     skip: !userId,
   });
 
-  useTitle(userResponse?.fullname ?? 'Сотрудники');
+  useTitle(userResponse?.fullname);
 
   if (isLoading) {
     return <Loading />;

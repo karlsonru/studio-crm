@@ -1,59 +1,52 @@
-import { useSearchParams } from 'react-router-dom';
 import { LessonDetails } from './LessonDetails';
 import { StudentsList } from './StudentsList';
-import { useFindVisitsQuery, useGetLessonQuery } from '../../shared/api';
+import { useFindVisitsQuery } from '../../shared/api';
 import { Loading } from '../../shared/components/Loading';
+import { ILessonModel } from '../../shared/models/ILessonModel';
+import { useAppSelector } from '../../shared/hooks/useAppSelector';
+import { ShowError } from '../../shared/components/ShowError';
+import { VisitStatus } from '../../shared/models/IVisitModel';
 
-export function LessonInfo() {
-  const [searchParams] = useSearchParams();
-  const selectedLessonId = searchParams.get('lessonId') ?? '';
-  const currentDateTimestamp = +(searchParams.get('date') ?? 0);
-
-  const isFuture = currentDateTimestamp > Date.now();
-
-  const {
-    data: currentLesson, isLoading: isLoadingCurrent,
-  } = useGetLessonQuery(selectedLessonId, {
-    skip: !selectedLessonId,
-  });
+export function LessonInfo({ selectedLesson }: { selectedLesson: ILessonModel }) {
+  const currentDateTimestamp = useAppSelector(
+    (state) => state.visitsPageReducer.currentDateTimestamp,
+  );
 
   const {
-    data: visitedLesson, isLoading: isisLoadingVisited,
+    data: visitedLesson, isLoading, isError, error,
   } = useFindVisitsQuery({
-    $and: [
-      { lesson: selectedLessonId },
-      { date: currentDateTimestamp },
-    ],
+    lesson: selectedLesson._id,
+    date: currentDateTimestamp,
   }, {
-    skip: isFuture || !selectedLessonId,
+    skip: currentDateTimestamp > Date.now(),
   });
 
-  // ничего не рисуем, пока информация запрашивается
-  if (isLoadingCurrent || isisLoadingVisited) {
+  if (isLoading) {
     return <Loading />;
   }
 
-  if (!currentLesson || !selectedLessonId || !visitedLesson) {
-    return null;
+  if (isError) {
+    <ShowError details={error} />;
   }
 
-  const isVisited = (visitedLesson && visitedLesson?.length > 0) ?? false;
-  const visitedLessonId = visitedLesson[0]._id;
-
-  const visitedStudents = visitedLesson[0].students.filter((visit) => visit.visitStatus === 'visited').length || 0;
+  if (!visitedLesson) {
+    return null;
+  }
 
   return (
   <>
     <LessonDetails
-      lesson={currentLesson}
+      lesson={selectedLesson}
       dateTimestamp={currentDateTimestamp}
-      visitedStudents={visitedStudents}
+      visitedStudents={
+        visitedLesson[0]?.students
+          .filter((visit) => visit.visitStatus === VisitStatus.VISITED).length
+      }
     />
     <StudentsList
-      lesson={currentLesson}
+      lesson={selectedLesson}
       dateTimestamp={currentDateTimestamp}
-      isVisited={isVisited}
-      visitedLessonId={visitedLessonId}
+      visitedLessonId={visitedLesson[0]?._id}
     />
   </>
   );

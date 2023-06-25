@@ -19,7 +19,7 @@ export function LessonPage() {
     skip: !lessonId,
   });
 
-  useTitle(lesson?.title ?? 'Занятия');
+  useTitle(lesson?.title);
 
   if (isLoading) {
     return <Loading />;
