@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { set } from 'date-fns';
 import { PageHeader } from './PageHeader';
 import { TimetableContent } from './Content';
+import { LessonDetails } from './LessonDetails';
 import { useFindLessonsQuery } from '../../shared/api';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useMobile } from '../../shared/hooks/useMobile';
@@ -51,6 +52,7 @@ export function TimetablePage() {
     <>
       <PageHeader />
       <TimetableContent lessons={data} />
+      <LessonDetails />
     </>
   );
 }

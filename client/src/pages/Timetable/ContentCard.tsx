@@ -10,10 +10,8 @@ import { ContentCardPreview } from './ContentCardPreview';
 import { ILessonModel, ITime } from '../../shared/models/ILessonModel';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { convertTime } from '../../shared/helpers/convertTime';
-import { LessonDetails } from './LessonDetails';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { timetablePageActions } from '../../shared/reducers/timetablePageSlice';
-import { useMobile } from '../../shared/hooks/useMobile';
 
 const CARD_STYLE = {
   left: 0,
@@ -127,7 +125,6 @@ interface IContentCard {
 
 export function ContentCard({ lesson, step, date }: IContentCard) {
   const view = useAppSelector((state) => state.timetablePageReducer.view);
-  const isMobile = useMobile();
   const actions = useActionCreators(timetablePageActions);
 
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
@@ -149,9 +146,11 @@ export function ContentCard({ lesson, step, date }: IContentCard) {
     title, timeStart, timeEnd, students,
   } = formattedContent.content;
 
-  const clickHandler = () => {
-    actions.setShowDetails(true);
-    actions.setSelectedLesson(lesson._id);
+  const showDetails = () => {
+    actions.setLessonDetails({
+      date,
+      selectedLesson: lesson,
+    });
   };
 
   return (
@@ -159,7 +158,7 @@ export function ContentCard({ lesson, step, date }: IContentCard) {
       <Card
         onMouseEnter={showPreview}
         onMouseLeave={hidePreview}
-        onClick={clickHandler}
+        onClick={showDetails}
         variant="outlined"
         sx={{ ...formattedContent.style, ...CARD_STYLE }}
       >
@@ -182,8 +181,6 @@ export function ContentCard({ lesson, step, date }: IContentCard) {
         anchorEl={anchorEl}
         content={lesson.students.map((visiting) => visiting.student.fullname)}
       />
-
-      {!isMobile && <LessonDetails lesson={lesson} date={date} />}
     </>
   );
 }
