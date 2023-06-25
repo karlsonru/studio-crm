@@ -52,8 +52,6 @@ export function VisititedLessonsPage() {
     dateFrom: { $lte: currentDateTimestamp },
   });
 
-  console.log('VisitedLesson page component rerender');
-
   const selectedLesson = useMemo(
     () => lessons?.find((lesson) => lesson._id === selectedLessonId),
     [selectedLessonId, lessons],

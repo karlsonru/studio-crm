@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Drawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
@@ -12,6 +12,7 @@ import { timetablePageActions } from '../../shared/reducers/timetablePageSlice';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { ILessonModel } from '../../shared/models/ILessonModel';
 import { MODAL_FORM_WIDTH } from '../../shared/constants';
+import { AddStudentsDialog } from '../Lesson/AddStudentDialog';
 
 function LessonInfo({ lesson }: { lesson: ILessonModel }) {
   const time = `с ${lesson.timeStart.hh}:${lesson.timeStart.min} по ${lesson.timeEnd.hh}:${lesson.timeEnd.min}`;
@@ -50,6 +51,7 @@ function StudentsList({ lesson }: { lesson: ILessonModel }) {
 export const LessonDetails = React.memo((
   { lesson, date }: { lesson: ILessonModel, date: number },
 ) => {
+  const [isAddStudent, setAddStudent] = useState(false);
   const navigate = useNavigate();
   const actions = useActionCreators(timetablePageActions);
   const isShowDetails = useAppSelector((state) => state.timetablePageReducer.isShowDetails);
@@ -79,8 +81,8 @@ export const LessonDetails = React.memo((
     >
       <Box
         component="div"
-        sx={{ width: MODAL_FORM_WIDTH }}
         padding={2}
+        sx={{ width: MODAL_FORM_WIDTH }}
       >
         <LessonInfo lesson={lesson} />
 
@@ -96,6 +98,25 @@ export const LessonDetails = React.memo((
         </Button>
 
         <StudentsList lesson={lesson} />
+
+        <Button
+          color="success"
+          onClick={() => setAddStudent(true)}
+          fullWidth
+          sx={{
+            textAlign: 'center',
+          }}
+        >
+          Записть на занятие
+        </Button>
+
+        <AddStudentsDialog
+          isOpen={isAddStudent}
+          lesson={lesson}
+          setModalOpen={setAddStudent}
+          date={date}
+        />
+
       </Box>
     </Drawer>
   );

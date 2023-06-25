@@ -9,22 +9,35 @@ import TextField from '@mui/material/TextField';
 import Checkbox from '@mui/material/Checkbox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import Select from '@mui/material/Select';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
+import MenuItem from '@mui/material/MenuItem';
+import { format, parse } from 'date-fns';
+import { getTodayTimestamp } from 'shared/helpers/getTodayTimestamp';
 import { useFindStudentsQuery, usePatchLessonStudentsMutation } from '../../shared/api';
 import { IStudentModel } from '../../shared/models/IStudentModel';
 import { ILessonModel, VisitType } from '../../shared/models/ILessonModel';
 import { CardWrapper } from '../../shared/components/CardWrapper';
 import { DialogFormWrapper } from '../../shared/components/DialogFormWrapper';
 import { ShowError } from '../../shared/components/ShowError';
+import { DateField } from '../../shared/components/fields/DateField';
 // import { Loading } from '../../shared/components/Loading';
 
 interface IAddStudentsDialog {
   lesson: ILessonModel;
   isOpen: boolean;
   setModalOpen: (value: boolean) => void;
+  date?: number;
 }
 
-export function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudentsDialog) {
+export function AddStudentsDialog({
+  lesson, isOpen, setModalOpen, date,
+}: IAddStudentsDialog) {
+  const [visitType, setVisitType] = useState<VisitType>(VisitType.REGULAR);
+  const [visitDate, setVisitDate] = useState(format(date ?? getTodayTimestamp(), 'yyyy-MM-dd'));
   const [selectedOptions, setSelected] = useState<IStudentModel[]>([]);
+
   const { data: possibleStudents, isError, error } = useFindStudentsQuery({
     _id: { $nin: lesson.students.map((visiting) => visiting.student._id) },
   });
@@ -47,8 +60,8 @@ export function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudents
       newItem: {
         students: [...selectedOptions.map((student) => ({
           student: student._id,
-          date: null,
-          visitType: VisitType.REGULAR,
+          date: visitType === VisitType.REGULAR ? null : parse(visitDate, 'yyyy-MM-dd', new Date()).getTime(),
+          visitType,
         }))],
       },
     });
@@ -103,7 +116,30 @@ export function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudents
             />
           )}
         />
-        }
+      }
+
+      <FormControl>
+          <FormLabel>Посещение</FormLabel>
+            <Select
+              name="visitType"
+              label="visitType"
+              value={visitType}
+              onChange={(event) => setVisitType(event.target.value as VisitType)}
+              fullWidth
+            >
+              <MenuItem value={VisitType.REGULAR}>Постоянное</MenuItem>
+              <MenuItem value={VisitType.MISSED_REGULAR}>Отработка</MenuItem>
+              <MenuItem value={VisitType.NEW}>Новое</MenuItem>
+              <MenuItem value={VisitType.SINGLE}>Однократное</MenuItem>
+            </Select>
+        </FormControl>
+
+      {visitType !== VisitType.REGULAR && <DateField
+        value={visitDate}
+        onChange={(event) => setVisitDate(event.target.value)}
+        name="date"
+        label="Дата посещения"
+      />}
 
     </DialogFormWrapper>
   );
