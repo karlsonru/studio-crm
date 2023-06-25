@@ -19,7 +19,7 @@ export enum VisitStatus {
 interface IVisit {
   student: IStudentModel;
   visitStatus: VisitStatus;
-  billingStatus: string;
+  billingStatus: BillingStatus;
   subscription: string;
 }
 

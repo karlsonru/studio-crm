@@ -15,17 +15,46 @@ import {
   usePatchVisitMutation,
 } from '../../shared/api';
 import { MODAL_FORM_WIDTH } from '../../shared/constants';
+import { BillingStatus, VisitStatus } from '../../shared/models/IVisitModel';
 
 interface IStudentsListItem {
   student: IStudentModel;
-  defaultStatus?: string;
+  visitStatus?: VisitStatus;
+  billingStatus?: BillingStatus;
+
 }
 
-function StudentsListItem({ student, defaultStatus }: IStudentsListItem) {
+function getBillingStatusNameAndColor(billingStatus?: BillingStatus) {
+  switch (billingStatus) {
+    case BillingStatus.PAID:
+      return {
+        name: 'Оплачено',
+        color: 'success.main',
+      };
+    case BillingStatus.UNPAID:
+      return {
+        name: 'Неоплачено',
+        color: 'error.main',
+      };
+    default:
+      return {
+        name: 'Нет информации',
+        color: 'default',
+      };
+  }
+}
+
+function StudentsListItem({ student, visitStatus, billingStatus }: IStudentsListItem) {
+  const { name, color } = getBillingStatusNameAndColor(billingStatus);
+
   return (
     <ListItem divider={true}>
-      <ListItemText primary={student.fullname} />
-      <VisitStatusButton studentId={student._id} defaultStatus={defaultStatus} />
+      <ListItemText
+        primary={student.fullname}
+        secondary={name}
+        secondaryTypographyProps={{ sx: { color } }}
+      />
+      <VisitStatusButton studentId={student._id} visitStatus={visitStatus} />
     </ListItem>
   );
 }
@@ -52,7 +81,8 @@ function StudentsListVisited({ lessonId }: { lessonId: string }) {
         (visit) => <StudentsListItem
           key={visit.student._id}
           student={visit.student}
-          defaultStatus={visit.visitStatus}
+          visitStatus={visit.visitStatus}
+          billingStatus={visit.billingStatus}
         />,
       )}
     </List>

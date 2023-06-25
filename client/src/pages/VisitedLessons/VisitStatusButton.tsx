@@ -23,12 +23,12 @@ const VISIT_STATUSES: Array<IVisitStatus> = [
 
 interface IVisitStatusButton {
   studentId: string;
-  defaultStatus?: string
+  visitStatus?: string
 }
 
-export function VisitStatusButton({ studentId, defaultStatus }: IVisitStatusButton) {
+export function VisitStatusButton({ studentId, visitStatus }: IVisitStatusButton) {
   const actions = useActionCreators(visitsPageActions);
-  const initialStatus = defaultStatus ?? 'unknown';
+  const initialStatus = visitStatus ?? 'unknown';
 
   // проставим сразу в store статус посещения по каждому студенту
   useEffect(() => {
