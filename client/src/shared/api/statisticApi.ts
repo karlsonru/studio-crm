@@ -1,13 +1,13 @@
 import { basicApi } from './basicApi';
-import { IVisitModel } from '../models/IVisitModel';
+import { IAttendanceModel } from '../models/IAttendanceModel';
 
 const tag = 'statistic';
 const route = 'statistic';
 
 basicApi.enhanceEndpoints({ addTagTypes: [tag] });
 
-interface IVisitedLessonsWithStatistic {
-  visitedLessons: Array<IVisitModel>;
+interface IAttendancesWithStatistic {
+  attendances: Array<IAttendanceModel>;
   statistic: Record<string, number>;
 }
 
@@ -20,7 +20,7 @@ export const { useGetVisitedLessonsStatisticByStudentQuery } = basicApi.injectEn
   endpoints: (build) => ({
     getVisitedLessonsStatisticByStudent:
       build
-        .query<IVisitedLessonsWithStatistic, IStatisticArgs>(
+        .query<IAttendancesWithStatistic, IStatisticArgs>(
         {
           query: ({ query, id }) => (
             {

@@ -6,7 +6,7 @@ import { UserPage } from './pages/User';
 import { TimetablePage } from './pages/Timetable';
 import { LessonsPage } from './pages/Lessons';
 import { LessonPage } from './pages/Lesson';
-import { VisititedLessonsPage } from './pages/VisitedLessons';
+import { AttendancePage } from './pages/Attendance';
 import { StudentsPage } from './pages/Students';
 import { StudentPage } from './pages/Student';
 import { NotFoundPage } from './pages/NotFound';
@@ -22,7 +22,7 @@ export const router = createBrowserRouter(
 
         <Route path='/timetable' element={<TimetablePage />} />
 
-        <Route path='/visits' element={<VisititedLessonsPage />} />
+        <Route path='/attendances' element={<AttendancePage />} />
 
         <Route path='/students'>
           <Route index element={<StudentsPage />} />

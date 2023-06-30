@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { format, subMonths } from 'date-fns';
 import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
-import { useFindVisitsQuery } from '../../shared/api';
+import { useFindAttendancesQuery } from '../../shared/api';
 import { BasicTable, CreateRow } from '../../shared/components/BasicTable';
 import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
-import { VisitStatus } from '../../shared/models/IVisitModel';
+import { VisitStatus } from '../../shared/models/IAttendanceModel';
 import { useMobile } from '../../shared/hooks/useMobile';
 
 export function ContentTabVisits({ userId }: { userId: string }) {
@@ -17,7 +17,7 @@ export function ContentTabVisits({ userId }: { userId: string }) {
   // отправляем запрос к статистике на список посещённых занятий по студенту
   const {
     data: visitedLessonsResponse, isLoading, isError, error,
-  } = useFindVisitsQuery({
+  } = useFindAttendancesQuery({
     $and: [
       { date: { $gte: dateFrom } },
       { date: { $lte: today } },

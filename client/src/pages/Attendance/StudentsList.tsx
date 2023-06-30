@@ -10,12 +10,12 @@ import { IStudentModel } from '../../shared/models/IStudentModel';
 import { ILessonModel } from '../../shared/models/ILessonModel';
 import {
   useGetLessonQuery,
-  useCreateVisitMutation,
-  useFindVisitsQuery,
-  usePatchVisitMutation,
+  useCreateAttendanceMutation,
+  useFindAttendancesQuery,
+  usePatchAttendanceMutation,
 } from '../../shared/api';
 import { MODAL_FORM_WIDTH } from '../../shared/constants';
-import { BillingStatus, VisitStatus } from '../../shared/models/IVisitModel';
+import { BillingStatus, VisitStatus } from '../../shared/models/IAttendanceModel';
 
 interface IStudentsListItem {
   student: IStudentModel;
@@ -64,7 +64,7 @@ function StudentsListVisited({ lessonId }: { lessonId: string }) {
     (state) => state.visitsPageReducer.currentDateTimestamp,
   );
 
-  const { data } = useFindVisitsQuery({
+  const { data } = useFindAttendancesQuery({
     $and: [
       { lesson: lessonId },
       { date },
@@ -114,8 +114,8 @@ interface IStudentsList {
 export function StudentsList({
   lesson, visitedLessonId, dateTimestamp,
 }: IStudentsList) {
-  const [updateVisit] = usePatchVisitMutation();
-  const [createVisit] = useCreateVisitMutation();
+  const [updateAttendance] = usePatchAttendanceMutation();
+  const [createAttendance] = useCreateAttendanceMutation();
 
   const visits = useAppSelector((state) => state.visitsPageReducer.visits);
 
@@ -123,14 +123,14 @@ export function StudentsList({
     event.preventDefault();
 
     if (visitedLessonId) {
-      updateVisit({
+      updateAttendance({
         id: visitedLessonId,
         newItem: {
           students: visits,
         },
       });
     } else {
-      createVisit({
+      createAttendance({
         lesson: lesson._id,
         teacher: lesson.teacher._id,
         day: lesson.day,

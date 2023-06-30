@@ -73,7 +73,7 @@ function createMenuList() {
       icon: <CalendarMonthIcon />,
     },
     {
-      path: 'visits',
+      path: 'attendances',
       title: 'Посещения',
       icon: <DomainVerificationIcon />,
     },

@@ -23,7 +23,7 @@ interface IVisit {
   subscription: string;
 }
 
-export interface IVisitModel {
+export interface IAttendanceModel {
   _id: string;
   lesson: ILessonModel;
   teacher: IUserModel;
@@ -32,7 +32,7 @@ export interface IVisitModel {
   students: Array<IVisit>,
 }
 
-export interface IVisitModelCreate extends Omit<IVisitModel, '_id' | 'lesson' | 'teacher' | 'students'> {
+export interface IAttendanceModelCreate extends Omit<IAttendanceModel, '_id' | 'lesson' | 'teacher' | 'students'> {
   lesson: string;
   teacher: string;
   students: Array<Record<'student' | 'visitStatus', string>>

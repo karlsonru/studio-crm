@@ -141,7 +141,7 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
 
   const headersVisits = isMobile ? ['Занятие', 'Дата занятия'] : ['Занятие', 'Дата занятия', 'Статус посещения', 'Статус оплаты'];
   const rowsVisits = [...responseVisitedLessonsStatisticByStudent
-    .visitedLessons]
+    .attendances]
     .sort((a, b) => (b.date - a.date))
     .map((visitedLesson) => {
       // с backend'а всегда возвращается массив с 1 студентом по которому делали запрос

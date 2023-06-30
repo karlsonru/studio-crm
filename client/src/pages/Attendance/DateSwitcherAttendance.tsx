@@ -10,7 +10,7 @@ function dateFormatterDay(date: Date | number) {
   return format(date, 'EEEE, dd MMMM', { locale: ru, weekStartsOn: 1 });
 }
 
-export function DateSwitcherVisitedLesson() {
+export function DateSwitcherAttendance() {
   const actions = useActionCreators(visitsPageActions);
   const [, setSearchParams] = useSearchParams();
   const date = useAppSelector((state) => state.visitsPageReducer.currentDateTimestamp);

@@ -15,7 +15,7 @@ import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { ValidateIdPipe } from '../shared/validaitonPipe';
 
-@Controller('attendance')
+@Controller('attendances')
 export class AttendanceController {
   constructor(private readonly service: AttendanceService) {}
 

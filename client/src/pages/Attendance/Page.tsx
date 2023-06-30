@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/system/Stack';
 import { LessonsList } from './LessonsList';
 import { LessonInfo } from './LessonInfo';
-import { DateSwitcherVisitedLesson } from './DateSwitcherVisitedLesson';
+import { DateSwitcherAttendance } from './DateSwitcherAttendance';
 import { Loading } from '../../shared/components/Loading';
 import { useTitle } from '../../shared/hooks/useTitle';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
@@ -16,11 +16,11 @@ import { useAppSelector } from '../../shared/hooks/useAppSelector';
 
 const Header = React.memo(() => (
   <Box component='header' mx='1rem'>
-    <DateSwitcherVisitedLesson />
+    <DateSwitcherAttendance />
   </Box>
 ));
 
-export function VisititedLessonsPage() {
+export function AttendancePage() {
   useTitle('Посещения');
 
   const [searchParams, setSearchParams] = useSearchParams();

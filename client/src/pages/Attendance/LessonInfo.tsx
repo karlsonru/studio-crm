@@ -1,11 +1,11 @@
 import { LessonDetails } from './LessonDetails';
 import { StudentsList } from './StudentsList';
-import { useFindVisitsQuery } from '../../shared/api';
+import { useFindAttendancesQuery } from '../../shared/api';
 import { Loading } from '../../shared/components/Loading';
 import { ILessonModel } from '../../shared/models/ILessonModel';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { ShowError } from '../../shared/components/ShowError';
-import { VisitStatus } from '../../shared/models/IVisitModel';
+import { VisitStatus } from '../../shared/models/IAttendanceModel';
 
 export function LessonInfo({ selectedLesson }: { selectedLesson: ILessonModel }) {
   const currentDateTimestamp = useAppSelector(
@@ -13,8 +13,8 @@ export function LessonInfo({ selectedLesson }: { selectedLesson: ILessonModel })
   );
 
   const {
-    data: visitedLesson, isLoading, isError, error,
-  } = useFindVisitsQuery({
+    data: attendance, isLoading, isError, error,
+  } = useFindAttendancesQuery({
     lesson: selectedLesson._id,
     date: currentDateTimestamp,
   }, {
@@ -29,7 +29,7 @@ export function LessonInfo({ selectedLesson }: { selectedLesson: ILessonModel })
     <ShowError details={error} />;
   }
 
-  if (!visitedLesson) {
+  if (!attendance) {
     return null;
   }
 
@@ -39,14 +39,14 @@ export function LessonInfo({ selectedLesson }: { selectedLesson: ILessonModel })
       lesson={selectedLesson}
       dateTimestamp={currentDateTimestamp}
       visitedStudents={
-        visitedLesson[0]?.students
+        attendance[0]?.students
           .filter((visit) => visit.visitStatus === VisitStatus.VISITED).length
       }
     />
     <StudentsList
       lesson={selectedLesson}
       dateTimestamp={currentDateTimestamp}
-      visitedLessonId={visitedLesson[0]?._id}
+      visitedLessonId={attendance[0]?._id}
     />
   </>
   );
