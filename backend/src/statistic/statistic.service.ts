@@ -1,30 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { IFilterQuery } from '../shared/IFilterQuery';
-import { VisitedLessonService } from '../visited-lesson/visited-lesson.service';
-import { BillingStatus, VisitStatus } from '../schemas/visitedLesson.schema';
-import { VisitedLessonModel, SubscriptionModel } from '../schemas';
+import { AttendanceService } from '../attendance/attendance.service';
+import { BillingStatus, VisitStatus } from '../schemas/attendance.schema';
+import { AttendanceModel, SubscriptionModel } from '../schemas';
 import { SubscriptionService } from '../subscription/subscription.service';
 import { FinanceService } from '../finance/finance.service';
 import { isMongoId } from 'class-validator';
 
 export interface IFindVisitedByStudentWithStatistic {
-  visitedLessons: Array<VisitedLessonModel>;
+  attendance: Array<AttendanceModel>;
   statistic: Record<string, number>;
 }
 
 @Injectable()
 export class StatisticService {
   constructor(
-    private visitedLessonsService: VisitedLessonService,
+    private attendanceService: AttendanceService,
     private subscribtionService: SubscriptionService,
     private financeService: FinanceService,
   ) {}
 
   async calcVisitedLessonsByStudent(
-    query: IFilterQuery<VisitedLessonModel>,
+    query: IFilterQuery<AttendanceModel>,
     studentId: string,
   ): Promise<IFindVisitedByStudentWithStatistic> {
-    const visitedLessons = await this.visitedLessonsService.findAll({
+    const attendance = await this.attendanceService.findAll({
       $and: [
         { date: { $gte: query.startPeriod } },
         { students: { $elemMatch: { student: studentId } } },
@@ -38,7 +38,7 @@ export class StatisticService {
       unpaid: 0,
     };
 
-    visitedLessons.forEach((visited) => {
+    attendance.forEach((visited) => {
       const visit = visited.students.find(
         (students) => students.student._id.toString() === studentId,
       );
@@ -67,7 +67,7 @@ export class StatisticService {
     });
 
     return {
-      visitedLessons,
+      attendance,
       statistic,
     };
   }

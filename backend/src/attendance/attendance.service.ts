@@ -1,24 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model, PopulateOptions } from 'mongoose';
-import { CreateVisitedLessonDto } from './dto/create-visited-lesson.dto';
-import { UpdateVisitedLessonDto } from './dto/update-visited-lesson.dto';
-import { VisitedLessonModel, VisitedLessonDocument } from '../schemas';
+import { CreateAttendanceDto } from './dto/create-attendance.dto';
+import { UpdateAttendanceDto } from './dto/update-attendance.dto';
+import { AttendanceModel, AttendanceDocument } from '../schemas';
 import { SubscriptionChargeService } from '../subscription-charge/subscriptionCharge.service';
 import { IFilterQuery } from '../shared/IFilterQuery';
 import { withTransaction } from '../shared/withTransaction';
 import { logger } from '../shared/logger.middleware';
 
 @Injectable()
-export class VisitedLessonService {
-  private readonly populateQueryVisitedLesson: Array<string | PopulateOptions>;
+export class AttendanceService {
+  private readonly populateQueryAttendance: Array<string | PopulateOptions>;
 
   constructor(
-    @InjectModel(VisitedLessonModel.name)
-    private readonly visitedLessonModel: Model<VisitedLessonDocument>,
+    @InjectModel(AttendanceModel.name)
+    private readonly attendanceModel: Model<AttendanceDocument>,
     private readonly subscriptionChargeService: SubscriptionChargeService,
   ) {
-    this.populateQueryVisitedLesson = [
+    this.populateQueryAttendance = [
       'lesson',
       'teacher',
       {
@@ -30,15 +30,15 @@ export class VisitedLessonService {
     ];
   }
 
-  async create(createVisitedLessonDto: CreateVisitedLessonDto): Promise<VisitedLessonModel | null> {
+  async create(createAttendanceDto: CreateAttendanceDto): Promise<AttendanceModel | null> {
     logger.debug(`
       Обрабатываем запрос на создание нового посещённого занятия по уроку с ID:
-      ${createVisitedLessonDto.lesson} за дату 
-      ${new Date(createVisitedLessonDto.date).toDateString()}
+      ${createAttendanceDto.lesson} за дату 
+      ${new Date(createAttendanceDto.date).toDateString()}
     `);
 
-    const candidate = await this.visitedLessonModel.findOne({
-      $and: [{ date: createVisitedLessonDto.date }, { lesson: createVisitedLessonDto.lesson }],
+    const candidate = await this.attendanceModel.findOne({
+      $and: [{ date: createAttendanceDto.date }, { lesson: createAttendanceDto.lesson }],
     });
 
     if (candidate) {
@@ -49,52 +49,47 @@ export class VisitedLessonService {
     const transaction = async (session: ClientSession) => {
       // для каждого студента добавим абонемент с которго нужно списать
       await this.subscriptionChargeService.addSubscription(
-        createVisitedLessonDto.students,
-        createVisitedLessonDto.lesson,
-        createVisitedLessonDto.date,
+        createAttendanceDto.students,
+        createAttendanceDto.lesson,
+        createAttendanceDto.date,
       );
 
       // для каждого студента добавим биллинг статус
       await this.subscriptionChargeService.addBillingStatus(
-        createVisitedLessonDto.students,
-        createVisitedLessonDto.lesson,
+        createAttendanceDto.students,
+        createAttendanceDto.lesson,
       );
 
       // конвертируем объекты с подписками в обычные текстовые строки с id
-      this.subscriptionChargeService.normalizeSubscriptionIds(createVisitedLessonDto.students);
+      this.subscriptionChargeService.normalizeSubscriptionIds(createAttendanceDto.students);
 
       // после проставления статусов спишем занятия с найденных абонементов
       await this.subscriptionChargeService.chargeSubscriptions(
-        createVisitedLessonDto.students,
-        createVisitedLessonDto.lesson,
+        createAttendanceDto.students,
+        createAttendanceDto.lesson,
       );
 
       // сохраним само занятие и вернём его
-      return await this.visitedLessonModel.create(createVisitedLessonDto);
+      return await this.attendanceModel.create(createAttendanceDto);
     };
 
-    const created = await withTransaction<VisitedLessonDocument>(
-      this.visitedLessonModel,
-      transaction,
-    );
+    const created = await withTransaction<AttendanceDocument>(this.attendanceModel, transaction);
 
     return created;
   }
 
-  async findAll(query?: IFilterQuery<VisitedLessonModel>): Promise<Array<VisitedLessonModel>> {
-    return await this.visitedLessonModel
-      .find(query ?? {})
-      .populate(this.populateQueryVisitedLesson);
+  async findAll(query?: IFilterQuery<AttendanceModel>): Promise<Array<AttendanceModel>> {
+    return await this.attendanceModel.find(query ?? {}).populate(this.populateQueryAttendance);
   }
 
-  async findOne(id: string): Promise<VisitedLessonModel | null> {
-    return await this.visitedLessonModel.findById(id).populate(this.populateQueryVisitedLesson);
+  async findOne(id: string): Promise<AttendanceModel | null> {
+    return await this.attendanceModel.findById(id).populate(this.populateQueryAttendance);
   }
 
   async update(
     id: string,
-    updateVisitedLessonDto: UpdateVisitedLessonDto,
-  ): Promise<VisitedLessonModel | null> {
+    updateAttendanceDto: UpdateAttendanceDto,
+  ): Promise<AttendanceModel | null> {
     logger.debug(`Посещённое занятие: ${id}}. Получен запрос на обновление. Ищем занятие`);
 
     // найдём занятие, которое нужно обновить
@@ -107,29 +102,26 @@ export class VisitedLessonService {
 
     // добавлям транзакцию для обновления различных статусов абонементов
     const transaction = async (session: ClientSession) => {
-      if (updateVisitedLessonDto.students) {
+      if (updateAttendanceDto.students) {
         await this.subscriptionChargeService.changeBillingStatus(
-          updateVisitedLessonDto.students,
+          updateAttendanceDto.students,
           visitedLesson,
         );
       }
 
       // обновим занятие и вернём результат
-      return await this.visitedLessonModel.findByIdAndUpdate(id, updateVisitedLessonDto, {
+      return await this.attendanceModel.findByIdAndUpdate(id, updateAttendanceDto, {
         new: true,
       });
     };
 
-    const updated = await withTransaction<VisitedLessonDocument>(
-      this.visitedLessonModel,
-      transaction,
-    );
+    const updated = await withTransaction<AttendanceDocument>(this.attendanceModel, transaction);
 
     return updated;
   }
 
   async remove(id: string) {
-    await this.visitedLessonModel.findByIdAndRemove(id);
+    await this.attendanceModel.findByIdAndRemove(id);
     return;
   }
 }

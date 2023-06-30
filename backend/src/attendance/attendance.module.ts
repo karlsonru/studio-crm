@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { VisitedLessonService } from './visited-lesson.service';
-import { VisitedLessonController } from './visited-lesson.controller';
+import { AttendanceService } from './attendance.service';
+import { AttendanceController } from './attendance.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { VisitedLessonModel, VisitedLessonSchema } from '../schemas';
+import { AttendanceModel, AttendanceSchema } from '../schemas';
 import { SubscriptionModel, SubscriptionSchema } from '../schemas';
 import { SubscriptionModule } from '../subscription/subscription.module';
 import { BillingModulde } from '../subscription-charge/subscriptionCharge.module';
@@ -12,12 +12,12 @@ import { BillingModulde } from '../subscription-charge/subscriptionCharge.module
     SubscriptionModule,
     BillingModulde,
     MongooseModule.forFeature([
-      { name: VisitedLessonModel.name, schema: VisitedLessonSchema },
+      { name: AttendanceModel.name, schema: AttendanceSchema },
       { name: SubscriptionModel.name, schema: SubscriptionSchema },
     ]),
   ],
-  controllers: [VisitedLessonController],
-  providers: [VisitedLessonService],
-  exports: [VisitedLessonService],
+  controllers: [AttendanceController],
+  providers: [AttendanceService],
+  exports: [AttendanceService],
 })
-export class VisitedLessonModule {}
+export class AttendanceModule {}

@@ -21,7 +21,7 @@ export {
 } from './subscriptionTemplate.schema';
 
 export {
-  VisitedLesson as VisitedLessonModel,
-  VisitedLessonSchema,
-  VisitedLessonDocument,
-} from './visitedLesson.schema';
+  Attendance as AttendanceModel,
+  AttendanceSchema,
+  AttendanceDocument,
+} from './attendance.schema';

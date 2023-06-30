@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 import Drawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
@@ -14,17 +15,18 @@ import { timetablePageActions } from '../../shared/reducers/timetablePageSlice';
 import { ILessonModel, VisitType } from '../../shared/models/ILessonModel';
 import { MODAL_FORM_WIDTH } from '../../shared/constants';
 
-function LessonInfo({ lesson }: { lesson: ILessonModel }) {
+function LessonInfo({ lesson, date }: { lesson: ILessonModel, date: number }) {
   const time = `с ${lesson.timeStart.hh}:${lesson.timeStart.min} по ${lesson.timeEnd.hh}:${lesson.timeEnd.min}`;
   return (
     <>
-      <Typography variant="h5" textAlign="center">
-        Информация о занятии
+      <Typography variant="h6" textAlign="center">
+        Информация о занятии <br/>
+        {lesson.title}
+      </Typography>
+      <Typography variant="subtitle1" textAlign="center">
+        {format(date, 'dd.MM.yyyy')}
       </Typography>
       <List>
-        <ListItem>
-          <ListItemText primary={`Название: ${lesson.title}`} />
-        </ListItem>
         <ListItem>
           <ListItemText primary={`Педагог: ${lesson.teacher.fullname}`} />
         </ListItem>
@@ -113,7 +115,7 @@ export const LessonDetails = React.memo(() => {
         padding={2}
         sx={{ width: MODAL_FORM_WIDTH }}
       >
-        <LessonInfo lesson={lesson} />
+        <LessonInfo lesson={lesson} date={date} />
 
         <Button
           size="large"

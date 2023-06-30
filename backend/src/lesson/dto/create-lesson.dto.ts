@@ -12,7 +12,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { ITime } from '../../schemas/lesson.schema';
-import { VisitType } from '../../schemas/visitedLesson.schema';
+import { VisitType } from '../../schemas/attendance.schema';
 
 class Time implements ITime {
   @IsNumber()

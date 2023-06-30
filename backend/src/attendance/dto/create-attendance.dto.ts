@@ -10,7 +10,7 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { BillingStatus, VisitStatus, VisitType } from '../../schemas/visitedLesson.schema';
+import { BillingStatus, VisitStatus, VisitType } from '../../schemas/attendance.schema';
 
 export class VisitedStudent {
   @IsMongoId()
@@ -31,7 +31,7 @@ export class VisitedStudent {
   visitType: VisitType;
 }
 
-export class CreateVisitedLessonDto {
+export class CreateAttendanceDto {
   @IsString()
   @IsMongoId()
   lesson: string;

@@ -5,7 +5,7 @@ import { User } from './user.schema';
 import { Student } from './student.schema';
 import { Transform, Type } from 'class-transformer';
 
-export type VisitedLessonDocument = HydratedDocument<VisitedLesson>;
+export type AttendanceDocument = HydratedDocument<Attendance>;
 
 export enum VisitStatus {
   UNKNOWN = 'unknown',
@@ -39,7 +39,7 @@ export class VisitedStudent {
 @Schema({
   timestamps: true,
 })
-export class VisitedLesson {
+export class Attendance {
   @Transform(({ value }) => value.toString())
   @Type(() => String)
   _id: Types.ObjectId;
@@ -117,4 +117,4 @@ export class VisitedLesson {
   students: VisitedStudent[];
 }
 
-export const VisitedLessonSchema = SchemaFactory.createForClass(VisitedLesson);
+export const AttendanceSchema = SchemaFactory.createForClass(Attendance);

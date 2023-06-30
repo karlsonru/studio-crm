@@ -8,7 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { LocationModule } from './location/location.module';
 import { SubscriptionTemplateModule } from './subscription-template/subscription-template.module';
 import { SubscriptionModule } from './subscription/subscription.module';
-import { VisitedLessonModule } from './visited-lesson/visited-lesson.module';
+import { AttendanceModule } from './attendance/attendance.module';
 import { SubscriptionChargeService } from './subscription-charge/subscriptionCharge.service';
 import { StatisticModule } from './statistic/statistic.module';
 import { AuthModule } from './auth/auth.module';
@@ -23,7 +23,7 @@ import { FinanceModule } from './finance/finance.module';
     }),
     UserModule,
     LessonModule,
-    VisitedLessonModule,
+    AttendanceModule,
     StudentModule,
     LocationModule,
     SubscriptionTemplateModule,

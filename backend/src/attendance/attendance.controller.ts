@@ -10,18 +10,18 @@ import {
   HttpStatus,
   Query,
 } from '@nestjs/common';
-import { VisitedLessonService } from './visited-lesson.service';
-import { CreateVisitedLessonDto } from './dto/create-visited-lesson.dto';
-import { UpdateVisitedLessonDto } from './dto/update-visited-lesson.dto';
+import { AttendanceService } from './attendance.service';
+import { CreateAttendanceDto } from './dto/create-attendance.dto';
+import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { ValidateIdPipe } from '../shared/validaitonPipe';
 
-@Controller('visits')
-export class VisitedLessonController {
-  constructor(private readonly service: VisitedLessonService) {}
+@Controller('attendance')
+export class AttendanceController {
+  constructor(private readonly service: AttendanceService) {}
 
   @Post()
-  async create(@Body() createVisitedLessonDto: CreateVisitedLessonDto) {
-    const created = await this.service.create(createVisitedLessonDto);
+  async create(@Body() createAttendanceDto: CreateAttendanceDto) {
+    const created = await this.service.create(createAttendanceDto);
 
     if (created === null) {
       throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
@@ -49,9 +49,9 @@ export class VisitedLessonController {
   @Patch(':id')
   async update(
     @Param('id', ValidateIdPipe) id: string,
-    @Body() updateVisitedLessonDto: UpdateVisitedLessonDto,
+    @Body() updateAttendanceDto: UpdateAttendanceDto,
   ) {
-    const updated = await this.service.update(id, updateVisitedLessonDto);
+    const updated = await this.service.update(id, updateAttendanceDto);
 
     if (updated === null) {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);

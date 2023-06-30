@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { logger } from '../shared/logger.middleware';
-import { VisitStatus, BillingStatus, VisitedStudent } from '../schemas/visitedLesson.schema';
-import { VisitedStudent as VisitedStudentDto } from '../visited-lesson/dto/create-visited-lesson.dto';
+import { VisitStatus, BillingStatus, VisitedStudent } from '../schemas/attendance.schema';
+import { VisitedStudent as VisitedStudentDto } from '../attendance/dto/create-attendance.dto';
 import { SubscriptionService } from '../subscription/subscription.service';
-import { VisitedLessonModel, SubscriptionModel } from '../schemas';
+import { AttendanceModel, SubscriptionModel } from '../schemas';
 
 interface IVisitedStudentDto extends Omit<VisitedStudentDto, 'subscription'> {
   subscription: string | null | SubscriptionModel;
@@ -155,18 +155,18 @@ export class SubscriptionChargeService {
 
   async changeBillingStatus(
     updatedVisitedStudents: VisitedStudentDto[],
-    visitedLesson: VisitedLessonModel,
+    attendance: AttendanceModel,
   ) {
     logger.debug(
-      `Посещённое занятие: ${visitedLesson._id}. Проверяем обновлённый список посетивших студентов`,
+      `Посещённое занятие: ${attendance._id}. Проверяем обновлённый список посетивших студентов`,
     );
 
     // проверим списки студентов и найдём отличающуюся информацию
-    const studentsWithChangedStatuses = this.compareVisits(updatedVisitedStudents, visitedLesson);
+    const studentsWithChangedStatuses = this.compareVisits(updatedVisitedStudents, attendance);
 
     if (!studentsWithChangedStatuses.length) return;
     logger.debug(`
-      Посещённое занятие: ${visitedLesson._id}. Изменился статус у ${studentsWithChangedStatuses.length} студентов. 
+      Посещённое занятие: ${attendance._id}. Изменился статус у ${studentsWithChangedStatuses.length} студентов. 
     `);
 
     // возвращаем все изменения в абонементах сделанные по прошлому занятию обратно
@@ -175,10 +175,10 @@ export class SubscriptionChargeService {
     const updatedStudents = studentsWithChangedStatuses.map(
       (prevAndNextVisit) => prevAndNextVisit.updatedVisit,
     );
-    const sourceLessonId = visitedLesson.lesson._id.toString();
+    const sourceLessonId = attendance.lesson._id.toString();
 
     // найдём абонемент с которого списать
-    await this.addSubscription(updatedStudents, sourceLessonId, visitedLesson.date);
+    await this.addSubscription(updatedStudents, sourceLessonId, attendance.date);
 
     // добавим биллинг статус
     await this.addBillingStatus(updatedStudents, sourceLessonId);
@@ -190,11 +190,11 @@ export class SubscriptionChargeService {
     await this.chargeSubscriptions(updatedStudents, sourceLessonId);
   }
 
-  compareVisits(updatedVisitedStudents: VisitedStudentDto[], visitedLesson: VisitedLessonModel) {
+  compareVisits(updatedVisitedStudents: VisitedStudentDto[], attendance: AttendanceModel) {
     const studentsWithChangedStatuses: Array<IPrevAndUpdatedVisit> = [];
 
     updatedVisitedStudents.forEach((updatedVisitedStudent) => {
-      const previousVisit = visitedLesson.students.find(
+      const previousVisit = attendance.students.find(
         (visitedStudent) => visitedStudent.student._id.toString() === updatedVisitedStudent.student,
       );
 
@@ -204,7 +204,7 @@ export class SubscriptionChargeService {
       // если нет предыдущего визита для этого студента - то это новый студент, ранее не отмечался
       if (!previousVisit) {
         logger.debug(
-          `Посещённое занятие: ${visitedLesson._id}. Новый студент ${updatedVisitedStudent.student}`,
+          `Посещённое занятие: ${attendance._id}. Новый студент ${updatedVisitedStudent.student}`,
         );
       }
 
@@ -220,7 +220,7 @@ export class SubscriptionChargeService {
       });
 
       logger.debug(`
-        Посещённое занятие: ${visitedLesson._id}. Изменился статус студента ${updatedVisitedStudent.student}. 
+        Посещённое занятие: ${attendance._id}. Изменился статус студента ${updatedVisitedStudent.student}. 
         Прошлый статус: ${previousVisit?.visitStatus}. Новый статус: ${updatedVisitedStudent.visitStatus}.        
       `);
     });
