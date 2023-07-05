@@ -9,6 +9,11 @@ import { IFilterQuery } from '../shared/IFilterQuery';
 import { withTransaction } from '../shared/withTransaction';
 import { logger } from '../shared/logger.middleware';
 
+interface ICreateAttendance extends Pick<CreateAttendanceDto, 'lesson' | 'teacher' | 'students'> {
+  date: number;
+  day: number;
+}
+
 @Injectable()
 export class AttendanceService {
   private readonly populateQueryAttendance: Array<string | PopulateOptions>;
@@ -30,7 +35,7 @@ export class AttendanceService {
     ];
   }
 
-  async create(createAttendanceDto: CreateAttendanceDto): Promise<AttendanceModel | null> {
+  async create(createAttendanceDto: ICreateAttendance): Promise<AttendanceModel | null> {
     logger.debug(`
       Обрабатываем запрос на создание нового посещённого занятия по уроку с ID:
       ${createAttendanceDto.lesson} за дату 
@@ -38,7 +43,8 @@ export class AttendanceService {
     `);
 
     const candidate = await this.attendanceModel.findOne({
-      $and: [{ date: createAttendanceDto.date }, { lesson: createAttendanceDto.lesson }],
+      date: createAttendanceDto.date,
+      lesson: createAttendanceDto.lesson,
     });
 
     if (candidate) {
@@ -78,8 +84,8 @@ export class AttendanceService {
     return created;
   }
 
-  async findAll(query?: IFilterQuery<AttendanceModel>): Promise<Array<AttendanceModel>> {
-    return await this.attendanceModel.find(query ?? {}).populate(this.populateQueryAttendance);
+  async findAll(query: IFilterQuery<AttendanceModel>): Promise<Array<AttendanceModel>> {
+    return await this.attendanceModel.find(query).populate(this.populateQueryAttendance);
   }
 
   async findOne(id: string): Promise<AttendanceModel | null> {

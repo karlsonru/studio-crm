@@ -1,5 +1,5 @@
 import { IUserModel } from './IUserModel';
-import { ILessonModel } from './ILessonModel';
+import { ILessonModel, VisitType } from './ILessonModel';
 import { IStudentModel } from './IStudentModel';
 
 export enum BillingStatus {
@@ -20,6 +20,7 @@ interface IVisit {
   student: IStudentModel;
   visitStatus: VisitStatus;
   billingStatus: BillingStatus;
+  visitType: VisitType;
   subscription: string;
 }
 

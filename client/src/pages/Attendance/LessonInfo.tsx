@@ -29,24 +29,27 @@ export function LessonInfo({ selectedLesson }: { selectedLesson: ILessonModel })
     <ShowError details={error} />;
   }
 
+  /*
   if (!attendance) {
     return null;
   }
+  */
+
+  const visitedStudents = attendance && attendance.length
+    ? attendance[0]?.students.filter((visit) => visit.visitStatus === VisitStatus.VISITED).length
+    : 0;
 
   return (
   <>
     <LessonDetails
       lesson={selectedLesson}
       dateTimestamp={currentDateTimestamp}
-      visitedStudents={
-        attendance[0]?.students
-          .filter((visit) => visit.visitStatus === VisitStatus.VISITED).length
-      }
+      visitedStudents={visitedStudents}
     />
     <StudentsList
       lesson={selectedLesson}
       dateTimestamp={currentDateTimestamp}
-      visitedLessonId={attendance[0]?._id}
+      visitedLessonId={attendance && attendance.length ? attendance[0]._id : undefined}
     />
   </>
   );

@@ -7,7 +7,7 @@ import { VisitStatusButton } from './VisitStatusButton';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { IStudentModel } from '../../shared/models/IStudentModel';
-import { ILessonModel } from '../../shared/models/ILessonModel';
+import { ILessonModel, VisitType } from '../../shared/models/ILessonModel';
 import {
   useGetLessonQuery,
   useCreateAttendanceMutation,
@@ -19,9 +19,26 @@ import { BillingStatus, VisitStatus } from '../../shared/models/IAttendanceModel
 
 interface IStudentsListItem {
   student: IStudentModel;
-  visitStatus?: VisitStatus;
-  billingStatus?: BillingStatus;
+  visitDetails?: {
+    visitStatus?: VisitStatus;
+    billingStatus?: BillingStatus;
+    visitType?: VisitType;
+  }
+}
 
+function getVisitTypeName(visitType?: VisitType) {
+  switch (visitType) {
+    case VisitType.REGULAR:
+      return 'Постоянно';
+    case VisitType.MISSED_REGULAR:
+      return 'Отработка';
+    case VisitType.NEW:
+      return 'Новый';
+    case VisitType.SINGLE:
+      return 'Однократно';
+    default:
+      return 'Неизвестно';
+  }
 }
 
 function getBillingStatusNameAndColor(billingStatus?: BillingStatus) {
@@ -44,14 +61,41 @@ function getBillingStatusNameAndColor(billingStatus?: BillingStatus) {
   }
 }
 
-function StudentsListItem({ student, visitStatus, billingStatus }: IStudentsListItem) {
-  const { name, color } = getBillingStatusNameAndColor(billingStatus);
+interface IStudentBillingStatusAndVisitType {
+  billingStatus: string;
+  visitType: string;
+}
+
+function StudentBillingStatusAndVisitType({
+  billingStatus, visitType,
+}: IStudentBillingStatusAndVisitType) {
+  return (
+    <List disablePadding>
+      <ListItem disablePadding>
+        <ListItemText secondary={visitType} />
+      </ListItem>
+      <ListItem disablePadding>
+        <ListItemText secondary={billingStatus} />
+      </ListItem>
+    </List>
+  );
+}
+
+function StudentsListItem({ student, visitDetails }: IStudentsListItem) {
+  const { visitStatus, billingStatus, visitType } = visitDetails ?? {};
+  const { name: billingStatusName, color } = getBillingStatusNameAndColor(billingStatus);
+  const visitTypeName = getVisitTypeName(visitType);
 
   return (
     <ListItem divider={true}>
       <ListItemText
         primary={student.fullname}
-        secondary={name}
+        secondary={
+          <StudentBillingStatusAndVisitType
+            billingStatus={billingStatusName}
+            visitType={visitTypeName}
+          />
+        }
         secondaryTypographyProps={{ sx: { color } }}
       />
       <VisitStatusButton studentId={student._id} visitStatus={visitStatus} />
@@ -81,8 +125,11 @@ function StudentsListVisited({ lessonId }: { lessonId: string }) {
         (visit) => <StudentsListItem
           key={visit.student._id}
           student={visit.student}
-          visitStatus={visit.visitStatus}
-          billingStatus={visit.billingStatus}
+          visitDetails={{
+            visitStatus: visit.visitStatus,
+            visitType: visit.visitType,
+            billingStatus: visit.billingStatus,
+          }}
         />,
       )}
     </List>
@@ -99,7 +146,13 @@ function StudentsListFuture({ lessonId }: { lessonId: string }) {
   return (
     <List>
       {data.students.map(
-        (visiting) => <StudentsListItem key={visiting.student._id} student={visiting.student} />,
+        (visiting) => <StudentsListItem
+          key={visiting.student._id}
+          student={visiting.student}
+          visitDetails={{
+            visitType: visiting.visitType,
+          }}
+        />,
       )}
     </List>
   );

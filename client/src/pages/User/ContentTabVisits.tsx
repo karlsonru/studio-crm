@@ -55,7 +55,7 @@ export function ContentTabVisits({ userId }: { userId: string }) {
           ]
         }
       props={{
-        onDoubleClick: () => navigate(`/visits?date=${visit.date}&lessonId=${visit.lesson._id}`),
+        onDoubleClick: () => navigate(`/attendances?date=${visit.date}&lessonId=${visit.lesson._id}`),
       }}
     />);
 

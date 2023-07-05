@@ -21,7 +21,18 @@ export class AttendanceController {
 
   @Post()
   async create(@Body() createAttendanceDto: CreateAttendanceDto) {
-    const created = await this.service.create(createAttendanceDto);
+    // время занятия сохраняем в UTC
+    const timestamp = Date.UTC(
+      createAttendanceDto.year,
+      createAttendanceDto.month - 1,
+      createAttendanceDto.day,
+    );
+
+    const created = await this.service.create({
+      ...createAttendanceDto,
+      date: timestamp,
+      day: createAttendanceDto.weekday,
+    });
 
     if (created === null) {
       throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
@@ -31,8 +42,20 @@ export class AttendanceController {
   }
 
   @Get()
-  async findAll(@Query('filter') filter?: string) {
-    return await this.service.findAll(filter ? JSON.parse(filter) : {});
+  async findAll(
+    @Query('filter') filter: string,
+    @Param('year') year?: number,
+    @Param('month') month?: number,
+    @Param('day') day?: number,
+  ) {
+    const parsedQuery = JSON.parse(filter);
+
+    // если в запросе переаны параметры даты, то узнаём UTC timestamp занятия и добавляем его к запросу
+    if (year && month && day) {
+      parsedQuery.date = Date.UTC(year, month, day);
+    }
+
+    return await this.service.findAll(parsedQuery);
   }
 
   @Get(':id')

@@ -37,13 +37,26 @@ export class CreateAttendanceDto {
   lesson: string;
 
   @IsNumber()
-  @Min(0)
-  @Max(6)
+  @IsPositive()
+  year: number;
+
+  @IsNumber()
+  @IsPositive()
+  @Min(1)
+  @Max(12)
+  month: number;
+
+  @IsNumber()
+  @IsPositive()
+  @Min(1)
+  @Max(31)
   day: number;
 
   @IsNumber()
   @IsPositive()
-  date: number;
+  @Min(0)
+  @Max(6)
+  weekday: number;
 
   @IsString()
   @IsMongoId()

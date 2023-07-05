@@ -94,7 +94,8 @@ export const LessonDetails = React.memo(() => {
   };
 
   const goAttendancePage = () => {
-    navigate(`/visits?lessonId=${lesson._id}&date=${date}`);
+    closeHandler();
+    navigate(`/attendances?lessonId=${lesson._id}&date=${date}`);
   };
 
   return (
