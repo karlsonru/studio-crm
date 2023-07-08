@@ -15,6 +15,8 @@ import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
 import { IStudentModel } from '../../shared/models/IStudentModel';
 import { CardContentItem } from '../../shared/components/CardContentItem';
+import { getVisitStatusName } from '../../shared/helpers/getVisitStatusName';
+import { getBillingStatusNameAndColor } from '../../shared/helpers/getBillingStatusNameAndColor';
 
 interface IVisitsStatistic {
   statistic: Record<string, number>;
@@ -139,8 +141,6 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
     return <ShowError details={'Не удалось запросить данные'} />;
   }
 
-  console.log(responseVisitedLessonsStatisticByStudent);
-
   const headersVisits = isMobile ? ['Занятие', 'Дата занятия'] : ['Занятие', 'Дата занятия', 'Статус посещения', 'Статус оплаты'];
   const rowsVisits = [...responseVisitedLessonsStatisticByStudent
     .attendances]
@@ -149,22 +149,25 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
       // с backend'а всегда возвращается массив с 1 студентом по которому делали запрос
       const studentVisit = visitedLesson.students[0];
 
+      const billingStatusName = getBillingStatusNameAndColor(studentVisit.billingStatus).name;
+      const visitStatusName = getVisitStatusName(studentVisit.visitStatus);
+
       return (
         <CreateRows
           key={visitedLesson._id}
           contentDesktop={[
             visitedLesson.lesson.title,
             format(visitedLesson.date, 'EEEE, dd-MM-YYY', { locale: ru }),
-            studentVisit.visitStatus,
-            studentVisit.billingStatus,
+            visitStatusName,
+            billingStatusName,
           ]}
           contentMobile={[
             visitedLesson.lesson.title,
             format(visitedLesson.date, 'EEEE, dd-MM-YYY', { locale: ru }),
           ]}
           contentCollapsed={[
-            <CardContentItem title={'Посещение'} value={studentVisit.visitStatus} props={{ width: '100%' }} />,
-            <CardContentItem title={'Оплата'} value={studentVisit.billingStatus} props={{ width: '100%' }} />,
+            <CardContentItem title={'Посещение'} value={visitStatusName} props={{ width: '100%' }} />,
+            <CardContentItem title={'Оплата'} value={billingStatusName} props={{ width: '100%' }} />,
           ]}
         />
       );

@@ -10,41 +10,8 @@ import { ILessonModel, VisitType } from '../../shared/models/ILessonModel';
 import { useCreateAttendanceMutation, usePatchAttendanceMutation } from '../../shared/api';
 import { MODAL_FORM_WIDTH } from '../../shared/constants';
 import { BillingStatus, IAttendanceModel, VisitStatus } from '../../shared/models/IAttendanceModel';
-
-function getVisitTypeName(visitType?: VisitType) {
-  switch (visitType) {
-    case VisitType.REGULAR:
-      return 'Постоянно';
-    case VisitType.MISSED_REGULAR:
-      return 'Отработка';
-    case VisitType.NEW:
-      return 'Новый';
-    case VisitType.SINGLE:
-      return 'Однократно';
-    default:
-      return 'Неизвестно';
-  }
-}
-
-function getBillingStatusNameAndColor(billingStatus?: BillingStatus) {
-  switch (billingStatus) {
-    case BillingStatus.PAID:
-      return {
-        name: 'Оплачено',
-        color: 'success.main',
-      };
-    case BillingStatus.UNPAID:
-      return {
-        name: 'Неоплачено',
-        color: 'error.main',
-      };
-    default:
-      return {
-        name: 'Нет информации',
-        color: 'default',
-      };
-  }
-}
+import { getVisitTypeName } from '../../shared/helpers/getVisitTypeName';
+import { getBillingStatusNameAndColor } from '../../shared/helpers/getBillingStatusNameAndColor';
 
 interface IFormWrapper {
   children: ReactNode | Array<ReactNode>;

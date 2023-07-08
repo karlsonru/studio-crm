@@ -4,19 +4,17 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import CircleIcon from '@mui/icons-material/Circle';
 import { VisitStatus } from '../../shared/models/IAttendanceModel';
+import { getVisitStatusName } from '../../shared/helpers/getVisitStatusName';
 
-interface IVisitStatus {
-  title: string;
-  color: 'error' | 'disabled' | 'action' | 'inherit' | 'secondary' | 'primary' | 'success' | 'info' | 'warning';
+const VISIT_STATUSES: Array<{
   action: VisitStatus;
-}
-
-const VISIT_STATUSES: Array<IVisitStatus> = [
-  { title: 'Не отмечен', color: 'disabled', action: VisitStatus.UNKNOWN },
-  { title: 'Посетил', color: 'success', action: VisitStatus.VISITED },
-  { title: 'К отработке', color: 'primary', action: VisitStatus.POSTPONED },
-  { title: 'Пропустил', color: 'error', action: VisitStatus.MISSED },
-  { title: 'Болел', color: 'warning', action: VisitStatus.SICK },
+  color: 'error' | 'disabled' | 'action' | 'inherit' | 'secondary' | 'primary' | 'success' | 'info' | 'warning';
+}> = [
+  { action: VisitStatus.UNKNOWN, color: 'disabled' },
+  { action: VisitStatus.VISITED, color: 'success' },
+  { action: VisitStatus.POSTPONED, color: 'primary' },
+  { action: VisitStatus.MISSED, color: 'error' },
+  { action: VisitStatus.SICK, color: 'warning' },
 ];
 
 interface IVisitStatusButton {
@@ -37,9 +35,9 @@ export function VisitStatusButton({ studentId, visitStatus }: IVisitStatusButton
       >
       {
         VISIT_STATUSES.map((status) => (
-          <MenuItem key={status.title} value={status.action}>
+          <MenuItem key={status.action} value={status.action}>
             <CircleIcon color={status.color} fontSize="small" sx={{ marginRight: '0.5rem' }} />
-            { status.title }
+            { getVisitStatusName(status.action) }
           </MenuItem>
         ))
       }
