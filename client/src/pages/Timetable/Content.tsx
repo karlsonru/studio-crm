@@ -153,10 +153,7 @@ export function TimetableContent({ lessons }: { lessons: Array<ILessonModel> }) 
     const date = startDate.getDate();
 
     // дату складываем в UTC
-    const interval = [];
-    for (let i = 0; i < 7; i++) {
-      interval.push(Date.UTC(year, month, date + i));
-    }
+    const interval = [0, 1, 2, 3, 4, 5, 6].map((i) => Date.UTC(year, month, date + i));
 
     setDates(interval);
   }, [startDateTimestamp]);

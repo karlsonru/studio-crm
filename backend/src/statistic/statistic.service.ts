@@ -8,7 +8,7 @@ import { FinanceService } from '../finance/finance.service';
 import { isMongoId } from 'class-validator';
 
 export interface IFindVisitedByStudentWithStatistic {
-  attendance: Array<AttendanceModel>;
+  attendances: Array<AttendanceModel>;
   statistic: Record<string, number>;
 }
 
@@ -24,7 +24,7 @@ export class StatisticService {
     query: IFilterQuery<AttendanceModel>,
     studentId: string,
   ): Promise<IFindVisitedByStudentWithStatistic> {
-    const attendance = await this.attendanceService.findAll({
+    const attendances = await this.attendanceService.findAll({
       $and: [
         { date: { $gte: query.startPeriod } },
         { students: { $elemMatch: { student: studentId } } },
@@ -38,7 +38,7 @@ export class StatisticService {
       unpaid: 0,
     };
 
-    attendance.forEach((visited) => {
+    attendances.forEach((visited) => {
       const visit = visited.students.find(
         (students) => students.student._id.toString() === studentId,
       );
@@ -67,7 +67,7 @@ export class StatisticService {
     });
 
     return {
-      attendance,
+      attendances,
       statistic,
     };
   }

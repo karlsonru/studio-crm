@@ -139,6 +139,8 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
     return <ShowError details={'Не удалось запросить данные'} />;
   }
 
+  console.log(responseVisitedLessonsStatisticByStudent);
+
   const headersVisits = isMobile ? ['Занятие', 'Дата занятия'] : ['Занятие', 'Дата занятия', 'Статус посещения', 'Статус оплаты'];
   const rowsVisits = [...responseVisitedLessonsStatisticByStudent
     .attendances]
