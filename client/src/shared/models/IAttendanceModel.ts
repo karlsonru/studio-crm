@@ -29,12 +29,15 @@ export interface IAttendanceModel {
   lesson: ILessonModel;
   teacher: IUserModel;
   day: number;
-  date: number;
+  date: number; // UTC Timestamp
   students: Array<IVisit>,
 }
 
-export interface IAttendanceModelCreate extends Omit<IAttendanceModel, '_id' | 'lesson' | 'teacher' | 'students'> {
+export interface IAttendanceModelCreate extends Omit<IAttendanceModel, '_id' | 'lesson' | 'teacher' | 'students' | 'date'> {
   lesson: string;
   teacher: string;
   students: Array<Record<'student' | 'visitStatus', string>>
+  year: number;
+  month: number;
+  weekday: number;
 }

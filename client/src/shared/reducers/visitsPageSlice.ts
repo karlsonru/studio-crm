@@ -1,11 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ILessonModel } from '../models/ILessonModel';
+import { ILessonModel, VisitType } from '../models/ILessonModel';
+import { VisitStatus } from '../models/IAttendanceModel';
 import { getTodayTimestamp } from '../helpers/getTodayTimestamp';
 
 export interface IVisit {
   _id?: string;
   student: string;
-  visitStatus: string;
+  visitStatus: VisitStatus;
+  visitType: VisitType;
 }
 
 interface IVisitPageState {

@@ -19,10 +19,10 @@ import { BillingStatus, VisitStatus } from '../../shared/models/IAttendanceModel
 
 interface IStudentsListItem {
   student: IStudentModel;
-  visitDetails?: {
+  visitDetails: {
+    visitType: VisitType;
     visitStatus?: VisitStatus;
     billingStatus?: BillingStatus;
-    visitType?: VisitType;
   }
 }
 
@@ -61,23 +61,17 @@ function getBillingStatusNameAndColor(billingStatus?: BillingStatus) {
   }
 }
 
-interface IStudentBillingStatusAndVisitType {
-  billingStatus: string;
-  visitType: string;
+interface IStudentListItemText {
+  text: string;
+  color?: string;
 }
 
-function StudentBillingStatusAndVisitType({
-  billingStatus, visitType,
-}: IStudentBillingStatusAndVisitType) {
+function StudentListItemText({ text, color }: IStudentListItemText) {
   return (
-    <List disablePadding>
-      <ListItem disablePadding>
-        <ListItemText secondary={visitType} />
-      </ListItem>
-      <ListItem disablePadding>
-        <ListItemText secondary={billingStatus} />
-      </ListItem>
-    </List>
+    <ListItemText
+      secondary={text}
+      secondaryTypographyProps={{ sx: { color } }}
+    />
   );
 }
 
@@ -91,14 +85,17 @@ function StudentsListItem({ student, visitDetails }: IStudentsListItem) {
       <ListItemText
         primary={student.fullname}
         secondary={
-          <StudentBillingStatusAndVisitType
-            billingStatus={billingStatusName}
-            visitType={visitTypeName}
-          />
+          <List disablePadding>
+            <StudentListItemText text={billingStatusName} color={color} />
+            <StudentListItemText text={visitTypeName} />
+          </List>
         }
-        secondaryTypographyProps={{ sx: { color } }}
       />
-      <VisitStatusButton studentId={student._id} visitStatus={visitStatus} />
+      <VisitStatusButton
+        studentId={student._id}
+        visitStatus={visitStatus}
+        visitType={visitType}
+      />
     </ListItem>
   );
 }
@@ -117,7 +114,7 @@ function StudentsListVisited({ lessonId }: { lessonId: string }) {
     selectFromResult: (result) => ({ data: result.data }),
   });
 
-  if (!data) return null;
+  if (!data?.length) return null;
 
   return (
     <List>
@@ -171,6 +168,7 @@ export function StudentsList({
   const [createAttendance] = useCreateAttendanceMutation();
 
   const visits = useAppSelector((state) => state.visitsPageReducer.visits);
+  const date = new Date(dateTimestamp);
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -186,8 +184,10 @@ export function StudentsList({
       createAttendance({
         lesson: lesson._id,
         teacher: lesson.teacher._id,
-        day: lesson.day,
-        date: dateTimestamp,
+        year: date.getFullYear(),
+        month: date.getMonth() + 1,
+        day: date.getDate(),
+        weekday: lesson.day,
         students: visits,
       });
     }

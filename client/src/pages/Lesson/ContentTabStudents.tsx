@@ -17,16 +17,16 @@ import { CardWrapper } from '../../shared/components/CardWrapper';
 import { CardContentItem } from '../../shared/components/CardContentItem';
 
 interface IAddCard {
-  lessonId: string;
+  lesson: ILessonModel;
   student: IStudentModel;
 }
 
-function AddCard({ lessonId, student }: IAddCard) {
+function AddCard({ lesson, student }: IAddCard) {
   const [updateLessonStudents] = usePatchLessonStudentsMutation();
 
   const excludeHandler = () => {
     updateLessonStudents({
-      id: lessonId,
+      id: lesson._id,
       action: 'remove',
       newItem: {
         students: [student._id],
@@ -51,6 +51,15 @@ function AddCard({ lessonId, student }: IAddCard) {
           <CardContentItem title="Контакт" value={student.contacts[0].name} />
           <Divider />
           <CardContentItem title="Телефон" value={student.contacts[0].phone} />
+          <Divider />
+          <CardContentItem
+            title="Посещение"
+            value={
+              lesson.students
+                .find((visiting) => visiting.student._id === student._id)
+                ?.visitType
+                ?? 'Незвестно'
+            } />
           <Divider />
         </CardContent>
       </CardWrapper>
@@ -80,7 +89,7 @@ export function ContentStudents({ lesson }: { lesson: ILessonModel }) {
             .map((visiting) => (
               <AddCard
                 key={visiting.student._id}
-                lessonId={lesson._id}
+                lesson={lesson}
                 student={visiting.student}
               />
             ))

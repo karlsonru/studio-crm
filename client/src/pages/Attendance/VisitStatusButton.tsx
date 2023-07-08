@@ -6,6 +6,8 @@ import MenuItem from '@mui/material/MenuItem';
 import CircleIcon from '@mui/icons-material/Circle';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { visitsPageActions } from '../../shared/reducers/visitsPageSlice';
+import { VisitType } from '../../shared/models/ILessonModel';
+import { VisitStatus } from '../../shared/models/IAttendanceModel';
 
 interface IVisitStatus {
   title: string;
@@ -23,25 +25,28 @@ const VISIT_STATUSES: Array<IVisitStatus> = [
 
 interface IVisitStatusButton {
   studentId: string;
-  visitStatus?: string
+  visitStatus?: VisitStatus;
+  visitType: VisitType;
 }
 
-export function VisitStatusButton({ studentId, visitStatus }: IVisitStatusButton) {
+export function VisitStatusButton({ studentId, visitStatus, visitType }: IVisitStatusButton) {
   const actions = useActionCreators(visitsPageActions);
-  const initialStatus = visitStatus ?? 'unknown';
+  const initialStatus = visitStatus || VisitStatus.UNKNOWN;
 
   // проставим сразу в store статус посещения по каждому студенту
   useEffect(() => {
     actions.setVisits({
       student: studentId,
       visitStatus: initialStatus,
+      visitType,
     });
   }, []);
 
   const changeHandler = (event: SelectChangeEvent<string>) => {
     actions.setVisits({
       student: studentId,
-      visitStatus: event.target.value,
+      visitStatus: event.target.value as VisitStatus,
+      visitType,
     });
   };
 

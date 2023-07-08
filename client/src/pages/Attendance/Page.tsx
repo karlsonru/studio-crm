@@ -9,10 +9,10 @@ import { Loading } from '../../shared/components/Loading';
 import { useTitle } from '../../shared/hooks/useTitle';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { visitsPageActions } from '../../shared/reducers/visitsPageSlice';
-import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 import { useFindLessonsQuery } from '../../shared/api';
 import { ShowError } from '../../shared/components/ShowError';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
+import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 
 const Header = React.memo(() => (
   <Box component='header' mx='1rem'>
@@ -34,7 +34,7 @@ export function AttendancePage() {
   useEffect(() => {
     const date = searchParams.get('date');
 
-    // если даты нет в search params - добавим самостоятельно текущий день
+    // если даты нет в search params - добавим самостоятельно текущий день в UTC
     if (!date) {
       setSearchParams({ date: getTodayTimestamp().toString() });
       actions.setCurrentDateTimestamp(getTodayTimestamp());

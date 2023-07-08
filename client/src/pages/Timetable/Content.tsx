@@ -6,12 +6,10 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Stack from '@mui/system/Stack';
 import {
-  eachDayOfInterval,
   eachMinuteOfInterval,
   format,
   isMonday,
   previousMonday,
-  set,
 } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { ContentCard } from './ContentCard';
@@ -140,20 +138,28 @@ export function TimetableContent({ lessons }: { lessons: Array<ILessonModel> }) 
   }, [currentDate, view]);
 
   // запомним дату, с которой нужно рисовать даты в заголовках
-  const startDate = isMonday(currentDate) ? currentDate : previousMonday(currentDate).getTime();
+  const startDateTimestamp = isMonday(currentDate)
+    ? currentDate
+    : previousMonday(currentDate).getTime();
 
   // вычисляем даты в заголовках при изменении стартовой даты
   useEffect(() => {
     // не нужно вычислять, если у нас режим отображения - день
     if (isDayView) return;
 
-    const interval = eachDayOfInterval({
-      start: startDate,
-      end: set(startDate, { date: new Date(startDate).getDate() + 6 }),
-    }).map((date) => date.getTime());
+    const startDate = new Date(startDateTimestamp);
+    const year = startDate.getFullYear();
+    const month = startDate.getMonth();
+    const date = startDate.getDate();
+
+    // дату складываем в UTC
+    const interval = [];
+    for (let i = 0; i < 7; i++) {
+      interval.push(Date.UTC(year, month, date + i));
+    }
 
     setDates(interval);
-  }, [startDate]);
+  }, [startDateTimestamp]);
 
   // для вида День рисуем просто одну колонку с занятиями
   if (isDayView) {
