@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import GroupIcon from '@mui/icons-material/Group';
 import { differenceInMinutes } from 'date-fns';
 import { ContentCardPreview } from './ContentCardPreview';
-import { ILessonModel, ITime } from '../../shared/models/ILessonModel';
+import { ILessonModel, ITime, VisitType } from '../../shared/models/ILessonModel';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { convertTime } from '../../shared/helpers/convertTime';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
@@ -179,7 +179,13 @@ export function ContentCard({ lesson, step, date }: IContentCard) {
 
       <ContentCardPreview
         anchorEl={anchorEl}
-        content={lesson.students.map((visiting) => visiting.student.fullname)}
+        content={lesson.students.map((visiting) => {
+          // если визит не постоянный, то покажем студента только если это дата визита
+          if (visiting.visitType !== VisitType.REGULAR) {
+            return visiting.date === date ? visiting.student.fullname : null;
+          }
+          return visiting.student.fullname;
+        })}
       />
     </>
   );

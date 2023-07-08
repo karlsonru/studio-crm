@@ -3,7 +3,9 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 
-function ContentListItem({ item }: { item: string }) {
+function ContentListItem({ item }: { item: string | null }) {
+  if (item === null) return null;
+
   return (
     <ListItem divider={true}>
       <ListItemText primary={item} />
@@ -13,7 +15,7 @@ function ContentListItem({ item }: { item: string }) {
 
 interface IContentCardPreview {
   anchorEl: HTMLDivElement | null;
-  content: Array<string>;
+  content: Array<string | null>;
 }
 
 export function ContentCardPreview({ anchorEl, content }: IContentCardPreview) {

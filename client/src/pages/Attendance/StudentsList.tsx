@@ -119,13 +119,13 @@ function StudentsListVisited({ lessonId }: { lessonId: string }) {
   return (
     <List>
       {data[0].students.map(
-        (visit) => <StudentsListItem
-          key={visit.student._id}
-          student={visit.student}
+        (visited) => <StudentsListItem
+          key={visited.student._id}
+          student={visited.student}
           visitDetails={{
-            visitStatus: visit.visitStatus,
-            visitType: visit.visitType,
-            billingStatus: visit.billingStatus,
+            visitStatus: visited.visitStatus,
+            visitType: visited.visitType,
+            billingStatus: visited.billingStatus,
           }}
         />,
       )}
@@ -133,7 +133,7 @@ function StudentsListVisited({ lessonId }: { lessonId: string }) {
   );
 }
 
-function StudentsListFuture({ lessonId }: { lessonId: string }) {
+function StudentsListFuture({ lessonId, date }: { lessonId: string, date: number }) {
   const { data } = useGetLessonQuery(lessonId, {
     selectFromResult: (result) => ({ data: result.data }),
   });
@@ -143,13 +143,23 @@ function StudentsListFuture({ lessonId }: { lessonId: string }) {
   return (
     <List>
       {data.students.map(
-        (visiting) => <StudentsListItem
-          key={visiting.student._id}
-          student={visiting.student}
-          visitDetails={{
-            visitType: visiting.visitType,
-          }}
-        />,
+        (visiting) => {
+          // если студент однократный, то показываем его только за дату планируемого посещения
+          if (visiting.visitType !== VisitType.REGULAR
+            && visiting.date !== date) {
+            return null;
+          }
+
+          return (
+            <StudentsListItem
+              key={visiting.student._id}
+              student={visiting.student}
+              visitDetails={{
+                visitType: visiting.visitType,
+              }}
+            />
+          );
+        },
       )}
     </List>
   );
@@ -197,7 +207,11 @@ export function StudentsList({
     <Box component="form" onSubmit={submitHandler} width="100%" maxWidth={MODAL_FORM_WIDTH}>
 
       { visitedLessonId && <StudentsListVisited lessonId={lesson._id} /> }
-      { !visitedLessonId && <StudentsListFuture lessonId={lesson._id} /> }
+      { !visitedLessonId && <StudentsListFuture
+          lessonId={lesson._id}
+          date={dateTimestamp}
+        />
+      }
 
       <SubmitButton
         content={visitedLessonId ? 'Обновить' : 'Отметить'}

@@ -54,13 +54,20 @@ export function AddStudentsDialog({
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    const futureVisitDate = parse(visitDate, 'yyyy-MM-dd', new Date());
+    const futureVisitDateTimestamp = Date.UTC(
+      futureVisitDate.getFullYear(),
+      futureVisitDate.getMonth(),
+      futureVisitDate.getDate(),
+    );
+
     updateLessonStudents({
       id: lesson._id,
       action: 'add',
       newItem: {
         students: [...selectedOptions.map((student) => ({
           student: student._id,
-          date: visitType === VisitType.REGULAR ? null : parse(visitDate, 'yyyy-MM-dd', new Date()).getTime(),
+          date: visitType === VisitType.REGULAR ? null : futureVisitDateTimestamp,
           visitType,
         }))],
       },

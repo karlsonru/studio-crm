@@ -49,7 +49,7 @@ function getVisitTypeName(visitType: VisitType) {
   return visitTypeNames[visitType];
 }
 
-function StudentsList({ lesson }: { lesson: ILessonModel }) {
+function StudentsList({ lesson, date }: { lesson: ILessonModel, date: number }) {
   const sortedStudents = [...lesson.students].sort((a, b) => {
     if (a.visitType === VisitType.REGULAR && b.visitType === VisitType.REGULAR) {
       return a.student.fullname.localeCompare(b.student.fullname);
@@ -64,14 +64,22 @@ function StudentsList({ lesson }: { lesson: ILessonModel }) {
 
   return (
     <List>
-      { sortedStudents.map((visiting) => (
-          <ListItem key={visiting.student._id}>
-            <ListItemText
-              primary={visiting.student.fullname}
-              secondary={getVisitTypeName(visiting.visitType)}
-            />
-          </ListItem>
-      ))}
+      { sortedStudents.map((visiting) => {
+        // в списке показываем только тех временных студентов, у которых совпадает дата визита
+        if (visiting.visitType !== VisitType.REGULAR
+            && visiting.date !== date) {
+          return null;
+        }
+
+        return (
+            <ListItem key={visiting.student._id}>
+              <ListItemText
+                primary={visiting.student.fullname}
+                secondary={getVisitTypeName(visiting.visitType)}
+              />
+            </ListItem>
+        );
+      })}
     </List>
   );
 }
@@ -130,7 +138,7 @@ export const LessonDetails = React.memo(() => {
           Перейти к занятию
         </Button>
 
-        <StudentsList lesson={lesson} />
+        <StudentsList lesson={lesson} date={date} />
 
         <Button
           size="large"
