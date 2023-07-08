@@ -1,8 +1,22 @@
 import { ReactNode } from 'react';
-import Card from '@mui/material/Card';
+import Card, { CardProps } from '@mui/material/Card';
+import { SxProps, Theme } from '@mui/material/styles';
 import { useMobile } from '../hooks/useMobile';
 
-export function CardWrapper({ children }: { children: ReactNode | Array<ReactNode> }) {
+interface ICardWrapper {
+  children: ReactNode | Array<ReactNode>;
+  props?: CardProps;
+  extraStyle?: SxProps<Theme>;
+}
+
+const basicStyle = {
+  marginBottom: '0.5rem',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
+} as const;
+
+export function CardWrapper({ children, props, extraStyle }: ICardWrapper) {
   const isMobile = useMobile();
 
   return (
@@ -11,11 +25,10 @@ export function CardWrapper({ children }: { children: ReactNode | Array<ReactNod
       sx={{
         width: isMobile ? 'auto' : '325px',
         marginRight: isMobile ? 0 : '0.5rem',
-        marginBottom: '0.5rem',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
+        ...basicStyle,
+        ...extraStyle,
       }}
+      {...props}
     >
       { children }
     </Card>

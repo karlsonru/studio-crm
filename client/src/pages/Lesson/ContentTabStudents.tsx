@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { format } from 'date-fns';
 import Typography from '@mui/material/Typography/Typography';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -10,37 +11,48 @@ import SyncIcon from '@mui/icons-material/Sync';
 import { ChangeTeacherDialog } from './ChangeTeacherDialog';
 import { usePatchLessonStudentsMutation } from '../../shared/api';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
-import { IStudentModel } from '../../shared/models/IStudentModel';
 import { AddStudentButton, AddStudentsDialog } from './AddStudentDialog';
-import { ILessonModel } from '../../shared/models/ILessonModel';
+import { ILessonModel, IVisitingStudent } from '../../shared/models/ILessonModel';
 import { CardWrapper } from '../../shared/components/CardWrapper';
 import { CardContentItem } from '../../shared/components/CardContentItem';
+import { getVisitTypeName } from '../../shared/helpers/getVisitTypeName';
+import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 
-interface IAddCard {
-  lesson: ILessonModel;
-  student: IStudentModel;
+interface IStudentCard {
+  lessonId: string;
+  visiting: IVisitingStudent;
 }
 
-function AddCard({ lesson, student }: IAddCard) {
+function StudentCard({ lessonId, visiting }: IStudentCard) {
   const [updateLessonStudents] = usePatchLessonStudentsMutation();
 
   const excludeHandler = () => {
     updateLessonStudents({
-      id: lesson._id,
+      id: lessonId,
       action: 'remove',
       newItem: {
-        students: [student._id],
+        students: [visiting.student._id],
       },
     });
   };
 
   const [isModalOpen, setModalOpen] = useState(false);
+  const visitType = visiting.date === null
+    ? getVisitTypeName(visiting.visitType)
+    : `${getVisitTypeName(visiting.visitType)} ${format(visiting.date, 'dd.MM')}`;
+
+  const isOutdated = visiting.date !== null && visiting.date < getTodayTimestamp();
 
   return (
     <>
-      <CardWrapper>
+      <CardWrapper
+        extraStyle={{
+          borderColor: isOutdated ? 'error.main' : 'rgba(0, 0, 0, 0.12)',
+          opacity: isOutdated ? 0.5 : 1,
+        }}
+      >
         <CardHeader
-          title={student.fullname}
+          title={visiting.student.fullname}
           action={
             <IconButton onClick={() => setModalOpen(true)}>
               <RemoveCircleOutlineIcon />
@@ -48,25 +60,18 @@ function AddCard({ lesson, student }: IAddCard) {
             }
           />
         <CardContent>
-          <CardContentItem title="Контакт" value={student.contacts[0].name} />
+          <CardContentItem title="Контакт" value={visiting.student.contacts[0].name} />
           <Divider />
-          <CardContentItem title="Телефон" value={student.contacts[0].phone} />
+          <CardContentItem title="Телефон" value={visiting.student.contacts[0].phone} />
           <Divider />
-          <CardContentItem
-            title="Посещение"
-            value={
-              lesson.students
-                .find((visiting) => visiting.student._id === student._id)
-                ?.visitType
-                ?? 'Незвестно'
-            } />
+          <CardContentItem title="Посещение" value={visitType} />
           <Divider />
         </CardContent>
       </CardWrapper>
 
       <ConfirmationDialog
         title='Исключить из группы'
-        contentEl={<DeleteDialogText name={student.fullname} />}
+        contentEl={<DeleteDialogText name={visiting.student.fullname} />}
         isOpen={isModalOpen}
         setModalOpen={setModalOpen}
         callback={() => excludeHandler()}
@@ -87,10 +92,10 @@ export function ContentStudents({ lesson }: { lesson: ILessonModel }) {
           lesson
             .students
             .map((visiting) => (
-              <AddCard
+              <StudentCard
                 key={visiting.student._id}
-                lesson={lesson}
-                student={visiting.student}
+                lessonId={lesson._id}
+                visiting={visiting}
               />
             ))
         };
