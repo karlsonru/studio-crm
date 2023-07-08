@@ -1,30 +1,15 @@
-import { FormEvent } from 'react';
+import { FormEvent, ReactNode } from 'react';
 import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import { VisitStatusButton } from './VisitStatusButton';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
-import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { IStudentModel } from '../../shared/models/IStudentModel';
 import { ILessonModel, VisitType } from '../../shared/models/ILessonModel';
-import {
-  useGetLessonQuery,
-  useCreateAttendanceMutation,
-  useFindAttendancesQuery,
-  usePatchAttendanceMutation,
-} from '../../shared/api';
+import { useCreateAttendanceMutation, usePatchAttendanceMutation } from '../../shared/api';
 import { MODAL_FORM_WIDTH } from '../../shared/constants';
-import { BillingStatus, VisitStatus } from '../../shared/models/IAttendanceModel';
-
-interface IStudentsListItem {
-  student: IStudentModel;
-  visitDetails: {
-    visitType: VisitType;
-    visitStatus?: VisitStatus;
-    billingStatus?: BillingStatus;
-  }
-}
+import { BillingStatus, IAttendanceModel, VisitStatus } from '../../shared/models/IAttendanceModel';
 
 function getVisitTypeName(visitType?: VisitType) {
   switch (visitType) {
@@ -61,22 +46,46 @@ function getBillingStatusNameAndColor(billingStatus?: BillingStatus) {
   }
 }
 
-interface IStudentListItemText {
-  text: string;
-  color?: string;
+interface IFormWrapper {
+  children: ReactNode | Array<ReactNode>;
+  submitHandler: (event: FormEvent<HTMLFormElement>) => void;
 }
 
-function StudentListItemText({ text, color }: IStudentListItemText) {
+function FormWrapper({ children, submitHandler }: IFormWrapper) {
   return (
-    <ListItemText
-      secondary={text}
-      secondaryTypographyProps={{ sx: { color } }}
-    />
+    <Box
+      component="form"
+      onSubmit={submitHandler}
+      width="100%"
+      maxWidth={MODAL_FORM_WIDTH}
+    >
+
+      {children}
+
+      <SubmitButton
+        content='Подтвердить'
+        props={{
+          sx: {
+            float: 'right',
+            marginRight: '1rem',
+          },
+        }}
+      />
+    </Box>
   );
 }
 
+interface IStudentsListItem {
+  student: IStudentModel;
+  visitDetails: {
+    visitType: VisitType;
+    visitStatus?: VisitStatus;
+    billingStatus?: BillingStatus;
+  }
+}
+
 function StudentsListItem({ student, visitDetails }: IStudentsListItem) {
-  const { visitStatus, billingStatus, visitType } = visitDetails ?? {};
+  const { visitType, visitStatus, billingStatus } = visitDetails;
   const { name: billingStatusName, color } = getBillingStatusNameAndColor(billingStatus);
   const visitTypeName = getVisitTypeName(visitType);
 
@@ -86,142 +95,127 @@ function StudentsListItem({ student, visitDetails }: IStudentsListItem) {
         primary={student.fullname}
         secondary={
           <List disablePadding>
-            <StudentListItemText text={billingStatusName} color={color} />
-            <StudentListItemText text={visitTypeName} />
+            <ListItemText
+              secondary={billingStatusName}
+              secondaryTypographyProps={{ sx: { color } }}
+            />
+            <ListItemText
+              secondary={visitTypeName}
+            />
           </List>
         }
+        secondaryTypographyProps={{
+          component: 'div',
+        }}
       />
       <VisitStatusButton
         studentId={student._id}
         visitStatus={visitStatus}
-        visitType={visitType}
       />
     </ListItem>
   );
 }
 
-function StudentsListVisited({ lessonId }: { lessonId: string }) {
-  const date = useAppSelector(
-    (state) => state.visitsPageReducer.currentDateTimestamp,
-  );
+export function StudentsListVisited({ attendance }: { attendance: IAttendanceModel }) {
+  const [updateAttendance] = usePatchAttendanceMutation();
 
-  const { data } = useFindAttendancesQuery({
-    $and: [
-      { lesson: lessonId },
-      { date },
-    ],
-  }, {
-    selectFromResult: (result) => ({ data: result.data }),
-  });
+  const submitHandler = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget as HTMLFormElement);
 
-  if (!data?.length) return null;
+    const visitStatuses = Object.fromEntries(formData.entries());
+
+    const visits = attendance.students.map((visited) => ({
+      student: visited.student._id,
+      visitType: visited.visitType,
+      visitStatus: visitStatuses[visited.student._id] as VisitStatus,
+      billingStatus: visited.billingStatus,
+      subscription: visited.subscription,
+    }));
+
+    updateAttendance({
+      id: attendance._id,
+      newItem: {
+        students: visits,
+      },
+    });
+  };
 
   return (
-    <List>
-      {data[0].students.map(
-        (visited) => <StudentsListItem
-          key={visited.student._id}
-          student={visited.student}
-          visitDetails={{
-            visitStatus: visited.visitStatus,
-            visitType: visited.visitType,
-            billingStatus: visited.billingStatus,
-          }}
-        />,
-      )}
-    </List>
+    <FormWrapper submitHandler={submitHandler}>
+      <List>
+        {attendance.students.map(
+          (visited) => <StudentsListItem
+            key={visited.student._id}
+            student={visited.student}
+            visitDetails={{
+              visitStatus: visited.visitStatus,
+              visitType: visited.visitType,
+              billingStatus: visited.billingStatus,
+            }}
+          />,
+        )}
+      </List>
+    </FormWrapper>
   );
 }
 
-function StudentsListFuture({ lessonId, date }: { lessonId: string, date: number }) {
-  const { data } = useGetLessonQuery(lessonId, {
-    selectFromResult: (result) => ({ data: result.data }),
-  });
-
-  if (!data) return null;
-
-  return (
-    <List>
-      {data.students.map(
-        (visiting) => {
-          // если студент однократный, то показываем его только за дату планируемого посещения
-          if (visiting.visitType !== VisitType.REGULAR
-            && visiting.date !== date) {
-            return null;
-          }
-
-          return (
-            <StudentsListItem
-              key={visiting.student._id}
-              student={visiting.student}
-              visitDetails={{
-                visitType: visiting.visitType,
-              }}
-            />
-          );
-        },
-      )}
-    </List>
-  );
-}
-
-interface IStudentsList {
-  lesson: ILessonModel,
-  visitedLessonId?: string;
+interface IStudentsListFuture {
+  lesson: ILessonModel;
   dateTimestamp: number;
 }
 
-export function StudentsList({
-  lesson, visitedLessonId, dateTimestamp,
-}: IStudentsList) {
-  const [updateAttendance] = usePatchAttendanceMutation();
+export function StudentsListFuture({ lesson, dateTimestamp }: IStudentsListFuture) {
   const [createAttendance] = useCreateAttendanceMutation();
 
-  const visits = useAppSelector((state) => state.visitsPageReducer.visits);
   const date = new Date(dateTimestamp);
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const formData = new FormData(event.currentTarget as HTMLFormElement);
 
-    if (visitedLessonId) {
-      updateAttendance({
-        id: visitedLessonId,
-        newItem: {
-          students: visits,
-        },
-      });
-    } else {
-      createAttendance({
-        lesson: lesson._id,
-        teacher: lesson.teacher._id,
-        year: date.getFullYear(),
-        month: date.getMonth() + 1,
-        day: date.getDate(),
-        weekday: lesson.day,
-        students: visits,
-      });
-    }
+    const visitStatuses = Object.fromEntries(formData.entries());
+
+    const visits = lesson.students.map((visiting) => ({
+      student: visiting.student._id,
+      visitType: visiting.visitType,
+      visitStatus: visitStatuses[visiting.student._id] as VisitStatus,
+    }));
+
+    createAttendance({
+      lesson: lesson._id,
+      teacher: lesson.teacher._id,
+      year: date.getFullYear(),
+      month: date.getMonth() + 1,
+      day: date.getDate(),
+      weekday: lesson.day,
+      students: visits,
+    });
   };
 
   return (
-    <Box component="form" onSubmit={submitHandler} width="100%" maxWidth={MODAL_FORM_WIDTH}>
+    <FormWrapper submitHandler={submitHandler}>
+      <List>
+        {lesson.students.map(
+          (visiting) => {
+            // если студент однократный, то показываем его только за дату планируемого посещения
+            if (visiting.visitType !== VisitType.REGULAR
+              && visiting.date !== dateTimestamp) {
+              return null;
+            }
 
-      { visitedLessonId && <StudentsListVisited lessonId={lesson._id} /> }
-      { !visitedLessonId && <StudentsListFuture
-          lessonId={lesson._id}
-          date={dateTimestamp}
-        />
-      }
-
-      <SubmitButton
-        content={visitedLessonId ? 'Обновить' : 'Отметить'}
-        props={{
-          sx: {
-            float: 'right',
-            marginRight: '1rem',
+            return (
+              <StudentsListItem
+                key={visiting.student._id}
+                student={visiting.student}
+                visitDetails={{
+                  visitType: visiting.visitType,
+                }}
+              />
+            );
           },
-        }}
-      />
-    </Box>
+        )}
+      </List>
+    </FormWrapper>
   );
 }

@@ -4,5 +4,5 @@ import { CreateLessonDto, VisitingStudent } from './create-lesson.dto';
 
 export class UpdateLessonDto extends PartialType(OmitType(CreateLessonDto, ['students'])) {
   @IsArray()
-  students: Array<VisitingStudent | string>;
+  students: Array<VisitingStudent | string | null>;
 }

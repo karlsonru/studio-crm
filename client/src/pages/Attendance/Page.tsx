@@ -8,7 +8,7 @@ import { DateSwitcherAttendance } from './DateSwitcherAttendance';
 import { Loading } from '../../shared/components/Loading';
 import { useTitle } from '../../shared/hooks/useTitle';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
-import { visitsPageActions } from '../../shared/reducers/visitsPageSlice';
+import { attendancePageActions } from '../../shared/reducers/attendancePageSlice';
 import { useFindLessonsQuery } from '../../shared/api';
 import { ShowError } from '../../shared/components/ShowError';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
@@ -26,9 +26,9 @@ export function AttendancePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedLessonId = searchParams.get('lessonId');
 
-  const actions = useActionCreators(visitsPageActions);
+  const actions = useActionCreators(attendancePageActions);
   const currentDateTimestamp = useAppSelector(
-    (state) => state.visitsPageReducer.currentDateTimestamp,
+    (state) => state.attendancePageReducer.currentDateTimestamp,
   );
 
   useEffect(() => {

@@ -24,6 +24,10 @@ interface IVisit {
   subscription: string;
 }
 
+interface IVisitCreate extends Omit<IVisit, 'student' | 'subscription' | 'billingStatus'> {
+  student: string;
+}
+
 export interface IAttendanceModel {
   _id: string;
   lesson: ILessonModel;
@@ -36,7 +40,7 @@ export interface IAttendanceModel {
 export interface IAttendanceModelCreate extends Omit<IAttendanceModel, '_id' | 'lesson' | 'teacher' | 'students' | 'date'> {
   lesson: string;
   teacher: string;
-  students: Array<Record<'student' | 'visitStatus', string>>
+  students: Array<IVisitCreate>
   year: number;
   month: number;
   weekday: number;

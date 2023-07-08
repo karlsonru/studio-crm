@@ -1,5 +1,5 @@
 import { LessonDetails } from './LessonDetails';
-import { StudentsList } from './StudentsList';
+import { StudentsListFuture, StudentsListVisited } from './StudentsList';
 import { useFindAttendancesQuery } from '../../shared/api';
 import { Loading } from '../../shared/components/Loading';
 import { ILessonModel } from '../../shared/models/ILessonModel';
@@ -9,7 +9,7 @@ import { VisitStatus } from '../../shared/models/IAttendanceModel';
 
 export function LessonInfo({ selectedLesson }: { selectedLesson: ILessonModel }) {
   const currentDateTimestamp = useAppSelector(
-    (state) => state.visitsPageReducer.currentDateTimestamp,
+    (state) => state.attendancePageReducer.currentDateTimestamp,
   );
 
   const {
@@ -29,13 +29,7 @@ export function LessonInfo({ selectedLesson }: { selectedLesson: ILessonModel })
     <ShowError details={error} />;
   }
 
-  /*
-  if (!attendance) {
-    return null;
-  }
-  */
-
-  const visitedStudents = attendance && attendance.length
+  const visitedStudents = attendance?.length
     ? attendance[0]?.students.filter((visit) => visit.visitStatus === VisitStatus.VISITED).length
     : 0;
 
@@ -46,11 +40,15 @@ export function LessonInfo({ selectedLesson }: { selectedLesson: ILessonModel })
       dateTimestamp={currentDateTimestamp}
       visitedStudents={visitedStudents}
     />
-    <StudentsList
+
+    {!attendance?.length && <StudentsListFuture
       lesson={selectedLesson}
       dateTimestamp={currentDateTimestamp}
-      visitedLessonId={attendance && attendance.length ? attendance[0]._id : undefined}
-    />
+    />}
+
+    {attendance && attendance?.length > 0 && <StudentsListVisited
+      attendance={attendance[0]}
+    />}
   </>
   );
 }

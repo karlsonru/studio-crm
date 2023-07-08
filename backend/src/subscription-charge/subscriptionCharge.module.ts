@@ -8,4 +8,4 @@ import { SubscriptionModule } from '../subscription/subscription.module';
   providers: [SubscriptionChargeService],
   exports: [SubscriptionChargeService],
 })
-export class BillingModulde {}
+export class SubscriptionChargeModulde {}

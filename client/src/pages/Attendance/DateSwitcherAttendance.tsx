@@ -2,7 +2,7 @@ import { useSearchParams } from 'react-router-dom';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
-import { visitsPageActions } from '../../shared/reducers/visitsPageSlice';
+import { attendancePageActions } from '../../shared/reducers/attendancePageSlice';
 import { DateSwitcher } from '../../shared/components/DateSwitcher';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 
@@ -11,9 +11,9 @@ function dateFormatterDay(date: Date | number) {
 }
 
 export function DateSwitcherAttendance() {
-  const actions = useActionCreators(visitsPageActions);
+  const actions = useActionCreators(attendancePageActions);
   const [, setSearchParams] = useSearchParams();
-  const date = useAppSelector((state) => state.visitsPageReducer.currentDateTimestamp);
+  const date = useAppSelector((state) => state.attendancePageReducer.currentDateTimestamp);
 
   const updateDate = (newDate: number) => {
     actions.setCurrentDateTimestamp(newDate);

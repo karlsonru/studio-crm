@@ -53,6 +53,12 @@ export class LessonService {
     logger.info(`Запрос на изменение студентов ${action} занятия с ID ${id}`);
 
     if (action === 'remove') {
+      logger.debug(`
+        Занятие ${id}. Удаление ${updateLessonDto.students.length} студентов: ${updateLessonDto.students}
+      `);
+
+      if (!updateLessonDto.students.length) return null;
+
       const removeQuery = {
         $pull: {
           students: { student: { $in: updateLessonDto.students } },

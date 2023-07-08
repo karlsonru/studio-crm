@@ -14,7 +14,7 @@ function ListItemLesson({ lesson }: { lesson: ILessonModel }) {
   const selectedLessonId = searchParams.get('lessonId');
 
   const currentDateTimestamp = useAppSelector(
-    (state) => state.visitsPageReducer.currentDateTimestamp,
+    (state) => state.attendancePageReducer.currentDateTimestamp,
   );
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, lessonId: string) => {

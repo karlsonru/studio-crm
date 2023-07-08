@@ -8,6 +8,8 @@ import { SubscriptionChargeService } from '../subscription-charge/subscriptionCh
 import { IFilterQuery } from '../shared/IFilterQuery';
 import { withTransaction } from '../shared/withTransaction';
 import { logger } from '../shared/logger.middleware';
+import { LessonService } from 'src/lesson/lesson.service';
+import { VisitType } from 'src/schemas/attendance.schema';
 
 interface ICreateAttendance extends Pick<CreateAttendanceDto, 'lesson' | 'teacher' | 'students'> {
   date: number;
@@ -22,6 +24,7 @@ export class AttendanceService {
     @InjectModel(AttendanceModel.name)
     private readonly attendanceModel: Model<AttendanceDocument>,
     private readonly subscriptionChargeService: SubscriptionChargeService,
+    private readonly lessonService: LessonService,
   ) {
     this.populateQueryAttendance = [
       'lesson',
@@ -73,6 +76,17 @@ export class AttendanceService {
       await this.subscriptionChargeService.chargeSubscriptions(
         createAttendanceDto.students,
         createAttendanceDto.lesson,
+      );
+
+      // удалим студентов с однократным посещением из основного занятия
+      await this.lessonService.updateStudents(
+        createAttendanceDto.lesson,
+        {
+          students: createAttendanceDto.students.map((visited) =>
+            visited.visitType !== VisitType.REGULAR ? visited.student : null,
+          ),
+        },
+        'remove',
       );
 
       // сохраним само занятие и вернём его
