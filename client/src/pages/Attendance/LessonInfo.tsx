@@ -46,7 +46,7 @@ export function LessonInfo({ selectedLesson }: { selectedLesson: ILessonModel })
       dateTimestamp={currentDateTimestamp}
     />}
 
-    {attendance && attendance?.length > 0 && <StudentsListVisited
+    {attendance && attendance.length > 0 && <StudentsListVisited
       attendance={attendance[0]}
     />}
   </>

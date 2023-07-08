@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import { AddStudentsDialog } from '../Lesson/AddStudentDialog';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
+import { useMobile } from '../../shared/hooks/useMobile';
 import { timetablePageActions } from '../../shared/reducers/timetablePageSlice';
 import { ILessonModel, VisitType } from '../../shared/models/ILessonModel';
 import { MODAL_FORM_WIDTH } from '../../shared/constants';
@@ -85,6 +86,7 @@ function StudentsList({ lesson, date }: { lesson: ILessonModel, date: number }) 
 }
 
 export const LessonDetails = React.memo(() => {
+  const isMobile = useMobile();
   const navigate = useNavigate();
   const [isAddStudent, setAddStudent] = useState(false);
   const actions = useActionCreators(timetablePageActions);
@@ -122,7 +124,7 @@ export const LessonDetails = React.memo(() => {
       <Box
         component="div"
         padding={2}
-        sx={{ width: MODAL_FORM_WIDTH }}
+        sx={{ width: isMobile ? '100%' : MODAL_FORM_WIDTH }}
       >
         <LessonInfo lesson={lesson} date={date} />
 

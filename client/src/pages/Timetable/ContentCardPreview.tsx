@@ -2,6 +2,7 @@ import Popover from '@mui/material/Popover';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import { useMobile } from '../../shared/hooks/useMobile';
 
 function ContentListItem({ item }: { item: string | null }) {
   if (item === null) return null;
@@ -20,6 +21,10 @@ interface IContentCardPreview {
 
 export function ContentCardPreview({ anchorEl, content }: IContentCardPreview) {
   if (!anchorEl) return null;
+
+  const isMobile = useMobile();
+
+  if (isMobile) return null;
 
   const width = anchorEl.offsetWidth;
 
