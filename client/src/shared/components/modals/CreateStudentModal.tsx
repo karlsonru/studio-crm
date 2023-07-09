@@ -1,5 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
@@ -16,6 +18,8 @@ import { useCreateStudentMutation } from '../../api';
 import { DialogFormWrapper } from '../DialogFormWrapper';
 import { isValidPhone } from '../../helpers/isValidPhone';
 import { DateField } from '../fields/DateField';
+import { KnowledgeSource } from '../../models/IStudentModel';
+import { getKnowledgeSourceName } from '../../helpers/getKnowladgeSourceName';
 
 function NewContact({ idx, handler }: { idx: number, handler: () => void }) {
   return (
@@ -99,6 +103,7 @@ export function CreateStudentModal() {
       birthday: +Date.parse(formData.birthday as string),
       balance: 0,
       contacts: studentContacts,
+      knowledgeSource: formData.knowledgeSource as KnowledgeSource,
       comment: (formData.comment as string).trim() ?? '',
       isActive: true,
     });
@@ -144,6 +149,22 @@ export function CreateStudentModal() {
 
       <Button variant="outlined" onClick={addContact}>Добавить контакт</Button>
       <hr/>
+
+      <FormControl>
+        <FormLabel>Источник</FormLabel>
+        <Select
+          name='knowledgeSource'
+          label='источник'
+          defaultValue={KnowledgeSource.UNKNOWN}
+          fullWidth
+        >
+          {
+            Object.values(KnowledgeSource).map((source) => (
+              <MenuItem key={source} value={source}>{getKnowledgeSourceName(source)}</MenuItem>
+            ))
+          }
+        </Select>
+      </FormControl>
 
       <TextField
         variant="outlined"

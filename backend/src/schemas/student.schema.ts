@@ -4,6 +4,16 @@ import { HydratedDocument, Types } from 'mongoose';
 
 export type StudentDocument = HydratedDocument<Student>;
 
+export enum KnowledgeSource {
+  VK = 'vk',
+  SITE = 'site',
+  FRIENDS = 'friends',
+  ADVERT_PAPER = 'advert_paper',
+  ADVERT_CLINIC = 'advert_clinic',
+  OTHER = 'other',
+  UNKNOWN = 'unknown',
+}
+
 export interface IStudentContact {
   name: string;
   phone: number;
@@ -56,8 +66,10 @@ export class Student {
 
   @Prop({
     type: String,
+    enum: KnowledgeSource,
+    default: KnowledgeSource.UNKNOWN,
   })
-  source?: string;
+  knowledgeSource?: KnowledgeSource;
 
   @Prop({
     type: String,

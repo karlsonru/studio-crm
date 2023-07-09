@@ -1,5 +1,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { format } from 'date-fns';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
@@ -16,8 +18,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import { usePatchStudentMutation } from '../../shared/api';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { FormContentColumn } from '../../shared/components/FormContentColumn';
-import { IStudentModel, IStudentModelContact } from '../../shared/models/IStudentModel';
+import { IStudentModel, IStudentModelContact, KnowledgeSource } from '../../shared/models/IStudentModel';
 import { DateField } from '../../shared/components/fields/DateField';
+import { getKnowledgeSourceName } from '../../shared/helpers/getKnowladgeSourceName';
 
 interface IContact {
   idx: number;
@@ -134,6 +137,7 @@ export function ContentTabDetails({ student }: { student: IStudentModel }) {
         birthday: +Date.parse(formData.birthday as string),
         balance: 0,
         contacts: studentContacts,
+        knowledgeSource: formData.knowledgeSource as KnowledgeSource,
         comment: (formData.comment as string).trim() ?? '',
         isActive: true,
       },
@@ -223,8 +227,24 @@ export function ContentTabDetails({ student }: { student: IStudentModel }) {
         >
           Добавить контакт
         </Button>
-
         <hr/>
+
+        <FormControl>
+          <FormLabel>Источник</FormLabel>
+          <Select
+            name='knowledgeSource'
+            label='источник'
+            defaultValue={student.knowledgeSource ?? KnowledgeSource.UNKNOWN}
+            fullWidth
+            disabled={!isEdit}
+          >
+            {
+              Object.values(KnowledgeSource).map((source) => (
+                <MenuItem key={source} value={source}>{getKnowledgeSourceName(source)}</MenuItem>
+              ))
+            }
+          </Select>
+        </FormControl>
 
         <TextField
           variant="outlined"

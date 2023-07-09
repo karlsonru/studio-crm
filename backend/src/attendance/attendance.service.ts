@@ -99,7 +99,10 @@ export class AttendanceService {
   }
 
   async findAll(query: IFilterQuery<AttendanceModel>): Promise<Array<AttendanceModel>> {
-    return await this.attendanceModel.find(query).populate(this.populateQueryAttendance);
+    return await this.attendanceModel
+      .find(query)
+      .populate(this.populateQueryAttendance)
+      .sort({ date: -1 });
   }
 
   async findOne(id: string): Promise<AttendanceModel | null> {
