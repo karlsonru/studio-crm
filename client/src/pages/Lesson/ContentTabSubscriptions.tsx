@@ -9,6 +9,7 @@ import { PrimaryButton } from '../../shared/components/buttons/PrimaryButton';
 import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
 import { ILessonModel } from '../../shared/models/ILessonModel';
+import { INPUT_DATE_FORMAT } from '../../shared/constants';
 
 interface IContentSubscriptions {
   lesson: ILessonModel;
@@ -57,7 +58,7 @@ function ShowSubscriptions({ lessonId, isActive }: IShowSubscriptions) {
             subscription.student.fullname,
             subscription.visitsTotal,
             subscription.visitsLeft,
-            format(subscription.dateTo, 'Y-MM-dd'),
+            format(subscription.dateTo, INPUT_DATE_FORMAT),
             subscription.price,
           ]
       }

@@ -17,6 +17,7 @@ import { getDayName } from '../../helpers/getDayName';
 import { useCreateLessonMutation, useGetLocationsQuery, useGetUsersQuery } from '../../api';
 import { useMobile } from '../../hooks/useMobile';
 import { DialogFormWrapper } from '../DialogFormWrapper';
+import { INPUT_DATE_FORMAT } from '../../constants';
 
 function validateFrom(formData: { [key: string]: FormDataEntryValue }) {
   if ((formData.title as string).trim().length < 3) {
@@ -245,7 +246,7 @@ export function CreateLessonModal() {
             name='dateFrom'
             type='date'
             label={isMobile ? 'Начало' : ''}
-            defaultValue={format(now, 'Y-MM-dd')}
+            defaultValue={format(now, INPUT_DATE_FORMAT)}
             required
             InputProps={{
               endAdornment: <InputAdornment position='end'>{!isMobile && 'Начало'}</InputAdornment>,
@@ -256,7 +257,7 @@ export function CreateLessonModal() {
             name='dateTo'
             type='date'
             label={isMobile ? 'Конец' : ''}
-            defaultValue={format(addYears(now, 1), 'Y-MM-dd')}
+            defaultValue={format(addYears(now, 1), INPUT_DATE_FORMAT)}
             required
             error={!formValidation.dateTo}
             helperText={!formValidation.dateTo ? 'Дата должна быть после даты начала' : ''}

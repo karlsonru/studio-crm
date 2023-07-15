@@ -6,7 +6,7 @@ export interface ISubscriptionTemplateModel {
   title: string;
   price: number;
   visits: number;
-  duration: number;
+  // duration: number;
 }
 
 export interface ISubscriptionTemplateCreate extends Omit<ISubscriptionTemplateModel, '_id'> {}

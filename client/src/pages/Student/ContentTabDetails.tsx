@@ -21,6 +21,7 @@ import { FormContentColumn } from '../../shared/components/FormContentColumn';
 import { IStudentModel, IStudentModelContact, KnowledgeSource } from '../../shared/models/IStudentModel';
 import { DateField } from '../../shared/components/fields/DateField';
 import { getKnowledgeSourceName } from '../../shared/helpers/getKnowladgeSourceName';
+import { INPUT_DATE_FORMAT } from '../../shared/constants';
 
 interface IContact {
   idx: number;
@@ -175,7 +176,7 @@ export function ContentTabDetails({ student }: { student: IStudentModel }) {
         <DateField
           name="birthday"
           label="Дата рождения"
-          defaultValue={format(student.birthday, 'Y-MM-dd')}
+          defaultValue={format(student.birthday, INPUT_DATE_FORMAT)}
           disabled={!isEdit}
         />
 

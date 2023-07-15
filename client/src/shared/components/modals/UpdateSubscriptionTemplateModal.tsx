@@ -1,11 +1,13 @@
 import { FormEvent, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
+/*
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/system/Stack';
+*/
 import { usePatchSubscriptionTemplateMutation, useGetSubscriptionTemplatesQuery } from '../../api';
 import { NumberField } from '../fields/NumberField';
 import { DialogFormWrapper } from '../DialogFormWrapper';
@@ -128,6 +130,7 @@ export function UpdateSubscriptionTemplateModal() {
         defaultValue={templateEdit.visits}
       />
 
+      {/*
       <FormControl>
         <FormLabel sx={{ mb: 1 }}>Период</FormLabel>
 
@@ -152,6 +155,7 @@ export function UpdateSubscriptionTemplateModal() {
         </Stack>
 
       </FormControl>
+      */}
 
     </DialogFormWrapper>
   );

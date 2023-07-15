@@ -15,8 +15,10 @@ export class CreateSubscriptionTemplateDto {
   @Min(1)
   visits: number;
 
+  /*
   @IsNumber()
   @IsNotEmpty()
   @Min(86_400_000)
   duration: number;
+  */
 }

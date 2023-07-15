@@ -1,11 +1,13 @@
 import { FormEvent, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
+/*
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/system/Stack';
+*/
 import { NumberField } from '../fields/NumberField';
 import { DialogFormWrapper } from '../DialogFormWrapper';
 import { useCreateSubscriptionTemplateMutation } from '../../api';
@@ -29,7 +31,7 @@ export function CreateSubscriptionTemplateModal() {
     title: true,
     price: true,
     visits: true,
-    duration: true,
+    // duration: true,
   });
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
@@ -43,7 +45,7 @@ export function CreateSubscriptionTemplateModal() {
       title: true,
       price: true,
       visits: true,
-      duration: true,
+      // duration: true,
     });
 
     const errorName = validateForm(formData);
@@ -55,6 +57,7 @@ export function CreateSubscriptionTemplateModal() {
       return;
     }
 
+    /*
     const calculateDuration = () => {
       const day = 86400000; // длительность дня в милисекундах
       switch (formData.period) {
@@ -68,12 +71,13 @@ export function CreateSubscriptionTemplateModal() {
           return 0;
       }
     };
+    */
 
     createSubscriptionTemplate({
       title: formData.title as string,
       price: +formData.price as number,
       visits: +formData.visits as number,
-      duration: calculateDuration(),
+      // duration: calculateDuration(),
     });
   };
 
@@ -106,6 +110,7 @@ export function CreateSubscriptionTemplateModal() {
         minValue={1}
       />
 
+      {/*
       <FormControl>
         <FormLabel sx={{ mb: 1 }}>Период</FormLabel>
 
@@ -127,8 +132,8 @@ export function CreateSubscriptionTemplateModal() {
             <MenuItem value="month">Месяцев</MenuItem>
           </Select>
         </Stack>
-
       </FormControl>
+      */}
 
     </DialogFormWrapper>
   );

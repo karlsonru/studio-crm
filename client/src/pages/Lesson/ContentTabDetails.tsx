@@ -25,6 +25,7 @@ import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { convertTime } from '../../shared/helpers/convertTime';
 import { FormContentColumn } from '../../shared/components/FormContentColumn';
 import { ILessonModel } from '../../shared/models/ILessonModel';
+import { INPUT_DATE_FORMAT } from '../../shared/constants';
 
 function validateFrom(formData: { [key: string]: FormDataEntryValue }) {
   if ((formData.title as string).trim().length < 3) {
@@ -287,7 +288,7 @@ export function ContentTabDetails({ lesson }: { lesson: ILessonModel }) {
               name='dateFrom'
               label={isMobile ? 'Начало' : ''}
               type='date'
-              defaultValue={format(lesson.dateFrom, 'Y-MM-dd')}
+              defaultValue={format(lesson.dateFrom, INPUT_DATE_FORMAT)}
               disabled={!isEdit}
               required
               InputProps={{
@@ -299,7 +300,7 @@ export function ContentTabDetails({ lesson }: { lesson: ILessonModel }) {
               name='dateTo'
               label={isMobile ? 'Конец' : ''}
               type='date'
-              defaultValue={format(lesson.dateTo, 'Y-MM-dd')}
+              defaultValue={format(lesson.dateTo, INPUT_DATE_FORMAT)}
               disabled={!isEdit}
               required
               error={!formValidation.dateTo}

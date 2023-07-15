@@ -19,7 +19,7 @@ import { ShowError } from '../../../shared/components/ShowError';
 
 function AddCard({ cardDetails }: { cardDetails: ISubscriptionTemplateModel }) {
   const [, setSearchParams] = useSearchParams();
-  const days = cardDetails.duration / 86400000;
+  // const days = cardDetails.duration / 86400000;
   const isMobile = useMobile();
 
   const [deleteCard] = useDeleteSubscriptionTemplateMutation();
@@ -37,8 +37,10 @@ function AddCard({ cardDetails }: { cardDetails: ISubscriptionTemplateModel }) {
           <CardContent>
             <CardContentItem title="Занятий" value={cardDetails.visits} />
             <Divider />
+            {/*
             <CardContentItem title="Длительность (дней)" value={days} />
             <Divider />
+            */}
             <CardContentItem title="Стоимость P" value={cardDetails.price} />
           </CardContent>
         </CardActionArea>

@@ -20,7 +20,7 @@ export interface IStudentModel {
   birthday: number;
   balance: number;
   contacts: Array<IStudentModelContact>;
-  knowledgeSource: KnowledgeSource,
+  knowledgeSource?: KnowledgeSource,
   comment?: string;
   isActive: boolean;
 }
