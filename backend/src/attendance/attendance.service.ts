@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model, PopulateOptions } from 'mongoose';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
@@ -9,7 +9,7 @@ import { IFilterQuery } from '../shared/IFilterQuery';
 import { withTransaction } from '../shared/withTransaction';
 import { logger } from '../shared/logger.middleware';
 import { LessonService } from 'src/lesson/lesson.service';
-import { VisitType } from 'src/schemas/attendance.schema';
+import { BillingStatus, VisitType } from 'src/schemas/attendance.schema';
 
 interface ICreateAttendance extends Pick<CreateAttendanceDto, 'lesson' | 'teacher' | 'students'> {
   date: number;
@@ -23,6 +23,7 @@ export class AttendanceService {
   constructor(
     @InjectModel(AttendanceModel.name)
     private readonly attendanceModel: Model<AttendanceDocument>,
+    @Inject(forwardRef(() => SubscriptionChargeService))
     private readonly subscriptionChargeService: SubscriptionChargeService,
     private readonly lessonService: LessonService,
   ) {
@@ -36,6 +37,23 @@ export class AttendanceService {
         },
       },
     ];
+  }
+
+  async findUnpiadAttendances(dateFrom: number, dateTo: number, studentId?: string) {
+    // если передаеём ID конкретного студента - ищем по нему, если нет - ищем все за период
+    const studentsQuery = {
+      students: {
+        $elemMatch: studentId
+          ? { student: studentId, billingStatus: BillingStatus.UNPAID }
+          : { billingStatus: BillingStatus.UNPAID },
+      },
+    };
+
+    const unpaidAttendances = await this.attendanceModel.find({
+      $and: [{ date: { $gte: dateFrom, $lte: dateTo } }, studentsQuery],
+    });
+
+    return unpaidAttendances;
   }
 
   async create(createAttendanceDto: ICreateAttendance): Promise<AttendanceModel | null> {

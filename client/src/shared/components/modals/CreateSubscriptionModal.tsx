@@ -12,7 +12,6 @@ import MenuItem from '@mui/material/MenuItem';
 import Autocomplete from '@mui/material/Autocomplete';
 import { ISubscriptionTemplateModel } from 'shared/models/ISubscriptionModel';
 import { DialogFormWrapper } from '../DialogFormWrapper';
-// import { Loading } from '../Loading';
 import {
   useCreateSubscriptionMutation,
   useGetStudentsQuery,
@@ -22,6 +21,14 @@ import {
 import { useMobile } from '../../hooks/useMobile';
 import { ILessonModel } from '../../models/ILessonModel';
 import { INPUT_DATE_FORMAT } from '../../constants';
+
+/*
+  * TODO ммплементация шаблона с одним занятием
+  * TODO проверка есть ли задолженность у ученика
+*/
+function ShowDebt() {
+  return <></>;
+}
 
 export function CreateSubscriptionModal() {
   const isMobile = useMobile();
@@ -38,6 +45,13 @@ export function CreateSubscriptionModal() {
   // изменим цену в price при изменении шаблона или даты
   useEffect(() => {
     if (!selectedTemplate) return;
+
+    // для разового абонемента, не нужно считать сколько занятий осталось до конца месяца / цену
+    if (selectedTemplate.visits === 1) {
+      setPrice(selectedTemplate.price);
+      setVisitsTotal(selectedTemplate.visits);
+      return;
+    }
 
     // получим интервал дней с dateFrom до конца месяца
     const interval = eachDayOfInterval({
@@ -109,7 +123,6 @@ export function CreateSubscriptionModal() {
 
     const dateFromTimestamp = Date.parse(formData.dateFrom as string);
 
-    /*
     createSubsciption({
       student: student._id,
       lessons: selectedLessons.map((lesson) => lesson._id),
@@ -121,7 +134,6 @@ export function CreateSubscriptionModal() {
       dateTo: Date.UTC(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate() + 1),
       paymentMethod: formData.paymentMethod as string,
     });
-    */
 
     form.reset();
   };
@@ -174,6 +186,7 @@ export function CreateSubscriptionModal() {
         label="Стоимость"
         value={price}
         onChange={changePriceHandler}
+        // disabled={selectedTemplate?.visits === 1}
         required
       />
 
@@ -187,6 +200,7 @@ export function CreateSubscriptionModal() {
         label="Посещений"
         value={visitsTotal}
         onChange={changeVisitsHandler}
+        // disabled={selectedTemplate?.visits === 1}
         required
       />
 

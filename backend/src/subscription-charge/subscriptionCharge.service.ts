@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, forwardRef, Inject } from '@nestjs/common';
 import { logger } from '../shared/logger.middleware';
 import { VisitStatus, BillingStatus, VisitedStudent } from '../schemas/attendance.schema';
 import { VisitedStudent as VisitedStudentDto } from '../attendance/dto/create-attendance.dto';
@@ -29,7 +29,69 @@ interface IChargeBackSubscription {
 
 @Injectable()
 export class SubscriptionChargeService {
-  constructor(private readonly subscriptionService: SubscriptionService) {}
+  constructor(
+    @Inject(forwardRef(() => SubscriptionService))
+    private readonly subscriptionService: SubscriptionService,
+  ) {}
+
+  assignSubscriptions(attendance: AttendanceModel, subscriptions: SubscriptionModel[]) {
+    for (const visitedStudent of attendance.students) {
+      switch (visitedStudent.visitStatus) {
+        case VisitStatus.POSTPONED:
+        case VisitStatus.VISITED:
+          const subscription = subscriptions.find(
+            (subscription) => subscription.student._id === visitedStudent.student._id,
+          );
+
+          // если посетил занятие или перенёс, то ищем абонемент
+          visitedStudent.subscription = subscription?._id.toString() ?? null;
+          break;
+        // отметим только что не нужно снимать с абонемента, если visitStatus не походит для списания
+        default:
+          visitedStudent.subscription = null;
+      }
+
+      logger.debug(
+        `Студент ${visitedStudent.student}. 
+        Статус визита: ${visitedStudent.visitStatus}. 
+        Статус оплаты: ${visitedStudent.billingStatus}. 
+        Абонемент: ${visitedStudent.subscription ?? 'не найден'}`,
+      );
+    }
+  }
+
+  getBillingStatus(visitStatus: VisitStatus, isPaid: boolean): BillingStatus {
+    switch (visitStatus) {
+      case VisitStatus.POSTPONED:
+      case VisitStatus.VISITED:
+        return isPaid ? BillingStatus.PAID : BillingStatus.UNPAID;
+      default:
+        return BillingStatus.UNCHARGED;
+    }
+  }
+
+  async findSubscription(
+    studentId: string,
+    lessonId: string,
+    date: number,
+  ): Promise<SubscriptionModel[] | null> {
+    const subscription = await this.subscriptionService.findAll(
+      {
+        lesson: lessonId,
+        student: studentId,
+        visitsLeft: { $gte: 0 },
+        dateTo: { $gte: date },
+      },
+      /*
+      {
+        sort: {
+          visitsLeft: 1,
+        },
+      },
+      */
+    );
+    return subscription;
+  }
 
   async addSubscription(visitedStudents: IVisitedStudentDto[], lessonId: string, date: number) {
     // найдём абонементы по этому занятию
@@ -77,6 +139,31 @@ export class SubscriptionChargeService {
     });
   }
 
+  async _addBillingStatus(visitedStudents: VisitedStudent[], lessonId: string) {
+    // в зависимости от найденных абонементов - каждому студенту проставим его биллинг статус
+    for (const visitedStudent of visitedStudents) {
+      switch (visitedStudent.visitStatus) {
+        case VisitStatus.POSTPONED:
+        case VisitStatus.VISITED:
+          // Если есть абонемент с которого списать - отметим что занятие оплачено
+          visitedStudent.billingStatus = visitedStudent.subscription
+            ? BillingStatus.PAID
+            : BillingStatus.UNPAID;
+          break;
+        // отметим только что не нужно снимать с абонемента, если visitStatus не походит для списания
+        default:
+          visitedStudent.billingStatus = BillingStatus.UNCHARGED;
+      }
+
+      logger.debug(
+        `Занятие: ${lessonId}. Студент ${visitedStudent.student}. 
+        Статус визита: ${visitedStudent.visitStatus}. 
+        Статус оплаты: ${visitedStudent.billingStatus}. 
+        Абонемент: ${visitedStudent.subscription ?? 'не найден'}`,
+      );
+    }
+  }
+
   async addBillingStatus(visitedStudents: IVisitedStudentDto[], lessonId: string) {
     // в зависимости от найденных абонементов - каждому студенту проставим его биллинг статус
     visitedStudents.forEach((visitedStudent) => {
@@ -112,6 +199,44 @@ export class SubscriptionChargeService {
         Абонемент (осталось занятий): ${visitedStudent.subscription?.visitsLeft ?? 'не найден'}`,
       );
     });
+  }
+
+  async _chargeSubscriptions(visitedStudents: VisitedStudent[], lessonId: string) {
+    // спишем по одному занятию из списка оставшихся у тех, у кого статус оплачено
+    const studentsPaidIds = visitedStudents
+      .filter((visitedStudent) => visitedStudent.billingStatus === BillingStatus.PAID)
+      .map((visitedStudent) => visitedStudent.subscription);
+
+    if (studentsPaidIds.length) {
+      logger.debug(`
+        Занятие ${lessonId}. Списание оплаченных занятий у ${studentsPaidIds.length} студентов.
+      `);
+
+      await this.subscriptionService.updateMany(
+        { _id: { $in: studentsPaidIds } },
+        { $inc: { visitsLeft: -1 } },
+      );
+    }
+
+    const studentsPaidAndPostponedIds = visitedStudents
+      .filter(
+        (visitedStudent) =>
+          visitedStudent.billingStatus === BillingStatus.PAID &&
+          visitedStudent.visitStatus === VisitStatus.POSTPONED,
+      )
+      .map((visitedStudent) => visitedStudent.subscription);
+
+    // дополнительно отметим перенесённое занятие у тех у кого оплачено
+    if (studentsPaidAndPostponedIds.length) {
+      logger.debug(`
+        Занятие ${lessonId}. Перенос занятий у ${studentsPaidIds.length} студентов.
+      `);
+
+      await this.subscriptionService.updateMany(
+        { _id: { $in: studentsPaidAndPostponedIds } },
+        { $inc: { visitsPostponed: 1 } },
+      );
+    }
   }
 
   async chargeSubscriptions(visitedStudents: VisitedStudentDto[], lessonId: string) {

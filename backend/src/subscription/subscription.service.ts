@@ -1,20 +1,57 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, QueryOptions, mongo } from 'mongoose';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { SubscriptionModel, SubscriptionDocument } from '../schemas';
 import { IFilterQuery } from '../shared/IFilterQuery';
+import { AttendanceService } from '../attendance/attendance.service';
 
 @Injectable()
 export class SubscriptionService {
   private readonly populateQuery: Array<string>;
 
   constructor(
+    @Inject(forwardRef(() => AttendanceService))
+    private readonly attendanceService: AttendanceService,
     @InjectModel(SubscriptionModel.name)
     private readonly subscriptionModel: Model<SubscriptionDocument>,
   ) {
     this.populateQuery = ['student', 'lessons'];
+  }
+
+  async createAndChargeUnpaid(
+    createSubscriptionDto: CreateSubscriptionDto,
+  ): Promise<SubscriptionModel> {
+    // сначала создадим абонемент
+    const created = await this.create(createSubscriptionDto);
+
+    /*
+    // ищем неоплаченные занятия по этому студенту
+    const unpaidAttendances = await this.attendancesServices.findUnpiadAttendances(
+      createSubscriptionDto.dateFrom,
+      createSubscriptionDto.dateTo,
+      createSubscriptionDto.student,
+    );
+
+    // если таких нет - вернём сразу созданный абонемент
+    if (!unpaidAttendances.length) return created;
+
+    // есть ли среди неоплаченных занятий занятие, на которое сейчас оформляется абонемент
+    const unpaidLessons = unpaidAttendances.filter((attendance) =>
+      createSubscriptionDto.lessons.includes(attendance.lesson._id.toString()),
+    );
+
+    if (!unpaidLessons.length) return created;
+    */
+
+    /*
+     далее в каждом из unpaid lessons / attendances нужно
+     1. списать занятие
+     2. поменять статус на оплачено
+     3. добавить ссылку на абонемент, с которого списали
+    */
+    return created;
   }
 
   async create(createSubscriptionDto: CreateSubscriptionDto): Promise<SubscriptionModel> {
@@ -33,7 +70,11 @@ export class SubscriptionService {
       .populate(this.populateQuery);
   }
 
-  async findOne(id: string): Promise<SubscriptionModel | null> {
+  async findOne(query: IFilterQuery<SubscriptionModel>): Promise<SubscriptionModel | null> {
+    return await this.subscriptionModel.findOne(query).populate(this.populateQuery);
+  }
+
+  async findOneById(id: string): Promise<SubscriptionModel | null> {
     return await this.subscriptionModel.findById(id).populate(this.populateQuery);
   }
 

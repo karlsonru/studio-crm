@@ -42,7 +42,7 @@ export class SubscriptionController {
 
   @Get(':id')
   async findOne(@Param('id', ValidateIdPipe) id: string) {
-    const candidate = await this.service.findOne(id);
+    const candidate = await this.service.findOneById(id);
 
     if (candidate === null) {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);

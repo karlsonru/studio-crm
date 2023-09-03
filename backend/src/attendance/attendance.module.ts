@@ -1,26 +1,16 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { AttendanceController } from './attendance.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import {
-  AttendanceModel,
-  AttendanceSchema,
-  SubscriptionModel,
-  SubscriptionSchema,
-} from '../schemas';
-import { SubscriptionModule } from '../subscription/subscription.module';
+import { AttendanceModel, AttendanceSchema } from '../schemas';
 import { SubscriptionChargeModulde } from '../subscription-charge/subscriptionCharge.module';
 import { LessonModule } from '../lesson/lesson.module';
 
 @Module({
   imports: [
-    SubscriptionModule,
-    SubscriptionChargeModulde,
+    forwardRef(() => SubscriptionChargeModulde),
     LessonModule,
-    MongooseModule.forFeature([
-      { name: AttendanceModel.name, schema: AttendanceSchema },
-      { name: SubscriptionModel.name, schema: SubscriptionSchema },
-    ]),
+    MongooseModule.forFeature([{ name: AttendanceModel.name, schema: AttendanceSchema }]),
   ],
   controllers: [AttendanceController],
   providers: [AttendanceService],

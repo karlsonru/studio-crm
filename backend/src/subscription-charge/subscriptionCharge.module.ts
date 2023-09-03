@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { SubscriptionChargeService } from './subscriptionCharge.service';
 import { SubscriptionModule } from '../subscription/subscription.module';
 
 @Module({
-  imports: [SubscriptionModule],
+  imports: [forwardRef(() => SubscriptionModule)],
   controllers: [],
   providers: [SubscriptionChargeService],
   exports: [SubscriptionChargeService],

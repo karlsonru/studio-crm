@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LessonModule } from './lesson/lesson.module';
 import { StudentModule } from './student/student.module';
 import { UserModule } from './user/user.module';
-import { MongooseModule } from '@nestjs/mongoose';
 import { LocationModule } from './location/location.module';
 import { SubscriptionTemplateModule } from './subscription-template/subscription-template.module';
 import { SubscriptionModule } from './subscription/subscription.module';
+import { SubscriptionChargeModulde } from './subscription-charge/subscriptionCharge.module';
 import { AttendanceModule } from './attendance/attendance.module';
-import { SubscriptionChargeService } from './subscription-charge/subscriptionCharge.service';
 import { StatisticModule } from './statistic/statistic.module';
 import { AuthModule } from './auth/auth.module';
 import { FinanceModule } from './finance/finance.module';
@@ -28,11 +28,12 @@ import { FinanceModule } from './finance/finance.module';
     LocationModule,
     SubscriptionTemplateModule,
     SubscriptionModule,
+    SubscriptionChargeModulde,
     StatisticModule,
     AuthModule,
     FinanceModule,
   ],
   controllers: [AppController],
-  providers: [AppService, SubscriptionChargeService],
+  providers: [AppService],
 })
 export class AppModule {}
