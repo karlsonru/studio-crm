@@ -1,15 +1,16 @@
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model, PopulateOptions } from 'mongoose';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { AttendanceModel, AttendanceDocument } from '../schemas';
-import { SubscriptionChargeService } from '../subscription-charge/subscriptionCharge.service';
+import { SubscriptionChargeService } from './subscriptionCharge.service';
+// import { SubscriptionChargeService } from '../subscription-charge/subscriptionCharge.service';
 import { IFilterQuery } from '../shared/IFilterQuery';
 import { withTransaction } from '../shared/withTransaction';
 import { logger } from '../shared/logger.middleware';
-import { LessonService } from 'src/lesson/lesson.service';
-import { BillingStatus, VisitType } from 'src/schemas/attendance.schema';
+import { LessonService } from '../lesson/lesson.service';
+import { BillingStatus, VisitType } from '../schemas/attendance.schema';
 
 interface ICreateAttendance extends Pick<CreateAttendanceDto, 'lesson' | 'teacher' | 'students'> {
   date: number;
@@ -23,7 +24,6 @@ export class AttendanceService {
   constructor(
     @InjectModel(AttendanceModel.name)
     private readonly attendanceModel: Model<AttendanceDocument>,
-    @Inject(forwardRef(() => SubscriptionChargeService))
     private readonly subscriptionChargeService: SubscriptionChargeService,
     private readonly lessonService: LessonService,
   ) {

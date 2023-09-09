@@ -1,9 +1,9 @@
-import { Injectable, forwardRef, Inject } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { logger } from '../shared/logger.middleware';
+import { VisitedStudent as VisitedStudentDto } from './dto/create-attendance.dto';
 import { VisitStatus, BillingStatus, VisitedStudent } from '../schemas/attendance.schema';
-import { VisitedStudent as VisitedStudentDto } from '../attendance/dto/create-attendance.dto';
-import { SubscriptionService } from '../subscription/subscription.service';
 import { AttendanceModel, SubscriptionModel } from '../schemas';
+import { SubscriptionService } from '../subscription/subscription.service';
 
 interface IVisitedStudentDto extends Omit<VisitedStudentDto, 'subscription'> {
   subscription: string | null | SubscriptionModel;
@@ -26,6 +26,9 @@ interface IChargeBackSubscription {
   ids: Array<string>;
   action: Record<string, number>;
 }
+
+// TODO: refactor
+// SubscriptionChargeService -> AttendancePayment Service
 
 @Injectable()
 export class SubscriptionChargeService {

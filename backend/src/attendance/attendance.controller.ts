@@ -15,6 +15,24 @@ import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { ValidateIdPipe } from '../shared/validaitonPipe';
 
+/** 
+TODO: перенести логику списания абонемента в контроллер. 
+AttendanceService отвечает за создание занятие 
+SubscriptionCharge (AttendanceCharge, AttendancePaymentService ?) отвечает за списание абонементов по посещению
+
+Транзакция --> 
+
+То есть:
+- поиск абонементов подходящих для занятия   
+- добавление абонемента к студенту
+- списание занятия с абонемента
+- добавление статуса оплаты студента
+- удаление студента из lesson в случае если занятие однократное
+
+<-- 
+
+*/
+
 @Controller('attendances')
 export class AttendanceController {
   constructor(private readonly service: AttendanceService) {}
