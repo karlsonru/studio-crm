@@ -17,7 +17,7 @@ import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 import { ValidateIdPipe } from '../shared/validaitonPipe';
 import { LessonModel } from '../schemas';
-import { MongooseClassSerializerInterceptor } from 'src/shared/mongooseClassSerializer.interceptor';
+import { MongooseClassSerializerInterceptor } from '../shared/mongooseClassSerializer.interceptor';
 
 @Controller('lesson')
 @UseInterceptors(MongooseClassSerializerInterceptor(LessonModel))

@@ -9,6 +9,7 @@ import {
   HttpException,
   HttpStatus,
   Query,
+  HttpCode,
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
@@ -102,6 +103,7 @@ export class AttendanceController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string) {
     return this.service.remove(id);
   }
