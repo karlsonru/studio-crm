@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { IFilterQuery } from '../shared/IFilterQuery';
 import { AttendanceService } from '../attendance/attendance.service';
-import { BillingStatus, VisitStatus } from '../schemas/attendance.schema';
+import { PaymentStatus, VisitStatus } from '../schemas/attendance.schema';
 import { AttendanceModel, SubscriptionModel } from '../schemas';
 import { SubscriptionService } from '../subscription/subscription.service';
 import { FinanceService } from '../finance/finance.service';
@@ -45,7 +45,7 @@ export class StatisticService {
 
       if (!visit) return;
 
-      if (visit?.billingStatus === BillingStatus.UNPAID) {
+      if (visit?.paymentStatus === PaymentStatus.UNPAID) {
         statistic.unpaid += 1;
       }
 

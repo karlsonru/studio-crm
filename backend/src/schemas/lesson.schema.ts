@@ -4,7 +4,7 @@ import { User } from './user.schema';
 import { Student } from './student.schema';
 import { Location } from './location.schema';
 import { Transform, Type } from 'class-transformer';
-import { VisitType } from './attendance.schema';
+import { Attendance, VisitType } from './attendance.schema';
 
 export type LessonDocument = HydratedDocument<Lesson>;
 
@@ -60,6 +60,14 @@ class VisitingStudent {
     required: true,
   })
   visitType: VisitType;
+
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'Attendance',
+    required: false,
+  })
+  @Type(() => Attendance)
+  visitInstead?: Attendance;
 }
 
 @Schema({ timestamps: true })

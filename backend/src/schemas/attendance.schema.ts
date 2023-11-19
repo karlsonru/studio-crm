@@ -15,7 +15,7 @@ export enum VisitStatus {
   SICK = 'sick',
 }
 
-export enum BillingStatus {
+export enum PaymentStatus {
   PAID = 'paid',
   UNPAID = 'unpaid',
   UNCHARGED = 'uncharged',
@@ -23,15 +23,15 @@ export enum BillingStatus {
 
 export enum VisitType {
   REGULAR = 'regular',
-  MISSED_REGULAR = 'missedRegular',
   SINGLE = 'single',
   NEW = 'new',
+  POSTPONED = 'postponed', // ОТРАБОТКА
 }
 
 export class VisitedStudent {
   student: Student;
   visitStatus: VisitStatus;
-  billingStatus: BillingStatus;
+  paymentStatus: PaymentStatus;
   subscription: string | null;
   visitType: VisitType;
 }
@@ -92,10 +92,10 @@ export class Attendance {
           trim: true,
           required: true,
         },
-        billingStatus: {
+        paymentStatus: {
           type: String,
-          enum: BillingStatus,
-          default: BillingStatus.UNCHARGED,
+          enum: PaymentStatus,
+          default: PaymentStatus.UNCHARGED,
           trim: true,
           required: true,
         },

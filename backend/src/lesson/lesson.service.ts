@@ -54,10 +54,12 @@ export class LessonService {
 
     if (action === 'remove') {
       logger.debug(`
-        Занятие ${id}. Удаление ${updateLessonDto.students.length} студентов: ${updateLessonDto.students}
+        Занятие ${id}. Удаление ${
+        updateLessonDto.students.filter((student) => student).length
+      } студентов: ${updateLessonDto.students}
       `);
 
-      if (!updateLessonDto.students.length) return null;
+      if (!updateLessonDto.students.filter((student) => student).length) return null;
 
       const removeQuery = {
         $pull: {

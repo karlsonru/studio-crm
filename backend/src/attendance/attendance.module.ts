@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AttendanceModel, AttendanceSchema } from '../schemas';
 import { LessonModule } from '../lesson/lesson.module';
 import { SubscriptionModule } from '../subscription/subscription.module';
-import { SubscriptionChargeService } from './subscriptionCharge.service';
+import { AttendancePaymentService } from './attendancePayment.service';
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import { SubscriptionChargeService } from './subscriptionCharge.service';
     MongooseModule.forFeature([{ name: AttendanceModel.name, schema: AttendanceSchema }]),
   ],
   controllers: [AttendanceController],
-  providers: [AttendanceService, SubscriptionChargeService],
+  providers: [AttendanceService, AttendancePaymentService],
   exports: [AttendanceService],
 })
 export class AttendanceModule {}

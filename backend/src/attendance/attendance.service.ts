@@ -4,13 +4,13 @@ import { ClientSession, Model, PopulateOptions } from 'mongoose';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { AttendanceModel, AttendanceDocument } from '../schemas';
-import { SubscriptionChargeService } from './subscriptionCharge.service';
+import { AttendancePaymentService } from './attendancePayment.service';
 // import { SubscriptionChargeService } from '../subscription-charge/subscriptionCharge.service';
 import { IFilterQuery } from '../shared/IFilterQuery';
 import { withTransaction } from '../shared/withTransaction';
 import { logger } from '../shared/logger.middleware';
 import { LessonService } from '../lesson/lesson.service';
-import { BillingStatus, VisitType } from '../schemas/attendance.schema';
+import { PaymentStatus, VisitType } from '../schemas/attendance.schema';
 
 interface ICreateAttendance extends Pick<CreateAttendanceDto, 'lesson' | 'teacher' | 'students'> {
   date: number;
@@ -24,7 +24,7 @@ export class AttendanceService {
   constructor(
     @InjectModel(AttendanceModel.name)
     private readonly attendanceModel: Model<AttendanceDocument>,
-    private readonly subscriptionChargeService: SubscriptionChargeService,
+    private readonly attendancePaymentService: AttendancePaymentService,
     private readonly lessonService: LessonService,
   ) {
     this.populateQueryAttendance = [
@@ -44,8 +44,8 @@ export class AttendanceService {
     const studentsQuery = {
       students: {
         $elemMatch: studentId
-          ? { student: studentId, billingStatus: BillingStatus.UNPAID }
-          : { billingStatus: BillingStatus.UNPAID },
+          ? { student: studentId, paymentStatus: PaymentStatus.UNPAID }
+          : { paymentStatus: PaymentStatus.UNPAID },
       },
     };
 
@@ -75,23 +75,23 @@ export class AttendanceService {
 
     const transaction = async (session: ClientSession) => {
       // для каждого студента добавим абонемент с которго нужно списать
-      await this.subscriptionChargeService.addSubscription(
+      await this.attendancePaymentService.addSubscription(
         createAttendanceDto.students,
         createAttendanceDto.lesson,
         createAttendanceDto.date,
       );
 
       // для каждого студента добавим биллинг статус
-      await this.subscriptionChargeService.addBillingStatus(
+      await this.attendancePaymentService.addPaymentStatus(
         createAttendanceDto.students,
         createAttendanceDto.lesson,
       );
 
       // конвертируем объекты с подписками в обычные текстовые строки с id
-      this.subscriptionChargeService.normalizeSubscriptionIds(createAttendanceDto.students);
+      this.attendancePaymentService.normalizeSubscriptionIds(createAttendanceDto.students);
 
       // после проставления статусов спишем занятия с найденных абонементов
-      await this.subscriptionChargeService.chargeSubscriptions(
+      await this.attendancePaymentService.chargeSubscriptions(
         createAttendanceDto.students,
         createAttendanceDto.lesson,
       );
@@ -144,7 +144,7 @@ export class AttendanceService {
     // добавлям транзакцию для обновления различных статусов абонементов
     const transaction = async (session: ClientSession) => {
       if (updateAttendanceDto.students) {
-        await this.subscriptionChargeService.changeBillingStatus(
+        await this.attendancePaymentService.changePaymentStatus(
           updateAttendanceDto.students,
           visitedLesson,
         );
