@@ -1,76 +1,113 @@
-import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-const theme = createTheme();
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import FormHelperText from '@mui/material/FormHelperText';
+import Avatar from '@mui/material/Avatar';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { useLoginMutation } from '../../shared/api';
+import { useMobile } from '../../shared/hooks/useMobile';
+import { useActionCreators } from '../../shared/hooks/useActionCreators';
+import { authActions } from '../../shared/reducers/authSlice';
+import { PasswordField } from '../../shared/components/fields/PasswordField';
+import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
+import { FormContentColumn } from '../../shared/components/FormContentColumn';
 
 export default function AuthPage() {
+  const isMobile = useMobile();
+  const navigate = useNavigate();
+  const actions = useActionCreators(authActions);
+  const [hasError, setError] = useState(false);
+
+  const [login, {
+    data: responseLogin, isSuccess, isError, error, isLoading,
+  }] = useLoginMutation();
+
+  useEffect(() => {
+    if (isSuccess && responseLogin?.token) {
+      actions.setToken(responseLogin?.token);
+
+      navigate('/');
+    }
+
+    if (isError) {
+      console.error(error);
+      setError(true);
+    }
+  }, [isSuccess, isError]);
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    setError(false);
+
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+
     console.log({
-      email: data.get('email'),
+      login: data.get('login'),
       password: data.get('password'),
+    });
+
+    login({
+      login: data.get('login') as string,
+      password: data.get('password') as string,
     });
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 20,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+          <LockOutlinedIcon />
+        </Avatar>
         <Box
+          component="form"
+          noValidate
+          onSubmit={handleSubmit}
           sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
+            mt: 3,
+            width: isMobile ? '100%' : 'auto',
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  id="email"
-                  label="Электронная почта"
-                  name="email"
-                  autoComplete="email"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  name="password"
-                  label="Пароль"
-                  type="password"
-                  id="password"
-                  autoComplete="new-password"
-                />
-              </Grid>
-            </Grid>
-            <Button
-              type="submit"
+          <FormContentColumn>
+            <TextField
+              required
               fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Войти
-            </Button>
-          </Box>
+              id="login"
+              label="Логин"
+              name="login"
+              autoComplete="login"
+            />
+            <PasswordField
+              name="password"
+              props={{
+                label: 'Пароль',
+                required: true,
+                fullWidth: true,
+              }}
+            />
+            {hasError && <FormHelperText error>
+              Не удалось. Проверьте правильность и попробуйте ещё раз.
+            </FormHelperText>
+            }
+            <SubmitButton
+              content='Войти'
+              props={{
+                disabled: isLoading,
+                fullWidth: true,
+                sx: { mt: 3, mb: 2 },
+              }}
+            />
+          </FormContentColumn>
         </Box>
-      </Container>
-    </ThemeProvider>
+      </Box>
+    </Container>
   );
 }

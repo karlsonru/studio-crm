@@ -1,5 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { format } from 'date-fns';
+import { TwitterPicker } from 'react-color';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select/Select';
@@ -17,13 +18,14 @@ import { getDayName } from '../../shared/helpers/getDayName';
 import {
   useGetLocationsQuery,
   useGetUsersQuery,
-  useGetLessonQuery,
   usePatchLessonMutation,
 } from '../../shared/api';
 import { useMobile } from '../../shared/hooks/useMobile';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { convertTime } from '../../shared/helpers/convertTime';
 import { FormContentColumn } from '../../shared/components/FormContentColumn';
+import { ILessonModel } from '../../shared/models/ILessonModel';
+import { INPUT_DATE_FORMAT } from '../../shared/constants';
 
 function validateFrom(formData: { [key: string]: FormDataEntryValue }) {
   if ((formData.title as string).trim().length < 3) {
@@ -51,11 +53,11 @@ function validateFrom(formData: { [key: string]: FormDataEntryValue }) {
   return '';
 }
 
-export function ContentTabDetails({ lessonId }: { lessonId: string }) {
+export function ContentTabDetails({ lesson }: { lesson: ILessonModel }) {
   const isMobile = useMobile();
   const [isEdit, setEdit] = useState(false);
+  const [color, setColor] = useState<string>();
 
-  const { data: lessonDetails } = useGetLessonQuery(lessonId);
   const [updateLesson] = usePatchLessonMutation();
   const { data: locationsData, isSuccess: isLocationsSuccess } = useGetLocationsQuery();
   const { data: usersData, isSuccess: isUsersSuccess } = useGetUsersQuery();
@@ -66,10 +68,6 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
     teacher: true,
     dateTo: true,
   });
-
-  if (!lessonDetails?.payload) {
-    return null;
-  }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -96,7 +94,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
     const timeEnd = (formData.timeEnd as string).split(':');
 
     updateLesson({
-      id: lessonId,
+      id: lesson._id,
       newItem: {
         title: formData.title as string,
         teacher: formData.teacher as string,
@@ -110,11 +108,10 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
           hh: +timeEnd[0],
           min: +timeEnd[1],
         },
-        activeStudents: 0,
         students: [],
         dateFrom: +Date.parse(formData.dateFrom as string),
         dateTo: +Date.parse(formData.dateTo as string),
-        isActive: true,
+        color,
       },
     });
 
@@ -142,7 +139,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
           name='title'
           label='Занятие'
           placeholder='Занятие'
-          defaultValue={lessonDetails.payload.title}
+          defaultValue={lesson.title}
           disabled={!isEdit}
           autoFocus
           fullWidth
@@ -177,7 +174,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
           <Select
             name='day'
             label='День недели'
-            defaultValue={lessonDetails.payload.day}
+            defaultValue={lesson.day}
             disabled={!isEdit}
             fullWidth
             required
@@ -210,7 +207,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
                 step: 300,
                 min: '09:00',
                 max: '21:55',
-                defaultValue: convertTime(lessonDetails.payload.timeStart),
+                defaultValue: convertTime(lesson.timeStart),
               }}
               InputLabelProps={{
                 shrink: true,
@@ -236,7 +233,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
                 step: 300,
                 min: '09:05',
                 max: '22:00',
-                defaultValue: convertTime(lessonDetails.payload.timeEnd),
+                defaultValue: convertTime(lesson.timeEnd),
               }}
               InputLabelProps={{
                 shrink: true,
@@ -254,13 +251,13 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
           <Select
             name='location'
             label='Помещение'
-            defaultValue={lessonDetails.payload.location._id}
+            defaultValue={lesson.location._id}
             disabled={!isEdit}
             fullWidth
             required
           >
           { isLocationsSuccess
-              && locationsData.payload.map((location) => (
+              && locationsData.map((location) => (
                 <MenuItem key={location._id} value={location._id}>{location.title}</MenuItem>
               ))}
           </Select>
@@ -271,13 +268,13 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
           <Select
             name='teacher'
             label='Педагог'
-            defaultValue={lessonDetails.payload.teacher._id}
+            defaultValue={lesson.teacher._id}
             disabled={!isEdit}
             required
           >
             <MenuItem value={''}><em>Укажите педагога</em></MenuItem>
             { isUsersSuccess
-              && usersData.payload.map((user) => (
+              && usersData.map((user) => (
                 <MenuItem key={user._id} value={user._id}>{user.fullname}</MenuItem>
               ))}
           </Select>
@@ -291,7 +288,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
               name='dateFrom'
               label={isMobile ? 'Начало' : ''}
               type='date'
-              defaultValue={format(lessonDetails.payload.dateFrom, 'Y-MM-dd')}
+              defaultValue={format(lesson.dateFrom, INPUT_DATE_FORMAT)}
               disabled={!isEdit}
               required
               InputProps={{
@@ -303,7 +300,7 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
               name='dateTo'
               label={isMobile ? 'Конец' : ''}
               type='date'
-              defaultValue={format(lessonDetails.payload.dateTo, 'Y-MM-dd')}
+              defaultValue={format(lesson.dateTo, INPUT_DATE_FORMAT)}
               disabled={!isEdit}
               required
               error={!formValidation.dateTo}
@@ -314,6 +311,15 @@ export function ContentTabDetails({ lessonId }: { lessonId: string }) {
               InputLabelProps={{ shrink: true }}
               />
           </Stack>
+        </FormControl>
+
+        <FormControl>
+          <TwitterPicker
+            color={color ?? lesson.color}
+            colors={['#FF6900', '#FCB900', '#7BDCB5', '#00D084', '#8ED1FC', '#0693E3', '#ABB8C3']}
+            width="100%"
+            onChangeComplete={(colorResult) => setColor(colorResult.hex)}
+          />
         </FormControl>
 
         <SubmitButton

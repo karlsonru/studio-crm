@@ -6,12 +6,17 @@ import { useMobile } from '../../shared/hooks/useMobile';
 import { useFindSubscriptionsQuery } from '../../shared/api';
 import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 import { PrimaryButton } from '../../shared/components/buttons/PrimaryButton';
+import { Loading } from '../../shared/components/Loading';
+import { ShowError } from '../../shared/components/ShowError';
+import { ILessonModel } from '../../shared/models/ILessonModel';
+import { INPUT_DATE_FORMAT } from '../../shared/constants';
 
 interface IContentSubscriptions {
-  lessonId: string;
+  lesson: ILessonModel;
 }
 
-interface IShowSubscriptions extends IContentSubscriptions {
+interface IShowSubscriptions {
+  lessonId: string;
   isActive: boolean;
 }
 
@@ -20,25 +25,27 @@ function ShowSubscriptions({ lessonId, isActive }: IShowSubscriptions) {
   const today = getTodayTimestamp();
   const query = { dateTo: isActive ? { $gte: today } : { $lte: today } };
 
-  const { data, isError, isLoading } = useFindSubscriptionsQuery({
+  const {
+    data, isLoading, isError, error,
+  } = useFindSubscriptionsQuery({
     lesson: lessonId,
     ...query,
   });
 
   if (isLoading) {
-    return <h3>Идёт загрузка...</h3>;
+    return <Loading />;
   }
 
   if (isError) {
-    return <h3>Ошибка при запросе!</h3>;
+    return <ShowError details={error} />;
   }
 
-  if (!data?.payload.length) {
+  if (!data?.length) {
     return <h3>Не найдено</h3>;
   }
 
   const headers = isMobile ? ['Ученик', 'Остаток'] : ['Ученик', 'Длительность', 'Остаток', 'Действует до', 'Стоимость'];
-  const rows = data?.payload.map((subscription) => (
+  const rows = data?.map((subscription) => (
     <CreateRow
       key={subscription._id}
       content={
@@ -49,10 +56,10 @@ function ShowSubscriptions({ lessonId, isActive }: IShowSubscriptions) {
           ]
           : [
             subscription.student.fullname,
-            subscription.template.visits,
+            subscription.visitsTotal,
             subscription.visitsLeft,
-            format(subscription.dateTo, 'Y-MM-dd'),
-            subscription.template.price,
+            format(subscription.dateTo, INPUT_DATE_FORMAT),
+            subscription.price,
           ]
       }
     />
@@ -72,7 +79,7 @@ function ShowSubscriptions({ lessonId, isActive }: IShowSubscriptions) {
   );
 }
 
-export function ContentSubscriptions({ lessonId }: IContentSubscriptions) {
+export function ContentSubscriptions({ lesson }: IContentSubscriptions) {
   const [showAll, setShowAll] = useState(false);
 
   const showAllHandler = () => {
@@ -81,7 +88,7 @@ export function ContentSubscriptions({ lessonId }: IContentSubscriptions) {
 
   return (
     <>
-      <ShowSubscriptions lessonId={lessonId} isActive={true} />
+      <ShowSubscriptions lessonId={lesson._id} isActive={true} />
 
       <PrimaryButton
         content={showAll ? 'Скрыть прошлые абонементы' : 'Показать прошлые абонементы'}
@@ -90,7 +97,7 @@ export function ContentSubscriptions({ lessonId }: IContentSubscriptions) {
           sx: { marginY: '1rem' },
         }}
       />
-      {showAll && <ShowSubscriptions lessonId={lessonId} isActive={false} />}
+      {showAll && <ShowSubscriptions lessonId={lesson._id} isActive={false} />}
     </>
   );
 }

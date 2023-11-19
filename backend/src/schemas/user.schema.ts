@@ -53,15 +53,29 @@ export class User {
   @IsOptional()
   @Prop({
     type: Number,
+    default: 0,
   })
   salary: number;
+
+  @Prop({
+    type: Boolean,
+    required: true,
+    default: false,
+  })
+  canAuth: boolean;
 
   @IsOptional()
   @Prop({
     type: String,
     minLength: 5,
-    unique: true,
     trim: true,
+    index: {
+      unique: true,
+      partialFilterExpression: {
+        login: { $ne: null },
+      },
+    },
+    default: null,
   })
   login?: string;
 

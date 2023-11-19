@@ -4,7 +4,7 @@ import {
 import { ISubscriptionTemplateModel, ISubscriptionTemplateCreate } from '../models/ISubscriptionModel';
 
 const tag = 'SubscriptionTemplate';
-const route = 'subscription/templates';
+const route = 'subscription-templates';
 
 basicApi.enhanceEndpoints({ addTagTypes: [tag] });
 

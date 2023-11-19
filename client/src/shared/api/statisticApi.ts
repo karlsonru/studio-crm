@@ -1,33 +1,72 @@
-import {
-  basicApi,
-  IResponse,
-} from './basicApi';
-import { IVisitModel } from '../models/IVisitModel';
+import { basicApi } from './basicApi';
+import { IAttendanceModel } from '../models/IAttendanceModel';
 
 const tag = 'statistic';
 const route = 'statistic';
 
 basicApi.enhanceEndpoints({ addTagTypes: [tag] });
 
-interface IVisitedLessonsWithStatistic {
-  visitedLessons: Array<IVisitModel>;
+interface IAttendancesWithStatistic {
+  attendances: Array<IAttendanceModel>;
   statistic: Record<string, number>;
 }
 
-interface IVisitedLessonsWithStatisticArgs {
+export interface IStatisticArgs {
   query: Record<string, unknown>;
-  studentId: string;
+  id?: string;
 }
 
 export const { useGetVisitedLessonsStatisticByStudentQuery } = basicApi.injectEndpoints({
   endpoints: (build) => ({
     getVisitedLessonsStatisticByStudent:
       build
-        .query<IResponse<IVisitedLessonsWithStatistic>, IVisitedLessonsWithStatisticArgs>(
+        .query<IAttendancesWithStatistic, IStatisticArgs>(
         {
-          query: ({ query, studentId }) => (
+          query: ({ query, id }) => (
             {
-              url: `${route}/visited-lessons/${studentId}`,
+              url: `${route}/visited-lessons/${id}`,
+              params: { filter: JSON.stringify(query) },
+            }
+          ),
+          providesTags: [tag as any],
+        },
+      ),
+  }),
+});
+
+interface IIncomeStatistic {
+  income: Array<number>;
+  amount: Array<number>;
+  expenses: Array<number>;
+}
+
+export const { useGetIncomeStatisticQuery } = basicApi.injectEndpoints({
+  endpoints: (build) => ({
+    getIncomeStatistic:
+      build
+        .query<IIncomeStatistic, IStatisticArgs>(
+        {
+          query: ({ query, id }) => (
+            {
+              url: `${route}/finance/income/${id}`,
+              params: { filter: JSON.stringify(query) },
+            }
+          ),
+          providesTags: [tag as any],
+        },
+      ),
+  }),
+});
+
+export const { useGetIncomeByUserQuery } = basicApi.injectEndpoints({
+  endpoints: (build) => ({
+    getIncomeByUser:
+      build
+        .query<number, IStatisticArgs>(
+        {
+          query: ({ query, id }) => (
+            {
+              url: `${route}/finance/income/user/${id}`,
               params: { filter: JSON.stringify(query) },
             }
           ),

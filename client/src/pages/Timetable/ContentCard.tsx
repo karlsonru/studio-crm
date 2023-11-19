@@ -1,5 +1,4 @@
 import { useMemo, useState, MouseEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import CardHeader, { CardHeaderProps } from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
@@ -8,9 +7,11 @@ import Typography from '@mui/material/Typography';
 import GroupIcon from '@mui/icons-material/Group';
 import { differenceInMinutes } from 'date-fns';
 import { ContentCardPreview } from './ContentCardPreview';
-import { ILessonModel, ITime } from '../../shared/models/ILessonModel';
+import { ILessonModel, ITime, VisitType } from '../../shared/models/ILessonModel';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { convertTime } from '../../shared/helpers/convertTime';
+import { useActionCreators } from '../../shared/hooks/useActionCreators';
+import { timetablePageActions } from '../../shared/reducers/timetablePageSlice';
 
 const CARD_STYLE = {
   left: 0,
@@ -98,7 +99,6 @@ function formatCardContent(lesson: ILessonModel, step: number, view: 'day' | 'we
   }
 
   // для размещения в виде Недели вычисляем размещение каждой карточки
-
   const duration = calculateDuration(lesson.timeEnd, lesson.timeStart);
 
   // мультипликатор насколько нужно смещать карточку в зависимости от шага времени
@@ -125,7 +125,7 @@ interface IContentCard {
 
 export function ContentCard({ lesson, step, date }: IContentCard) {
   const view = useAppSelector((state) => state.timetablePageReducer.view);
-  const navigate = useNavigate();
+  const actions = useActionCreators(timetablePageActions);
 
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
 
@@ -133,7 +133,7 @@ export function ContentCard({ lesson, step, date }: IContentCard) {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const hidePreview = () => {
     setAnchorEl(null);
   };
 
@@ -146,30 +146,46 @@ export function ContentCard({ lesson, step, date }: IContentCard) {
     title, timeStart, timeEnd, students,
   } = formattedContent.content;
 
-  const goVisitsPage = () => {
-    navigate(`/visits?lessonId=${lesson._id}&date=${date}`);
+  const showDetails = () => {
+    actions.setLessonDetails({
+      date,
+      selectedLesson: lesson,
+    });
   };
 
   return (
     <>
       <Card
         onMouseEnter={showPreview}
-        onMouseLeave={handleClose}
-        onDoubleClick={goVisitsPage}
+        onMouseLeave={hidePreview}
+        onClick={showDetails}
         variant="outlined"
         sx={{ ...formattedContent.style, ...CARD_STYLE }}
       >
         <CardHeader
-          title={<TitleWithIcon title={title} amount={students} />}
-          subheader={`${timeStart} - ${timeEnd}`}
+          title={
+            <TitleWithIcon title={title} amount={students} />
+          }
+          subheader={
+            `${timeStart} - ${timeEnd} ${lesson.teacher.fullname}`
+          }
           {...CARD_HEADER_PROPS}
+          sx={{
+            backgroundColor: lesson.color,
+          }}
         />
         <CardContent sx={{ padding: '0.25rem' }} />
       </Card>
+
       <ContentCardPreview
         anchorEl={anchorEl}
-        handleClose={handleClose}
-        content={lesson.students.map((student) => student.fullname)}
+        content={lesson.students.map((visiting) => {
+          // если визит не постоянный, то покажем студента только если это дата визита
+          if (visiting.visitType !== VisitType.REGULAR) {
+            return visiting.date === date ? visiting.student.fullname : null;
+          }
+          return visiting.student.fullname;
+        })}
       />
     </>
   );

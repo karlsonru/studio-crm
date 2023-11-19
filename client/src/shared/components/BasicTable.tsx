@@ -76,16 +76,16 @@ export function BasicTable({ headers, rows }: IBasicTable) {
 
 interface IBasicTableWithTitleAndButton extends IBasicTable {
   tableTitle: string;
-  buttonTitle: string;
-  buttonAction: () => void;
+  buttomTitle: string;
+  buttomAction: () => void;
 }
 
 export function BasicTableWithTitleAndButton({
   tableTitle,
   headers,
   rows,
-  buttonTitle,
-  buttonAction,
+  buttomTitle,
+  buttomAction,
 }: IBasicTableWithTitleAndButton) {
   return (
     <>
@@ -101,9 +101,9 @@ export function BasicTableWithTitleAndButton({
         rows={rows}
       />
       <PrimaryButton
-        content={buttonTitle}
+        content={buttomTitle}
         props={{
-          onClick: buttonAction,
+          onClick: buttomAction,
           sx: {
             marginY: '1rem',
           },

@@ -1,13 +1,14 @@
 import {
   ArrayMinSize,
   IsArray,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   MinLength,
 } from 'class-validator';
-import { IStudentContact } from '../../schemas/student.schema';
+import { IStudentContact, KnowledgeSource } from '../../schemas/student.schema';
 
 export class CreateStudentDto {
   @IsString()
@@ -26,6 +27,10 @@ export class CreateStudentDto {
   contacts: IStudentContact[];
 
   @IsOptional()
+  @IsEnum(KnowledgeSource)
+  knowledgeSource?: KnowledgeSource;
+
+  @IsOptional()
   @IsString()
-  source?: string;
+  comment?: string;
 }

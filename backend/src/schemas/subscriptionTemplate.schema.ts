@@ -34,12 +34,14 @@ export class SubscriptionTemplate {
   })
   visits: number;
 
+  /*
   @Prop({
     type: Number,
     required: true,
     min: 86_400_000,
   })
   duration: number;
+  */
 }
 
 export const SubscriptionTemplateSchema = SchemaFactory.createForClass(SubscriptionTemplate);

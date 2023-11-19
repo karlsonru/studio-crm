@@ -10,13 +10,14 @@ import {
   HttpStatus,
   Query,
   UseInterceptors,
+  HttpCode,
 } from '@nestjs/common';
-import { LessonService } from './lesson.service';
+import { LessonService, action } from './lesson.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 import { ValidateIdPipe } from '../shared/validaitonPipe';
 import { LessonModel } from '../schemas';
-import { MongooseClassSerializerInterceptor } from 'src/shared/mongooseClassSerializer.interceptor';
+import { MongooseClassSerializerInterceptor } from '../shared/mongooseClassSerializer.interceptor';
 
 @Controller('lesson')
 @UseInterceptors(MongooseClassSerializerInterceptor(LessonModel))
@@ -25,6 +26,7 @@ export class LessonController {
 
   @Post()
   async create(@Body() createLessonDto: CreateLessonDto) {
+    console.log('Create lesson dto');
     console.log(createLessonDto);
     const created = await this.service.create(createLessonDto);
 
@@ -32,59 +34,58 @@ export class LessonController {
       throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
     }
 
-    return {
-      message: 'success',
-      payload: created,
-    };
+    return created;
   }
 
   @Get()
   async findAll(@Query('filter') filter?: string) {
-    if (filter) {
-      const query = JSON.parse(filter);
-
-      return {
-        message: 'success',
-        payload: await this.service.findAll(query),
-      };
-    }
-
-    return {
-      message: 'success',
-      payload: await this.service.findAll(),
-    };
+    return await this.service.findAll(filter ? JSON.parse(filter) : {});
   }
 
   @Get(':id')
   async findOne(@Param('id', ValidateIdPipe) id: string) {
-    const candidate = await this.service.findOne(id);
+    const lesson = await this.service.findOne(id);
 
-    if (candidate === null) {
+    if (lesson === null) {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
     }
 
-    return {
-      message: 'success',
-      payload: candidate,
-    };
+    return lesson;
   }
 
-  @Patch(':id')
-  async update(@Param('id', ValidateIdPipe) id: string, @Body() updateLessonDto: UpdateLessonDto) {
-    const updated = await this.service.update(id, updateLessonDto);
+  @Patch(':id/students/:action')
+  async updateStudents(
+    @Param('id', ValidateIdPipe) id: string,
+    @Param('action') action: action,
+    @Body() updateLessonDto: UpdateLessonDto,
+  ) {
+    const updated = await this.service.updateStudents(id, updateLessonDto, action);
 
     if (updated === null) {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
     }
 
-    return {
-      message: 'success',
-      payload: updated,
-    };
+    return updated;
+  }
+
+  @Patch(':id')
+  async update(@Param('id', ValidateIdPipe) id: string, @Body() updateLessonDto: UpdateLessonDto) {
+    const updated = await this.service.update(id, updateLessonDto as UpdateLessonDto);
+
+    if (updated === null) {
+      throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
+    }
+
+    return updated;
   }
 
   @Delete(':id')
+  @HttpCode(204)
   async remove(@Param('id', ValidateIdPipe) id: string) {
-    return await this.service.remove(id);
+    const deleted = await this.service.remove(id);
+
+    if (!deleted) {
+      throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
+    }
   }
 }

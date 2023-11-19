@@ -4,6 +4,7 @@ import { User } from './user.schema';
 import { Student } from './student.schema';
 import { Location } from './location.schema';
 import { Transform, Type } from 'class-transformer';
+import { Attendance, VisitType } from './attendance.schema';
 
 export type LessonDocument = HydratedDocument<Lesson>;
 
@@ -35,9 +36,41 @@ export class ITime {
   min: number;
 }
 
-@Schema({
-  timestamps: true,
-})
+@Schema({ _id: false })
+class VisitingStudent {
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'Student',
+    required: true,
+  })
+  @Type(() => Student)
+  student: Student;
+
+  @Prop({
+    type: Number,
+    default: null,
+    required: true,
+  })
+  date: number | null;
+
+  @Prop({
+    type: String,
+    enum: VisitType,
+    default: VisitType.REGULAR,
+    required: true,
+  })
+  visitType: VisitType;
+
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'Attendance',
+    required: false,
+  })
+  @Type(() => Attendance)
+  visitInstead?: Attendance;
+}
+
+@Schema({ timestamps: true })
 export class Lesson {
   @Transform(({ value }) => value.toString())
   @Type(() => String)
@@ -59,15 +92,12 @@ export class Lesson {
   teacher: User;
 
   @Prop({
-    type: [
-      {
-        type: Types.ObjectId,
-        ref: 'Student',
-      },
-    ],
+    type: Types.ObjectId,
+    ref: 'Student',
+    required: true,
   })
-  @Type(() => Student)
-  students: Student[];
+  @Type(() => VisitingStudent)
+  students: VisitingStudent[];
 
   @Prop({
     type: Types.ObjectId,
@@ -109,9 +139,9 @@ export class Lesson {
   dateTo: number;
 
   @Prop({
-    required: true,
+    type: String,
   })
-  isActive: boolean;
+  color?: string;
 }
 
 export const LessonSchema = SchemaFactory.createForClass(Lesson);

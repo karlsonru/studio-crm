@@ -10,7 +10,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useGetLessonsQuery, useDeleteLessonMutation } from '../../shared/api/lessonApi';
 import { useMobile } from '../../shared/hooks/useMobile';
-import { ILessonModel } from '../../shared/models/ILessonModel';
+import { ILessonModel, VisitType } from '../../shared/models/ILessonModel';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { getDayName } from '../../shared/helpers/getDayName';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
@@ -20,6 +20,8 @@ import { CreateLessonModal } from '../../shared/components/modals/CreateLessonMo
 import { CustomGridToolbar } from '../../shared/components/CustomGridToolbar';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { convertTime } from '../../shared/helpers/convertTime';
+import { Loading } from '../../shared/components/Loading';
+import { ShowError } from '../../shared/components/ShowError';
 
 function ExtendedToolbar() {
   const [deleteLesson] = useDeleteLessonMutation();
@@ -49,7 +51,9 @@ export function LessonsContent() {
   const navigate = useNavigate();
   const actions = useActionCreators(lessonsPageActions);
 
-  const { data, isLoading, error } = useGetLessonsQuery();
+  const {
+    data, isLoading, isError, error,
+  } = useGetLessonsQuery();
 
   const deleteLessonHandler = useCallback((currentLesson: ILessonModel) => {
     actions.setCurrentLesson(currentLesson);
@@ -84,12 +88,15 @@ export function LessonsContent() {
     },
     */
     {
-      field: 'activeStudents',
+      field: 'students',
       type: 'number',
       headerName: 'Ученики',
       flex: 1,
       align: 'left',
       headerAlign: 'left',
+      valueFormatter: (params: GridValueFormatterParams<ILessonModel['students']>) => (
+        params.value.filter((student) => student.visitType === VisitType.REGULAR).length
+      ),
     },
     {
       field: 'isActive',
@@ -109,19 +116,23 @@ export function LessonsContent() {
     },
   ], [deleteLessonHandler]);
 
-  if (isLoading || !data?.payload) {
-    return null;
+  if (isLoading) {
+    return <Loading />;
   }
 
-  if (error) {
-    return <h1>Error!!! </h1>;
+  if (isError) {
+    return <ShowError details={error} />;
+  }
+
+  if (!data) {
+    return null;
   }
 
   return (
     <DataGrid
       autoHeight
       columns={isMobile ? [columns[0]] : columns}
-      rows={data.payload}
+      rows={data}
       getRowId={(item) => item._id}
       disableColumnMenu
       density="comfortable"

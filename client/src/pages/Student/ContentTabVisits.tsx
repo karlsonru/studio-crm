@@ -1,45 +1,31 @@
 import { useState } from 'react';
 import { format, subMonths } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
-import Stack from '@mui/material/Stack';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 import { useFindSubscriptionsQuery, useGetVisitedLessonsStatisticByStudentQuery } from '../../shared/api';
 import { BasicTableWithTitleAndButton, CreateRow, CreateRowWithCollapse } from '../../shared/components/BasicTable';
 import { useMobile } from '../../shared/hooks/useMobile';
 import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
+import { IStudentModel } from '../../shared/models/IStudentModel';
+import { CardContentItem } from '../../shared/components/CardContentItem';
+import { getVisitStatusName } from '../../shared/helpers/getVisitStatusName';
+import { getBillingStatusNameAndColor } from '../../shared/helpers/getBillingStatusNameAndColor';
 
 interface IVisitsStatistic {
-  statistic?: Record<string, number>;
-  studentFullname: string;
+  statistic: Record<string, number>;
   startPeriod: number;
 }
 
-function CardContentItem({ title, value }: { title: string, value: string | number }) {
-  return (
-    <Stack
-      direction="row"
-      justifyContent="space-between"
-      my={1}
-      width='100%'
-    >
-      <Typography>
-        { title }
-      </Typography>
-      <Typography sx={{ fontWeight: 'bold' }}>
-        { value }
-      </Typography>
-  </Stack>
-  );
-}
-
-function VisitsStatistic({ statistic, studentFullname, startPeriod }: IVisitsStatistic) {
+function VisitsStatistic({ statistic, startPeriod }: IVisitsStatistic) {
   const isMobile = useMobile();
+  const [isExpanded, setExpanded] = useState(false);
 
   const statisticFieldsName = {
     visited: 'Посещено',
@@ -48,42 +34,33 @@ function VisitsStatistic({ statistic, studentFullname, startPeriod }: IVisitsSta
     unpaid: 'Не оплачено',
   };
 
-  const period = startPeriod === 0 ? 'за всё время' : `с ${format(startPeriod, 'dd-MM-Y')}`;
-
   return (
-    <Card sx={{
-      width: isMobile ? '100%' : '20%',
-      maxWidth: '325px',
-    }}
+    <Accordion
+      expanded={isExpanded}
+      onChange={() => setExpanded((prev) => !prev)}
+      sx={{ width: isMobile ? '100%' : '25%' }}
     >
-      <CardHeader
-        title={studentFullname}
-        subheader={`Статистика ${period}`}
-        sx={{
-          padding: '0.5rem',
-        }}
-      />
-
-      <CardContent
-        sx={{
-          padding: '0.5rem',
-          paddingBottom: '0.5rem!important',
-        }}
-      >
+      <AccordionSummary expandIcon={<ExpandMoreIcon />} >
+        <Typography>Показать статистику</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <Typography>{`${startPeriod === 0 ? 'Всё время' : 'Последние 3 месяца'}`}</Typography>
         <List dense>
-          {Object.entries(statisticFieldsName)
-            .map((parameters) => (
-              <CardContentItem
-                key={parameters[0]}
-                title={parameters[1]}
-                value={statistic?.[parameters[0]] ?? 'Неизвестно'}
-              />
-            ))
-          }
+            {Object.entries(statisticFieldsName)
+              .map((parameters) => (
+                <CardContentItem
+                  key={parameters[0]}
+                  title={parameters[1]}
+                  value={statistic[parameters[0]] ?? 'Неизвестно'}
+                  props={{
+                    width: '100%',
+                  }}
+                />
+              ))
+            }
         </List>
-      </CardContent>
-
-    </Card>
+      </AccordionDetails>
+    </Accordion>
   );
 }
 
@@ -117,7 +94,7 @@ function CreateRows({
   );
 }
 
-export function ContentTabVisits({ studentId }: { studentId: string }) {
+export function ContentTabVisits({ student }: { student: IStudentModel }) {
   const isMobile = useMobile();
   const today = getTodayTimestamp();
   const [showMoreVisits, setShowMoreVisits] = useState(false);
@@ -133,12 +110,9 @@ export function ContentTabVisits({ studentId }: { studentId: string }) {
     error: errorVisitedLessons,
   } = useGetVisitedLessonsStatisticByStudentQuery({
     query: {
-      $and: [
-        { students: { $elemMatch: { student: studentId } } },
-        { date: { $gte: startPeriodLessons } },
-      ],
+      startPeriod: startPeriodLessons,
     },
-    studentId,
+    id: student._id,
   });
 
   // найдём все абонементы студента за последние 3 мес
@@ -149,7 +123,7 @@ export function ContentTabVisits({ studentId }: { studentId: string }) {
     error: errorSubscriptions,
   } = useFindSubscriptionsQuery({
     $and: [
-      { student: studentId },
+      { student: student._id },
       { dateTo: { $gte: showMoreSubscriptions ? 0 : subMonths(today, 3).getTime() } },
     ],
   });
@@ -167,19 +141,16 @@ export function ContentTabVisits({ studentId }: { studentId: string }) {
     return <ShowError details={'Не удалось запросить данные'} />;
   }
 
-  let studentFullname = '';
-
   const headersVisits = isMobile ? ['Занятие', 'Дата занятия'] : ['Занятие', 'Дата занятия', 'Статус посещения', 'Статус оплаты'];
-  const rowsVisits = responseVisitedLessonsStatisticByStudent
-    .payload
-    .visitedLessons
+  const rowsVisits = [...responseVisitedLessonsStatisticByStudent
+    .attendances]
+    .sort((a, b) => (b.date - a.date))
     .map((visitedLesson) => {
       // с backend'а всегда возвращается массив с 1 студентом по которому делали запрос
       const studentVisit = visitedLesson.students[0];
 
-      if (!studentFullname) {
-        studentFullname = studentVisit.student.fullname;
-      }
+      const billingStatusName = getBillingStatusNameAndColor(studentVisit.billingStatus).name;
+      const visitStatusName = getVisitStatusName(studentVisit.visitStatus);
 
       return (
         <CreateRows
@@ -187,16 +158,16 @@ export function ContentTabVisits({ studentId }: { studentId: string }) {
           contentDesktop={[
             visitedLesson.lesson.title,
             format(visitedLesson.date, 'EEEE, dd-MM-YYY', { locale: ru }),
-            studentVisit.visitStatus,
-            studentVisit.billingStatus,
+            visitStatusName,
+            billingStatusName,
           ]}
           contentMobile={[
             visitedLesson.lesson.title,
             format(visitedLesson.date, 'EEEE, dd-MM-YYY', { locale: ru }),
           ]}
           contentCollapsed={[
-            <CardContentItem title={'Посещение'} value={studentVisit.visitStatus} />,
-            <CardContentItem title={'Оплата'} value={studentVisit.billingStatus} />,
+            <CardContentItem title={'Посещение'} value={visitStatusName} props={{ width: '100%' }} />,
+            <CardContentItem title={'Оплата'} value={billingStatusName} props={{ width: '100%' }} />,
           ]}
         />
       );
@@ -204,50 +175,45 @@ export function ContentTabVisits({ studentId }: { studentId: string }) {
 
   const headersSubscriptions = isMobile ? ['Осталось', 'Действует до'] : ['Занятий всего', 'Осталось', 'Действует до', 'Стоимость'];
   const rowsSubscriptions = responseSubscriptions
-    .payload
     .map((subscription) => <CreateRows
       key={subscription._id}
       contentDesktop={[
-        subscription.template.visits,
+        subscription.visitsTotal,
         subscription.visitsLeft,
         format(subscription.dateTo, 'dd-MM-YYY'),
-        subscription.template.price,
+        subscription.price,
       ]}
       contentMobile={[
         subscription.visitsLeft,
         format(subscription.dateTo, 'dd-MM-YYY'),
       ]}
       contentCollapsed={[
-        <CardContentItem title={'Всего визитов'} value={subscription.template.visits} />,
-        <CardContentItem title={'Стоимость'} value={subscription.template.price} />,
+        <CardContentItem title={'Всего визитов'} value={subscription.visitsTotal} props={{ width: '100%' }} />,
+        <CardContentItem title={'Стоимость'} value={subscription.price} props={{ width: '100%' }} />,
       ]}
     />);
 
   return (
     <>
       <VisitsStatistic
-        studentFullname={studentFullname}
+        statistic={responseVisitedLessonsStatisticByStudent.statistic}
         startPeriod={startPeriodLessons}
-        statistic={responseVisitedLessonsStatisticByStudent
-          .payload
-          .statistic
-        }
       />
 
       <BasicTableWithTitleAndButton
         tableTitle='Посещения'
         headers={headersVisits}
         rows={rowsVisits}
-        buttonTitle={showMoreVisits ? 'Скрыть' : 'Показать ещё'}
-        buttonAction={() => setShowMoreVisits((prev) => !prev)}
+        buttomTitle={showMoreVisits ? 'Скрыть' : 'Показать ещё'}
+        buttomAction={() => setShowMoreVisits((prev) => !prev)}
       />
 
       <BasicTableWithTitleAndButton
-        tableTitle='Посещения'
+        tableTitle='Абонементы'
         headers={headersSubscriptions}
         rows={rowsSubscriptions}
-        buttonTitle={showMoreSubscriptions ? 'Скрыть' : 'Показать ещё'}
-        buttonAction={() => setShowMoreSubscriptions((prev) => !prev)}
+        buttomTitle={showMoreSubscriptions ? 'Скрыть' : 'Показать ещё'}
+        buttomAction={() => setShowMoreSubscriptions((prev) => !prev)}
       />
     </>
   );

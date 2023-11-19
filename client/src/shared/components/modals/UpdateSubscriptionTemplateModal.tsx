@@ -1,20 +1,17 @@
 import { FormEvent, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
+/*
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/system/Stack';
-import Button from '@mui/material/Button';
-import DialogActions from '@mui/material/DialogActions';
+*/
 import { usePatchSubscriptionTemplateMutation, useGetSubscriptionTemplatesQuery } from '../../api';
 import { NumberField } from '../fields/NumberField';
-import { SubmitButton } from '../buttons/SubmitButton';
-import { FormContentColumn } from '../FormContentColumn';
+import { DialogFormWrapper } from '../DialogFormWrapper';
+import { Loading } from '../Loading';
 
 function validateForm(formData: { [key: string]: FormDataEntryValue }) {
   if (!formData.title || (formData.title as string).trim().length < 3) {
@@ -43,14 +40,14 @@ function calculateDuration(period: string, duration: number) {
 }
 
 export function UpdateSubscriptionTemplateModal() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const { data: templateEdit } = useGetSubscriptionTemplatesQuery(undefined, {
     selectFromResult: ({ data }) => ({
-      data: data?.payload.find((template) => template._id === searchParams.get('id')),
+      data: data?.find((template) => template._id === searchParams.get('id')),
     }),
   });
 
-  const [updateSubscriptionTemplate] = usePatchSubscriptionTemplateMutation();
+  const [updateSubscriptionTemplate, requestStatus] = usePatchSubscriptionTemplateMutation();
   const [formValidation, setFormValidation] = useState({
     title: true,
     price: true,
@@ -58,10 +55,12 @@ export function UpdateSubscriptionTemplateModal() {
     duration: true,
   });
 
-  if (!searchParams.has('update-template')) return <></>;
+  if (searchParams.has('update-template') && !templateEdit) {
+    return <Loading />;
+  }
 
   if (!templateEdit) {
-    return <h1>Is Loading...</h1>;
+    return null;
   }
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
@@ -92,7 +91,6 @@ export function UpdateSubscriptionTemplateModal() {
       price: +formData.price as number,
       visits: +formData.visits as number,
       duration: calculateDuration(formData.period as string, +formData.duration),
-      isActive: true,
     };
 
     updateSubscriptionTemplate({ id: templateEdit._id, newItem: payload });
@@ -101,72 +99,64 @@ export function UpdateSubscriptionTemplateModal() {
   };
 
   return (
-    <Dialog open={searchParams.has('update-template')} onClose={() => setSearchParams('')}>
-      <DialogTitle>Редактировать шаблон</DialogTitle>
-      <DialogContent>
-        <form onSubmit={submitHandler}>
-          <FormContentColumn>
-            <TextField
-              variant="outlined"
-              name="title"
-              label="Название"
-              defaultValue={templateEdit.title}
-              fullWidth
-              required
-              error={!formValidation.title}
-              helperText={!formValidation.title && 'Название не должно быть пустым или слишком коротким'}
-            />
-            <NumberField
-              name="price"
-              label="Цена"
-              error={!formValidation.price}
-              minValue={0}
-              defaultValue={templateEdit.price}
-            />
-            <NumberField
-              name="visits"
-              label="Количество занятий"
-              error={!formValidation.visits}
-              minValue={1}
-              defaultValue={templateEdit.visits}
-            />
+    <DialogFormWrapper
+      title='Редактировать шаблон'
+      isOpen={searchParams.has('update-template')}
+      onSubmit={submitHandler}
+      requestStatus={requestStatus}
+    >
+      <TextField
+        variant="outlined"
+        name="title"
+        label="Название"
+        defaultValue={templateEdit.title}
+        fullWidth
+        required
+        error={!formValidation.title}
+        helperText={!formValidation.title && 'Название не должно быть пустым или слишком коротким'}
+      />
+      <NumberField
+        name="price"
+        label="Цена"
+        error={!formValidation.price}
+        minValue={0}
+        defaultValue={templateEdit.price}
+      />
+      <NumberField
+        name="visits"
+        label="Количество занятий"
+        error={!formValidation.visits}
+        minValue={1}
+        defaultValue={templateEdit.visits}
+      />
 
-            <FormControl>
-              <FormLabel sx={{ mb: 1 }}>Период</FormLabel>
+      {/*
+      <FormControl>
+        <FormLabel sx={{ mb: 1 }}>Период</FormLabel>
 
-              <Stack direction="row">
-                <NumberField
-                  name="duration"
-                  label="Длительность"
-                  error={!formValidation.duration}
-                  minValue={1}
-                  defaultValue={Math.floor(templateEdit.duration / 86_400_000)}
-                />
+        <Stack direction="row">
+          <NumberField
+            name="duration"
+            label="Длительность"
+            error={!formValidation.duration}
+            minValue={1}
+            defaultValue={Math.floor(templateEdit.duration / 86_400_000)}
+          />
 
-                <Select
-                  name="period"
-                  defaultValue="day"
-                  sx={{ flexGrow: 1, minWidth: '115px' }}
-                >
-                  <MenuItem value="day">Дней</MenuItem>
-                  <MenuItem value="week">Недель</MenuItem>
-                  <MenuItem value="month">Месяцев</MenuItem>
-                </Select>
-              </Stack>
+          <Select
+            name="period"
+            defaultValue="day"
+            sx={{ flexGrow: 1, minWidth: '115px' }}
+          >
+            <MenuItem value="day">Дней</MenuItem>
+            <MenuItem value="week">Недель</MenuItem>
+            <MenuItem value="month">Месяцев</MenuItem>
+          </Select>
+        </Stack>
 
-            </FormControl>
+      </FormControl>
+      */}
 
-          </FormContentColumn>
-
-          <DialogActions sx={{ paddingRight: '0' }}>
-            <Button autoFocus variant='contained' color='error' onClick={() => setSearchParams('')}>
-              Закрыть
-            </Button>
-            <SubmitButton content='Подтвердить' />
-          </DialogActions>
-
-        </form>
-      </DialogContent>
-    </Dialog>
+    </DialogFormWrapper>
   );
 }

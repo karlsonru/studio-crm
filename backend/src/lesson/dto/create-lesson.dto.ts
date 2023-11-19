@@ -1,15 +1,18 @@
 import { Type } from 'class-transformer';
 import {
-  ArrayUnique,
-  IsBoolean,
+  IsEnum,
   IsMongoId,
+  IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
   Max,
   Min,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
 import { ITime } from '../../schemas/lesson.schema';
+import { VisitType } from '../../schemas/attendance.schema';
 
 class Time implements ITime {
   @IsNumber()
@@ -23,6 +26,22 @@ class Time implements ITime {
   min: number;
 }
 
+export class VisitingStudent {
+  @IsString()
+  @IsNotEmpty()
+  @IsMongoId()
+  student: string;
+
+  @IsNotEmpty()
+  @IsEnum(VisitType)
+  visitType: VisitType;
+
+  @ValidateIf((obj, value) => value !== null)
+  @IsNumber()
+  @Min(0)
+  date: null | number;
+}
+
 export class CreateLessonDto {
   @IsString()
   title: string;
@@ -31,10 +50,9 @@ export class CreateLessonDto {
   @IsMongoId()
   teacher: string;
 
-  @Type(() => String)
-  @IsMongoId({ each: true })
-  @ArrayUnique()
-  students: string[];
+  @ValidateNested({ each: true })
+  @Type(() => VisitingStudent)
+  students: VisitingStudent[];
 
   @IsString()
   @IsMongoId()
@@ -57,6 +75,7 @@ export class CreateLessonDto {
   @IsNumber()
   dateTo: number;
 
-  @IsBoolean()
-  isActive: boolean;
+  @IsOptional()
+  @IsString()
+  color?: number;
 }

@@ -9,6 +9,7 @@ import {
   HttpException,
   HttpStatus,
   UseInterceptors,
+  HttpCode,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -30,32 +31,23 @@ export class UserController {
       throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
     }
 
-    return {
-      message: 'success',
-      payload: created,
-    };
+    return created;
   }
 
   @Get()
   async findAll() {
-    return {
-      message: 'success',
-      payload: await this.service.findAll(),
-    };
+    return await this.service.findAll();
   }
 
   @Get(':id')
   async findOne(@Param('id', ValidateIdPipe) id: string) {
-    const candidate = await this.service.findOne(id);
+    const candidate = await this.service.findOne({ _id: id });
 
     if (candidate === null) {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
     }
 
-    return {
-      message: 'success',
-      payload: candidate,
-    };
+    return candidate;
   }
 
   @Patch(':id')
@@ -66,14 +58,16 @@ export class UserController {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
     }
 
-    return {
-      message: 'success',
-      payload: updated,
-    };
+    return updated;
   }
 
   @Delete(':id')
+  @HttpCode(204)
   async remove(@Param('id', ValidateIdPipe) id: string) {
-    return await this.service.remove(id);
+    const deleted = await this.service.remove(id);
+
+    if (!deleted) {
+      throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
+    }
   }
 }

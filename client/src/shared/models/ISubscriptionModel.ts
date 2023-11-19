@@ -1,4 +1,4 @@
-// import { ILessonModel } from './ILessonModel';
+import { ILessonModel } from './ILessonModel';
 import { IStudentModel } from './IStudentModel';
 
 export interface ISubscriptionTemplateModel {
@@ -6,8 +6,7 @@ export interface ISubscriptionTemplateModel {
   title: string;
   price: number;
   visits: number;
-  duration: number;
-  isActive: boolean;
+  // duration: number;
 }
 
 export interface ISubscriptionTemplateCreate extends Omit<ISubscriptionTemplateModel, '_id'> {}
@@ -15,17 +14,17 @@ export interface ISubscriptionTemplateCreate extends Omit<ISubscriptionTemplateM
 export interface ISubscriptionModel {
   _id: string;
   student: IStudentModel;
-  template: ISubscriptionTemplateModel;
-  lesson: string;
+  lessons: Array<ILessonModel>;
+  price: number;
+  visitsTotal: number;
   visitsLeft: number;
+  visitsPostponed: number;
   dateFrom: number;
   dateTo: number;
   paymentMethod: string;
-  isActive: boolean;
 }
 
-export interface ISubscriptionCreate extends Omit<ISubscriptionModel, '_id' | 'student' | 'template' | 'lesson'> {
+export interface ISubscriptionCreate extends Omit<ISubscriptionModel, '_id' | 'student' | 'template' | 'lessons'> {
   student: string;
-  template: string;
-  lesson: string;
+  lessons: Array<string>;
 }

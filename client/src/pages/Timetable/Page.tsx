@@ -1,31 +1,31 @@
 import { useEffect } from 'react';
 import { set } from 'date-fns';
-import CircularProgress from '@mui/material/CircularProgress';
 import { PageHeader } from './PageHeader';
 import { TimetableContent } from './Content';
+import { LessonDetails } from './LessonDetails';
 import { useFindLessonsQuery } from '../../shared/api';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useMobile } from '../../shared/hooks/useMobile';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { timetablePageActions } from '../../shared/reducers/timetablePageSlice';
-import { setPageTitle } from '../../shared/reducers/appMenuSlice';
-import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
+import { useTitle } from '../../shared/hooks/useTitle';
+import { Loading } from '../../shared/components/Loading';
+import { ShowError } from '../../shared/components/ShowError';
 
 export function TimetablePage() {
-  const dispatch = useAppDispatch();
+  useTitle('Расписание');
+  const isMobile = useMobile();
 
   const view = useAppSelector((state) => state.timetablePageReducer.view);
   const currentDate = useAppSelector((state) => state.timetablePageReducer.currentDate);
-  const currentMonth = new Date(currentDate).getMonth();
-  const isMobile = useMobile();
   const actions = useActionCreators(timetablePageActions);
 
-  useEffect(() => {
-    dispatch(setPageTitle('Расписание'));
-  });
+  const currentMonth = new Date(currentDate).getMonth();
 
   // запрашиваем занятия на +1 месяц от текущих и -1 месяц от текущих
-  const { data, isFetching } = useFindLessonsQuery({
+  const {
+    data, isLoading, isError, error,
+  } = useFindLessonsQuery({
     dateFrom: { $lte: set(currentDate, { month: currentMonth - 1, date: 1 }).getTime() },
     dateTo: { $gte: set(currentDate, { month: currentMonth + 1, date: 1 }).getTime() },
   });
@@ -38,16 +38,21 @@ export function TimetablePage() {
     }
   }, [view, isMobile]);
 
-  if (isFetching) {
-    return <CircularProgress />;
+  if (isLoading) {
+    return <Loading />;
   }
 
-  if (!data?.payload) return null;
+  if (isError) {
+    return <ShowError details={error} />;
+  }
+
+  if (!data) return null;
 
   return (
     <>
       <PageHeader />
-      <TimetableContent lessons={data.payload} />
+      <TimetableContent lessons={data} />
+      <LessonDetails />
     </>
   );
 }

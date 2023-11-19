@@ -9,6 +9,8 @@ import {
   HttpException,
   HttpStatus,
   UseInterceptors,
+  Query,
+  HttpCode,
 } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { CreateStudentDto } from './dto/create-student.dto';
@@ -30,18 +32,12 @@ export class StudentController {
       throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
     }
 
-    return {
-      message: 'success',
-      payload: created,
-    };
+    return created;
   }
 
   @Get()
-  async findAll() {
-    return {
-      message: 'success',
-      payload: await this.service.findAll(),
-    };
+  async findAll(@Query('filter') filter?: string) {
+    return await this.service.findAll(filter ? JSON.parse(filter) : {});
   }
 
   @Get(':id')
@@ -52,10 +48,7 @@ export class StudentController {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
     }
 
-    return {
-      message: 'success',
-      payload: candidate,
-    };
+    return candidate;
   }
 
   @Patch(':id')
@@ -69,13 +62,11 @@ export class StudentController {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
     }
 
-    return {
-      message: 'success',
-      payload: updated,
-    };
+    return updated;
   }
 
   @Delete(':id')
+  @HttpCode(204)
   async remove(@Param('id', ValidateIdPipe) id: string) {
     return await this.service.remove(id);
   }

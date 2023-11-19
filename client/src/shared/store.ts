@@ -4,17 +4,21 @@ import { timetablePageReducer } from './reducers/timetablePageSlice';
 import { lessonsPageReducer } from './reducers/lessonsPageSlice';
 import { studentsPageReducer } from './reducers/studentsPageSlice';
 import { subscriptionsPageReducer } from './reducers/subscriptionsPageSlice';
-import { visitsPageReducer } from './reducers/visitsPageSlice';
+import { attendancePageReducer } from './reducers/attendancePageSlice';
+import { authReducer } from './reducers/authSlice';
+import { financeReducer } from './reducers/financeSlice';
 import { basicApi } from './api/basicApi';
 
 const store = configureStore({
   reducer: {
+    authReducer,
+    attendancePageReducer,
     menuReducer,
     timetablePageReducer,
     lessonsPageReducer,
     studentsPageReducer,
     subscriptionsPageReducer,
-    visitsPageReducer,
+    financeReducer,
     [basicApi.reducerPath]: basicApi.reducer,
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(basicApi.middleware),

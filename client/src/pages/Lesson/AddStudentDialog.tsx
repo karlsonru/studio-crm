@@ -1,87 +1,109 @@
-import { useEffect, useState } from 'react';
-import Card from '@mui/material/Card';
+import { FormEvent, useState } from 'react';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
-import DialogActions from '@mui/material/DialogActions';
 import Divider from '@mui/material/Divider';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { useMobile } from '../../shared/hooks/useMobile';
-import { useFindStudentsQuery, useGetLessonQuery, usePatchLessonMutation } from '../../shared/api';
+import Select from '@mui/material/Select';
+import FormControl from '@mui/material/FormControl';
+import FormLabel from '@mui/material/FormLabel';
+import MenuItem from '@mui/material/MenuItem';
+import { format, parse } from 'date-fns';
+import { getTodayTimestamp } from 'shared/helpers/getTodayTimestamp';
+import { useFindStudentsQuery, usePatchLessonStudentsMutation } from '../../shared/api';
 import { IStudentModel } from '../../shared/models/IStudentModel';
-import { ILessonModel } from '../../shared/models/ILessonModel';
+import { ILessonModel, VisitType } from '../../shared/models/ILessonModel';
+import { CardWrapper } from '../../shared/components/CardWrapper';
+import { DialogFormWrapper } from '../../shared/components/DialogFormWrapper';
+import { ShowError } from '../../shared/components/ShowError';
+import { DateField } from '../../shared/components/fields/DateField';
+// import { Loading } from '../../shared/components/Loading';
 
 interface IAddStudentsDialog {
   lesson: ILessonModel;
   isOpen: boolean;
   setModalOpen: (value: boolean) => void;
+  date?: number;
 }
 
-function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudentsDialog) {
+export function AddStudentsDialog({
+  lesson, isOpen, setModalOpen, date,
+}: IAddStudentsDialog) {
+  const [visitType, setVisitType] = useState<VisitType>(VisitType.REGULAR);
+  const [visitDate, setVisitDate] = useState(format(date ?? getTodayTimestamp(), 'yyyy-MM-dd'));
   const [selectedOptions, setSelected] = useState<IStudentModel[]>([]);
-  const { data } = useFindStudentsQuery({
-    _id: {
-      $nin: [...lesson.students.map((student) => student._id)],
-    },
+
+  const { data: possibleStudents, isError, error } = useFindStudentsQuery({
+    _id: { $nin: lesson.students.map((visiting) => visiting.student._id) },
   });
-  const [updateLesson, { isSuccess, isError, error }] = usePatchLessonMutation();
+  const [updateLessonStudents, requestStatus] = usePatchLessonStudentsMutation();
+
+  if (!possibleStudents) {
+    return null;
+  }
 
   if (isError) {
-    console.error(error);
+    <ShowError details={error} />;
   }
 
-  useEffect(() => {
-    setModalOpen(false);
-  }, [isSuccess]);
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-  if (!data?.payload) {
-    return <h3>Все студенты записаны</h3>;
-  }
+    const futureVisitDate = parse(visitDate, 'yyyy-MM-dd', new Date());
+    const futureVisitDateTimestamp = Date.UTC(
+      futureVisitDate.getFullYear(),
+      futureVisitDate.getMonth(),
+      futureVisitDate.getDate(),
+    );
 
-  const handleOk = () => {
-    updateLesson({
+    updateLessonStudents({
       id: lesson._id,
+      action: 'add',
       newItem: {
-        // @ts-ignore
-        $addToSet: {
-          students: [...selectedOptions.map((student) => student._id)],
-        },
+        students: [...selectedOptions.map((student) => ({
+          student: student._id,
+          date: visitType === VisitType.REGULAR ? null : futureVisitDateTimestamp,
+          visitType,
+        }))],
       },
     });
+
+    setSelected([]);
   };
 
-  const handleCancel = () => {
-    setModalOpen(false);
-  };
-
-  const changeHandler = (event: React.SyntheticEvent<Element, Event>, value: IStudentModel[]) => {
-    setSelected(() => value);
-  };
+  const hasAvailableStudents = possibleStudents.length > 0;
 
   return (
-    <Dialog open={isOpen} maxWidth='xl' transitionDuration={500} onClose={() => setModalOpen(false)}>
-      <DialogTitle>Добавить студентов</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-          Выберите студентов, которых хотите добавить к занятию
-        </DialogContentText>
+    <DialogFormWrapper
+      title="Добавить студентов"
+      isOpen={isOpen}
+      onSubmit={handleSubmit}
+      requestStatus={requestStatus}
+      onClose={() => setModalOpen(false)}
+      dialogProps={{
+        maxWidth: 'xl',
+        // transitionDuration: 250,
+      }}
+    >
+      <DialogContentText>
+        {hasAvailableStudents
+          ? 'Выберите студентов, которых хотите добавить к занятию'
+          : 'Все студенты уже записаны'
+        }
+      </DialogContentText>
 
-        <Divider sx={{ m: '1rem 0' }}/>
+      <Divider sx={{ m: '1rem 0' }}/>
 
-        <Autocomplete
+      {hasAvailableStudents && <Autocomplete
           multiple
-          options={data.payload}
+          options={possibleStudents}
           getOptionLabel={(option) => option.fullname}
-          onChange={changeHandler}
+          onChange={(event, value) => setSelected(() => value)}
           renderOption={(props, option, { selected }) => (
             <li {...props}>
               <Checkbox
@@ -101,53 +123,46 @@ function AddStudentsDialog({ lesson, isOpen, setModalOpen }: IAddStudentsDialog)
             />
           )}
         />
+      }
 
-      </DialogContent>
-      <DialogActions>
-        <Button autoFocus variant='contained' color='error' onClick={handleCancel}>
-          Закрыть
-        </Button>
-        <Button variant='contained' color='success' onClick={handleOk}>Подтвердить</Button>
-      </DialogActions>
-    </Dialog>
+      <FormControl>
+          <FormLabel>Посещение</FormLabel>
+            <Select
+              name="visitType"
+              label="visitType"
+              value={visitType}
+              onChange={(event) => setVisitType(event.target.value as VisitType)}
+              fullWidth
+            >
+              <MenuItem value={VisitType.REGULAR}>Постоянное</MenuItem>
+              <MenuItem value={VisitType.MISSED_REGULAR}>Отработка</MenuItem>
+              <MenuItem value={VisitType.NEW}>Новое</MenuItem>
+              <MenuItem value={VisitType.SINGLE}>Однократное</MenuItem>
+            </Select>
+        </FormControl>
+
+      {visitType !== VisitType.REGULAR && <DateField
+        value={visitDate}
+        onChange={(event) => setVisitDate(event.target.value)}
+        name="date"
+        label="Дата посещения"
+      />}
+
+    </DialogFormWrapper>
   );
 }
 
-export function AddStudentButton({ lessonId }: { lessonId: string }) {
-  const isMobile = useMobile();
-  const [isModalOpen, setModalOpen] = useState(false);
-
-  const {
-    data, isFetching, isError, error,
-  } = useGetLessonQuery(lessonId);
-
-  if (isFetching || !data?.payload) {
-    return null;
-  }
-
-  if (isError) {
-    console.error(error);
-    return <h3>Ошибка при запросе</h3>;
-  }
-
+export function AddStudentButton({ setModalOpen }: { setModalOpen: (value: boolean) => void }) {
   return (
-    <>
-      <Card variant="outlined" sx={{ width: '325px', marginRight: isMobile ? 0 : '0.5rem', marginBottom: '0.5rem' }}>
-        <CardActionArea
-          sx={{ height: '100%' }}
-          onClick={() => setModalOpen(true)}
-        >
-        <CardContent sx={{ textAlign: 'center' }}>
-            <ControlPointIcon fontSize='large' />
-          </CardContent>
-        </CardActionArea>
-      </Card>
-
-      <AddStudentsDialog
-        lesson={data?.payload}
-        isOpen={isModalOpen}
-        setModalOpen={setModalOpen}
-      />
-    </>
+    <CardWrapper>
+      <CardActionArea
+        sx={{ height: '100%' }}
+        onClick={() => setModalOpen(true)}
+      >
+      <CardContent sx={{ textAlign: 'center' }}>
+          <ControlPointIcon fontSize='large' />
+        </CardContent>
+      </CardActionArea>
+    </CardWrapper>
   );
 }

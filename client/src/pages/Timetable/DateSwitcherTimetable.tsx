@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { useMemo } from 'react';
 import {
   startOfWeek, endOfWeek, addDays, subDays, format,

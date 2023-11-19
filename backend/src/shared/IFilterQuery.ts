@@ -2,6 +2,7 @@ export interface IFilterQuery<T> {
   $and?: IFilterQuery<T>[];
   $or?: IFilterQuery<T>[];
   $nor?: IFilterQuery<T>[];
+  $addToSet?: IFilterQuery<T>[];
   $text?: {
     $search: string;
     $language?: string;

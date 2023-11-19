@@ -7,6 +7,19 @@ export interface ITime {
   min: number;
 }
 
+export enum VisitType {
+  REGULAR = 'regular',
+  MISSED_REGULAR = 'missedRegular',
+  SINGLE = 'single',
+  NEW = 'new',
+}
+
+export interface IVisitingStudent {
+  student: IStudentModel;
+  date: null | number;
+  visitType: VisitType;
+}
+
 export interface ILessonModel {
   _id: string;
   title: string;
@@ -15,15 +28,18 @@ export interface ILessonModel {
   day: number;
   timeStart: ITime;
   timeEnd: ITime;
-  activeStudents: number;
-  students: Array<IStudentModel>,
+  students: Array<IVisitingStudent>,
   dateFrom: number;
   dateTo: number;
-  isActive: boolean;
+  color?: string;
+}
+
+interface IVisitingStudentCreate extends Omit<IVisitingStudent, 'student'> {
+  student: string;
 }
 
 export interface ILessonModelCreate extends Omit<ILessonModel, '_id' | 'teacher' | 'location' | 'students'> {
   teacher: string;
   location: string;
-  students: Array<string>;
+  students: Array<IVisitingStudentCreate>;
 }

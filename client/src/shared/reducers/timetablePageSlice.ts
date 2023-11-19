@@ -1,19 +1,25 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { getTodayTimestamp } from '../helpers/getTodayTimestamp';
+import { ILessonModel } from '../models/ILessonModel';
+
+interface ILessonDetails {
+  date: number | null;
+  selectedLesson: ILessonModel | null;
+}
 
 interface ITimetablePageState {
   currentDate: number;
   view: 'day' | 'week';
+  lessonDetails: ILessonDetails;
 }
 
-const now = new Date();
-now.setHours(0);
-now.setMinutes(0);
-now.setSeconds(0);
-now.setMilliseconds(0);
-
 const initialState: ITimetablePageState = {
-  currentDate: now.getTime(),
+  currentDate: getTodayTimestamp(),
   view: 'week',
+  lessonDetails: {
+    date: null,
+    selectedLesson: null,
+  },
 };
 
 const timetablePageState = createSlice({
@@ -25,6 +31,9 @@ const timetablePageState = createSlice({
     },
     setView: (state, action: PayloadAction<'day' | 'week'>) => {
       state.view = action.payload;
+    },
+    setLessonDetails: (state, action: PayloadAction<ILessonDetails>) => {
+      state.lessonDetails = action.payload;
     },
   },
 });

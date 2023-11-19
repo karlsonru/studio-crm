@@ -1,7 +1,6 @@
 import { useState } from 'react';
+import { format } from 'date-fns';
 import Typography from '@mui/material/Typography/Typography';
-import Stack from '@mui/system/Stack';
-import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import CardContent from '@mui/material/CardContent';
 import IconButton from '@mui/material/IconButton';
@@ -10,67 +9,69 @@ import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import SyncIcon from '@mui/icons-material/Sync';
 import { ChangeTeacherDialog } from './ChangeTeacherDialog';
-import { useMobile } from '../../shared/hooks/useMobile';
-import { useGetLessonQuery, usePatchLessonMutation } from '../../shared/api';
+import { usePatchLessonStudentsMutation } from '../../shared/api';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
-import { IStudentModel } from '../../shared/models/IStudentModel';
-import { AddStudentButton } from './AddStudentDialog';
+import { AddStudentButton, AddStudentsDialog } from './AddStudentDialog';
+import { ILessonModel, IVisitingStudent } from '../../shared/models/ILessonModel';
+import { CardWrapper } from '../../shared/components/CardWrapper';
+import { CardContentItem } from '../../shared/components/CardContentItem';
+import { getVisitTypeName } from '../../shared/helpers/getVisitTypeName';
+import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 
-function CardContentItem({ title, value }: { title: string, value: string | number }) {
-  return (
-    <Stack direction="row" justifyContent="space-between" my={1} >
-      <Typography>
-        { title }
-      </Typography>
-      <Typography sx={{ fontWeight: 'bold' }}>
-        { value }
-      </Typography>
-  </Stack>
-  );
-}
-
-interface IAddCard {
+interface IStudentCard {
   lessonId: string;
-  student: IStudentModel;
+  visiting: IVisitingStudent;
 }
 
-function AddCard({ lessonId, student }: IAddCard) {
-  const isMobile = useMobile();
-  const [updateLesson] = usePatchLessonMutation();
+function StudentCard({ lessonId, visiting }: IStudentCard) {
+  const [updateLessonStudents] = usePatchLessonStudentsMutation();
 
   const excludeHandler = () => {
-    updateLesson({
+    updateLessonStudents({
       id: lessonId,
+      action: 'remove',
       newItem: {
-        // @ts-ignore
-        $pull: {
-          students: student._id,
-        },
+        students: [visiting.student._id],
       },
     });
   };
 
   const [isModalOpen, setModalOpen] = useState(false);
+  const visitType = visiting.date === null
+    ? getVisitTypeName(visiting.visitType)
+    : `${getVisitTypeName(visiting.visitType)} ${format(visiting.date, 'dd.MM')}`;
+
+  const isOutdated = visiting.date !== null && visiting.date < getTodayTimestamp();
 
   return (
     <>
-      <Card variant="outlined" sx={{ width: '325px', marginRight: isMobile ? 0 : '0.5rem', marginBottom: '0.5rem' }}>
-        <CardHeader title={student.fullname} action={
-          <IconButton onClick={() => setModalOpen(true)}>
-            <RemoveCircleOutlineIcon />
-          </IconButton>
-          } />
+      <CardWrapper
+        extraStyle={{
+          borderColor: isOutdated ? 'error.main' : 'rgba(0, 0, 0, 0.12)',
+          opacity: isOutdated ? 0.5 : 1,
+        }}
+      >
+        <CardHeader
+          title={visiting.student.fullname}
+          action={
+            <IconButton onClick={() => setModalOpen(true)}>
+              <RemoveCircleOutlineIcon />
+            </IconButton>
+            }
+          />
         <CardContent>
-          <CardContentItem title="Контакт" value={student.contacts[0].name} />
+          <CardContentItem title="Контакт" value={visiting.student.contacts[0].name} />
           <Divider />
-          <CardContentItem title="Телефон" value={student.contacts[0].phone} />
+          <CardContentItem title="Телефон" value={visiting.student.contacts[0].phone} />
+          <Divider />
+          <CardContentItem title="Посещение" value={visitType} />
           <Divider />
         </CardContent>
-      </Card>
+      </CardWrapper>
 
       <ConfirmationDialog
         title='Исключить из группы'
-        contentEl={<DeleteDialogText name={student.fullname} />}
+        contentEl={<DeleteDialogText name={visiting.student.fullname} />}
         isOpen={isModalOpen}
         setModalOpen={setModalOpen}
         callback={() => excludeHandler()}
@@ -79,49 +80,43 @@ function AddCard({ lessonId, student }: IAddCard) {
   );
 }
 
-export function ContentStudents({ lessonId }: { lessonId: string }) {
-  const isMobile = useMobile();
-  const [isModalOpen, setModalOpen] = useState(false);
-  const { data, isError, isFetching } = useGetLessonQuery(lessonId);
-
-  if (isError) {
-    return <h3>Ошибка при запросе!</h3>;
-  }
-
-  if (isFetching || !data?.payload) {
-    return null;
-  }
-
-  // TODO - добавить телефон педагога и выводить его в карточке
+export function ContentStudents({ lesson }: { lesson: ILessonModel }) {
+  const [isChangeTeacher, setChangeTeacher] = useState(false);
+  const [isAddStudent, setAddStudent] = useState(false);
 
   return (
     <>
       <Typography mb="1rem" variant="h5" component={'h5'}>Ученики</Typography>
       <Grid container direction="row">
         {
-          data?.payload.students.map(
-            (student) => <AddCard key={student._id} lessonId={lessonId} student={student} />,
-          )
-        }
-        <AddStudentButton lessonId={lessonId} />
+          lesson
+            .students
+            .map((visiting) => (
+              <StudentCard
+                key={visiting.student._id}
+                lessonId={lesson._id}
+                visiting={visiting}
+              />
+            ))
+        };
+
+        <AddStudentButton setModalOpen={setAddStudent} />
+
+        <AddStudentsDialog
+          lesson={lesson}
+          isOpen={isAddStudent}
+          setModalOpen={setAddStudent}
+        />
       </Grid>
 
       <Divider sx={{ m: '1rem 0' }} />
-
       <Typography mb="1rem" variant="h5" component={'h5'}>Педагог</Typography>
 
-      <Card
-        variant="outlined"
-        sx={{
-          width: '325px',
-          marginRight: isMobile ? 0 : '0.5rem',
-          marginBottom: '0.5rem',
-        }}>
-
+      <CardWrapper>
         <CardHeader
-          title={data.payload.teacher.fullname}
+          title={lesson.teacher.fullname}
           action={
-            <IconButton onClick={() => setModalOpen(true)}>
+            <IconButton onClick={() => setChangeTeacher(true)}>
               <SyncIcon />
             </IconButton>
           } />
@@ -129,17 +124,15 @@ export function ContentStudents({ lessonId }: { lessonId: string }) {
         <CardContent>
           <CardContentItem
             title="Телефон"
-            value={data.payload.teacher.phone} />
+            value={lesson.teacher.phone} />
         </CardContent>
-
-      </Card>
+      </CardWrapper>
 
       <ChangeTeacherDialog
-        lesson={data.payload}
-        isOpen={isModalOpen}
-        setModalOpen={setModalOpen}
+        lesson={lesson}
+        isOpen={isChangeTeacher}
+        setModalOpen={setChangeTeacher}
       />
-
     </>
   );
 }

@@ -2,8 +2,11 @@ import Popover from '@mui/material/Popover';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import { useMobile } from '../../shared/hooks/useMobile';
 
-function ContentListItem({ item }: { item: string }) {
+function ContentListItem({ item }: { item: string | null }) {
+  if (item === null) return null;
+
   return (
     <ListItem divider={true}>
       <ListItemText primary={item} />
@@ -11,38 +14,25 @@ function ContentListItem({ item }: { item: string }) {
   );
 }
 
-interface IContentList {
-  content: Array<string>;
-  width: number;
-}
-
-function ContentList({ content, width }: IContentList) {
-  return (
-    <List sx={{ width }}>
-      { content.map(
-        (item) => <ContentListItem key={item} item={item} />,
-      ) }
-    </List>
-  );
-}
-
 interface IContentCardPreview {
   anchorEl: HTMLDivElement | null;
-  handleClose: () => void;
-  content: Array<string>;
+  content: Array<string | null>;
 }
 
-export function ContentCardPreview({ anchorEl, content, handleClose }: IContentCardPreview) {
-  const width = anchorEl?.offsetWidth;
-
+export function ContentCardPreview({ anchorEl, content }: IContentCardPreview) {
   if (!anchorEl) return null;
+
+  const isMobile = useMobile();
+
+  if (isMobile) return null;
+
+  const width = anchorEl.offsetWidth;
 
   return (
     <Popover
       disableAutoFocus
-      open={Boolean(anchorEl)}
+      open={!!anchorEl}
       anchorEl={anchorEl}
-      onClose={handleClose}
       anchorOrigin={{
         vertical: 'bottom',
         horizontal: 'center',
@@ -55,7 +45,9 @@ export function ContentCardPreview({ anchorEl, content, handleClose }: IContentC
         pointerEvents: 'none',
       }}
     >
-      <ContentList content={content} width={width ?? 0} />
+      <List sx={{ width }}>
+        { content.map((item) => <ContentListItem key={item} item={item} />) }
+      </List>
     </Popover>
   );
 }

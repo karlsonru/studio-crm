@@ -1,14 +1,8 @@
-import { useEffect } from 'react';
-import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
-import { setPageTitle } from '../../shared/reducers/appMenuSlice';
 import { StudentsContent } from './Content';
+import { useTitle } from '../../shared/hooks/useTitle';
 
 export function StudentsPage() {
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    dispatch(setPageTitle('Ученики'));
-  }, []);
+  useTitle('Ученики');
 
   return <StudentsContent />;
 }

@@ -1,6 +1,8 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateLessonDto } from './create-lesson.dto';
+import { IsArray } from 'class-validator';
+import { OmitType, PartialType } from '@nestjs/mapped-types';
+import { CreateLessonDto, VisitingStudent } from './create-lesson.dto';
 
-export class UpdateLessonDto extends PartialType(CreateLessonDto) {
-  $addToSet?: any;
+export class UpdateLessonDto extends PartialType(OmitType(CreateLessonDto, ['students'])) {
+  @IsArray()
+  students: Array<VisitingStudent | string | null>;
 }

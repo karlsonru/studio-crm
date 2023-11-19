@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import TextField from '@mui/material/TextField';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
 
 interface INumberField {
   name: string;
@@ -8,10 +8,11 @@ interface INumberField {
   helperText?: string;
   minValue?: number;
   defaultValue?: number;
+  props?: TextFieldProps;
 }
 
 export function NumberField({
-  name, label, error, helperText, minValue, defaultValue,
+  name, label, error, helperText, minValue, defaultValue, props,
 }: INumberField) {
   const [value, setValue] = useState(defaultValue ?? '');
   const [valueError, setValueError] = useState(false);
@@ -44,6 +45,7 @@ export function NumberField({
       required
       error={error || valueError}
       helperText={(error && helperText) || (valueError && valueErrorText)}
+      {...props}
     />
   );
 }

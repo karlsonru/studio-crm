@@ -1,4 +1,6 @@
+import { Type } from 'class-transformer';
 import {
+  ArrayUnique,
   IsMongoId,
   IsNotEmpty,
   IsNumber,
@@ -17,10 +19,18 @@ export class CreateSubscriptionDto {
   @IsNotEmpty()
   template: string;
 
-  @IsOptional()
-  @IsString()
-  @IsMongoId()
-  lesson: string | null;
+  @Type(() => String)
+  @IsMongoId({ each: true })
+  @ArrayUnique()
+  lessons: [string];
+
+  @IsNumber()
+  @Min(0)
+  price: number;
+
+  @IsNumber()
+  @Min(0)
+  visitsTotal: number;
 
   @IsNumber()
   @Min(0)

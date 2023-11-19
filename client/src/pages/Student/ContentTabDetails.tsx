@@ -1,5 +1,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { format } from 'date-fns';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
@@ -8,16 +10,18 @@ import FormHelperText from '@mui/material/FormHelperText';
 import RadioGroup from '@mui/material/RadioGroup';
 import Radio from '@mui/material/Radio';
 import Stack from '@mui/system/Stack';
-import TextareaAutosize from '@mui/material/TextareaAutosize';
 import InputLabel from '@mui/material/InputLabel';
 import Button from '@mui/material/Button';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
-import { useGetStudentQuery, usePatchStudentMutation } from '../../shared/api';
+import { usePatchStudentMutation } from '../../shared/api';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { FormContentColumn } from '../../shared/components/FormContentColumn';
-import { IStudentModelContact } from '../../shared/models/IStudentModel';
+import { IStudentModel, IStudentModelContact, KnowledgeSource } from '../../shared/models/IStudentModel';
+import { DateField } from '../../shared/components/fields/DateField';
+import { getKnowledgeSourceName } from '../../shared/helpers/getKnowladgeSourceName';
+import { INPUT_DATE_FORMAT } from '../../shared/constants';
 
 interface IContact {
   idx: number;
@@ -72,8 +76,7 @@ function validateForm(formData: { [key: string]: FormDataEntryValue }) {
   return '';
 }
 
-export function ContentTabDetails({ studentId }: { studentId: string }) {
-  const { data: studentDetails } = useGetStudentQuery(studentId);
+export function ContentTabDetails({ student }: { student: IStudentModel }) {
   const [updadateStudent] = usePatchStudentMutation();
   const [contacts, setContacts] = useState<Array<number>>([0]);
   const [isEdit, setEdit] = useState(false);
@@ -85,18 +88,12 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
   });
 
   useEffect(() => {
-    if (!studentDetails?.payload) return;
-
-    const contactsNum = new Array(studentDetails.payload.contacts.length)
+    const contactsNum = new Array(student.contacts.length)
       .fill(0)
       .map((val, idx) => idx);
 
     setContacts(contactsNum);
-  }, [studentDetails]);
-
-  if (!studentDetails?.payload) {
-    return <>'Не удалось получить информацию по студенту'</>;
-  }
+  }, [student]);
 
   const addContact = () => {
     setContacts((prevState) => [...prevState, prevState.length]);
@@ -134,13 +131,14 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
     }));
 
     updadateStudent({
-      id: studentId,
+      id: student._id,
       newItem: {
         fullname: (formData.fullname as string).trim(),
         sex: formData.sex as string,
         birthday: +Date.parse(formData.birthday as string),
         balance: 0,
         contacts: studentContacts,
+        knowledgeSource: formData.knowledgeSource as KnowledgeSource,
         comment: (formData.comment as string).trim() ?? '',
         isActive: true,
       },
@@ -168,23 +166,18 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
           variant="outlined"
           name="fullname"
           label="ФИО"
-          defaultValue={studentDetails.payload.fullname}
+          defaultValue={student.fullname}
           disabled={!isEdit}
           fullWidth
           required
           error={!formValidation.fullname}
           helperText={!formValidation.fullname && 'Имя не должно быть пустым или слишком короткий'}
         />
-        <TextField
-          variant="outlined"
-          type="date"
+        <DateField
           name="birthday"
           label="Дата рождения"
-          defaultValue={format(studentDetails.payload.birthday, 'Y-MM-dd')}
+          defaultValue={format(student.birthday, INPUT_DATE_FORMAT)}
           disabled={!isEdit}
-          InputLabelProps={{ shrink: true }}
-          fullWidth
-          required
         />
 
         <FormControl required>
@@ -192,7 +185,7 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
           <RadioGroup
             row
             name="sex"
-            defaultValue={studentDetails.payload.sex}
+            defaultValue={student.sex}
             aria-labelledby="sex-label"
           >
             <FormControlLabel
@@ -213,7 +206,7 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
         <hr/>
 
         {contacts.map((idx) => {
-          const contactDetails = studentDetails.payload.contacts[idx];
+          const contactDetails = student.contacts[idx];
           return (
             <NewContact
               key={`contact${idx}`}
@@ -235,15 +228,34 @@ export function ContentTabDetails({ studentId }: { studentId: string }) {
         >
           Добавить контакт
         </Button>
-
         <hr/>
 
-        <InputLabel>Комментарий</InputLabel>
-        <TextareaAutosize
+        <FormControl>
+          <FormLabel>Источник</FormLabel>
+          <Select
+            name='knowledgeSource'
+            label='источник'
+            defaultValue={student.knowledgeSource ?? KnowledgeSource.UNKNOWN}
+            fullWidth
+            disabled={!isEdit}
+          >
+            {
+              Object.values(KnowledgeSource).map((source) => (
+                <MenuItem key={source} value={source}>{getKnowledgeSourceName(source)}</MenuItem>
+              ))
+            }
+          </Select>
+        </FormControl>
+
+        <TextField
+          variant="outlined"
           name="comment"
-          defaultValue={studentDetails.payload.comment}
-          minRows={5}
+          label="Комментарий"
+          defaultValue={student.comment}
           disabled={!isEdit}
+          fullWidth
+          multiline
+          minRows={3}
         />
 
       <SubmitButton content={'Подтвердить'} props={{ disabled: !isEdit }} />

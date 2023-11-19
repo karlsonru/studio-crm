@@ -6,12 +6,10 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Stack from '@mui/system/Stack';
 import {
-  eachDayOfInterval,
   eachMinuteOfInterval,
   format,
   isMonday,
   previousMonday,
-  set,
 } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { ContentCard } from './ContentCard';
@@ -109,12 +107,14 @@ function Row({ content, dates }: IRow) {
 
   return (
     <TableRow>
-      { content.map((item, idx) => <Cell
+      { content.map((item, idx) => (
+        <Cell
           key={time + idx}
           content={item}
           idx={idx}
           date={idx === 0 ? 0 : dates[idx - 1]}
-        />)
+        />
+      ))
       }
     </TableRow>
   );
@@ -127,39 +127,36 @@ export function TimetableContent({ lessons }: { lessons: Array<ILessonModel> }) 
 
   // запоминаем какой установлен вид отображения
   const isDayView = view === 'day';
+  const currentDay = new Date(currentDate).getDay();
 
   // отфильтруем все занятия для этого дня недели и отсортируем их по времени начала
   const dayLessons = useMemo(() => {
     // не проводим фильтрацию если режим отображения Неделя
     if (!isDayView) return [];
 
-    const currentDay = new Date(currentDate).getDay();
-    const filteredLessons = lessons
-      .filter((lesson) => lesson.day === currentDay)
-      .sort((lessonA, lessonB) => {
-        if (lessonA.timeStart.hh !== lessonB.timeStart.hh) {
-          return lessonA.timeStart.hh - lessonB.timeStart.hh;
-        }
-        return lessonA.timeStart.min - lessonB.timeStart.min;
-      });
-    return filteredLessons;
+    return lessons.filter((lesson) => lesson.day === currentDay);
   }, [currentDate, view]);
 
   // запомним дату, с которой нужно рисовать даты в заголовках
-  const startDate = isMonday(currentDate) ? currentDate : previousMonday(currentDate).getTime();
+  const startDateTimestamp = isMonday(currentDate)
+    ? currentDate
+    : previousMonday(currentDate).getTime();
 
   // вычисляем даты в заголовках при изменении стартовой даты
   useEffect(() => {
     // не нужно вычислять, если у нас режим отображения - день
     if (isDayView) return;
 
-    const interval = eachDayOfInterval({
-      start: startDate,
-      end: set(startDate, { date: new Date(startDate).getDate() + 6 }),
-    }).map((date) => date.getTime());
+    const startDate = new Date(startDateTimestamp);
+    const year = startDate.getFullYear();
+    const month = startDate.getMonth();
+    const date = startDate.getDate();
+
+    // дату складываем в UTC
+    const interval = [0, 1, 2, 3, 4, 5, 6].map((i) => Date.UTC(year, month, date + i));
 
     setDates(interval);
-  }, [startDate, setDates]);
+  }, [startDateTimestamp]);
 
   // для вида День рисуем просто одну колонку с занятиями
   if (isDayView) {
@@ -178,6 +175,7 @@ export function TimetableContent({ lessons }: { lessons: Array<ILessonModel> }) 
   }
 
   // поделим все занятия по ячейкам и строкам
+  // const rowsContent = useMemo(() => fillRowsWithContent(lessons), [lessons]);
   const rowsContent = fillRowsWithContent(lessons);
 
   const dateNames = [null, ...dates.map((intervalDate) => format(intervalDate, 'dd EEEE', { locale: ru }))];

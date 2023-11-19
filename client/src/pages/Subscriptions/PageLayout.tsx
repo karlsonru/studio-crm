@@ -1,18 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
-import { useAppDispatch } from '../../shared/hooks/useAppDispatch';
-import { setPageTitle } from '../../shared/reducers/appMenuSlice';
+import { useTitle } from '../../shared/hooks/useTitle';
 
 export function SubscriptionsPageLayout() {
+  useTitle('Абонементы');
   const location = useLocation();
-  const dispatch = useAppDispatch();
   const [value, setValue] = useState(location.pathname.includes('templates') ? 1 : 0);
-
-  useEffect(() => {
-    dispatch(setPageTitle('Абонементы'));
-  }, []);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);

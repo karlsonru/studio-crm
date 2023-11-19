@@ -8,6 +8,7 @@ import {
   GridValueFormatterParams,
 } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import { useGetStudentsQuery, useDeleteStudentMutation } from '../../shared/api/studentApi';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { IStudentModel } from '../../shared/models/IStudentModel';
@@ -50,7 +51,7 @@ export function StudentsContent() {
   const actions = useActionCreators(studentsPageActions);
   const navigate = useNavigate();
 
-  const { data, isFetching, error } = useGetStudentsQuery();
+  const { data, isLoading, error } = useGetStudentsQuery();
 
   const deleteStudentHandler = useCallback((currentStudent: IStudentModel) => {
     actions.setCurrentStudent(currentStudent);
@@ -98,6 +99,15 @@ export function StudentsContent() {
       type: 'actions',
       getActions: (params: GridRowParams<IStudentModel>) => [
         <GridActionsCellItem
+          label="WhatsApp"
+          color="success"
+          icon={<WhatsAppIcon />}
+          onClick={() => window.open(
+            `https://api.whatsapp.com/send/?phone=${params.row.contacts[0].phone}&text&type=phone_number`,
+            '_blank',
+          )}
+        />,
+        <GridActionsCellItem
           label="Delete"
           icon={<DeleteIcon />}
           onClick={() => deleteStudentHandler(params.row)}
@@ -106,7 +116,7 @@ export function StudentsContent() {
     },
   ], [deleteStudentHandler, dateValueFormatter]);
 
-  if (isFetching) {
+  if (isLoading) {
     return <Loading />;
   }
 
@@ -123,7 +133,7 @@ export function StudentsContent() {
       autoHeight
       disableColumnMenu
       columns={isMobile ? [columns[0]] : columns}
-      rows={data.payload}
+      rows={data}
       getRowId={(item) => item._id}
       onRowDoubleClick={((params: GridRowParams<IStudentModel>) => navigate(`./${params.id}`))}
       components={{
