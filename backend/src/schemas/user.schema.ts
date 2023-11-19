@@ -79,13 +79,13 @@ export class User {
   })
   login?: string;
 
+  @Exclude()
   @IsOptional()
   @Prop({
     type: String,
     minLength: 10,
     trim: true,
   })
-  @Exclude()
   password?: string;
 }
 

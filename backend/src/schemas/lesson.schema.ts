@@ -8,29 +8,6 @@ import { Attendance, VisitType } from './attendance.schema';
 
 export type LessonDocument = HydratedDocument<Lesson>;
 
-/*
-interface IStudentsPermament {
-  studentId: Types.ObjectId;
-}
-
-interface IStudentsTemp {
-  studentId: string;
-  subscriptionId: string;
-  reason: 'postponed' | 'oneVisit' | 'new'; // если reason postponed - спишем из занятия postponed этого абонемента, если занятие oneVisit - спишем с обычного занятия абонемента
-}
-
-interface IStudents {
-  permament: IStudentsPermament;
-  temp: IStudentsTemp;
-}
-
-
-после того как будет создан visitedLesson
-и будет списано занятие с абонемента ученика
-мы удалим его из списка temp студентов
-как мы узнаем, этот студент "Новый?" или у него абонемент на 1 занятие (однократный) или это отработка? 
-*/
-
 export class ITime {
   hh: number;
   min: number;

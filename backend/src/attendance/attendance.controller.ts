@@ -15,6 +15,7 @@ import { AttendanceService } from './attendance.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { ValidateIdPipe } from '../shared/validaitonPipe';
+import { VisitStatus } from '../schemas/attendance.schema';
 
 /** 
 TODO: перенести логику списания абонемента в контроллер. 
@@ -75,6 +76,19 @@ export class AttendanceController {
     }
 
     return await this.service.findAll(parsedQuery);
+  }
+
+  // ищем все отложенные занятия
+  @Get('/postponed')
+  async findAllPostponed(@Query('from') from: string, @Query('to') to: string) {
+    return await this.service.findAll({
+      date: { $gte: from, $lte: to },
+      students: {
+        $elemMatch: {
+          visitStatus: VisitStatus.POSTPONED_FUTURE,
+        },
+      },
+    });
   }
 
   @Get(':id')

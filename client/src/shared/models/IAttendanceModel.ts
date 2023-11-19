@@ -11,9 +11,10 @@ export enum BillingStatus {
 export enum VisitStatus {
   UNKNOWN = 'unknown',
   VISITED = 'visited',
-  POSTPONED = 'postponed',
   MISSED = 'missed',
   SICK = 'sick',
+  POSTPONED_FUTURE = 'postponed_future',
+  POSTPONED_DONE = 'postponed_done',
 }
 
 interface IVisit {
@@ -22,6 +23,7 @@ interface IVisit {
   billingStatus: BillingStatus;
   visitType: VisitType;
   subscription: string;
+  visitInstead?: string;
 }
 
 interface IVisitCreate extends Omit<IVisit, 'student' | 'subscription' | 'billingStatus'> {

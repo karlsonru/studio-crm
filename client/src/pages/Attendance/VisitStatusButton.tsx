@@ -12,9 +12,10 @@ const VISIT_STATUSES: Array<{
 }> = [
   { action: VisitStatus.UNKNOWN, color: 'disabled' },
   { action: VisitStatus.VISITED, color: 'success' },
-  { action: VisitStatus.POSTPONED, color: 'primary' },
+  { action: VisitStatus.POSTPONED_FUTURE, color: 'primary' },
   { action: VisitStatus.MISSED, color: 'error' },
   { action: VisitStatus.SICK, color: 'warning' },
+  { action: VisitStatus.POSTPONED_DONE, color: 'success' },
 ];
 
 interface IVisitStatusButton {
@@ -35,7 +36,10 @@ export function VisitStatusButton({ studentId, visitStatus }: IVisitStatusButton
       >
       {
         VISIT_STATUSES.map((status) => (
-          <MenuItem key={status.action} value={status.action}>
+          <MenuItem key={status.action}
+            value={status.action}
+            disabled={status.action === VisitStatus.POSTPONED_DONE}
+          >
             <CircleIcon color={status.color} fontSize="small" sx={{ marginRight: '0.5rem' }} />
             { getVisitStatusName(status.action) }
           </MenuItem>

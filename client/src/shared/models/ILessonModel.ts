@@ -9,7 +9,7 @@ export interface ITime {
 
 export enum VisitType {
   REGULAR = 'regular',
-  MISSED_REGULAR = 'missedRegular',
+  POSTPONED = 'postponed',
   SINGLE = 'single',
   NEW = 'new',
 }
@@ -18,6 +18,7 @@ export interface IVisitingStudent {
   student: IStudentModel;
   date: null | number;
   visitType: VisitType;
+  visitInstead?: string;
 }
 
 export interface ILessonModel {

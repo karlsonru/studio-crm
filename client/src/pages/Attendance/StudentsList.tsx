@@ -48,11 +48,14 @@ interface IStudentsListItem {
     visitType: VisitType;
     visitStatus?: VisitStatus;
     billingStatus?: BillingStatus;
+    visitInstead?: string;
   }
 }
 
 function StudentsListItem({ student, visitDetails }: IStudentsListItem) {
-  const { visitType, visitStatus, billingStatus } = visitDetails;
+  const {
+    visitType, visitStatus, billingStatus, visitInstead,
+  } = visitDetails;
   const { name: billingStatusName, color } = getBillingStatusNameAndColor(billingStatus);
   const visitTypeName = getVisitTypeName(visitType);
 
@@ -69,6 +72,11 @@ function StudentsListItem({ student, visitDetails }: IStudentsListItem) {
             <ListItemText
               secondary={visitTypeName}
             />
+            {
+              visitInstead && VisitType.POSTPONED && <ListItemText
+                secondary={`Отработано в занятии ${visitInstead}`}
+              />
+            }
           </List>
         }
         secondaryTypographyProps={{
@@ -119,6 +127,7 @@ export function StudentsListVisited({ attendance }: { attendance: IAttendanceMod
               visitStatus: visited.visitStatus,
               visitType: visited.visitType,
               billingStatus: visited.billingStatus,
+              visitInstead: visited.visitInstead,
             }}
           />,
         )}

@@ -10,9 +10,10 @@ export type AttendanceDocument = HydratedDocument<Attendance>;
 export enum VisitStatus {
   UNKNOWN = 'unknown',
   VISITED = 'visited',
-  POSTPONED = 'postponed',
   MISSED = 'missed',
   SICK = 'sick',
+  POSTPONED_FUTURE = 'postponed_future', // К отработке
+  POSTPONED_DONE = 'postponed_done', // Отработано
 }
 
 export enum PaymentStatus {
@@ -34,6 +35,7 @@ export class VisitedStudent {
   paymentStatus: PaymentStatus;
   subscription: string | null;
   visitType: VisitType;
+  visitInstead?: Attendance | null;
 }
 
 @Schema({

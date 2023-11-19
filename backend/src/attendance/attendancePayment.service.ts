@@ -40,7 +40,6 @@ export class AttendancePaymentService {
   assignSubscriptions(attendance: AttendanceModel, subscriptions: SubscriptionModel[]) {
     for (const visitedStudent of attendance.students) {
       switch (visitedStudent.visitStatus) {
-        case VisitStatus.POSTPONED:
         case VisitStatus.VISITED:
           const subscription = subscriptions.find(
             (subscription) => subscription.student._id === visitedStudent.student._id,
@@ -65,7 +64,6 @@ export class AttendancePaymentService {
 
   getPaymentStatus(visitStatus: VisitStatus, isPaid: boolean): PaymentStatus {
     switch (visitStatus) {
-      case VisitStatus.POSTPONED:
       case VisitStatus.VISITED:
         return isPaid ? PaymentStatus.PAID : PaymentStatus.UNPAID;
       default:
@@ -119,15 +117,7 @@ export class AttendancePaymentService {
     );
 
     visitedStudents.forEach((visitedStudent) => {
-      // отметим только что не нужно снимать с абонемента, если visitStatus не походит для списания
       switch (visitedStudent.visitStatus) {
-        case VisitStatus.MISSED:
-        case VisitStatus.SICK:
-        case VisitStatus.UNKNOWN:
-          visitedStudent.subscription = null;
-          break;
-
-        case VisitStatus.POSTPONED:
         case VisitStatus.VISITED:
           // если посетил занятие или перенёс, то ищем абонемент
           const subscription = subscriptions.find(
@@ -137,34 +127,11 @@ export class AttendancePaymentService {
           visitedStudent.subscription = subscription ?? null;
           break;
 
-        default:
-      }
-    });
-  }
-
-  async _addPaymentStatus(visitedStudents: VisitedStudent[], lessonId: string) {
-    // в зависимости от найденных абонементов - каждому студенту проставим его биллинг статус
-    for (const visitedStudent of visitedStudents) {
-      switch (visitedStudent.visitStatus) {
-        case VisitStatus.POSTPONED:
-        case VisitStatus.VISITED:
-          // Если есть абонемент с которого списать - отметим что занятие оплачено
-          visitedStudent.paymentStatus = visitedStudent.subscription
-            ? PaymentStatus.PAID
-            : PaymentStatus.UNPAID;
-          break;
         // отметим только что не нужно снимать с абонемента, если visitStatus не походит для списания
         default:
-          visitedStudent.paymentStatus = PaymentStatus.UNCHARGED;
+          visitedStudent.subscription = null;
       }
-
-      logger.debug(
-        `Занятие: ${lessonId}. Студент ${visitedStudent.student}. 
-        Статус визита: ${visitedStudent.visitStatus}. 
-        Статус оплаты: ${visitedStudent.paymentStatus}. 
-        Абонемент: ${visitedStudent.subscription ?? 'не найден'}`,
-      );
-    }
+    });
   }
 
   async addPaymentStatus(visitedStudents: IVisitedStudentDto[], lessonId: string) {
@@ -175,13 +142,6 @@ export class AttendancePaymentService {
 
       // отметим только что не нужно снимать с абонемента, если visitStatus не походит для списания
       switch (visitedStudent.visitStatus) {
-        case VisitStatus.MISSED:
-        case VisitStatus.SICK:
-        case VisitStatus.UNKNOWN:
-          visitedStudent.paymentStatus = PaymentStatus.UNCHARGED;
-          break;
-
-        case VisitStatus.POSTPONED:
         case VisitStatus.VISITED:
           // Если есть абонемент с которого списать - отметим что занятие оплачено
           if (visitedStudent.subscription && visitedStudent.subscription.visitsLeft > 0) {
@@ -193,6 +153,7 @@ export class AttendancePaymentService {
           break;
 
         default:
+          visitedStudent.paymentStatus = PaymentStatus.UNCHARGED;
       }
 
       logger.debug(
@@ -204,81 +165,22 @@ export class AttendancePaymentService {
     });
   }
 
-  async _chargeSubscriptions(visitedStudents: VisitedStudent[], lessonId: string) {
-    // спишем по одному занятию из списка оставшихся у тех, у кого статус оплачено
-    const studentsPaidIds = visitedStudents
-      .filter((visitedStudent) => visitedStudent.paymentStatus === PaymentStatus.PAID)
-      .map((visitedStudent) => visitedStudent.subscription);
-
-    if (studentsPaidIds.length) {
-      logger.debug(`
-        Занятие ${lessonId}. Списание оплаченных занятий у ${studentsPaidIds.length} студентов.
-      `);
-
-      await this.subscriptionService.updateMany(
-        { _id: { $in: studentsPaidIds } },
-        { $inc: { visitsLeft: -1 } },
-      );
-    }
-
-    const studentsPaidAndPostponedIds = visitedStudents
-      .filter(
-        (visitedStudent) =>
-          visitedStudent.paymentStatus === PaymentStatus.PAID &&
-          visitedStudent.visitStatus === VisitStatus.POSTPONED,
-      )
-      .map((visitedStudent) => visitedStudent.subscription);
-
-    // дополнительно отметим перенесённое занятие у тех у кого оплачено
-    if (studentsPaidAndPostponedIds.length) {
-      logger.debug(`
-        Занятие ${lessonId}. Перенос занятий у ${studentsPaidIds.length} студентов.
-      `);
-
-      await this.subscriptionService.updateMany(
-        { _id: { $in: studentsPaidAndPostponedIds } },
-        { $inc: { visitsPostponed: 1 } },
-      );
-    }
-  }
-
   async chargeSubscriptions(visitedStudents: VisitedStudentDto[], lessonId: string) {
     // спишем по одному занятию из списка оставшихся у тех, у кого статус оплачено
-
-    const studentsPaidIds = visitedStudents
+    const subscriptionsIds = visitedStudents
       .filter((visitedStudent) => visitedStudent.paymentStatus === PaymentStatus.PAID)
       .map((visitedStudent) => visitedStudent.subscription);
 
-    if (studentsPaidIds.length) {
-      logger.debug(`
-        Занятие ${lessonId}. Списание оплаченных занятий у ${studentsPaidIds.length} студентов.
-      `);
+    logger.debug(`
+      Занятие ${lessonId}. Списание оплаченных занятий у ${subscriptionsIds.length} студентов.
+    `);
+    if (!subscriptionsIds.length) return;
 
-      await this.subscriptionService.updateMany(
-        { _id: { $in: studentsPaidIds } },
-        { $inc: { visitsLeft: -1 } },
-      );
-    }
-
-    const studentsPaidAndPostponedIds = visitedStudents
-      .filter(
-        (visitedStudent) =>
-          visitedStudent.paymentStatus === PaymentStatus.PAID &&
-          visitedStudent.visitStatus === VisitStatus.POSTPONED,
-      )
-      .map((visitedStudent) => visitedStudent.subscription);
-
-    // дополнительно отметим перенесённое занятие у тех у кого оплачено
-    if (studentsPaidAndPostponedIds.length) {
-      logger.debug(`
-        Занятие ${lessonId}. Перенос занятий у ${studentsPaidIds.length} студентов.
-      `);
-
-      await this.subscriptionService.updateMany(
-        { _id: { $in: studentsPaidAndPostponedIds } },
-        { $inc: { visitsPostponed: 1 } },
-      );
-    }
+    // обновляем абонементы - списываем с каждого по одному занятию
+    await this.subscriptionService.updateMany(
+      { _id: { $in: subscriptionsIds } },
+      { $inc: { visitsLeft: -1 } },
+    );
   }
 
   async changePaymentStatus(
@@ -309,21 +211,22 @@ export class AttendancePaymentService {
     const updatedStudents = studentsWithChangedStatuses.map(
       (prevAndNextVisit) => prevAndNextVisit.updatedVisit,
     );
-    const sourceLessonId = attendance.lesson._id.toString();
+    const lessonId = attendance.lesson._id.toString();
 
     // найдём абонемент с которого списать
-    await this.addSubscription(updatedStudents, sourceLessonId, attendance.date);
+    await this.addSubscription(updatedStudents, lessonId, attendance.date);
 
     // добавим биллинг статус
-    await this.addPaymentStatus(updatedStudents, sourceLessonId);
+    await this.addPaymentStatus(updatedStudents, lessonId);
 
     // конвертируем объекты с подписками в обычные текстовые строки с id
     this.normalizeSubscriptionIds(updatedStudents);
 
     // спишем занятие
-    await this.chargeSubscriptions(updatedStudents, sourceLessonId);
+    await this.chargeSubscriptions(updatedStudents, lessonId);
   }
 
+  // сравним полученный обновленный список студентов с уже отмеченными студентами
   compareVisits(updatedVisitedStudents: VisitedStudentDto[], attendance: AttendanceModel) {
     const studentsWithChangedStatuses: Array<IPrevAndUpdatedVisit> = [];
 
@@ -378,14 +281,6 @@ export class AttendancePaymentService {
       ids: [],
       action: { visitsLeft: 1 },
     };
-    const deductPostponedVisits: IChargeBackSubscription = {
-      ids: [],
-      action: { visitsPostponed: -1 },
-    };
-    const increasePostponedVisits: IChargeBackSubscription = {
-      ids: [],
-      action: { visitsPostponed: 1 },
-    };
 
     studentsWithChangedStatuses.forEach((prevAndUpdatedVisit) => {
       const { prevVisit } = prevAndUpdatedVisit;
@@ -395,27 +290,18 @@ export class AttendancePaymentService {
 
       // смотрим какой был статус и какой новый
       switch (prevVisit.visitStatus) {
-        // если старый статус не подразуемвал списания - то ничего не делаем
-        case VisitStatus.MISSED:
-        case VisitStatus.SICK:
-        case VisitStatus.UNKNOWN:
-          break;
-
-        // если ранее был статус ПЕРЕНЕСЁН - вернём списанное и отложенное занятие
-        case VisitStatus.POSTPONED:
-          increaseVisitsLeft.ids.push(prevVisit.subscription);
-          deductPostponedVisits.ids.push(prevVisit.subscription);
-          break;
-
         // если старый статус ПОСЕТИЛ вернём ему списанное занятие
         case VisitStatus.VISITED:
           increaseVisitsLeft.ids.push(prevVisit.subscription);
           break;
+
+        // если старый статус не подразуемвал списания - то ничего не делаем
+        default:
       }
     });
 
     // по полученным спискам ID абонементов где есть отличия пройдём по всем и внесём изменения в абонементы
-    [increaseVisitsLeft, deductPostponedVisits, increasePostponedVisits].forEach(async (change) => {
+    await (async (change: IChargeBackSubscription) => {
       if (!change.ids.length) return;
 
       const updatedResult = await this.subscriptionService.updateMany(
@@ -426,6 +312,6 @@ export class AttendancePaymentService {
       logger.debug(
         `У ${change.ids.length} студентов выполнено действие ${change.action}. Обновлено ${updatedResult.modifiedCount} документов`,
       );
-    });
+    })(increaseVisitsLeft);
   }
 }

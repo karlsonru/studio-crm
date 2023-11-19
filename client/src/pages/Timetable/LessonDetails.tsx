@@ -44,7 +44,7 @@ function getVisitTypeName(visitType: VisitType) {
     [VisitType.REGULAR]: 'постоянный',
     [VisitType.SINGLE]: 'однократный',
     [VisitType.NEW]: 'новый',
-    [VisitType.MISSED_REGULAR]: 'отработка',
+    [VisitType.POSTPONED]: 'отработка',
   };
 
   return visitTypeNames[visitType];

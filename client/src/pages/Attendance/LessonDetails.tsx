@@ -1,4 +1,5 @@
 // import Card from '@mui/material/Card';
+import { useNavigate } from 'react-router-dom';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import List from '@mui/material/List';
@@ -6,6 +7,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import Button from '@mui/material/Button';
 import ScheduleOutlinedIcon from '@mui/icons-material/ScheduleOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
@@ -32,12 +34,16 @@ interface ILessonDetails {
 
 export function LessonDetails({ lesson, dateTimestamp, visitedStudents }: ILessonDetails) {
   const dateField = `${dateValueFormatter(dateTimestamp)} c ${convertTime(lesson.timeStart)} до ${convertTime(lesson.timeEnd)}`;
+  const navigate = useNavigate();
 
   return (
-    // <Card sx={{ maxHeight: '250px' }}>
     <CardWrapper>
-      <CardHeader title={lesson.title} />
-      <CardContent>
+      <CardHeader
+        title={lesson.title}
+        subheader={ <Button onClick={() => navigate(`/lessons/${lesson._id}`)}>К занятию</Button> }
+        sx={{ paddingBottom: 0 }}
+      />
+      <CardContent sx={{ paddingTop: 0 }} >
         <List>
           <AddListItem text={lesson.location.address} icon={<LocationOnOutlinedIcon />} />
           <AddListItem text={dateField} icon={<ScheduleOutlinedIcon />} />
