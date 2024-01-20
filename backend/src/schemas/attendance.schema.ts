@@ -29,6 +29,11 @@ export enum VisitType {
   POSTPONED = 'postponed', // ОТРАБОТКА
 }
 
+export enum AttendanceType {
+  DONE = 'done',
+  FUTURE = 'future',
+}
+
 export class VisitedStudent {
   student: Student;
   visitStatus: VisitStatus;
@@ -38,9 +43,7 @@ export class VisitedStudent {
   visitInstead?: Attendance | null;
 }
 
-@Schema({
-  timestamps: true,
-})
+@Schema({ timestamps: true })
 export class Attendance {
   @Transform(({ value }) => value.toString())
   @Type(() => String)
@@ -54,6 +57,13 @@ export class Attendance {
   })
   @Type(() => Lesson)
   lesson: Lesson;
+
+  @Prop({
+    type: String,
+    enum: AttendanceType,
+    default: AttendanceType.DONE,
+  })
+  type: AttendanceType;
 
   @Prop({
     type: Number,

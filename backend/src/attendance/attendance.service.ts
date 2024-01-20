@@ -10,7 +10,7 @@ import { IFilterQuery } from '../shared/IFilterQuery';
 import { withTransaction } from '../shared/withTransaction';
 import { logger } from '../shared/logger.middleware';
 import { LessonService } from '../lesson/lesson.service';
-import { PaymentStatus, VisitType } from '../schemas/attendance.schema';
+import { AttendanceType, PaymentStatus, VisitType } from '../schemas/attendance.schema';
 
 interface ICreateAttendance extends Pick<CreateAttendanceDto, 'lesson' | 'teacher' | 'students'> {
   date: number;
@@ -28,13 +28,11 @@ export class AttendanceService {
     private readonly lessonService: LessonService,
   ) {
     this.populateQueryAttendance = [
-      'lesson',
-      'teacher',
+      { path: 'lesson', select: ['_id', 'title'] },
+      { path: 'teacher', select: ['_id', 'fullname'] },
       {
         path: 'students',
-        populate: {
-          path: 'student',
-        },
+        populate: { path: 'student', select: ['_id', 'fullname'] },
       },
     ];
   }
@@ -68,7 +66,7 @@ export class AttendanceService {
       lesson: createAttendanceDto.lesson,
     });
 
-    if (candidate) {
+    if (candidate && candidate.type === AttendanceType.DONE) {
       logger.debug(`Занятие уже существует`);
       return null;
     }
@@ -107,8 +105,20 @@ export class AttendanceService {
         'remove',
       );
 
+      // если уже было занятие из будущего - удалим его сейчас
+      if (candidate && candidate.type === AttendanceType.FUTURE) {
+        logger.debug(`Удалим существующее занятие из будущего`);
+        this.remove(candidate._id.toString());
+      }
+
+      // Это занятие из будущего ?
+      const isFuture = createAttendanceDto.date > Date.now();
+
       // сохраним само занятие и вернём его
-      return await this.attendanceModel.create(createAttendanceDto);
+      return await this.attendanceModel.create({
+        ...createAttendanceDto,
+        type: isFuture ? AttendanceType.FUTURE : AttendanceType.DONE,
+      });
     };
 
     const created = await withTransaction<AttendanceDocument>(this.attendanceModel, transaction);
@@ -143,12 +153,28 @@ export class AttendanceService {
 
     // добавлям транзакцию для обновления различных статусов абонементов
     const transaction = async (session: ClientSession) => {
-      if (updateAttendanceDto.students) {
-        await this.attendancePaymentService.changePaymentStatus(
-          updateAttendanceDto.students,
-          visitedLesson,
-        );
+      if (!updateAttendanceDto.students) {
+        const updated = await this.attendanceModel.findByIdAndUpdate(id, updateAttendanceDto, {
+          new: true,
+        });
+        return updated;
       }
+
+      await this.attendancePaymentService.changePaymentStatus(
+        updateAttendanceDto.students,
+        visitedLesson,
+      );
+
+      // удалим студентов с однократным посещением из основного занятия
+      await this.lessonService.updateStudents(
+        visitedLesson.lesson._id.toString(),
+        {
+          students: updateAttendanceDto.students?.map((visited) =>
+            visited.visitType !== VisitType.REGULAR ? visited.student : null,
+          ),
+        },
+        'remove',
+      );
 
       // обновим занятие и вернём результат
       return await this.attendanceModel.findByIdAndUpdate(id, updateAttendanceDto, {
