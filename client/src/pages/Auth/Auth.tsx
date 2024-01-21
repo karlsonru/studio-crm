@@ -11,13 +11,14 @@ import { useMobile } from '../../shared/hooks/useMobile';
 import { PasswordField } from '../../shared/components/fields/PasswordField';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { FormContentColumn } from '../../shared/components/FormContentColumn';
-import { useLocalStorage } from '../../shared/hooks/useLocalStorage';
+import { useActionCreators } from '../../shared/hooks/useActionCreators';
+import { authActions } from '../../shared/reducers/authSlice';
 
 export default function AuthPage() {
   const isMobile = useMobile();
   const navigate = useNavigate();
+  const actions = useActionCreators(authActions);
   const [hasError, setError] = useState(false);
-  const { setItem } = useLocalStorage();
 
   const [login, {
     data: auth, isSuccess, isError, error, isLoading,
@@ -26,7 +27,7 @@ export default function AuthPage() {
   useEffect(() => {
     if (!isSuccess || !auth?.token) return;
 
-    setItem('token', auth.token);
+    actions.setToken(auth.token);
 
     navigate('/');
   }, [isSuccess]);

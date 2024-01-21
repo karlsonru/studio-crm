@@ -1,14 +1,17 @@
+import { useEffect } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Stack from '@mui/material/Stack';
 import { Outlet, Navigate } from 'react-router-dom';
 import { AppHeader } from '../shared/components/AppHeader';
-import { useLocalStorage } from '../shared/hooks/useLocalStorage';
 import {
   SideMenu,
   MobileMenu,
   MobileMenuIcon,
   DesktopMenuIcon,
 } from '../shared/components/Menu';
+import { useAppSelector } from '../shared/hooks/useAppSelector';
+import { useActionCreators } from '../shared/hooks/useActionCreators';
+import { authActions } from '../shared/reducers/authSlice';
 // import { StickyFooter } from '../components/StickyFooter';
 
 export function Layout() {
@@ -29,8 +32,15 @@ export function Layout() {
 }
 
 export function ProtectedLayout() {
-  const { getItem } = useLocalStorage();
-  const token = getItem('token');
+  const token = useAppSelector((state) => state.authReducer.token);
+  const actions = useActionCreators(authActions);
+
+  useEffect(() => {
+    const removeToken = () => actions.setToken(null);
+
+    window.addEventListener('remove-token', removeToken);
+    return () => window.removeEventListener('remove-token', removeToken);
+  }, []);
 
   if (!token) {
     return <Navigate to='/auth' replace={true} />;
