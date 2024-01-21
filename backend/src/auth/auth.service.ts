@@ -10,7 +10,6 @@ export class AuthService {
   constructor(private userService: UserService, private jwtService: JwtService) {}
 
   async signIn(createAuthDto: CreateAuthDto): Promise<null | string> {
-    console.log(createAuthDto);
     logger.info(`Пользователь: ${createAuthDto.login}. Аутентификация.`);
     const user = await this.userService.findOne({ login: createAuthDto.login });
 
