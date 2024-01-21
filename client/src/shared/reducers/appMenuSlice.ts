@@ -39,4 +39,4 @@ export const {
   setMobileMenuAnchorEl,
 } = menuSlice.actions;
 
-export default menuSlice.reducer;
+export const menuReducer = menuSlice.reducer;

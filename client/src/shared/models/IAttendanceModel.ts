@@ -17,7 +17,12 @@ export enum VisitStatus {
   POSTPONED_DONE = 'postponed_done',
 }
 
-interface IVisit {
+export enum AttendanceType {
+  DONE = 'done',
+  FUTURE = 'future',
+}
+
+export interface IVisit {
   student: IStudentModel;
   visitStatus: VisitStatus;
   billingStatus: BillingStatus;
@@ -34,12 +39,13 @@ export interface IAttendanceModel {
   _id: string;
   lesson: ILessonModel;
   teacher: IUserModel;
+  type: AttendanceType;
   day: number;
   date: number; // UTC Timestamp
   students: Array<IVisit>,
 }
 
-export interface IAttendanceModelCreate extends Omit<IAttendanceModel, '_id' | 'lesson' | 'teacher' | 'students' | 'date'> {
+export interface IAttendanceModelCreate extends Omit<IAttendanceModel, '_id' | 'lesson' | 'teacher' | 'students' | 'date' | 'type'> {
   lesson: string;
   teacher: string;
   students: Array<IVisitCreate>

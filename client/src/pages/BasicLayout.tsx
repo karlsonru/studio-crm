@@ -1,8 +1,8 @@
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Stack from '@mui/material/Stack';
 import { Outlet, Navigate } from 'react-router-dom';
-import { AppHeader } from 'shared/components/AppHeader';
-import { useAppSelector } from 'shared/hooks/useAppSelector';
+import { AppHeader } from '../shared/components/AppHeader';
+import { useLocalStorage } from '../shared/hooks/useLocalStorage';
 import {
   SideMenu,
   MobileMenu,
@@ -29,7 +29,8 @@ export function Layout() {
 }
 
 export function ProtectedLayout() {
-  const token = useAppSelector((state) => state.authReducer.token) ?? true;
+  const { getItem } = useLocalStorage();
+  const token = getItem('token');
 
   if (!token) {
     return <Navigate to='/auth' replace={true} />;

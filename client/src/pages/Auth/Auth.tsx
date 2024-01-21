@@ -8,45 +8,39 @@ import Avatar from '@mui/material/Avatar';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useLoginMutation } from '../../shared/api';
 import { useMobile } from '../../shared/hooks/useMobile';
-import { useActionCreators } from '../../shared/hooks/useActionCreators';
-import { authActions } from '../../shared/reducers/authSlice';
 import { PasswordField } from '../../shared/components/fields/PasswordField';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { FormContentColumn } from '../../shared/components/FormContentColumn';
+import { useLocalStorage } from '../../shared/hooks/useLocalStorage';
 
 export default function AuthPage() {
   const isMobile = useMobile();
   const navigate = useNavigate();
-  const actions = useActionCreators(authActions);
   const [hasError, setError] = useState(false);
+  const { setItem } = useLocalStorage();
 
   const [login, {
-    data: responseLogin, isSuccess, isError, error, isLoading,
+    data: auth, isSuccess, isError, error, isLoading,
   }] = useLoginMutation();
 
   useEffect(() => {
-    if (isSuccess && responseLogin?.token) {
-      actions.setToken(responseLogin?.token);
+    if (!isSuccess || !auth?.token) return;
 
-      navigate('/');
-    }
+    setItem('token', auth.token);
 
-    if (isError) {
-      console.error(error);
-      setError(true);
-    }
-  }, [isSuccess, isError]);
+    navigate('/');
+  }, [isSuccess]);
+
+  if (isError) {
+    console.error(error);
+    setError(true);
+  }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setError(false);
 
-    event.preventDefault();
     const data = new FormData(event.currentTarget);
-
-    console.log({
-      login: data.get('login'),
-      password: data.get('password'),
-    });
 
     login({
       login: data.get('login') as string,
