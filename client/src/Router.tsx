@@ -1,5 +1,6 @@
 import { createBrowserRouter, createRoutesFromElements, Route } from 'react-router-dom';
 import { ProtectedLayout } from './pages/BasicLayout';
+import { MainPage } from './pages/Main';
 import { AuthPage } from './pages/Auth';
 import { UsersPage } from './pages/Users';
 import { UserPage } from './pages/User';
@@ -19,6 +20,8 @@ export const router = createBrowserRouter(
       <Route path='/auth' element={<AuthPage />} />
 
       <Route path='/' element={<ProtectedLayout />} >
+
+        <Route path='/' element={<MainPage />} />
 
         <Route path='/timetable' element={<TimetablePage />} />
 

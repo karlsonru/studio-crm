@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
@@ -18,7 +18,6 @@ export default function AuthPage() {
   const isMobile = useMobile();
   const navigate = useNavigate();
   const actions = useActionCreators(authActions);
-  const [hasError, setError] = useState(false);
 
   const [login, {
     data: auth, isSuccess, isError, error, isLoading,
@@ -34,12 +33,10 @@ export default function AuthPage() {
 
   if (isError) {
     console.error(error);
-    setError(true);
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError(false);
 
     const data = new FormData(event.currentTarget);
 
@@ -88,7 +85,7 @@ export default function AuthPage() {
                 fullWidth: true,
               }}
             />
-            {hasError && <FormHelperText error>
+            {isError && <FormHelperText error>
               Не удалось. Проверьте правильность и попробуйте ещё раз.
             </FormHelperText>
             }

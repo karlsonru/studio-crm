@@ -1,27 +1,31 @@
-/* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+export enum MenuWidth {
+  FULL = 200,
+  SMALL = 55,
+}
+
 interface IMenuState {
-  width: number;
+  width: MenuWidth;
   title: string;
   mobileMenuAnchorEl: null | string;
 }
 
 const initialState: IMenuState = {
-  width: 55,
+  width: MenuWidth.SMALL,
   title: document.title,
   mobileMenuAnchorEl: null,
 };
 
-export const menuSlice = createSlice({
+export const appMenuState = createSlice({
   name: 'menu',
   initialState,
   reducers: {
     setFullWidth: (state) => {
-      state.width = 200;
+      state.width = MenuWidth.FULL;
     },
     setSmallWidth: (state) => {
-      state.width = 55;
+      state.width = MenuWidth.SMALL;
     },
     setPageTitle: (state, action: PayloadAction<string>) => {
       state.title = action.payload;
@@ -32,11 +36,4 @@ export const menuSlice = createSlice({
   },
 });
 
-export const {
-  setFullWidth,
-  setSmallWidth,
-  setPageTitle,
-  setMobileMenuAnchorEl,
-} = menuSlice.actions;
-
-export const menuReducer = menuSlice.reducer;
+export const { reducer: appMenuReducer, actions: appMenuActions } = appMenuState;
