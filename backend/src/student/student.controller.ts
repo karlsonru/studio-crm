@@ -39,8 +39,6 @@ export class StudentController {
   async findStudentsWithClosestBirthday(@Query('filter') filter: string) {
     const { period } = JSON.parse(filter);
 
-    console.log(`period: ${period}`);
-
     const birthdayMaxPossible = new Date();
     birthdayMaxPossible.setFullYear(1970);
     birthdayMaxPossible.setDate(birthdayMaxPossible.getDate() + period);
@@ -50,10 +48,6 @@ export class StudentController {
     birthdayMinPossible.setDate(birthdayMinPossible.getDate() - period);
 
     const students = await this.service.findAll({});
-
-    console.log(`birthdayMaxPossible: ${birthdayMaxPossible}`);
-    console.log(`birthdayMinPossible: ${birthdayMinPossible}`);
-    console.log(students);
 
     return students.filter((student) => {
       const birthday = new Date(student.birthday);

@@ -10,7 +10,7 @@ import { ILessonModel, IVisitingStudent, VisitType } from '../../shared/models/I
 import { useCreateAttendanceMutation, usePatchAttendanceMutation } from '../../shared/api';
 import { MODAL_FORM_WIDTH } from '../../shared/constants';
 import {
-  BillingStatus, IAttendanceModel, VisitStatus, IVisit,
+  PaymentStatus, IAttendanceModel, VisitStatus, IVisit,
 } from '../../shared/models/IAttendanceModel';
 import { getVisitTypeName } from '../../shared/helpers/getVisitTypeName';
 import { getBillingStatusNameAndColor } from '../../shared/helpers/getBillingStatusNameAndColor';
@@ -49,7 +49,7 @@ interface IStudentsListItem {
   visitDetails: {
     visitType: VisitType;
     visitStatus?: VisitStatus;
-    billingStatus?: BillingStatus;
+    billingStatus?: PaymentStatus;
     visitInstead?: string;
   }
 }
@@ -111,7 +111,7 @@ export function StudentsListVisited({ attendance }: { attendance: IAttendanceMod
       student: visited.student._id,
       visitType: visited.visitType,
       visitStatus: visitStatuses[visited.student._id] as VisitStatus,
-      billingStatus: visited.billingStatus,
+      billingStatus: visited.paymentStatus,
       subscription: visited.subscription,
     }));
 
@@ -133,7 +133,7 @@ export function StudentsListVisited({ attendance }: { attendance: IAttendanceMod
             visitDetails={{
               visitStatus: visited.visitStatus,
               visitType: visited.visitType,
-              billingStatus: visited.billingStatus,
+              billingStatus: visited.paymentStatus,
               visitInstead: visited.visitInstead,
             }}
           />,

@@ -1,22 +1,167 @@
 import Grid from '@mui/material/Grid';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
 import { useTitle } from '../../shared/hooks/useTitle';
 import { BasicTable, CreateRow } from '../../shared/components/BasicTable';
-import { useFindStudentsClosestBirthdaysQuery } from '../../shared/api';
+import {
+  useFindStudentsClosestBirthdaysQuery,
+  useFindSubscriptionsQuery,
+  useFindAttendancesQuery,
+} from '../../shared/api';
 import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
+import { PaymentStatus, VisitStatus } from '../../shared/models/IAttendanceModel';
 
 function ExpiringSubscriptionsDisplay() {
-  return <h2>Истекающие Абонементы</h2>;
+  const navigate = useNavigate();
+  const today = new Date();
+  const searchDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
+
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    isSuccess,
+  } = useFindSubscriptionsQuery({
+    $and: [
+      {
+        dateTo: { $gte: today.getTime(), $lte: searchDate.getTime() },
+      },
+    ],
+  });
+
+  if (isSuccess) {
+    console.log('Success');
+    console.log(data);
+  }
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isError) {
+    return <ShowError details={error} />;
+  }
+
+  const subscriptions = data ?? [];
+  const rows = subscriptions.map((subscription) => {
+    const expiringSubscriptions: Array<React.ReactNode> = [];
+
+    subscription.lessons.forEach((lesson) => {
+      expiringSubscriptions.push(
+        CreateRow({
+          content: [lesson.title, subscription.student.fullname, format(subscription.dateTo, 'dd.MM.yyyy')],
+          props: {
+            onDoubleClick: () => navigate(`/lessons/${lesson._id}`),
+          },
+        }),
+      );
+    });
+    return expiringSubscriptions;
+  }).flat();
+
+  return <BasicTable
+    headers={['Занятие', 'Ученик', 'Действует до']}
+    rows={rows}
+  />;
 }
 
 function UnpaidVisistDisplay() {
-  return <h2>Неоплаченные посещения</h2>;
+  const navigate = useNavigate();
+  const today = new Date();
+  const searchDate = new Date(today.getFullYear(), today.getMonth() - 2, today.getDate());
+
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+  } = useFindAttendancesQuery({
+    'students.paymentStatus': PaymentStatus.UNPAID,
+    date: { $gte: searchDate.getTime() },
+  });
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isError) {
+    return <ShowError details={error} />;
+  }
+
+  const attendances = data ?? [];
+  const rows = attendances.map((attendance) => {
+    const studentsWithPostponedVisits: Array<React.ReactNode> = [];
+
+    attendance.students.forEach((student) => {
+      if (student.paymentStatus !== PaymentStatus.UNPAID) return;
+
+      const row = CreateRow({
+        content: [attendance.lesson.title, format(attendance.date, 'dd.MM.yyyy'), student.student.fullname],
+        props: {
+          onDoubleClick: () => navigate(`/attendances?lessonId=${attendance.lesson._id}&date=${attendance.date}`),
+        },
+      });
+      studentsWithPostponedVisits.push(row);
+    });
+
+    return [...studentsWithPostponedVisits];
+  }).flat();
+
+  return <BasicTable
+    headers={['Пропущенное занятие', 'Дата', 'Ученик']}
+    rows={rows}
+  />;
 }
 
 function PostponedLessonsDisplay() {
-  return <h2>Отработки</h2>;
+  const navigate = useNavigate();
+  const today = new Date();
+  const searchDate = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+  } = useFindAttendancesQuery({
+    'students.visitStatus': VisitStatus.POSTPONED_FUTURE,
+    date: { $gte: searchDate.getTime() },
+  });
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isError) {
+    return <ShowError details={error} />;
+  }
+
+  const attendances = data ?? [];
+  const rows = attendances.map((attendance) => {
+    const studentsWithPostponedVisits: Array<React.ReactNode> = [];
+
+    attendance.students.forEach((student) => {
+      if (student.visitStatus !== VisitStatus.POSTPONED_FUTURE) return;
+
+      const row = CreateRow({
+        content: [attendance.lesson.title, format(attendance.date, 'dd.MM.yyyy'), student.student.fullname],
+        props: {
+          onDoubleClick: () => navigate(`/attendances?lessonId=${attendance.lesson._id}&date=${attendance.date}`),
+        },
+      });
+      studentsWithPostponedVisits.push(row);
+    });
+
+    return [...studentsWithPostponedVisits];
+  }).flat();
+
+  return <BasicTable
+    headers={['Пропущенное занятие', 'Дата', 'Ученик']}
+    rows={rows}
+  />;
 }
 
 function BirthdayDisplay() {
@@ -39,7 +184,7 @@ function BirthdayDisplay() {
 
   const students = data ?? [];
   const rows = students.map((student) => CreateRow(
-    { content: [student.fullname, format(student.birthday, 'EEE, d MMM', { locale: ru })] },
+    { content: [student.fullname, format(student.birthday, 'EEEEEE, d MMM', { locale: ru })] },
   ));
 
   return <BasicTable
@@ -57,9 +202,11 @@ export function MainPage() {
 
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
+          <h2>Неоплаченные посещения</h2>
           <UnpaidVisistDisplay />
         </Grid>
         <Grid item xs={12} sm={6}>
+          <h2>Истекающие абонементы</h2>
           <ExpiringSubscriptionsDisplay />
         </Grid>
       </Grid>

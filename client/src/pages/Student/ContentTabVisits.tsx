@@ -149,7 +149,7 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
       // с backend'а всегда возвращается массив с 1 студентом по которому делали запрос
       const studentVisit = visitedLesson.students[0];
 
-      const billingStatusName = getBillingStatusNameAndColor(studentVisit.billingStatus).name;
+      const billingStatusName = getBillingStatusNameAndColor(studentVisit.paymentStatus).name;
       const visitStatusName = getVisitStatusName(studentVisit.visitStatus);
 
       return (

@@ -2,7 +2,7 @@ import { IUserModel } from './IUserModel';
 import { ILessonModel, VisitType } from './ILessonModel';
 import { IStudentModel } from './IStudentModel';
 
-export enum BillingStatus {
+export enum PaymentStatus {
   PAID = 'paid',
   UNPAID = 'unpaid',
   UNCHARGED = 'uncharged',
@@ -25,13 +25,13 @@ export enum AttendanceType {
 export interface IVisit {
   student: IStudentModel;
   visitStatus: VisitStatus;
-  billingStatus: BillingStatus;
+  paymentStatus: PaymentStatus;
   visitType: VisitType;
   subscription: string;
   visitInstead?: string;
 }
 
-interface IVisitCreate extends Omit<IVisit, 'student' | 'subscription' | 'billingStatus'> {
+interface IVisitCreate extends Omit<IVisit, 'student' | 'subscription' | 'paymentStatus'> {
   student: string;
 }
 

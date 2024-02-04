@@ -1,13 +1,13 @@
-import { BillingStatus } from '../models/IAttendanceModel';
+import { PaymentStatus } from '../models/IAttendanceModel';
 
-export function getBillingStatusNameAndColor(billingStatus?: BillingStatus) {
+export function getBillingStatusNameAndColor(billingStatus?: PaymentStatus) {
   switch (billingStatus) {
-    case BillingStatus.PAID:
+    case PaymentStatus.PAID:
       return {
         name: 'Оплачено',
         color: 'success.main',
       };
-    case BillingStatus.UNPAID:
+    case PaymentStatus.UNPAID:
       return {
         name: 'Неоплачено',
         color: 'error.main',

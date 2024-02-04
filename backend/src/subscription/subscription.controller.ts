@@ -37,6 +37,7 @@ export class SubscriptionController {
 
   @Get()
   async findAll(@Query('filter') filter?: string) {
+    console.log('Filter: ' + filter);
     return await this.service.findAll(filter ? JSON.parse(filter) : {});
   }
 
