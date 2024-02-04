@@ -57,7 +57,7 @@ export function injectGetOne<T>(name: string, tag: any, route: string) {
 export function injectFind<T>(name: string, tag: any, route: string) {
   const extendedApi = basicApi.injectEndpoints({
     endpoints: (build) => ({
-      [name]: build.query<Array<T>, Partial<T> | Record<string, unknown> >({
+      [name]: build.query<Array<T>, Partial<T> | Record<string, unknown>>({
         query: (query) => ({ url: `${route}`, params: { filter: JSON.stringify(query) } }),
         providesTags: [tag],
       }),

@@ -35,6 +35,36 @@ export class StudentController {
     return created;
   }
 
+  @Get('/closest-birthdays')
+  async findStudentsWithClosestBirthday(@Query('filter') filter: string) {
+    const { period } = JSON.parse(filter);
+
+    console.log(`period: ${period}`);
+
+    const birthdayMaxPossible = new Date();
+    birthdayMaxPossible.setFullYear(1970);
+    birthdayMaxPossible.setDate(birthdayMaxPossible.getDate() + period);
+
+    const birthdayMinPossible = new Date();
+    birthdayMinPossible.setFullYear(1970);
+    birthdayMinPossible.setDate(birthdayMinPossible.getDate() - period);
+
+    const students = await this.service.findAll({});
+
+    console.log(`birthdayMaxPossible: ${birthdayMaxPossible}`);
+    console.log(`birthdayMinPossible: ${birthdayMinPossible}`);
+    console.log(students);
+
+    return students.filter((student) => {
+      const birthday = new Date(student.birthday);
+      birthday.setFullYear(1970);
+
+      const condtion = birthday >= birthdayMinPossible && birthday <= birthdayMaxPossible;
+
+      return condtion;
+    });
+  }
+
   @Get()
   async findAll(@Query('filter') filter?: string) {
     return await this.service.findAll(filter ? JSON.parse(filter) : {});

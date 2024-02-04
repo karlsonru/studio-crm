@@ -47,10 +47,7 @@ function NavItem({ path, title, icon }: INavItem) {
       to={path}
       style={({ isActive }) => (isActive ? navItemActiveStyle : navItemRegularStyle)}
     >
-      <MenuItem
-        sx={{
-          background: 'inherit',
-        }}>
+      <MenuItem sx={{ background: 'inherit' }}>
         <ListItemIcon>
           {icon}
         </ListItemIcon>
@@ -120,11 +117,11 @@ export function DesktopMenuIcon() {
   const actions = useActionCreators(appMenuActions);
 
   const isSmallWidth = width === MenuWidth.SMALL;
-  const clickHadler = () => (isSmallWidth ? actions.setFullWidth() : actions.setSmallWidth());
+  const changeWidth = () => (isSmallWidth ? actions.setFullWidth() : actions.setSmallWidth());
 
   return (
     <Stack width={width} alignItems={isSmallWidth ? 'start' : 'end'}>
-      <IconButton onClick={clickHadler}>
+      <IconButton onClick={changeWidth}>
         {isSmallWidth && <ArrowForwardIosIcon fontSize='large' htmlColor='#fff' />}
         {!isSmallWidth && <ArrowBackIosIcon fontSize='large' htmlColor='#fff' />}
       </IconButton>

@@ -17,6 +17,7 @@ basicApi.enhanceEndpoints({ addTagTypes: [tag] });
 export const { useGetStudentQuery } = injectGetOne<IStudentModel>('getStudent', tag, route);
 export const { useGetStudentsQuery } = injectGetAll<IStudentModel>('getStudents', tag, route);
 export const { useFindStudentsQuery } = injectFind<IStudentModel>('findStudents', tag, route);
+export const { useFindStudentsClosestBirthdaysQuery } = injectFind<IStudentModel>('findStudentsClosestBirthdays', tag, `${route}/closest-birthdays`);
 export const { useCreateStudentMutation } = injectCreate<IStudentModel, IStudentModalCreate>('createStudent', tag, route);
 export const { usePatchStudentMutation } = injectPatch<IStudentModel, IStudentModalCreate>('patchStudent', tag, route);
 export const { useDeleteStudentMutation } = injectDelete('deleteStudent', tag, route);
