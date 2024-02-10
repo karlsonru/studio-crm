@@ -1,10 +1,10 @@
-import { basicApi } from './basicApi';
+import { api } from './basicApi';
 import { IAttendanceModel } from '../models/IAttendanceModel';
 
 const tag = 'statistic';
 const route = 'statistic';
 
-basicApi.enhanceEndpoints({ addTagTypes: [tag] });
+api.addTagTypes(tag);
 
 interface IAttendancesWithStatistic {
   attendances: Array<IAttendanceModel>;
@@ -16,7 +16,7 @@ export interface IStatisticArgs {
   id?: string;
 }
 
-export const { useGetVisitedLessonsStatisticByStudentQuery } = basicApi.injectEndpoints({
+export const { useGetVisitedLessonsStatisticByStudentQuery } = api.resource.injectEndpoints({
   endpoints: (build) => ({
     getVisitedLessonsStatisticByStudent:
       build
@@ -40,7 +40,7 @@ interface IIncomeStatistic {
   expenses: Array<number>;
 }
 
-export const { useGetIncomeStatisticQuery } = basicApi.injectEndpoints({
+export const { useGetIncomeStatisticQuery } = api.resource.injectEndpoints({
   endpoints: (build) => ({
     getIncomeStatistic:
       build
@@ -58,7 +58,7 @@ export const { useGetIncomeStatisticQuery } = basicApi.injectEndpoints({
   }),
 });
 
-export const { useGetIncomeByUserQuery } = basicApi.injectEndpoints({
+export const { useGetIncomeByUserQuery } = api.resource.injectEndpoints({
   endpoints: (build) => ({
     getIncomeByUser:
       build

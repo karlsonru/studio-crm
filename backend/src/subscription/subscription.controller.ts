@@ -41,6 +41,16 @@ export class SubscriptionController {
     return await this.service.findAll(filter ? JSON.parse(filter) : {});
   }
 
+  @Get('/expiring')
+  async findAllExpiring(@Query('days') days: number) {
+    const today = new Date();
+    const searchDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + days);
+
+    return await this.service.findAll({
+      dateTo: { $gte: today.getTime(), $lte: searchDate.getTime() },
+    });
+  }
+
   @Get(':id')
   async findOne(@Param('id', ValidateIdPipe) id: string) {
     const candidate = await this.service.findOneById(id);

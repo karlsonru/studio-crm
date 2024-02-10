@@ -1,22 +1,14 @@
-import {
-  basicApi,
-  injectGetOne,
-  injectGetAll,
-  injectCreate,
-  injectPatch,
-  injectDelete,
-  injectFind,
-} from './basicApi';
+import { api } from './basicApi';
 import { IAttendanceModel, IAttendanceModelCreate } from '../models/IAttendanceModel';
 
 const tag = 'Attendances';
 const route = 'attendances';
 
-basicApi.enhanceEndpoints({ addTagTypes: [tag] });
+api.addTagTypes(tag);
 
-export const { useGetAttendanceQuery } = injectGetOne<IAttendanceModel>('getAttendance', tag, route);
-export const { useGetAttendancesQuery } = injectGetAll<IAttendanceModel>('getAttendances', tag, route);
-export const { useFindAttendancesQuery } = injectFind<IAttendanceModel>('findAttendances', tag, route);
-export const { useCreateAttendanceMutation } = injectCreate<IAttendanceModel, IAttendanceModelCreate>('createAttendance', tag, route);
-export const { usePatchAttendanceMutation } = injectPatch<IAttendanceModel, IAttendanceModelCreate>('patchAttendance', tag, route);
-export const { useDeleteAttendanceMutation } = injectDelete('deleteAttendance', tag, route);
+export const { useGetAttendanceQuery } = api.injectGetOne<IAttendanceModel>('getAttendance', tag, route);
+export const { useGetAttendancesQuery } = api.injectGetAll<IAttendanceModel>('getAttendances', tag, route);
+export const { useFindAttendancesQuery } = api.injectFind<IAttendanceModel>('findAttendances', tag, route);
+export const { useCreateAttendanceMutation } = api.injectCreate<IAttendanceModel, IAttendanceModelCreate>('createAttendance', tag, route);
+export const { usePatchAttendanceMutation } = api.injectPatch<IAttendanceModel, IAttendanceModelCreate>('patchAttendance', tag, route);
+export const { useDeleteAttendanceMutation } = api.injectDelete('deleteAttendance', tag, route);

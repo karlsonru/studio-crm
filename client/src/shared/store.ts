@@ -7,7 +7,7 @@ import { subscriptionsPageReducer } from './reducers/subscriptionsPageSlice';
 import { attendancePageReducer } from './reducers/attendancePageSlice';
 import { authReducer } from './reducers/authSlice';
 import { financeReducer } from './reducers/financeSlice';
-import { basicApi } from './api/basicApi';
+import { api } from './api/basicApi';
 
 const store = configureStore({
   reducer: {
@@ -19,9 +19,9 @@ const store = configureStore({
     studentsPageReducer,
     subscriptionsPageReducer,
     financeReducer,
-    [basicApi.reducerPath]: basicApi.reducer,
+    [api.resource.reducerPath]: api.resource.reducer,
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(basicApi.middleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(api.resource.middleware),
   devTools: true,
 });
 

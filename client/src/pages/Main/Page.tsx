@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { useTitle } from '../../shared/hooks/useTitle';
 import { BasicTable, CreateRow } from '../../shared/components/BasicTable';
 import {
-  useFindStudentsClosestBirthdaysQuery,
-  useFindSubscriptionsQuery,
   useFindAttendancesQuery,
+  useFindStudentsClosestBirthdaysQuery,
+  useFindWithParamsSubscriptionsQuery,
 } from '../../shared/api';
 import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
@@ -15,27 +15,16 @@ import { PaymentStatus, VisitStatus } from '../../shared/models/IAttendanceModel
 
 function ExpiringSubscriptionsDisplay() {
   const navigate = useNavigate();
-  const today = new Date();
-  const searchDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 7);
 
   const {
     data,
     isLoading,
     isError,
     error,
-    isSuccess,
-  } = useFindSubscriptionsQuery({
-    $and: [
-      {
-        dateTo: { $gte: today.getTime(), $lte: searchDate.getTime() },
-      },
-    ],
+  } = useFindWithParamsSubscriptionsQuery({
+    route: 'expiring',
+    params: { days: 7 },
   });
-
-  if (isSuccess) {
-    console.log('Success');
-    console.log(data);
-  }
 
   if (isLoading) {
     return <Loading />;
@@ -52,7 +41,7 @@ function ExpiringSubscriptionsDisplay() {
     subscription.lessons.forEach((lesson) => {
       expiringSubscriptions.push(
         CreateRow({
-          content: [lesson.title, subscription.student.fullname, format(subscription.dateTo, 'dd.MM.yyyy')],
+          content: [lesson.title, subscription.student.fullname, format(subscription.dateTo, 'dd.MM.yyyy'), subscription.visitsLeft],
           props: {
             onDoubleClick: () => navigate(`/lessons/${lesson._id}`),
           },
@@ -63,7 +52,7 @@ function ExpiringSubscriptionsDisplay() {
   }).flat();
 
   return <BasicTable
-    headers={['Занятие', 'Ученик', 'Действует до']}
+    headers={['Занятие', 'Ученик', 'Действует до', 'Осталось занятий']}
     rows={rows}
   />;
 }
@@ -111,7 +100,7 @@ function UnpaidVisistDisplay() {
   }).flat();
 
   return <BasicTable
-    headers={['Пропущенное занятие', 'Дата', 'Ученик']}
+    headers={['Неоплаченное занятие', 'Дата', 'Ученик']}
     rows={rows}
   />;
 }
@@ -198,8 +187,6 @@ export function MainPage() {
 
   return (
     <>
-      <h1>Hello main</h1>
-
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
           <h2>Неоплаченные посещения</h2>
