@@ -15,7 +15,7 @@ import { AttendanceService } from './attendance.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 import { ValidateIdPipe } from '../shared/validaitonPipe';
-import { VisitStatus } from '../schemas/attendance.schema';
+import { PaymentStatus, VisitStatus } from '../schemas/attendance.schema';
 
 /** 
 TODO: перенести логику списания абонемента в контроллер. 
@@ -78,11 +78,28 @@ export class AttendanceController {
     return await this.service.findAll(parsedQuery);
   }
 
-  // ищем все отложенные занятия
-  @Get('/postponed')
-  async findAllPostponed(@Query('from') from: string, @Query('to') to: string) {
+  @Get('/unpaid')
+  async findAllUnpaid(@Query('days') days: number) {
+    const today = new Date();
+    const searchDate = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() - days);
+
     return await this.service.findAll({
-      date: { $gte: from, $lte: to },
+      date: { $gte: searchDate, $lte: today.getTime() },
+      students: {
+        $elemMatch: {
+          paymentStatus: PaymentStatus.UNPAID,
+        },
+      },
+    });
+  }
+
+  @Get('/postponed')
+  async findAllPostponed(@Query('days') days: number) {
+    const today = new Date();
+    const searchDate = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() - days);
+
+    return await this.service.findAll({
+      date: { $gte: searchDate, $lte: today.getTime() },
       students: {
         $elemMatch: {
           visitStatus: VisitStatus.POSTPONED_FUTURE,

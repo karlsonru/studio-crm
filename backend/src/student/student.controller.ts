@@ -15,7 +15,7 @@ import {
 import { StudentService } from './student.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
-import { ValidateIdPipe } from '../shared/validaitonPipe';
+import { ValidateIdPipe, ValidateNumberPipe } from '../shared/validaitonPipe';
 import { StudentModel } from '../schemas';
 import { MongooseClassSerializerInterceptor } from '../shared/mongooseClassSerializer.interceptor';
 
@@ -36,16 +36,14 @@ export class StudentController {
   }
 
   @Get('/closest-birthdays')
-  async findStudentsWithClosestBirthday(@Query('filter') filter: string) {
-    const { period } = JSON.parse(filter);
-
+  async findStudentsWithClosestBirthday(@Query('days', ValidateNumberPipe) days: number) {
     const birthdayMaxPossible = new Date();
+    birthdayMaxPossible.setDate(birthdayMaxPossible.getDate() + days);
     birthdayMaxPossible.setFullYear(1970);
-    birthdayMaxPossible.setDate(birthdayMaxPossible.getDate() + period);
 
     const birthdayMinPossible = new Date();
+    birthdayMinPossible.setDate(birthdayMinPossible.getDate() - days);
     birthdayMinPossible.setFullYear(1970);
-    birthdayMinPossible.setDate(birthdayMinPossible.getDate() - period);
 
     const students = await this.service.findAll({});
 

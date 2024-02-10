@@ -5,9 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { useTitle } from '../../shared/hooks/useTitle';
 import { BasicTable, CreateRow } from '../../shared/components/BasicTable';
 import {
-  useFindAttendancesQuery,
-  useFindStudentsClosestBirthdaysQuery,
+  useFindWithParamsStudentsQuery,
   useFindWithParamsSubscriptionsQuery,
+  useFindWithParamsAttendancesQuery,
 } from '../../shared/api';
 import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
@@ -57,19 +57,17 @@ function ExpiringSubscriptionsDisplay() {
   />;
 }
 
-function UnpaidVisistDisplay() {
+function UnpaidAttendancesDisplay() {
   const navigate = useNavigate();
-  const today = new Date();
-  const searchDate = new Date(today.getFullYear(), today.getMonth() - 2, today.getDate());
 
   const {
     data,
     isLoading,
     isError,
     error,
-  } = useFindAttendancesQuery({
-    'students.paymentStatus': PaymentStatus.UNPAID,
-    date: { $gte: searchDate.getTime() },
+  } = useFindWithParamsAttendancesQuery({
+    route: 'unpaid',
+    params: { days: 30 },
   });
 
   if (isLoading) {
@@ -105,19 +103,19 @@ function UnpaidVisistDisplay() {
   />;
 }
 
-function PostponedLessonsDisplay() {
+function PostponedAttendancesDisplay() {
   const navigate = useNavigate();
-  const today = new Date();
-  const searchDate = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
 
   const {
     data,
     isLoading,
     isError,
     error,
-  } = useFindAttendancesQuery({
-    'students.visitStatus': VisitStatus.POSTPONED_FUTURE,
-    date: { $gte: searchDate.getTime() },
+  } = useFindWithParamsAttendancesQuery({
+    route: 'postponed',
+    params: {
+      days: 30,
+    },
   });
 
   if (isLoading) {
@@ -159,8 +157,11 @@ function BirthdayDisplay() {
     isLoading,
     isError,
     error,
-  } = useFindStudentsClosestBirthdaysQuery({
-    period: 7,
+  } = useFindWithParamsStudentsQuery({
+    route: 'closest-birthdays',
+    params: {
+      days: 7,
+    },
   });
 
   if (isLoading) {
@@ -190,7 +191,7 @@ export function MainPage() {
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
           <h2>Неоплаченные посещения</h2>
-          <UnpaidVisistDisplay />
+          <UnpaidAttendancesDisplay />
         </Grid>
         <Grid item xs={12} sm={6}>
           <h2>Истекающие абонементы</h2>
@@ -201,7 +202,7 @@ export function MainPage() {
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
           <h2>Отработки</h2>
-          <PostponedLessonsDisplay />
+          <PostponedAttendancesDisplay />
         </Grid>
         <Grid item xs={12} sm={6}>
           <h2>Дни рождения</h2>

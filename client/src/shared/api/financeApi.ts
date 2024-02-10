@@ -4,7 +4,7 @@ import { IFinanceModel, IFinanceModelCreate } from '../models/IFinanceModel';
 const tag = 'Finance';
 const route = 'finance';
 
-api.enhanceEndpoints(tag);
+api.addTagTypes(tag);
 
 export const { useGetFinanceQuery } = api.injectGetOne<IFinanceModel>('getFinance', tag, route);
 export const { useGetFinancesQuery } = api.injectGetAll<IFinanceModel>('getFinances', tag, route);

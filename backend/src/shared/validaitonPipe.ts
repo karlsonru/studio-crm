@@ -16,3 +16,13 @@ export class ValidateIdPipe implements PipeTransform<string> {
     return value;
   }
 }
+
+@Injectable()
+export class ValidateNumberPipe implements PipeTransform<string> {
+  transform(value: string, metadata: ArgumentMetadata): number {
+    if (isNaN(+value)) {
+      throw new HttpException({ message: 'Invalid number parameter' }, HttpStatus.BAD_REQUEST);
+    }
+    return +value;
+  }
+}
