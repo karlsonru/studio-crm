@@ -16,7 +16,9 @@ export interface IStatisticArgs {
   id?: string;
 }
 
-export const { useGetVisitedLessonsStatisticByStudentQuery } = api.resource.injectEndpoints({
+const apiResource = api.getResource();
+
+export const { useGetVisitedLessonsStatisticByStudentQuery } = apiResource.injectEndpoints({
   endpoints: (build) => ({
     getVisitedLessonsStatisticByStudent:
       build
@@ -40,7 +42,7 @@ interface IIncomeStatistic {
   expenses: Array<number>;
 }
 
-export const { useGetIncomeStatisticQuery } = api.resource.injectEndpoints({
+export const { useGetIncomeStatisticQuery } = apiResource.injectEndpoints({
   endpoints: (build) => ({
     getIncomeStatistic:
       build
@@ -58,7 +60,7 @@ export const { useGetIncomeStatisticQuery } = api.resource.injectEndpoints({
   }),
 });
 
-export const { useGetIncomeByUserQuery } = api.resource.injectEndpoints({
+export const { useGetIncomeByUserQuery } = apiResource.injectEndpoints({
   endpoints: (build) => ({
     getIncomeByUser:
       build

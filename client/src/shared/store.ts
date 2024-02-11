@@ -9,6 +9,8 @@ import { authReducer } from './reducers/authSlice';
 import { financeReducer } from './reducers/financeSlice';
 import { api } from './api/basicApi';
 
+const apiResource = api.getResource();
+
 const store = configureStore({
   reducer: {
     authReducer,
@@ -19,9 +21,9 @@ const store = configureStore({
     studentsPageReducer,
     subscriptionsPageReducer,
     financeReducer,
-    [api.resource.reducerPath]: api.resource.reducer,
+    [apiResource.reducerPath]: apiResource.reducer,
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(api.resource.middleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiResource.middleware),
   devTools: true,
 });
 

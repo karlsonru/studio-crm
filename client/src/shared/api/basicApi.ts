@@ -10,7 +10,7 @@ interface IFindQuery {
 }
 
 class BasicApi {
-  public resource;
+  private resource;
 
   constructor(private readonly url: string) {
     this.resource = createApi({
@@ -38,6 +38,10 @@ class BasicApi {
       }),
       endpoints: () => ({}),
     });
+  }
+
+  getResource() {
+    return this.resource;
   }
 
   addTagTypes(tag: string) {

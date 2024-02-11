@@ -21,7 +21,9 @@ interface IUpdateLessonStudents {
   students: Array<IVisitingStudentUpdate | string>;
 }
 
-export const { usePatchLessonStudentsMutation } = api.resource.injectEndpoints({
+const apiResource = api.getResource();
+
+export const { usePatchLessonStudentsMutation } = apiResource.injectEndpoints({
   endpoints: (build) => ({
     patchLessonStudents: build
       .mutation<ILessonModel, { id: string, action: 'add' | 'remove', newItem: IUpdateLessonStudents }>({
