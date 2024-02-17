@@ -21,6 +21,7 @@ export class ValidateIdPipe implements PipeTransform<string> {
 export class ValidateNumberPipe implements PipeTransform<string> {
   transform(value: string, metadata: ArgumentMetadata): number {
     if (isNaN(+value)) {
+      console.log(value);
       throw new HttpException({ message: 'Invalid number parameter' }, HttpStatus.BAD_REQUEST);
     }
     return +value;

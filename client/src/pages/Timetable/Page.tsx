@@ -22,12 +22,11 @@ export function TimetablePage() {
 
   const currentMonth = new Date(currentDate).getMonth();
 
-  // запрашиваем занятия на +1 месяц от текущих и -1 месяц от текущих
+  // запрашиваем занятия с датой окончания начиная с -1 месяц от текущей
   const {
     data, isLoading, isError, error,
   } = useFindLessonsQuery({
-    dateFrom: { $lte: set(currentDate, { month: currentMonth - 1, date: 1 }).getTime() },
-    dateTo: { $gte: set(currentDate, { month: currentMonth + 1, date: 1 }).getTime() },
+    dateTo: { $gte: set(currentDate, { month: currentMonth - 1, date: 1 }).getTime() },
   });
 
   useEffect(() => {

@@ -13,8 +13,29 @@ import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { useMobile } from '../../shared/hooks/useMobile';
 import { timetablePageActions } from '../../shared/reducers/timetablePageSlice';
-import { ILessonModel, VisitType } from '../../shared/models/ILessonModel';
+import { ILessonModel, IVisitingStudent, VisitType } from '../../shared/models/ILessonModel';
 import { MODAL_FORM_WIDTH } from '../../shared/constants';
+import { useFindWithParamsAttendancesQuery } from '../../shared/api';
+import { Loading } from '../../shared/components/Loading';
+import { ShowError } from '../../shared/components/ShowError';
+import { IVisit, VisitStatus } from '../../shared/models/IAttendanceModel';
+import { PrimaryButton } from '../../shared/components/buttons/PrimaryButton';
+import { getVisitStatusName } from '../../shared/helpers/getVisitStatusName';
+
+function sortStudentsByVisitType(
+  a: IVisitingStudent | IVisit,
+  b: IVisitingStudent | IVisit,
+) {
+  if (a.visitType === VisitType.REGULAR && b.visitType === VisitType.REGULAR) {
+    return a.student.fullname.localeCompare(b.student.fullname);
+  }
+
+  if (b.visitType === VisitType.REGULAR) {
+    return 1;
+  }
+
+  return -1;
+}
 
 function LessonInfo({ lesson, date }: { lesson: ILessonModel, date: number }) {
   const time = `с ${lesson.timeStart.hh}:${lesson.timeStart.min} по ${lesson.timeEnd.hh}:${lesson.timeEnd.min}`;
@@ -50,37 +71,21 @@ function getVisitTypeName(visitType: VisitType) {
   return visitTypeNames[visitType];
 }
 
-function StudentsList({ lesson, date }: { lesson: ILessonModel, date: number }) {
-  const sortedStudents = [...lesson.students].sort((a, b) => {
-    if (a.visitType === VisitType.REGULAR && b.visitType === VisitType.REGULAR) {
-      return a.student.fullname.localeCompare(b.student.fullname);
-    }
-
-    if (b.visitType === VisitType.REGULAR) {
-      return 1;
-    }
-
-    return -1;
-  });
+function StudentsList({ students }: { students: Array<IVisitingStudent | IVisit> }) {
+  const sortedStudents = students.sort(sortStudentsByVisitType);
 
   return (
     <List>
-      { sortedStudents.map((visiting) => {
-        // в списке показываем только тех временных студентов, у которых совпадает дата визита
-        if (visiting.visitType !== VisitType.REGULAR
-            && visiting.date !== date) {
-          return null;
+      { sortedStudents.map((visiting) => <ListItem key={visiting.student._id}>
+            <ListItemText
+              primary={visiting.student.fullname}
+              secondary={getVisitTypeName(visiting.visitType)}
+            />
+            {// @ts-ignore
+              visiting.visitStatus && <ListItemText secondary={getVisitStatusName(visiting.visitStatus)} />
+            }
+          </ListItem>)
         }
-
-        return (
-            <ListItem key={visiting.student._id}>
-              <ListItemText
-                primary={visiting.student.fullname}
-                secondary={getVisitTypeName(visiting.visitType)}
-              />
-            </ListItem>
-        );
-      })}
     </List>
   );
 }
@@ -88,13 +93,37 @@ function StudentsList({ lesson, date }: { lesson: ILessonModel, date: number }) 
 export const LessonDetails = React.memo(() => {
   const isMobile = useMobile();
   const navigate = useNavigate();
-  const [isAddStudent, setAddStudent] = useState(false);
   const actions = useActionCreators(timetablePageActions);
+  const [isAddStudent, setAddStudent] = useState(false);
   const { selectedLesson: lesson, date } = useAppSelector(
     (state) => state.timetablePageReducer.lessonDetails,
   );
 
+  const {
+    data: attendance,
+    isLoading,
+    isError,
+    error,
+  } = useFindWithParamsAttendancesQuery({
+    params: {
+      lessonId: lesson?._id,
+      day: format(date || 0, 'd'),
+      month: format(date || 0, 'M'),
+      year: format(date || 0, 'yyyy'),
+    },
+  }, {
+    skip: !date || Date.now() < date,
+  });
+
   if (!lesson || !date) return null;
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isError) {
+    return <ShowError details={error} />;
+  }
 
   const closeHandler = () => {
     actions.setLessonDetails({
@@ -107,6 +136,12 @@ export const LessonDetails = React.memo(() => {
     closeHandler();
     navigate(`/attendances?lessonId=${lesson._id}&date=${date}`);
   };
+
+  const students = attendance && attendance.length
+    ? attendance[0]?.students
+    : lesson.students.filter(
+      (student) => student.visitType === VisitType.REGULAR || student.date === date,
+    );
 
   return (
     <Drawer
@@ -133,23 +168,17 @@ export const LessonDetails = React.memo(() => {
           color="primary"
           onClick={goAttendancePage}
           fullWidth
-          sx={{
-            textAlign: 'center',
-          }}
-          >
+        >
           Перейти к занятию
         </Button>
 
-        <StudentsList lesson={lesson} date={date} />
+        <StudentsList students={students} />
 
         <Button
           size="large"
           color="success"
           onClick={() => setAddStudent(true)}
           fullWidth
-          sx={{
-            textAlign: 'center',
-          }}
         >
           Записть на занятие
         </Button>

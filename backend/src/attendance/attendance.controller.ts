@@ -14,7 +14,7 @@ import {
 import { AttendanceService } from './attendance.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
-import { ValidateIdPipe } from '../shared/validaitonPipe';
+import { ValidateIdPipe, ValidateNumberPipe } from '../shared/validaitonPipe';
 import { PaymentStatus, VisitStatus } from '../schemas/attendance.schema';
 
 /** 
@@ -64,22 +64,30 @@ export class AttendanceController {
   @Get()
   async findAll(
     @Query('filter') filter: string,
-    @Param('year') year?: number,
-    @Param('month') month?: number,
-    @Param('day') day?: number,
+    @Query('lessonId', ValidateIdPipe) lessonId?: string,
+    @Query('year', ValidateNumberPipe) year?: number,
+    @Query('month', ValidateNumberPipe) month?: number,
+    @Query('day', ValidateNumberPipe) day?: number,
   ) {
-    const parsedQuery = JSON.parse(filter);
-
-    // если в запросе переаны параметры даты, то узнаём UTC timestamp занятия и добавляем его к запросу
-    if (year && month && day) {
-      parsedQuery.date = Date.UTC(year, month, day);
+    if (filter) {
+      return await this.service.findAll(JSON.parse(filter));
     }
 
-    return await this.service.findAll(parsedQuery);
+    const query: Record<string, string | number> = {};
+
+    if (lessonId) {
+      query['lesson'] = lessonId;
+    }
+
+    if (year && month && day) {
+      query.date = Date.UTC(year, month, day);
+    }
+
+    return await this.service.findAll(query);
   }
 
   @Get('/unpaid')
-  async findAllUnpaid(@Query('days') days: number) {
+  async findAllUnpaid(@Query('days', ValidateNumberPipe) days: number) {
     const today = new Date();
     const searchDate = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() - days);
 
@@ -94,7 +102,7 @@ export class AttendanceController {
   }
 
   @Get('/postponed')
-  async findAllPostponed(@Query('days') days: number) {
+  async findAllPostponed(@Query('days', ValidateNumberPipe) days: number) {
     const today = new Date();
     const searchDate = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() - days);
 

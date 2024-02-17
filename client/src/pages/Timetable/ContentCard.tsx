@@ -29,10 +29,6 @@ const CARD_STYLE_MOBILE = {
 };
 
 const CARD_HEADER_PROPS: CardHeaderProps = {
-  sx: {
-    padding: '0.25rem',
-    backgroundColor: 'lightyellow',
-  },
   titleTypographyProps: {
     fontWeight: 'bold',
     align: 'left',
@@ -51,7 +47,7 @@ const CARD_HEADER_PROPS: CardHeaderProps = {
 const STACK_PROPS: StackProps = {
   direction: 'row',
   alignItems: 'center',
-  spacing: 1,
+  spacing: 0.5,
 };
 
 function calculateDuration(timeStart: ITime, timeEnd: ITime) {
@@ -176,6 +172,7 @@ export function ContentCard({ lesson, step, date }: IContentCard) {
           {...CARD_HEADER_PROPS}
           sx={{
             backgroundColor: lesson.color,
+            padding: '0.25rem',
           }}
         />
         <CardContent sx={{ padding: '0.25rem' }} />
