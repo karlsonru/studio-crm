@@ -10,11 +10,12 @@ import {
   HttpStatus,
   Query,
   HttpCode,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
 import { UpdateAttendanceDto } from './dto/update-attendance.dto';
-import { ValidateIdPipe, ValidateNumberPipe } from '../shared/validaitonPipe';
+import { ValidateIdPipe, ValidateOptionalNumberPipe } from '../shared/validaitonPipe';
 import { PaymentStatus, VisitStatus } from '../schemas/attendance.schema';
 
 /** 
@@ -64,10 +65,10 @@ export class AttendanceController {
   @Get()
   async findAll(
     @Query('filter') filter: string,
-    @Query('lessonId', ValidateIdPipe) lessonId?: string,
-    @Query('year', ValidateNumberPipe) year?: number,
-    @Query('month', ValidateNumberPipe) month?: number,
-    @Query('day', ValidateNumberPipe) day?: number,
+    @Query('lessonId') lessonId?: string,
+    @Query('year', ValidateOptionalNumberPipe) year?: number,
+    @Query('month', ValidateOptionalNumberPipe) month?: number,
+    @Query('day', ValidateOptionalNumberPipe) day?: number,
   ) {
     if (filter) {
       return await this.service.findAll(JSON.parse(filter));
@@ -80,14 +81,14 @@ export class AttendanceController {
     }
 
     if (year && month && day) {
-      query.date = Date.UTC(year, month, day);
+      query.date = Date.UTC(year, month - 1, day);
     }
 
     return await this.service.findAll(query);
   }
 
   @Get('/unpaid')
-  async findAllUnpaid(@Query('days', ValidateNumberPipe) days: number) {
+  async findAllUnpaid(@Query('days', ParseIntPipe) days: number) {
     const today = new Date();
     const searchDate = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() - days);
 
@@ -102,7 +103,7 @@ export class AttendanceController {
   }
 
   @Get('/postponed')
-  async findAllPostponed(@Query('days', ValidateNumberPipe) days: number) {
+  async findAllPostponed(@Query('days', ParseIntPipe) days: number) {
     const today = new Date();
     const searchDate = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() - days);
 

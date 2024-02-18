@@ -17,3 +17,23 @@ export function getVisitStatusName(visitStatus?: VisitStatus) {
       return 'Не отмечен';
   }
 }
+
+function getVisitStatusColor(visitStatus?: VisitStatus) {
+  const visitStatusColors = {
+    [VisitStatus.VISITED]: 'success.main',
+    [VisitStatus.POSTPONED_FUTURE]: 'warning.main',
+    [VisitStatus.POSTPONED_DONE]: 'success.main',
+    [VisitStatus.MISSED]: 'error.main',
+    [VisitStatus.SICK]: 'error.main',
+    [VisitStatus.UNKNOWN]: 'default',
+  };
+
+  return visitStatusColors[visitStatus ?? VisitStatus.UNKNOWN];
+}
+
+export function getVisitStatusNameAndColor(visitStatus: VisitStatus) {
+  return {
+    name: getVisitStatusName(visitStatus),
+    color: getVisitStatusColor(visitStatus),
+  };
+}

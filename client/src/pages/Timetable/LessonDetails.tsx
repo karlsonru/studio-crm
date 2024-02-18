@@ -7,6 +7,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { AddStudentsDialog } from '../Lesson/AddStudentDialog';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
@@ -19,8 +20,8 @@ import { useFindWithParamsAttendancesQuery } from '../../shared/api';
 import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
 import { IVisit, VisitStatus } from '../../shared/models/IAttendanceModel';
-import { PrimaryButton } from '../../shared/components/buttons/PrimaryButton';
-import { getVisitStatusName } from '../../shared/helpers/getVisitStatusName';
+import { getVisitTypeName } from '../../shared/helpers/getVisitTypeName';
+import { getVisitStatusNameAndColor } from '../../shared/helpers/getVisitStatusName';
 
 function sortStudentsByVisitType(
   a: IVisitingStudent | IVisit,
@@ -60,32 +61,32 @@ function LessonInfo({ lesson, date }: { lesson: ILessonModel, date: number }) {
   );
 }
 
-function getVisitTypeName(visitType: VisitType) {
-  const visitTypeNames = {
-    [VisitType.REGULAR]: 'постоянный',
-    [VisitType.SINGLE]: 'однократный',
-    [VisitType.NEW]: 'новый',
-    [VisitType.POSTPONED]: 'отработка',
-  };
+function VisitStatusText({ visitStatus }: { visitStatus: VisitStatus }) {
+  const { name, color } = getVisitStatusNameAndColor(visitStatus);
+  return <Typography sx={{ color }}>{name}</Typography>;
+}
 
-  return visitTypeNames[visitType];
+function isVisitType(obj: any): obj is IVisit {
+  return (obj as IVisit).visitType !== undefined;
 }
 
 function StudentsList({ students }: { students: Array<IVisitingStudent | IVisit> }) {
-  const sortedStudents = students.sort(sortStudentsByVisitType);
+  const sortedStudents = [...students].sort(sortStudentsByVisitType);
 
   return (
     <List>
       { sortedStudents.map((visiting) => <ListItem key={visiting.student._id}>
             <ListItemText
               primary={visiting.student.fullname}
-              secondary={getVisitTypeName(visiting.visitType)}
+              secondary={
+                <Stack>
+                  { isVisitType(visiting) && <VisitStatusText visitStatus={visiting.visitStatus}/> }
+                  { getVisitTypeName(visiting.visitType) }
+                </Stack>
+              }
             />
-            {// @ts-ignore
-              visiting.visitStatus && <ListItemText secondary={getVisitStatusName(visiting.visitStatus)} />
-            }
-          </ListItem>)
-        }
+        </ListItem>)
+      }
     </List>
   );
 }

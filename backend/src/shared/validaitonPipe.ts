@@ -18,12 +18,17 @@ export class ValidateIdPipe implements PipeTransform<string> {
 }
 
 @Injectable()
-export class ValidateNumberPipe implements PipeTransform<string> {
+export class ValidateOptionalNumberPipe implements PipeTransform<string> {
   transform(value: string, metadata: ArgumentMetadata): number {
-    if (isNaN(+value)) {
-      console.log(value);
+    if (value === undefined) {
+      return 0;
+    }
+
+    const candidate = parseInt(value, 10);
+    if (isNaN(candidate)) {
       throw new HttpException({ message: 'Invalid number parameter' }, HttpStatus.BAD_REQUEST);
     }
-    return +value;
+
+    return Number(candidate);
   }
 }

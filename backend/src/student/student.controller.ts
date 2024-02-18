@@ -11,11 +11,12 @@ import {
   UseInterceptors,
   Query,
   HttpCode,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { StudentService } from './student.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
-import { ValidateIdPipe, ValidateNumberPipe } from '../shared/validaitonPipe';
+import { ValidateIdPipe } from '../shared/validaitonPipe';
 import { StudentModel } from '../schemas';
 import { MongooseClassSerializerInterceptor } from '../shared/mongooseClassSerializer.interceptor';
 
@@ -36,7 +37,7 @@ export class StudentController {
   }
 
   @Get('/closest-birthdays')
-  async findStudentsWithClosestBirthday(@Query('days', ValidateNumberPipe) days: number) {
+  async findStudentsWithClosestBirthday(@Query('days', ParseIntPipe) days: number) {
     const birthdayMaxPossible = new Date();
     birthdayMaxPossible.setDate(birthdayMaxPossible.getDate() + days);
     birthdayMaxPossible.setFullYear(1970);
