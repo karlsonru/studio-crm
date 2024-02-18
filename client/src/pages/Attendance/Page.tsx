@@ -12,7 +12,6 @@ import { attendancePageActions } from '../../shared/reducers/attendancePageSlice
 import { useFindLessonsQuery } from '../../shared/api';
 import { ShowError } from '../../shared/components/ShowError';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
-import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 
 const Header = React.memo(() => (
   <Box component='header' mx='1rem'>
@@ -27,29 +26,44 @@ export function AttendancePage() {
   const selectedLessonId = searchParams.get('lessonId');
 
   const actions = useActionCreators(attendancePageActions);
-  const currentDateTimestamp = useAppSelector(
-    (state) => state.attendancePageReducer.currentDateTimestamp,
+  const searchDateTimestamp = useAppSelector(
+    (state) => state.attendancePageReducer.searchDateTimestamp,
   );
 
   useEffect(() => {
-    const date = searchParams.get('date');
+    const year = searchParams.get('year');
+    const month = searchParams.get('month');
+    const day = searchParams.get('day');
 
+    // если дата в search params - обновим state для соответствия даты в state и params
+    if (year && month && day) {
+      const searchDate = Date.UTC(+year, +month - 1, +day);
+
+      if (searchDate !== searchDateTimestamp) {
+        actions.setSearchDateTimestamp(searchDate);
+      }
     // если даты нет в search params - добавим самостоятельно текущий день в UTC
-    if (!date) {
-      setSearchParams({ date: getTodayTimestamp().toString() });
-      actions.setCurrentDateTimestamp(getTodayTimestamp());
-    // если есть - обновим state чтобы дата в state соответствовала дате в params
-    } else if (+date !== currentDateTimestamp) {
-      actions.setCurrentDateTimestamp(+date);
+    } else {
+      const today = new Date();
+
+      setSearchParams({
+        year: today.getFullYear().toString(),
+        month: (today.getMonth() + 1).toString(),
+        day: today.getDate().toString(),
+      });
+
+      const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+
+      actions.setSearchDateTimestamp(todayUTC);
     }
-  });
+  }, [searchParams, actions, searchDateTimestamp]);
 
   const {
     data: lessons, isLoading, isError, error,
   } = useFindLessonsQuery({
-    day: new Date(currentDateTimestamp).getDay(),
-    dateTo: { $gte: currentDateTimestamp },
-    dateFrom: { $lte: currentDateTimestamp },
+    day: new Date(searchDateTimestamp).getDay(),
+    dateTo: { $gte: searchDateTimestamp },
+    dateFrom: { $lte: searchDateTimestamp },
   });
 
   const selectedLesson = useMemo(

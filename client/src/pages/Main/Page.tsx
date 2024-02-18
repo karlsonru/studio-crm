@@ -12,6 +12,7 @@ import {
 import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
 import { PaymentStatus, VisitStatus } from '../../shared/models/IAttendanceModel';
+import { getYearMonthDay } from '../../shared/helpers/getYearMonthDay';
 
 function ExpiringSubscriptionsDisplay() {
   const navigate = useNavigate();
@@ -85,10 +86,12 @@ function UnpaidAttendancesDisplay() {
     attendance.students.forEach((student) => {
       if (student.paymentStatus !== PaymentStatus.UNPAID) return;
 
+      const { year, month, day } = getYearMonthDay(attendance.date);
+
       const row = CreateRow({
         content: [attendance.lesson.title, format(attendance.date, 'dd.MM.yyyy'), student.student.fullname],
         props: {
-          onDoubleClick: () => navigate(`/attendances?lessonId=${attendance.lesson._id}&date=${attendance.date}`),
+          onDoubleClick: () => navigate(`/attendances?lessonId=${attendance.lesson._id}&year=${year}&month=${month + 1}&day=${day}`),
         },
       });
       studentsWithPostponedVisits.push(row);
@@ -133,10 +136,12 @@ function PostponedAttendancesDisplay() {
     attendance.students.forEach((student) => {
       if (student.visitStatus !== VisitStatus.POSTPONED_FUTURE) return;
 
+      const { year, month, day } = getYearMonthDay(attendance.date);
+
       const row = CreateRow({
         content: [attendance.lesson.title, format(attendance.date, 'dd.MM.yyyy'), student.student.fullname],
         props: {
-          onDoubleClick: () => navigate(`/attendances?lessonId=${attendance.lesson._id}&date=${attendance.date}`),
+          onDoubleClick: () => navigate(`/attendances?lessonId=${attendance.lesson._id}&year=${year}&month=${month + 1}&day=${day}`),
         },
       });
       studentsWithPostponedVisits.push(row);

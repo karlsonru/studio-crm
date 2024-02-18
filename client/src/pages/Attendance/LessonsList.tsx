@@ -13,12 +13,19 @@ function ListItemLesson({ lesson }: { lesson: ILessonModel }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedLessonId = searchParams.get('lessonId');
 
-  const currentDateTimestamp = useAppSelector(
-    (state) => state.attendancePageReducer.currentDateTimestamp,
+  const searchDateTimestamp = useAppSelector(
+    (state) => state.attendancePageReducer.searchDateTimestamp,
   );
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, lessonId: string) => {
-    setSearchParams({ date: currentDateTimestamp.toString(), lessonId });
+    const date = new Date(searchDateTimestamp);
+
+    setSearchParams({
+      year: date.getFullYear().toString(),
+      month: (date.getMonth() + 1).toString(),
+      day: date.getDate().toString(),
+      lessonId,
+    });
   };
 
   return (

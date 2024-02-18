@@ -24,7 +24,7 @@ function getVisitStatusColor(visitStatus?: VisitStatus) {
     [VisitStatus.POSTPONED_FUTURE]: 'warning.main',
     [VisitStatus.POSTPONED_DONE]: 'success.main',
     [VisitStatus.MISSED]: 'error.main',
-    [VisitStatus.SICK]: 'error.main',
+    [VisitStatus.SICK]: 'warning.main',
     [VisitStatus.UNKNOWN]: 'default',
   };
 

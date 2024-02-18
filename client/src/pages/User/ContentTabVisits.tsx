@@ -7,6 +7,7 @@ import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
 import { VisitStatus } from '../../shared/models/IAttendanceModel';
 import { useMobile } from '../../shared/hooks/useMobile';
+import { getYearMonthDay } from '../../shared/helpers/getYearMonthDay';
 
 export function ContentTabVisits({ userId }: { userId: string }) {
   const isMobile = useMobile();
@@ -55,7 +56,10 @@ export function ContentTabVisits({ userId }: { userId: string }) {
           ]
         }
       props={{
-        onDoubleClick: () => navigate(`/attendances?date=${visit.date}&lessonId=${visit.lesson._id}`),
+        onDoubleClick: () => {
+          const { year, month, day } = getYearMonthDay(visit.date);
+          navigate(`/attendances?lessonId=${visit.lesson._id}&year=${year}&month=${month + 1}&day=${day}`);
+        },
       }}
     />);
 

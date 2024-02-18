@@ -1,35 +1,26 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getTodayTimestamp } from '../helpers/getTodayTimestamp';
 
-/*
-export interface IVisit {
-  _id?: string;
-  student: string;
-  visitStatus: VisitStatus;
-  visitType: VisitType;
-}
-*/
-
 interface IAttendancePageState {
-  currentLessonId: string,
-  currentDateTimestamp: number;
+  searchLessonId: string,
+  searchDateTimestamp: number;
 }
 
 const initialState: IAttendancePageState = {
-  currentLessonId: '',
-  currentDateTimestamp: getTodayTimestamp(),
+  searchLessonId: '',
+  searchDateTimestamp: getTodayTimestamp(),
 };
 
 const attendancePageState = createSlice({
   name: 'attendancePage',
   initialState,
   reducers: {
-    setCurrentDateTimestamp: (state, action: PayloadAction<number>) => {
-      state.currentDateTimestamp = action.payload;
+    setSearchDateTimestamp: (state, action: PayloadAction<number>) => {
+      state.searchDateTimestamp = action.payload;
     },
 
-    setCurrentLessonId: (state, action: PayloadAction<string>) => {
-      state.currentLessonId = action.payload;
+    setSearchLessonId: (state, action: PayloadAction<string>) => {
+      state.searchLessonId = action.payload;
     },
   },
 });

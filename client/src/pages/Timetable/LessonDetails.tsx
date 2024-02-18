@@ -21,6 +21,7 @@ import { ShowError } from '../../shared/components/ShowError';
 import { IVisit, VisitStatus } from '../../shared/models/IAttendanceModel';
 import { getVisitTypeName } from '../../shared/helpers/getVisitTypeName';
 import { getVisitStatusNameAndColor } from '../../shared/helpers/getVisitStatusName';
+import { getYearMonthDay } from '../../shared/helpers/getYearMonthDay';
 
 function sortStudentsByVisitType(
   a: IVisitingStudent | IVisit,
@@ -154,7 +155,8 @@ export const LessonDetails = React.memo(() => {
 
   const goAttendancePage = () => {
     closeHandler();
-    navigate(`/attendances?lessonId=${lesson._id}&date=${date}`);
+    const { year, month, day } = getYearMonthDay(date);
+    navigate(`/attendances?lessonId=${lesson._id}&year=${year}&month=${month + 1}&day=${day}`);
   };
 
   const isAttendanceDone = isSuccess && attendance.length > 0;
