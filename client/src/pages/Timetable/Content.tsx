@@ -19,8 +19,9 @@ import { useAppSelector } from '../../shared/hooks/useAppSelector';
 const TIME_STEP: 60 | 30 = 30;
 const TIME_START = 9;
 const TIME_END = 22;
-const FIRST_COLUMN_WIDTH = '4%';
-const COLUMN_WIDTH = '12%';
+const FIRST_COLUMN_WIDTH = '2%';
+const COLUMN_WIDTH = '14%';
+const TABLE_MIN_WIDTH = '1650px';
 
 const CELL_STYLE = {
   position: 'relative',
@@ -175,13 +176,17 @@ export function TimetableContent({ lessons }: { lessons: Array<ILessonModel> }) 
   }
 
   // поделим все занятия по ячейкам и строкам
-  // const rowsContent = useMemo(() => fillRowsWithContent(lessons), [lessons]);
   const rowsContent = fillRowsWithContent(lessons);
 
   const dateNames = [null, ...dates.map((intervalDate) => format(intervalDate, 'dd EEEE', { locale: ru }))];
 
   return (
-    <Table>
+    <Table
+      sx={{
+        overflowX: 'scroll',
+        minWidth: TABLE_MIN_WIDTH,
+      }}
+    >
       <TableHead>
         <Row content={dateNames} dates={dates} />
       </TableHead>

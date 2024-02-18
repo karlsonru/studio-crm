@@ -7,7 +7,6 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { AddStudentsDialog } from '../Lesson/AddStudentDialog';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
@@ -38,8 +37,15 @@ function sortStudentsByVisitType(
   return -1;
 }
 
-function LessonInfo({ lesson, date }: { lesson: ILessonModel, date: number }) {
+interface ILessonInfo {
+  lesson: ILessonModel;
+  date: number;
+  isAttendanceDone: boolean;
+}
+
+function LessonInfo({ lesson, date, isAttendanceDone }: ILessonInfo) {
   const time = `с ${lesson.timeStart.hh}:${lesson.timeStart.min} по ${lesson.timeEnd.hh}:${lesson.timeEnd.min}`;
+
   return (
     <>
       <Typography variant="h6" textAlign="center">
@@ -50,6 +56,12 @@ function LessonInfo({ lesson, date }: { lesson: ILessonModel, date: number }) {
         {format(date, 'dd.MM.yyyy')}
       </Typography>
       <List>
+        <ListItem>
+          <ListItemText
+            primary={`Статус: ${isAttendanceDone ? 'Состоялось' : 'Запланированно'}`}
+            primaryTypographyProps={{ sx: { color: isAttendanceDone ? 'success.main' : 'primary.main' } }}
+          />
+        </ListItem>
         <ListItem>
           <ListItemText primary={`Педагог: ${lesson.teacher.fullname}`} />
         </ListItem>
@@ -79,11 +91,17 @@ function StudentsList({ students }: { students: Array<IVisitingStudent | IVisit>
             <ListItemText
               primary={visiting.student.fullname}
               secondary={
-                <Stack>
-                  { isVisitType(visiting) && <VisitStatusText visitStatus={visiting.visitStatus}/> }
+                <>
+                  { isVisitType(visiting)
+                    && visiting.visitStatus
+                    && <VisitStatusText visitStatus={visiting.visitStatus} />
+                  }
                   { getVisitTypeName(visiting.visitType) }
-                </Stack>
+                </>
               }
+              secondaryTypographyProps={{
+                component: 'div',
+              }}
             />
         </ListItem>)
       }
@@ -103,6 +121,7 @@ export const LessonDetails = React.memo(() => {
   const {
     data: attendance,
     isLoading,
+    isSuccess,
     isError,
     error,
   } = useFindWithParamsAttendancesQuery({
@@ -138,6 +157,8 @@ export const LessonDetails = React.memo(() => {
     navigate(`/attendances?lessonId=${lesson._id}&date=${date}`);
   };
 
+  const isAttendanceDone = isSuccess && attendance.length > 0;
+
   const students = attendance && attendance.length
     ? attendance[0]?.students
     : lesson.students.filter(
@@ -162,7 +183,11 @@ export const LessonDetails = React.memo(() => {
         padding={2}
         sx={{ width: isMobile ? '100%' : MODAL_FORM_WIDTH }}
       >
-        <LessonInfo lesson={lesson} date={date} />
+        <LessonInfo
+          lesson={lesson}
+          date={date}
+          isAttendanceDone={isAttendanceDone}
+        />
 
         <Button
           size="large"
