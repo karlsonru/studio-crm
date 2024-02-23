@@ -19,10 +19,11 @@ import { getErrorMessage } from '../helpers/getErrorMessage';
 
 interface IForm {
   title: string;
+  children: Array<ReactNode>;
   isOpen: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  children: Array<ReactNode>;
   onClose?: () => void;
+  clearParams?: boolean;
   requestStatus?: {
     isLoading: boolean;
     isSuccess: boolean;
@@ -34,7 +35,14 @@ interface IForm {
 }
 
 export function DialogFormWrapper({
-  title, isOpen, onSubmit, children, requestStatus, dialogProps, onClose,
+  title,
+  children,
+  isOpen,
+  onSubmit,
+  onClose,
+  clearParams = true,
+  requestStatus,
+  dialogProps,
 }: IForm) {
   const {
     isSuccess, isError, error, reset, isLoading,
@@ -54,7 +62,10 @@ export function DialogFormWrapper({
       onClose();
     }
 
-    setSearchParams(undefined);
+    // по умолчанию нужно очистить параметры перед закрытием
+    if (clearParams) {
+      setSearchParams(undefined);
+    }
   };
 
   useEffect(() => {

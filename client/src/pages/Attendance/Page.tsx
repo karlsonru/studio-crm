@@ -3,7 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Stack from '@mui/system/Stack';
 import { LessonsList } from './LessonsList';
-import { LessonInfo } from './LessonInfo';
+import { StudentsInfo } from './StudentsInfo';
+import { LessonDetails } from './LessonDetails';
 import { DateSwitcherAttendance } from './DateSwitcherAttendance';
 import { Loading } from '../../shared/components/Loading';
 import { useTitle } from '../../shared/hooks/useTitle';
@@ -13,7 +14,7 @@ import { useFindLessonsQuery } from '../../shared/api';
 import { ShowError } from '../../shared/components/ShowError';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 
-const Header = React.memo(() => (
+const AttendanceHeader = React.memo(() => (
   <Box component='header' mx='1rem'>
     <DateSwitcherAttendance />
   </Box>
@@ -59,7 +60,10 @@ export function AttendancePage() {
   }, [searchParams, actions, searchDateTimestamp]);
 
   const {
-    data: lessons, isLoading, isError, error,
+    data: lessons,
+    isLoading,
+    isError,
+    error,
   } = useFindLessonsQuery({
     day: new Date(searchDateTimestamp).getDay(),
     dateTo: { $gte: searchDateTimestamp },
@@ -85,10 +89,13 @@ export function AttendancePage() {
 
   return (
     <>
-      <Header />
+      <AttendanceHeader />
       <Stack direction="row" flexWrap="wrap" spacing={2}>
         <LessonsList lessons={lessons} />
-        {selectedLesson && <LessonInfo selectedLesson={selectedLesson} />}
+
+        {selectedLesson && <LessonDetails lesson={selectedLesson} />}
+
+        {selectedLesson && <StudentsInfo selectedLesson={selectedLesson} />}
       </Stack>
     </>
   );

@@ -3,6 +3,8 @@ import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import { VisitStatusButton } from './VisitStatusButton';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { IStudentModel } from '../../shared/models/IStudentModel';
@@ -10,10 +12,14 @@ import { ILessonModel, IVisitingStudent, VisitType } from '../../shared/models/I
 import { useCreateAttendanceMutation, usePatchAttendanceMutation } from '../../shared/api';
 import { MODAL_FORM_WIDTH } from '../../shared/constants';
 import {
-  PaymentStatus, IAttendanceModel, VisitStatus, IVisit,
+  PaymentStatus,
+  IAttendanceModel,
+  VisitStatus,
+  IVisit,
 } from '../../shared/models/IAttendanceModel';
 import { getVisitTypeName } from '../../shared/helpers/getVisitTypeName';
 import { getBillingStatusNameAndColor } from '../../shared/helpers/getBillingStatusNameAndColor';
+import { useAppSelector } from '../../shared/hooks/useAppSelector';
 
 interface IFormWrapper {
   children: ReactNode | Array<ReactNode>;
@@ -49,22 +55,21 @@ interface IStudentsListItem {
   visitDetails: {
     visitType: VisitType;
     visitStatus?: VisitStatus;
-    billingStatus?: PaymentStatus;
+    paymentStatus?: PaymentStatus;
     visitInstead?: string;
   }
 }
 
 function StudentsListItem({ student, visitDetails }: IStudentsListItem) {
   const {
-    visitType, visitStatus, billingStatus, visitInstead,
+    visitType,
+    visitStatus,
+    paymentStatus,
+    visitInstead,
   } = visitDetails;
-  const { name: billingStatusName, color } = getBillingStatusNameAndColor(billingStatus);
-  const visitTypeName = getVisitTypeName(visitType);
 
-  console.log('Student');
-  console.log(student);
-  console.log('Visitdetails');
-  console.log(visitDetails);
+  const { name: paymentStatusName, color } = getBillingStatusNameAndColor(paymentStatus);
+  const visitTypeName = getVisitTypeName(visitType);
 
   return (
     <ListItem divider={true}>
@@ -73,7 +78,7 @@ function StudentsListItem({ student, visitDetails }: IStudentsListItem) {
         secondary={
           <List disablePadding>
             <ListItemText
-              secondary={billingStatusName}
+              secondary={paymentStatusName}
               secondaryTypographyProps={{ sx: { color } }}
             />
             <ListItemText
@@ -98,6 +103,24 @@ function StudentsListItem({ student, visitDetails }: IStudentsListItem) {
   );
 }
 
+function DisplayNumberOfVisited({ attendance }: { attendance: IAttendanceModel }) {
+  const { students } = attendance;
+  const visited = students.filter(
+    (student) => (student.visitStatus === VisitStatus.VISITED),
+  ).length;
+
+  return (
+    <ListItem sx={{ textAlign: 'right' }}>
+      <ListItemIcon>
+        <PersonOutlineOutlinedIcon />
+      </ListItemIcon>
+      <ListItemText
+        primary={`Посетило ${visited} из ${students.length}`}
+      />
+    </ListItem>
+  );
+}
+
 export function StudentsListVisited({ attendance }: { attendance: IAttendanceModel }) {
   const [updateAttendance] = usePatchAttendanceMutation();
 
@@ -111,7 +134,7 @@ export function StudentsListVisited({ attendance }: { attendance: IAttendanceMod
       student: visited.student._id,
       visitType: visited.visitType,
       visitStatus: visitStatuses[visited.student._id] as VisitStatus,
-      billingStatus: visited.paymentStatus,
+      paymentStatus: visited.paymentStatus,
       subscription: visited.subscription,
     }));
 
@@ -124,7 +147,9 @@ export function StudentsListVisited({ attendance }: { attendance: IAttendanceMod
   };
 
   return (
-    <FormWrapper submitHandler={submitHandler}>
+    <FormWrapper
+      submitHandler={submitHandler}
+    >
       <List>
         {attendance.students.map(
           (visited) => <StudentsListItem
@@ -133,11 +158,13 @@ export function StudentsListVisited({ attendance }: { attendance: IAttendanceMod
             visitDetails={{
               visitStatus: visited.visitStatus,
               visitType: visited.visitType,
-              billingStatus: visited.paymentStatus,
+              paymentStatus: visited.paymentStatus,
               visitInstead: visited.visitInstead,
             }}
           />,
         )}
+
+        <DisplayNumberOfVisited attendance={attendance} />
       </List>
     </FormWrapper>
   );
@@ -145,14 +172,26 @@ export function StudentsListVisited({ attendance }: { attendance: IAttendanceMod
 
 interface IStudentsListFuture {
   lesson: ILessonModel;
-  dateTimestamp: number;
-  studentsList: Array<IVisitingStudent | IVisit>;
+  studentsFromFuture?: Array<IVisit>;
 }
 
-export function StudentsListFuture({ lesson, dateTimestamp, studentsList }: IStudentsListFuture) {
-  const [createAttendance] = useCreateAttendanceMutation();
+function isAttendanceStudent(obj: IVisit | IVisitingStudent): obj is IVisit {
+  return 'paymentStatus' in obj && 'visitStatus' in obj;
+}
 
-  const date = new Date(dateTimestamp);
+export function StudentsListFuture({ lesson, studentsFromFuture }: IStudentsListFuture) {
+  const [createAttendance] = useCreateAttendanceMutation();
+  const searchDateTimestamp = useAppSelector(
+    (state) => state.attendancePageReducer.searchDateTimestamp,
+  );
+
+  const students = lesson.students.filter(
+    (student) => student.visitType === VisitType.REGULAR || student.date === searchDateTimestamp,
+  );
+
+  const studentsList = studentsFromFuture ? [...students, ...studentsFromFuture] : students;
+
+  const date = new Date(searchDateTimestamp);
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -182,17 +221,14 @@ export function StudentsListFuture({ lesson, dateTimestamp, studentsList }: IStu
     <FormWrapper submitHandler={submitHandler}>
       <List>
         {studentsList.map(
-          (visiting, idx) => <StudentsListItem
-            // key={visiting.student._id}
-            key={idx}
+          (visiting) => <StudentsListItem
+            key={visiting.student._id}
             student={visiting.student}
             visitDetails={{
               ...visiting,
-              // @ts-ignore
-              visitStatus: visiting.visitStatus,
               visitType: visiting.visitType,
-              // @ts-ignore
-              billingStatus: visiting.billingStatus,
+              visitStatus: (isAttendanceStudent(visiting) && visiting.visitStatus) || undefined,
+              paymentStatus: (isAttendanceStudent(visiting) && visiting.paymentStatus) || undefined,
               visitInstead: visiting.visitInstead,
             }}
           />,
@@ -202,116 +238,3 @@ export function StudentsListFuture({ lesson, dateTimestamp, studentsList }: IStu
     </FormWrapper>
   );
 }
-
-/*
-interface IStudentsListUnited extends IStudentsListFuture {
-  attendance: IAttendanceModel;
-}
-
-interface IFormData {
-  [k: string]: FormDataEntryValue;
-}
-
-function createAttendancePayload(
-  studentsList: IVisitingStudent[] | IVisit[],
-  lesson: ILessonModel,
-  visitStatuses: IFormData,
-  date: Date
-) {
-  const visits = studentsList.map((visiting) => ({
-    student: visiting.student._id,
-    visitType: visiting.visitType,
-    visitStatus: visitStatuses[visiting.student._id] as VisitStatus,
-  }));
-
-  return {
-    lesson: lesson._id,
-    teacher: lesson.teacher._id,
-    year: date.getFullYear(),
-    month: date.getMonth() + 1,
-    day: date.getDate(),
-    weekday: lesson.day,
-    students: visits,
-  };
-}
-
-function updateAttendancePayload(attendance: IAttendanceModel, visitStatuses: IFormData) {
-  const visits = attendance.students.map((visited) => ({
-    student: visited.student._id,
-    visitType: visited.visitType,
-    visitStatus: visitStatuses[visited.student._id] as VisitStatus,
-    billingStatus: visited.billingStatus,
-    subscription: visited.subscription,
-  }));
-
-  return {
-    id: attendance._id,
-    newItem: {
-      students: visits,
-    },
-  };
-}
-
-export function StudentsListUnited({ attendance, lesson, dateTimestamp }: IStudentsListUnited) {
-  const [createAttendance] = useCreateAttendanceMutation();
-  const [updateAttendance] = usePatchAttendanceMutation();
-
-  const date = new Date(dateTimestamp);
-
-  const submitHandler = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget as HTMLFormElement);
-
-    const visitStatuses = Object.fromEntries(formData.entries());
-
-    if (attendance) {
-      const payload = updateAttendancePayload(attendance, visitStatuses);
-
-      updateAttendance(payload);
-    } else {
-      const payload = createAttendancePayload(lesson, visitStatuses, date);
-
-      createAttendance(payload);
-    }
-  };
-
-  return (
-    <FormWrapper submitHandler={submitHandler}>
-      <List>
-        {attendance && attendance.students.map(
-          (visited) => <StudentsListItem
-            key={visited.student._id}
-            student={visited.student}
-            visitDetails={{
-              visitStatus: visited.visitStatus,
-              visitType: visited.visitType,
-              billingStatus: visited.billingStatus,
-              visitInstead: visited.visitInstead,
-            }}
-          />,
-        )}
-
-        {!attendance && lesson.students.map(
-          (visiting) => {
-            // если студент однократный, то показываем его только за дату планируемого посещения
-            if (visiting.visitType !== VisitType.REGULAR
-                      && visiting.date !== dateTimestamp) {
-              return null;
-            }
-
-            return (
-              <StudentsListItem
-                key={visiting.student._id}
-                student={visiting.student}
-                visitDetails={{
-                  visitType: visiting.visitType,
-                }}
-              />
-            );
-          },
-        )}
-      </List>
-    </FormWrapper>
-  );
-}
-*/
