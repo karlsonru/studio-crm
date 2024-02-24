@@ -8,7 +8,6 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import SyncIcon from '@mui/icons-material/Sync';
-import { ChangeTeacherDialog } from './ChangeTeacherDialog';
 import { usePatchLessonStudentsMutation } from '../../shared/api';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { AddStudentButton, AddStudentsDialog } from './AddStudentDialog';
@@ -17,6 +16,7 @@ import { CardWrapper } from '../../shared/components/CardWrapper';
 import { CardContentItem } from '../../shared/components/CardContentItem';
 import { getVisitTypeName } from '../../shared/helpers/getVisitTypeName';
 import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
+import { ChangeTeacherDialog } from '../../shared/components/ChangeTeacherDialog';
 
 interface IStudentCard {
   lessonId: string;
@@ -83,6 +83,9 @@ function StudentCard({ lessonId, visiting }: IStudentCard) {
 export function ContentStudents({ lesson }: { lesson: ILessonModel }) {
   const [isChangeTeacher, setChangeTeacher] = useState(false);
   const [isAddStudent, setAddStudent] = useState(false);
+
+  console.log('ContentTabStudents');
+  console.log(`isChangeTeacher: ${isChangeTeacher}`);
 
   return (
     <>

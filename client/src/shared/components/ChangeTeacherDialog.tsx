@@ -4,7 +4,7 @@ import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
-import { useGetUsersQuery, usePatchAttendanceMutation } from '../api';
+import { useGetUsersQuery, usePatchAttendanceMutation, usePatchLessonMutation } from '../api';
 import { ILessonModel } from '../models/ILessonModel';
 import { DialogFormWrapper } from './DialogFormWrapper';
 import { ShowError } from './ShowError';
@@ -31,7 +31,6 @@ function ListAvailableTeachers({ currentTeacherId }: { currentTeacherId: string 
     return null;
   }
 
-  console.log(currentTeacherId);
   const availableTeachers = teachers.filter((teacher) => teacher._id !== currentTeacherId);
 
   return (
@@ -65,7 +64,7 @@ export function ChangeTeacherDialog(
     setModalOpen,
   }: IChangeTeacherDialog,
 ) {
-  const [updateLesson, requestStatusLessons] = usePatchAttendanceMutation();
+  const [updateLesson, requestStatusLessons] = usePatchLessonMutation();
   const [updateAttendance, requestStatusAttendance] = usePatchAttendanceMutation();
 
   if (!lesson && !attendance) {

@@ -44,12 +44,16 @@ export function DialogFormWrapper({
   requestStatus,
   dialogProps,
 }: IForm) {
-  const {
-    isSuccess, isError, error, reset, isLoading,
-  } = requestStatus ?? {};
-
   const ref = useRef<HTMLFormElement>();
   const [, setSearchParams] = useSearchParams();
+
+  const {
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+    reset,
+  } = requestStatus ?? {};
 
   const closeHandler = () => {
     // сбросим кэш запроса перед закрытием
