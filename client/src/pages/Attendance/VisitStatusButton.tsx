@@ -5,6 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import CircleIcon from '@mui/icons-material/Circle';
 import { VisitStatus } from '../../shared/models/IAttendanceModel';
 import { getVisitStatusName } from '../../shared/helpers/getVisitStatusName';
+import { useMobile } from '../../shared/hooks/useMobile';
 
 const VISIT_STATUSES: Array<{
   action: VisitStatus;
@@ -24,10 +25,14 @@ interface IVisitStatusButton {
 }
 
 export function VisitStatusButton({ studentId, visitStatus }: IVisitStatusButton) {
+  const isMobile = useMobile();
   const initialStatus = visitStatus ?? VisitStatus.UNKNOWN;
 
   return (
-    <FormControl sx={{ width: '180px' }}>
+    <FormControl sx={{
+      width: isMobile ? '135px' : '180px',
+      flexShrink: 0,
+    }}>
       <InputLabel>Сатус</InputLabel>
       <Select
         name={studentId}

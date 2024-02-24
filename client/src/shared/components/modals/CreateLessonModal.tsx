@@ -210,9 +210,10 @@ export function CreateLessonModal() {
         <Select
           name='location'
           label='Помещение'
-          defaultValue=''
+          defaultValue={isLocationsSuccess ? locationsData[0]._id : ''}
           fullWidth
           required
+          disabled={isLocationsSuccess}
         >
           <MenuItem value={''}><em>Выберите помещение</em></MenuItem>
         { isLocationsSuccess

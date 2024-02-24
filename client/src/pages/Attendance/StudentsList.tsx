@@ -38,19 +38,10 @@ function FormWrapper({ children, submitHandler, secondaryButton }: IFormWrapper)
       width="100%"
       maxWidth={MODAL_FORM_WIDTH}
     >
-
       {children}
 
       <Stack direction="row-reverse" justifyContent="space-between">
-        <SubmitButton
-          content='Подтвердить'
-          props={{
-            sx: {
-              float: 'right',
-              marginRight: '1rem',
-            },
-          }}
-          />
+        <SubmitButton content='Подтвердить' />
 
         {secondaryButton}
       </Stack>
@@ -117,12 +108,7 @@ interface IStudentAndVisitDetails extends IVisitDetails {
   student: IStudentModel;
 }
 
-interface IListStudents {
-  students: Array<IStudentAndVisitDetails>;
-  optionalComponents?: ReactNode | Array<ReactNode>;
-}
-
-function ListStudents({ students, optionalComponents }: IListStudents) {
+function ListStudents({ students }: { students: Array<IStudentAndVisitDetails> }) {
   return (
     <List>
       {students.map(
@@ -137,7 +123,6 @@ function ListStudents({ students, optionalComponents }: IListStudents) {
           }}
         />,
       )}
-      {optionalComponents}
     </List>
   );
 }
@@ -197,12 +182,13 @@ export function StudentsListAttendance({ attendance }: { attendance: IAttendance
       <FormWrapper
         submitHandler={submitHandler}
         secondaryButton={
-          <PrimaryButton content="Добавить" props={{ onClick: () => setAddStudentModalOpen(true) }} />
-        }>
-          <ListStudents
-            students={attendance.students}
-            optionalComponents={<DisplayNumberOfVisited attendance={attendance} />}
+          <PrimaryButton
+            content="Добавить"
+            props={{ onClick: () => setAddStudentModalOpen(true) }}
           />
+        }>
+          <ListStudents students={attendance.students} />
+          <DisplayNumberOfVisited attendance={attendance} />
       </FormWrapper>
 
       <AddStudentsDialog

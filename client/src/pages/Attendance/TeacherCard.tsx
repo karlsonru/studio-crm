@@ -7,6 +7,7 @@ import { ChangeTeacherDialog } from '../../shared/components/ChangeTeacherDialog
 import { ILessonModel } from '../../shared/models/ILessonModel';
 import { IAttendanceModel } from '../../shared/models/IAttendanceModel';
 import { IUserModel } from '../../shared/models/IUserModel';
+import { useMobile } from '../../shared/hooks/useMobile';
 
 interface ITeacherCard {
   teacher: IUserModel;
@@ -15,11 +16,15 @@ interface ITeacherCard {
 }
 
 export function TeacherCard({ teacher, lesson, attendance }: ITeacherCard) {
+  const isMobile = useMobile();
   const [isChangeTeacher, setChangeTeacher] = useState(false);
 
   return (
     <>
-      <CardWrapper extraStyle={{ height: 'max-content' }}>
+      <CardWrapper extraStyle={{
+        height: 'max-content',
+        margin: isMobile ? '1rem 0!important' : '0 0.5rem',
+      }}>
         <CardHeader
           title={teacher.fullname}
           titleTypographyProps={{ variant: 'h6' }}

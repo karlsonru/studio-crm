@@ -32,7 +32,10 @@ interface IAddStudentsDialog {
 }
 
 export function AddStudentsDialog({
-  lesson, isOpen, setModalOpen, date,
+  lesson,
+  isOpen,
+  setModalOpen,
+  date,
 }: IAddStudentsDialog) {
   const [visitType, setVisitType] = useState<VisitType>(VisitType.REGULAR);
   const [visitDate, setVisitDate] = useState(format(date ?? getTodayTimestamp(), 'yyyy-MM-dd'));

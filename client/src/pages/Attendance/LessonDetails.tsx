@@ -5,8 +5,9 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import Button from '@mui/material/Button';
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import EventIcon from '@mui/icons-material/Event';
 import ScheduleOutlinedIcon from '@mui/icons-material/ScheduleOutlined';
 import { dateValueFormatter } from '../../shared/helpers/dateValueFormatter';
 import { convertTime } from '../../shared/helpers/convertTime';
@@ -26,12 +27,10 @@ function AddListItemWIthIcon({ text, icon }: { text: string, icon: React.ReactEl
 }
 
 export function LessonDetails({ lesson }: { lesson: ILessonModel }) {
+  const navigate = useNavigate();
   const searchDateTimestamp = useAppSelector(
     (state) => state.attendancePageReducer.searchDateTimestamp,
   );
-
-  const dateField = `${dateValueFormatter(searchDateTimestamp)} c ${convertTime(lesson.timeStart)} до ${convertTime(lesson.timeEnd)}`;
-  const navigate = useNavigate();
 
   return (
     <CardWrapper extraStyle={{ height: 'max-content' }}>
@@ -42,8 +41,20 @@ export function LessonDetails({ lesson }: { lesson: ILessonModel }) {
       />
       <CardContent >
         <List>
-          <AddListItemWIthIcon text={lesson.location.address} icon={<LocationOnOutlinedIcon />} />
-          <AddListItemWIthIcon text={dateField} icon={<ScheduleOutlinedIcon />} />
+          <AddListItemWIthIcon
+            text={lesson.location.address}
+            icon={<LocationOnOutlinedIcon />}
+          />
+
+          <AddListItemWIthIcon
+            text={dateValueFormatter(searchDateTimestamp)}
+            icon={<EventIcon />}
+          />
+
+          <AddListItemWIthIcon
+            text={`C ${convertTime(lesson.timeStart)} до ${convertTime(lesson.timeEnd)}`}
+            icon={<ScheduleOutlinedIcon />}
+          />
         </List>
       </CardContent>
     </CardWrapper>

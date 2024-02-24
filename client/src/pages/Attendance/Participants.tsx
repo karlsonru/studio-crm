@@ -13,7 +13,7 @@ export function Participants({ selectedLesson }: { selectedLesson: ILessonModel 
     (state) => state.attendancePageReducer.searchDateTimestamp,
   );
 
-  // ищем есть ли информация по уже проведенному занятию
+  // ищем есть ли уже проведеённое занятие по этому уроку
   const {
     data: attendance,
     isLoading,
@@ -36,24 +36,28 @@ export function Participants({ selectedLesson }: { selectedLesson: ILessonModel 
     <ShowError details={error} />;
   }
 
-  // если есть ответ на запрос и массив с посещениями не пустой - посещение было
+  // если в ответе массив не пустой - занятие есть
   const hasAttendance = attendance !== undefined && attendance.length > 0;
 
   // проверим является ли посещение уже состоявшимся или только запланированное
   const isAttendanceDone = hasAttendance && attendance[0].type === AttendanceType.DONE;
 
-  return (
-  <>
-    {!isAttendanceDone && <StudentsListLesson
+  const studentsList = isAttendanceDone
+    ? <StudentsListAttendance attendance={attendance[0]} />
+    : <StudentsListLesson
       lesson={selectedLesson}
       studentsFromFutureAttendance={(hasAttendance && attendance[0].students) || undefined}
-    />}
+    />;
 
-    {isAttendanceDone && <StudentsListAttendance
-      attendance={attendance[0]}
-    />}
+  const teacherCard = isAttendanceDone
+    ? <TeacherCard teacher={attendance[0].teacher} attendance={attendance[0]} />
+    : null;
 
-    {isAttendanceDone && <TeacherCard teacher={attendance[0].teacher} attendance={attendance[0]} />}
-  </>
+  return (
+    <>
+      {studentsList}
+
+      {teacherCard}
+    </>
   );
 }
