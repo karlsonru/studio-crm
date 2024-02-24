@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Stack from '@mui/system/Stack';
 import { LessonsList } from './LessonsList';
-import { StudentsInfo } from './StudentsInfo';
+import { Participants } from './Participants';
 import { LessonDetails } from './LessonDetails';
 import { DateSwitcherAttendance } from './DateSwitcherAttendance';
 import { Loading } from '../../shared/components/Loading';
@@ -95,7 +95,7 @@ export function AttendancePage() {
 
         {selectedLesson && <LessonDetails lesson={selectedLesson} />}
 
-        {selectedLesson && <StudentsInfo selectedLesson={selectedLesson} />}
+        {selectedLesson && <Participants selectedLesson={selectedLesson} />}
       </Stack>
     </>
   );

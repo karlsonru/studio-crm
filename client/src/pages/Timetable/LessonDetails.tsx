@@ -18,14 +18,14 @@ import { MODAL_FORM_WIDTH } from '../../shared/constants';
 import { useFindWithParamsAttendancesQuery } from '../../shared/api';
 import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
-import { IVisit, VisitStatus } from '../../shared/models/IAttendanceModel';
+import { IAttendanceDetails, VisitStatus } from '../../shared/models/IAttendanceModel';
 import { getVisitTypeName } from '../../shared/helpers/getVisitTypeName';
 import { getVisitStatusNameAndColor } from '../../shared/helpers/getVisitStatusName';
 import { getYearMonthDay } from '../../shared/helpers/getYearMonthDay';
 
 function sortStudentsByVisitType(
-  a: IVisitingStudent | IVisit,
-  b: IVisitingStudent | IVisit,
+  a: IVisitingStudent | IAttendanceDetails,
+  b: IVisitingStudent | IAttendanceDetails,
 ) {
   if (a.visitType === VisitType.REGULAR && b.visitType === VisitType.REGULAR) {
     return a.student.fullname.localeCompare(b.student.fullname);
@@ -79,11 +79,11 @@ function VisitStatusText({ visitStatus }: { visitStatus: VisitStatus }) {
   return <Typography sx={{ color }}>{name}</Typography>;
 }
 
-function isVisitType(obj: any): obj is IVisit {
-  return (obj as IVisit).visitType !== undefined;
+function isVisitType(obj: any): obj is IAttendanceDetails {
+  return (obj as IAttendanceDetails).visitType !== undefined;
 }
 
-function StudentsList({ students }: { students: Array<IVisitingStudent | IVisit> }) {
+function StudentsList({ students }: { students: Array<IVisitingStudent | IAttendanceDetails> }) {
   const sortedStudents = [...students].sort(sortStudentsByVisitType);
 
   return (

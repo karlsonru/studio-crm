@@ -22,7 +22,7 @@ export enum AttendanceType {
   FUTURE = 'future',
 }
 
-export interface IVisit {
+export interface IAttendanceDetails {
   student: IStudentModel;
   visitStatus: VisitStatus;
   paymentStatus: PaymentStatus;
@@ -31,7 +31,7 @@ export interface IVisit {
   visitInstead?: string;
 }
 
-interface IVisitCreate extends Omit<IVisit, 'student' | 'subscription' | 'paymentStatus'> {
+interface IAttendanceDetailsCreate extends Omit<IAttendanceDetails, 'student' | 'subscription' | 'paymentStatus'> {
   student: string;
 }
 
@@ -42,13 +42,13 @@ export interface IAttendanceModel {
   type: AttendanceType;
   day: number;
   date: number; // UTC Timestamp
-  students: Array<IVisit>,
+  students: Array<IAttendanceDetails>,
 }
 
 export interface IAttendanceModelCreate extends Omit<IAttendanceModel, '_id' | 'lesson' | 'teacher' | 'students' | 'date' | 'type'> {
   lesson: string;
   teacher: string;
-  students: Array<IVisitCreate>
+  students: Array<IAttendanceDetailsCreate>
   year: number;
   month: number;
   weekday: number;

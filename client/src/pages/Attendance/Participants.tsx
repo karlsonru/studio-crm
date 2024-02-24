@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { StudentsListFuture, StudentsListVisited } from './StudentsList';
+import { StudentsListLesson, StudentsListAttendance } from './StudentsList';
 import { useFindWithParamsAttendancesQuery } from '../../shared/api';
 import { Loading } from '../../shared/components/Loading';
 import { ILessonModel } from '../../shared/models/ILessonModel';
@@ -8,7 +8,7 @@ import { ShowError } from '../../shared/components/ShowError';
 import { AttendanceType } from '../../shared/models/IAttendanceModel';
 import { TeacherCard } from './TeacherCard';
 
-export function StudentsInfo({ selectedLesson }: { selectedLesson: ILessonModel }) {
+export function Participants({ selectedLesson }: { selectedLesson: ILessonModel }) {
   const searchDateTimestamp = useAppSelector(
     (state) => state.attendancePageReducer.searchDateTimestamp,
   );
@@ -44,12 +44,12 @@ export function StudentsInfo({ selectedLesson }: { selectedLesson: ILessonModel 
 
   return (
   <>
-    {!isAttendanceDone && <StudentsListFuture
+    {!isAttendanceDone && <StudentsListLesson
       lesson={selectedLesson}
-      studentsFromFuture={(hasAttendance && attendance[0].students) || undefined}
+      studentsFromFutureAttendance={(hasAttendance && attendance[0].students) || undefined}
     />}
 
-    {isAttendanceDone && <StudentsListVisited
+    {isAttendanceDone && <StudentsListAttendance
       attendance={attendance[0]}
     />}
 

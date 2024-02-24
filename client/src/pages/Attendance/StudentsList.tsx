@@ -1,32 +1,36 @@
-import { FormEvent, ReactNode } from 'react';
+import { FormEvent, ReactNode, useState } from 'react';
 import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import { VisitStatusButton } from './VisitStatusButton';
+import { AddStudentsDialog } from './AddStudentDialog';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { IStudentModel } from '../../shared/models/IStudentModel';
-import { ILessonModel, IVisitingStudent, VisitType } from '../../shared/models/ILessonModel';
+import { ILessonModel, VisitType } from '../../shared/models/ILessonModel';
 import { useCreateAttendanceMutation, usePatchAttendanceMutation } from '../../shared/api';
 import { MODAL_FORM_WIDTH } from '../../shared/constants';
 import {
   PaymentStatus,
   IAttendanceModel,
   VisitStatus,
-  IVisit,
+  IAttendanceDetails,
 } from '../../shared/models/IAttendanceModel';
 import { getVisitTypeName } from '../../shared/helpers/getVisitTypeName';
 import { getBillingStatusNameAndColor } from '../../shared/helpers/getBillingStatusNameAndColor';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
+import { PrimaryButton } from '../../shared/components/buttons/PrimaryButton';
 
 interface IFormWrapper {
   children: ReactNode | Array<ReactNode>;
   submitHandler: (event: FormEvent<HTMLFormElement>) => void;
+  secondaryButton?: ReactNode;
 }
 
-function FormWrapper({ children, submitHandler }: IFormWrapper) {
+function FormWrapper({ children, submitHandler, secondaryButton }: IFormWrapper) {
   return (
     <Box
       component="form"
@@ -37,27 +41,33 @@ function FormWrapper({ children, submitHandler }: IFormWrapper) {
 
       {children}
 
-      <SubmitButton
-        content='Подтвердить'
-        props={{
-          sx: {
-            float: 'right',
-            marginRight: '1rem',
-          },
-        }}
-      />
+      <Stack direction="row-reverse" justifyContent="space-between">
+        <SubmitButton
+          content='Подтвердить'
+          props={{
+            sx: {
+              float: 'right',
+              marginRight: '1rem',
+            },
+          }}
+          />
+
+        {secondaryButton}
+      </Stack>
     </Box>
   );
 }
 
+interface IVisitDetails {
+  visitType: VisitType;
+  visitStatus?: VisitStatus;
+  paymentStatus?: PaymentStatus;
+  visitInstead?: string;
+}
+
 interface IStudentsListItem {
   student: IStudentModel;
-  visitDetails: {
-    visitType: VisitType;
-    visitStatus?: VisitStatus;
-    paymentStatus?: PaymentStatus;
-    visitInstead?: string;
-  }
+  visitDetails: IVisitDetails;
 }
 
 function StudentsListItem({ student, visitDetails }: IStudentsListItem) {
@@ -103,6 +113,35 @@ function StudentsListItem({ student, visitDetails }: IStudentsListItem) {
   );
 }
 
+interface IStudentAndVisitDetails extends IVisitDetails {
+  student: IStudentModel;
+}
+
+interface IListStudents {
+  students: Array<IStudentAndVisitDetails>;
+  optionalComponents?: ReactNode | Array<ReactNode>;
+}
+
+function ListStudents({ students, optionalComponents }: IListStudents) {
+  return (
+    <List>
+      {students.map(
+        (studentAndVisitDteails) => <StudentsListItem
+          key={studentAndVisitDteails.student._id}
+          student={studentAndVisitDteails.student}
+          visitDetails={{
+            visitType: studentAndVisitDteails.visitType,
+            visitStatus: studentAndVisitDteails.visitStatus,
+            paymentStatus: studentAndVisitDteails.paymentStatus,
+            visitInstead: studentAndVisitDteails.visitInstead,
+          }}
+        />,
+      )}
+      {optionalComponents}
+    </List>
+  );
+}
+
 function DisplayNumberOfVisited({ attendance }: { attendance: IAttendanceModel }) {
   const { students } = attendance;
   const visited = students.filter(
@@ -121,65 +160,66 @@ function DisplayNumberOfVisited({ attendance }: { attendance: IAttendanceModel }
   );
 }
 
-export function StudentsListVisited({ attendance }: { attendance: IAttendanceModel }) {
+function createVisitDetails(
+  studentsAndVisitDetails: Array<IStudentAndVisitDetails>,
+  formData: FormData,
+) {
+  const visitStatuses = Object.fromEntries(formData.entries());
+
+  return studentsAndVisitDetails.map((visitDetails) => ({
+    ...visitDetails,
+    student: visitDetails.student._id,
+    visitType: visitDetails.visitType,
+    visitStatus: visitStatuses[visitDetails.student._id] as VisitStatus,
+    paymentStatus: visitDetails.paymentStatus,
+    visitInstead: visitDetails.visitInstead,
+  }));
+}
+
+export function StudentsListAttendance({ attendance }: { attendance: IAttendanceModel }) {
   const [updateAttendance] = usePatchAttendanceMutation();
+  const [isAddStudentModalOpen, setAddStudentModalOpen] = useState(false);
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget as HTMLFormElement);
 
-    const visitStatuses = Object.fromEntries(formData.entries());
-
-    const visits = attendance.students.map((visited) => ({
-      student: visited.student._id,
-      visitType: visited.visitType,
-      visitStatus: visitStatuses[visited.student._id] as VisitStatus,
-      paymentStatus: visited.paymentStatus,
-      subscription: visited.subscription,
-    }));
-
     updateAttendance({
       id: attendance._id,
       newItem: {
-        students: visits,
+        students: createVisitDetails(attendance.students, formData),
       },
     });
   };
 
   return (
-    <FormWrapper
-      submitHandler={submitHandler}
-    >
-      <List>
-        {attendance.students.map(
-          (visited) => <StudentsListItem
-            key={visited.student._id}
-            student={visited.student}
-            visitDetails={{
-              visitStatus: visited.visitStatus,
-              visitType: visited.visitType,
-              paymentStatus: visited.paymentStatus,
-              visitInstead: visited.visitInstead,
-            }}
-          />,
-        )}
+    <>
+      <FormWrapper
+        submitHandler={submitHandler}
+        secondaryButton={
+          <PrimaryButton content="Добавить" props={{ onClick: () => setAddStudentModalOpen(true) }} />
+        }>
+          <ListStudents
+            students={attendance.students}
+            optionalComponents={<DisplayNumberOfVisited attendance={attendance} />}
+          />
+      </FormWrapper>
 
-        <DisplayNumberOfVisited attendance={attendance} />
-      </List>
-    </FormWrapper>
+      <AddStudentsDialog
+        attendance={attendance}
+        isOpen={isAddStudentModalOpen}
+        setOpen={setAddStudentModalOpen}
+      />
+    </>
   );
 }
 
-interface IStudentsListFuture {
+interface IStudentsListLesson {
   lesson: ILessonModel;
-  studentsFromFuture?: Array<IVisit>;
+  studentsFromFutureAttendance?: Array<IAttendanceDetails>;
 }
 
-function isAttendanceStudent(obj: IVisit | IVisitingStudent): obj is IVisit {
-  return 'paymentStatus' in obj && 'visitStatus' in obj;
-}
-
-export function StudentsListFuture({ lesson, studentsFromFuture }: IStudentsListFuture) {
+export function StudentsListLesson({ lesson, studentsFromFutureAttendance }: IStudentsListLesson) {
   const [createAttendance] = useCreateAttendanceMutation();
   const searchDateTimestamp = useAppSelector(
     (state) => state.attendancePageReducer.searchDateTimestamp,
@@ -189,22 +229,15 @@ export function StudentsListFuture({ lesson, studentsFromFuture }: IStudentsList
     (student) => student.visitType === VisitType.REGULAR || student.date === searchDateTimestamp,
   );
 
-  const studentsList = studentsFromFuture ? [...students, ...studentsFromFuture] : students;
+  const studentsList = studentsFromFutureAttendance
+    ? [...students, ...studentsFromFutureAttendance]
+    : students;
 
   const date = new Date(searchDateTimestamp);
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget as HTMLFormElement);
-
-    const visitStatuses = Object.fromEntries(formData.entries());
-
-    const visits = studentsList.map((visiting) => ({
-      ...visiting,
-      student: visiting.student._id,
-      visitType: visiting.visitType,
-      visitStatus: visitStatuses[visiting.student._id] as VisitStatus,
-    }));
 
     createAttendance({
       lesson: lesson._id,
@@ -213,28 +246,13 @@ export function StudentsListFuture({ lesson, studentsFromFuture }: IStudentsList
       month: date.getMonth() + 1,
       day: date.getDate(),
       weekday: lesson.day,
-      students: visits,
+      students: createVisitDetails(studentsList, formData),
     });
   };
 
   return (
     <FormWrapper submitHandler={submitHandler}>
-      <List>
-        {studentsList.map(
-          (visiting) => <StudentsListItem
-            key={visiting.student._id}
-            student={visiting.student}
-            visitDetails={{
-              ...visiting,
-              visitType: visiting.visitType,
-              visitStatus: (isAttendanceStudent(visiting) && visiting.visitStatus) || undefined,
-              paymentStatus: (isAttendanceStudent(visiting) && visiting.paymentStatus) || undefined,
-              visitInstead: visiting.visitInstead,
-            }}
-          />,
-        )
-        }
-      </List>
+      <ListStudents students={studentsList} />
     </FormWrapper>
   );
 }
