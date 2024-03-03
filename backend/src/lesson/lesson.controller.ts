@@ -26,8 +26,6 @@ export class LessonController {
 
   @Post()
   async create(@Body() createLessonDto: CreateLessonDto) {
-    console.log('Create lesson dto');
-    console.log(createLessonDto);
     const created = await this.service.create(createLessonDto);
 
     if (created === null) {

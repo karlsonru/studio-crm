@@ -1,21 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model, PopulateOptions } from 'mongoose';
-import { CreateAttendanceDto } from './dto/create-attendance.dto';
-import { UpdateAttendanceDto } from './dto/update-attendance.dto';
+import {
+  UpdateAttendanceDto,
+  // UpdatedVisitedStudent,
+  UpdatedVisitedStudentDtoAdapter,
+} from './dto/update-attendance.dto';
+import { CreateAttendanceDtoSchemaAdapter } from './createAttendanceDtoSchemaAdapter';
 import { AttendanceModel, AttendanceDocument } from '../schemas';
 import { AttendancePaymentService } from './attendancePayment.service';
-// import { SubscriptionChargeService } from '../subscription-charge/subscriptionCharge.service';
 import { IFilterQuery } from '../shared/IFilterQuery';
 import { withTransaction } from '../shared/withTransaction';
 import { logger } from '../shared/logger.middleware';
 import { LessonService } from '../lesson/lesson.service';
-import { AttendanceType, PaymentStatus, VisitType } from '../schemas/attendance.schema';
-
-interface ICreateAttendance extends Pick<CreateAttendanceDto, 'lesson' | 'teacher' | 'students'> {
-  date: number;
-  day: number;
-}
+import { AttendanceType, PaymentStatus } from '../schemas/attendance.schema';
 
 @Injectable()
 export class AttendanceService {
@@ -38,23 +36,29 @@ export class AttendanceService {
   }
 
   async findUnpiadAttendances(dateFrom: number, dateTo: number, studentId?: string) {
-    // если передаеём ID конкретного студента - ищем по нему, если нет - ищем все за период
-    const studentsQuery = {
-      students: {
-        $elemMatch: studentId
-          ? { student: studentId, paymentStatus: PaymentStatus.UNPAID }
-          : { paymentStatus: PaymentStatus.UNPAID },
-      },
+    const queryTemplates = {
+      withStudentId: { student: studentId, paymentStatus: PaymentStatus.UNPAID },
+      withoutStudentId: { paymentStatus: PaymentStatus.UNPAID },
     };
 
+    const studentsQuery = studentId
+      ? queryTemplates.withStudentId
+      : queryTemplates.withoutStudentId;
+
+    // если передаеём ID конкретного студента - ищем по нему, если нет - ищем все за период
     const unpaidAttendances = await this.attendanceModel.find({
-      $and: [{ date: { $gte: dateFrom, $lte: dateTo } }, studentsQuery],
+      $and: [
+        { date: { $gte: dateFrom, $lte: dateTo } },
+        { students: { $elemMatch: studentsQuery } },
+      ],
     });
 
     return unpaidAttendances;
   }
 
-  async create(createAttendanceDto: ICreateAttendance): Promise<AttendanceModel | null> {
+  async create(
+    createAttendanceDto: CreateAttendanceDtoSchemaAdapter,
+  ): Promise<AttendanceModel | null> {
     logger.debug(`
       Обрабатываем запрос на создание нового посещённого занятия по уроку с ID:
       ${createAttendanceDto.lesson} за дату 
@@ -67,58 +71,91 @@ export class AttendanceService {
     });
 
     if (candidate && candidate.type === AttendanceType.DONE) {
-      logger.debug(`Занятие уже существует`);
+      logger.debug(`Занятие ${createAttendanceDto.lesson}. Занятие уже существует`);
       return null;
     }
 
     const transaction = async (session: ClientSession) => {
-      // для каждого студента добавим абонемент с которго нужно списать
-      await this.attendancePaymentService.addSubscription(
-        createAttendanceDto.students,
+      // Найдем абонементы для студентов, которым нужно списать занятия
+      const subscriptions = await this.attendancePaymentService.findSubscriptionsForAttendance(
         createAttendanceDto.lesson,
+        createAttendanceDto.students.map((student) => student.student),
         createAttendanceDto.date,
       );
 
-      // для каждого студента добавим биллинг статус
-      await this.attendancePaymentService.addPaymentStatus(
-        createAttendanceDto.students,
+      // Добавим абонемент для студентов
+      this.attendancePaymentService.setSubscriptionsForStudents(
         createAttendanceDto.lesson,
+        createAttendanceDto.students,
+        subscriptions,
       );
 
-      // конвертируем объекты с подписками в обычные текстовые строки с id
-      this.attendancePaymentService.normalizeSubscriptionIds(createAttendanceDto.students);
-
-      // после проставления статусов спишем занятия с найденных абонементов
+      // Спишем абонементы от студентов
       await this.attendancePaymentService.chargeSubscriptions(
-        createAttendanceDto.students,
         createAttendanceDto.lesson,
+        createAttendanceDto.students
+          .filter((student) => student.subscription)
+          .map((student) => student.subscription) as string[],
       );
 
-      // удалим студентов с однократным посещением из основного занятия
-      await this.lessonService.updateStudents(
-        createAttendanceDto.lesson,
-        {
-          students: createAttendanceDto.students.map((visited) =>
-            visited.visitType !== VisitType.REGULAR ? visited.student : null,
-          ),
-        },
-        'remove',
+      // установим статус оплат после выполнения списаний
+      createAttendanceDto.students.forEach((student) => {
+        student.setPaymentStatus();
+      });
+
+      // ищем есть ли здесь студенты добавленные на одно занятие
+      const oneTimeStudents = createAttendanceDto.students.filter((student) =>
+        student.isOneTimeVisit(),
       );
+
+      logger.debug(`
+        Занятие ${createAttendanceDto.lesson}. 
+        Найдено ${oneTimeStudents.length} однократных посещений.
+      `);
+
+      if (oneTimeStudents.length) {
+        const oneTimeStudentsIds = oneTimeStudents.map((student) => student.student);
+
+        logger.debug(
+          `Студенты с однократным посещением: ${oneTimeStudentsIds}. Удаляем из основного занятия.`,
+        );
+
+        // Удалим студентов с однократным посещением из основного занятия
+        await this.lessonService.updateStudents(
+          createAttendanceDto.lesson,
+          { students: oneTimeStudentsIds },
+          'remove',
+        );
+      }
 
       // если уже было занятие из будущего - удалим его сейчас
       if (candidate && candidate.type === AttendanceType.FUTURE) {
-        logger.debug(`Удалим существующее занятие из будущего`);
-        this.remove(candidate._id.toString());
+        logger.debug(
+          `занятие: ${createAttendanceDto.lesson}. Удалим существующее занятие из будущего`,
+        );
+        await this.remove(candidate._id.toString());
       }
 
-      // Это занятие из будущего ?
-      const isFuture = createAttendanceDto.date > Date.now();
-
       // сохраним само занятие и вернём его
-      return await this.attendanceModel.create({
-        ...createAttendanceDto,
-        type: isFuture ? AttendanceType.FUTURE : AttendanceType.DONE,
-      });
+      const created = await this.attendanceModel.create(createAttendanceDto);
+
+      /*
+        7. Сделать линк - для студентов посетивших отработку со статусом POSTPONED_DONE нужно добавить:
+        - в текущее занятие вместо какого занятия он посетил отработку
+        - в занятие которое он пропустил со статусом отработка - ссылку на текущее занятие  
+
+        -> в visitInstead передаётся attendance id в котором назначена отработка
+
+        -> при сабите формы посещения занятия будет происходить передача visitInstead & visitType POSTPONED. VisitStatus будет POSTPONED_DONE
+        -> при создании attendance мы проверяем -> если это всё соблюдается, то при createAttendance сохраняем Attendance как есть
+        -> ищем attendanceId из visitInstead и добавляем в него ID нового созданного attendance
+
+
+        -> если статус посетил или пропустил - линк на занятия остаётся 
+        -> линк на занятие нужно удалить только если ребёнка удаляют из attendance в принципе
+      */
+
+      return created;
     };
 
     const created = await withTransaction<AttendanceDocument>(this.attendanceModel, transaction);
@@ -151,30 +188,20 @@ export class AttendanceService {
       return null;
     }
 
-    // добавлям транзакцию для обновления различных статусов абонементов
+    // если массив со студентами не передан - обновим только то что прислали
+    if (!updateAttendanceDto.students) {
+      return await this.attendanceModel.findByIdAndUpdate(
+        id,
+        { ...visitedLesson, ...updateAttendanceDto },
+        { new: true },
+      );
+    }
+
+    // добавлям транзакцию для сравнения и обновления различных статусов посещения студентов
     const transaction = async (session: ClientSession) => {
-      if (!updateAttendanceDto.students) {
-        const updated = await this.attendanceModel.findByIdAndUpdate(id, updateAttendanceDto, {
-          new: true,
-        });
-        return updated;
-      }
+      await this.attendancePaymentService.changePaymentStatus(visitedLesson, updateAttendanceDto);
 
-      await this.attendancePaymentService.changePaymentStatus(
-        updateAttendanceDto.students,
-        visitedLesson,
-      );
-
-      // удалим студентов с однократным посещением из основного занятия
-      await this.lessonService.updateStudents(
-        visitedLesson.lesson._id.toString(),
-        {
-          students: updateAttendanceDto.students?.map((visited) =>
-            visited.visitType !== VisitType.REGULAR ? visited.student : null,
-          ),
-        },
-        'remove',
-      );
+      console.log(JSON.stringify(updateAttendanceDto));
 
       // обновим занятие и вернём результат
       return await this.attendanceModel.findByIdAndUpdate(id, updateAttendanceDto, {

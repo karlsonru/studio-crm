@@ -17,6 +17,7 @@ export enum VisitStatus {
 }
 
 export enum PaymentStatus {
+  UNKNOWN = 'unknown',
   PAID = 'paid',
   UNPAID = 'unpaid',
   UNCHARGED = 'uncharged',
@@ -34,13 +35,13 @@ export enum AttendanceType {
   FUTURE = 'future',
 }
 
-export class VisitedStudent {
+export class VisitedStudentWithVisitDetails {
   student: Student;
   visitStatus: VisitStatus;
   paymentStatus: PaymentStatus;
   subscription: string | null;
   visitType: VisitType;
-  visitInstead?: Attendance | null;
+  visitInstead?: string | null;
 }
 
 @Schema({ timestamps: true })
@@ -71,7 +72,7 @@ export class Attendance {
     min: 0,
     max: 6,
   })
-  day: number;
+  weekday: number;
 
   @Prop({
     type: Number,
@@ -123,10 +124,15 @@ export class Attendance {
           trim: true,
           required: true,
         },
+        visitInstead: {
+          type: Types.ObjectId,
+          ref: 'Attendance',
+          default: null,
+        },
       },
     ],
   })
-  students: VisitedStudent[];
+  students: VisitedStudentWithVisitDetails[];
 }
 
 export const AttendanceSchema = SchemaFactory.createForClass(Attendance);

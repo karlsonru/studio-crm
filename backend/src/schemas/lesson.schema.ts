@@ -91,7 +91,7 @@ export class Lesson {
     min: 0,
     max: 6,
   })
-  day: number;
+  weekday: number;
 
   @Prop({
     required: true,

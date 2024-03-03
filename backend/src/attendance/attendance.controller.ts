@@ -14,27 +14,10 @@ import {
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
-import { UpdateAttendanceDto } from './dto/update-attendance.dto';
+import { UpdateAttendanceDto, UpdateAttendanceDtoSchemaAdapter } from './dto/update-attendance.dto';
 import { ValidateIdPipe, ValidateOptionalNumberPipe } from '../shared/validaitonPipe';
 import { PaymentStatus, VisitStatus } from '../schemas/attendance.schema';
-
-/** 
-TODO: перенести логику списания абонемента в контроллер. 
-AttendanceService отвечает за создание занятие 
-SubscriptionCharge (AttendanceCharge, AttendancePaymentService ?) отвечает за списание абонементов по посещению
-
-Транзакция --> 
-
-То есть:
-- поиск абонементов подходящих для занятия   
-- добавление абонемента к студенту
-- списание занятия с абонемента
-- добавление статуса оплаты студента
-- удаление студента из lesson в случае если занятие однократное
-
-<-- 
-
-*/
+import { CreateAttendanceDtoSchemaAdapter } from './createAttendanceDtoSchemaAdapter';
 
 @Controller('attendances')
 export class AttendanceController {
@@ -42,18 +25,9 @@ export class AttendanceController {
 
   @Post()
   async create(@Body() createAttendanceDto: CreateAttendanceDto) {
-    // время занятия сохраняем в UTC
-    const timestamp = Date.UTC(
-      createAttendanceDto.year,
-      createAttendanceDto.month - 1,
-      createAttendanceDto.day,
+    const created = await this.service.create(
+      new CreateAttendanceDtoSchemaAdapter(createAttendanceDto),
     );
-
-    const created = await this.service.create({
-      ...createAttendanceDto,
-      date: timestamp,
-      day: createAttendanceDto.weekday,
-    });
 
     if (created === null) {
       throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
@@ -133,7 +107,10 @@ export class AttendanceController {
     @Param('id', ValidateIdPipe) id: string,
     @Body() updateAttendanceDto: UpdateAttendanceDto,
   ) {
-    const updated = await this.service.update(id, updateAttendanceDto);
+    const updated = await this.service.update(
+      id,
+      new UpdateAttendanceDtoSchemaAdapter(updateAttendanceDto),
+    );
 
     if (updated === null) {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);

@@ -10,25 +10,22 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { PaymentStatus, VisitStatus, VisitType } from '../../schemas/attendance.schema';
+import { VisitStatus, VisitType } from '../../schemas/attendance.schema';
 
 export class VisitedStudent {
+  @IsString()
   @IsMongoId()
   student: string;
 
   @IsString()
   visitStatus: VisitStatus;
 
-  @IsOptional()
-  @IsString()
-  paymentStatus: PaymentStatus;
-
-  @IsOptional()
-  @IsString()
-  subscription: string | null;
-
   @IsString()
   visitType: VisitType;
+
+  @IsOptional()
+  @IsString()
+  visitInstead?: string | null;
 }
 
 export class CreateAttendanceDto {
