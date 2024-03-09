@@ -15,7 +15,7 @@ import {
 import { LessonService, action } from './lesson.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
-import { ValidateIdPipe } from '../shared/validaitonPipe';
+import { ValidateIdPipe, ValidateOptionalNumberPipe } from '../shared/validaitonPipe';
 import { LessonModel } from '../schemas';
 import { MongooseClassSerializerInterceptor } from '../shared/mongooseClassSerializer.interceptor';
 
@@ -36,8 +36,27 @@ export class LessonController {
   }
 
   @Get()
-  async findAll(@Query('filter') filter?: string) {
-    return await this.service.findAll(filter ? JSON.parse(filter) : {});
+  async findAll(
+    @Query('weekday', ValidateOptionalNumberPipe) weekday?: number,
+    @Query('dateFrom', ValidateOptionalNumberPipe) dateFrom?: number,
+    @Query('dateTo', ValidateOptionalNumberPipe) dateTo?: number,
+    @Query('filter') filter?: string,
+  ) {
+    const query: Record<string, string | number | Record<string, string | number>> = {};
+
+    if (weekday) {
+      query.weekday = weekday;
+    }
+
+    if (dateFrom) {
+      query.dateFrom = { $lte: dateFrom };
+    }
+
+    if (dateTo) {
+      query.dateTo = { $gte: dateTo };
+    }
+
+    return await this.service.findAll(filter ? JSON.parse(filter) : query);
   }
 
   @Get(':id')

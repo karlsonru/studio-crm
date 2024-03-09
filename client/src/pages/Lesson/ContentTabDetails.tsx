@@ -99,7 +99,7 @@ export function ContentTabDetails({ lesson }: { lesson: ILessonModel }) {
         title: formData.title as string,
         teacher: formData.teacher as string,
         location: formData.location as string,
-        day: +formData.day,
+        weekday: +formData.day,
         timeStart: {
           hh: +timeStart[0],
           min: +timeStart[1],
@@ -174,7 +174,7 @@ export function ContentTabDetails({ lesson }: { lesson: ILessonModel }) {
           <Select
             name='day'
             label='День недели'
-            defaultValue={lesson.day}
+            defaultValue={lesson.weekday}
             disabled={!isEdit}
             fullWidth
             required

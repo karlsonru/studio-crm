@@ -116,9 +116,7 @@ function PostponedAttendancesDisplay() {
     error,
   } = useFindWithParamsAttendancesQuery({
     route: 'postponed',
-    params: {
-      days: 30,
-    },
+    params: { days: 30 },
   });
 
   if (isLoading) {

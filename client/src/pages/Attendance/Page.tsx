@@ -10,7 +10,7 @@ import { Loading } from '../../shared/components/Loading';
 import { useTitle } from '../../shared/hooks/useTitle';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { attendancePageActions } from '../../shared/reducers/attendancePageSlice';
-import { useFindLessonsQuery } from '../../shared/api';
+import { useFindWithParamsLessonsQuery } from '../../shared/api';
 import { ShowError } from '../../shared/components/ShowError';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 
@@ -64,10 +64,12 @@ export function AttendancePage() {
     isLoading,
     isError,
     error,
-  } = useFindLessonsQuery({
-    day: new Date(searchDateTimestamp).getDay(),
-    dateTo: { $gte: searchDateTimestamp },
-    dateFrom: { $lte: searchDateTimestamp },
+  } = useFindWithParamsLessonsQuery({
+    params: {
+      weekday: new Date(searchDateTimestamp).getDay(),
+      dateFrom: searchDateTimestamp,
+      dateTo: searchDateTimestamp,
+    },
   });
 
   const selectedLesson = useMemo(

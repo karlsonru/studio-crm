@@ -26,7 +26,7 @@ export interface ILessonModel {
   title: string;
   teacher: IUserModel;
   location: ILocationModel;
-  day: number;
+  weekday: number;
   timeStart: ITime;
   timeEnd: ITime;
   students: Array<IVisitingStudent>,

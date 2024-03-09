@@ -19,7 +19,7 @@ import { getErrorMessage } from '../helpers/getErrorMessage';
 
 interface IForm {
   title: string;
-  children: Array<ReactNode>;
+  children: Array<ReactNode> | ReactNode;
   isOpen: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onClose?: () => void;

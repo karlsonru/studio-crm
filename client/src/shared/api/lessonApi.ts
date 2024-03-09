@@ -9,6 +9,7 @@ api.addTagTypes(tag);
 export const { useGetLessonQuery } = api.injectGetOne<ILessonModel>('getLesson', tag, route);
 export const { useGetLessonsQuery } = api.injectGetAll<ILessonModel>('getLessons', tag, route);
 export const { useFindLessonsQuery } = api.injectFind<ILessonModel>('findLessons', tag, route);
+export const { useFindWithParamsLessonsQuery } = api.injectFindWithParams<ILessonModel>('findWithParamsLessons', tag, route);
 export const { useCreateLessonMutation } = api.injectCreate<ILessonModel, ILessonModelCreate>('createLesson', tag, route);
 export const { usePatchLessonMutation } = api.injectPatch<ILessonModel, ILessonModelCreate>('patchLesson', tag, route);
 export const { useDeleteLessonMutation } = api.injectDelete('deleteLesson', tag, route);

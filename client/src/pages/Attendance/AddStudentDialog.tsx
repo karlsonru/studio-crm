@@ -39,7 +39,7 @@ export function AddStudentsDialog({
   );
 
   const [visitType, setVisitType] = useState<VisitType>(VisitType.POSTPONED);
-  const [selectedOptions, setSelected] = useState<IStudentModel[]>([]);
+  const [selectedStudent, setSelected] = useState<IStudentModel | null>();
   const [updateAttendanceStudents, requestStatus] = usePatchAttendanceStudentsMutation();
 
   const {
@@ -63,19 +63,21 @@ export function AddStudentsDialog({
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if (!selectedStudent) return;
+
     updateAttendanceStudents({
       id: attendance._id,
       action: 'add',
       newItem: {
-        students: [...selectedOptions.map((student) => ({
-          student: student._id,
+        students: [{
+          student: selectedStudent._id,
           visitStatus: VisitStatus.UNKNOWN,
           visitType,
-        }))],
+        }],
       },
     });
 
-    setSelected([]);
+    setSelected(null);
   };
 
   const hasAvailableStudents = possibleStudents.length > 0;
@@ -103,7 +105,6 @@ export function AddStudentsDialog({
       <Divider sx={{ m: '1rem 0' }}/>
 
       {hasAvailableStudents && <Autocomplete
-          multiple
           options={possibleStudents}
           getOptionLabel={(option) => option.fullname}
           onChange={(event, value) => setSelected(() => value)}
@@ -139,7 +140,7 @@ export function AddStudentsDialog({
             >
               <MenuItem value={VisitType.REGULAR}>Постоянное</MenuItem>
               <MenuItem value={VisitType.SINGLE}>Однократное</MenuItem>
-              <MenuItem value={VisitType.POSTPONED}>Отработка</MenuItem>
+              <MenuItem value={VisitType.POSTPONED}>Однократное</MenuItem>
               <MenuItem value={VisitType.NEW}>Новое</MenuItem>
             </Select>
         </FormControl>

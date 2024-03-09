@@ -5,9 +5,12 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import IconButton from '@mui/material/IconButton';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
+import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import { VisitStatusButton } from './VisitStatusButton';
 import { AddStudentsDialog } from './AddStudentDialog';
+import { EditPostponedAttendance } from './EditPostponedAttendance';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { IStudentModel } from '../../shared/models/IStudentModel';
 import { ILessonModel, VisitType } from '../../shared/models/ILessonModel';
@@ -23,6 +26,8 @@ import { getVisitTypeName } from '../../shared/helpers/getVisitTypeName';
 import { getBillingStatusNameAndColor } from '../../shared/helpers/getBillingStatusNameAndColor';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { PrimaryButton } from '../../shared/components/buttons/PrimaryButton';
+import { useActionCreators } from '../../shared/hooks/useActionCreators';
+import { attendancePageActions } from '../../shared/reducers/attendancePageSlice';
 
 interface IFormWrapper {
   children: ReactNode | Array<ReactNode>;
@@ -62,15 +67,17 @@ interface IStudentsListItem {
 }
 
 function StudentsListItem({ student, visitDetails }: IStudentsListItem) {
+  const actions = useActionCreators(attendancePageActions);
   const {
     visitType,
     visitStatus,
     paymentStatus,
-    visitInstead,
   } = visitDetails;
 
   const { name: paymentStatusName, color } = getBillingStatusNameAndColor(paymentStatus);
   const visitTypeName = getVisitTypeName(visitType);
+  const isPostponed = visitStatus === VisitStatus.POSTPONED_FUTURE
+                    || visitStatus === VisitStatus.POSTPONED_DONE;
 
   return (
     <ListItem divider={true}>
@@ -85,17 +92,22 @@ function StudentsListItem({ student, visitDetails }: IStudentsListItem) {
             <ListItemText
               secondary={visitTypeName}
             />
-            {
-              visitInstead && VisitType.POSTPONED && <ListItemText
-                secondary={`Отработано в занятии ${visitInstead}`}
-              />
-            }
           </List>
         }
         secondaryTypographyProps={{
           component: 'div',
         }}
       />
+      {
+        isPostponed && <IconButton
+          onClick={() => {
+            actions.setEditPostponedAttendanceModalOpen(true);
+            actions.setEditPostponedAttendanceStudentId(student._id);
+          }}
+        >
+          <EditCalendarIcon color="primary" />
+        </IconButton>
+      }
       <VisitStatusButton
         studentId={student._id}
         visitStatus={visitStatus}
@@ -196,6 +208,8 @@ export function StudentsListAttendance({ attendance }: { attendance: IAttendance
         isOpen={isAddStudentModalOpen}
         setOpen={setAddStudentModalOpen}
       />
+
+      <EditPostponedAttendance attendance={attendance} />
     </>
   );
 }
@@ -231,7 +245,7 @@ export function StudentsListLesson({ lesson, studentsFromFutureAttendance }: ISt
       year: date.getFullYear(),
       month: date.getMonth() + 1,
       day: date.getDate(),
-      weekday: lesson.day,
+      weekday: lesson.weekday,
       students: createVisitDetails(studentsList, formData),
     });
   };

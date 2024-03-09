@@ -4,11 +4,17 @@ import { getTodayTimestamp } from '../helpers/getTodayTimestamp';
 interface IAttendancePageState {
   searchLessonId: string,
   searchDateTimestamp: number;
+  editPostponedAttendanceId: string;
+  editPostponedAttendanceStudentId: string;
+  editPostponedAttendanceModalOpen: boolean;
 }
 
 const initialState: IAttendancePageState = {
   searchLessonId: '',
   searchDateTimestamp: getTodayTimestamp(),
+  editPostponedAttendanceId: '',
+  editPostponedAttendanceStudentId: '',
+  editPostponedAttendanceModalOpen: false,
 };
 
 const attendancePageState = createSlice({
@@ -21,6 +27,18 @@ const attendancePageState = createSlice({
 
     setSearchLessonId: (state, action: PayloadAction<string>) => {
       state.searchLessonId = action.payload;
+    },
+
+    setEditPostonedAttendanceId: (state, action: PayloadAction<string>) => {
+      state.editPostponedAttendanceId = action.payload;
+    },
+
+    setEditPostponedAttendanceStudentId: (state, action: PayloadAction<string>) => {
+      state.editPostponedAttendanceStudentId = action.payload;
+    },
+
+    setEditPostponedAttendanceModalOpen: (state, action: PayloadAction<boolean>) => {
+      state.editPostponedAttendanceModalOpen = action.payload;
     },
   },
 });

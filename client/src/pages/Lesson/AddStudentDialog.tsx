@@ -139,7 +139,6 @@ export function AddStudentsDialog({
             >
               <MenuItem value={VisitType.REGULAR}>Постоянное</MenuItem>
               <MenuItem value={VisitType.SINGLE}>Однократное</MenuItem>
-              <MenuItem value={VisitType.POSTPONED}>Отработка</MenuItem>
               <MenuItem value={VisitType.NEW}>Новое</MenuItem>
             </Select>
         </FormControl>

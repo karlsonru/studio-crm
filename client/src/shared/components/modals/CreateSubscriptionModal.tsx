@@ -60,7 +60,7 @@ export function CreateSubscriptionModal() {
     });
 
     // узнаем дни недели в которые будут проходить выбранные занятия
-    const selectedLessonsDays = selectedLessons.map((selectedLesson) => selectedLesson.day);
+    const selectedLessonsDays = selectedLessons.map((selectedLesson) => selectedLesson.weekday);
 
     // узнаем количество этих дней недели до конца интервала
     const possibleVisits = interval.filter((date) => selectedLessonsDays.includes(date.getDay()));

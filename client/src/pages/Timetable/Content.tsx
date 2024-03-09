@@ -67,7 +67,7 @@ function fillRowsWithContent(lessons: Array<ILessonModel>) {
     const time = format(lessonInterval, 'HH:mm');
 
     // добавим к строке с таким же временным интервалом
-    rows[time][lesson.day === 0 ? 6 : lesson.day - 1] = lesson;
+    rows[time][lesson.weekday === 0 ? 6 : lesson.weekday - 1] = lesson;
   });
 
   return rows;
@@ -135,7 +135,7 @@ export function TimetableContent({ lessons }: { lessons: Array<ILessonModel> }) 
     // не проводим фильтрацию если режим отображения Неделя
     if (!isDayView) return [];
 
-    return lessons.filter((lesson) => lesson.day === currentDay);
+    return lessons.filter((lesson) => lesson.weekday === currentDay);
   }, [currentDate, view]);
 
   // запомним дату, с которой нужно рисовать даты в заголовках

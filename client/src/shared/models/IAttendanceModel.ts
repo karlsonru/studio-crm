@@ -40,7 +40,7 @@ export interface IAttendanceModel {
   lesson: ILessonModel;
   teacher: IUserModel;
   type: AttendanceType;
-  day: number;
+  weekday: number;
   date: number; // UTC Timestamp
   students: Array<IAttendanceDetails>,
 }
@@ -51,5 +51,6 @@ export interface IAttendanceModelCreate extends Omit<IAttendanceModel, '_id' | '
   students: Array<IAttendanceDetailsCreate>
   year: number;
   month: number;
+  day: number;
   weekday: number;
 }

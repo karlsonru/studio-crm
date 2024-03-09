@@ -70,7 +70,7 @@ export function LessonsContent() {
       field: 'day',
       headerName: 'День',
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams<ILessonModel['day']>) => (
+      valueFormatter: (params: GridValueFormatterParams<ILessonModel['weekday']>) => (
         getDayName(params.value)
       ),
     },
