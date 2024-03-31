@@ -7,6 +7,7 @@ interface IAttendancePageState {
   editPostponedAttendanceId: string;
   editPostponedAttendanceStudentId: string;
   editPostponedAttendanceModalOpen: boolean;
+  showPostponedAttendanceModalOpen: boolean;
 }
 
 const initialState: IAttendancePageState = {
@@ -14,6 +15,7 @@ const initialState: IAttendancePageState = {
   searchDateTimestamp: getTodayTimestamp(),
   editPostponedAttendanceId: '',
   editPostponedAttendanceStudentId: '',
+  showPostponedAttendanceModalOpen: false,
   editPostponedAttendanceModalOpen: false,
 };
 
@@ -39,6 +41,9 @@ const attendancePageState = createSlice({
 
     setEditPostponedAttendanceModalOpen: (state, action: PayloadAction<boolean>) => {
       state.editPostponedAttendanceModalOpen = action.payload;
+    },
+    setShowPostponedAttendanceModalOpen: (state, action: PayloadAction<boolean>) => {
+      state.showPostponedAttendanceModalOpen = action.payload;
     },
   },
 });

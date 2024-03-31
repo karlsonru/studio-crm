@@ -29,6 +29,7 @@ export interface IAttendanceDetails {
   visitType: VisitType;
   subscription: string;
   visitInstead?: string;
+  visitInsteadDate?: number;
 }
 
 interface IAttendanceDetailsCreate extends Omit<IAttendanceDetails, 'student' | 'subscription' | 'paymentStatus'> {

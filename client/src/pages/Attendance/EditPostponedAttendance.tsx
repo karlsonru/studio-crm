@@ -2,7 +2,7 @@ import Select from '@mui/material/Select';
 import { format, parse } from 'date-fns';
 import { useState, FormEvent } from 'react';
 import MenuItem from '@mui/material/MenuItem';
-import { useFindWithParamsLessonsQuery, usePatchLessonStudentsMutation } from '../../shared/api';
+import { useFindWithParamsLessonsQuery, usePatchAttendnceStudentByIdMutation } from '../../shared/api';
 import { DialogFormWrapper } from '../../shared/components/DialogFormWrapper';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
 import { VisitType } from '../../shared/models/ILessonModel';
@@ -15,7 +15,7 @@ export function EditPostponedAttendance({ attendance }: { attendance: IAttendanc
   const actions = useActionCreators(attendancePageActions);
   const [date, setDate] = useState(format(Date.now(), 'yyyy-MM-dd'));
   const [isDateError, setDateError] = useState(false);
-  const [updateLesson] = usePatchLessonStudentsMutation();
+  const [updateAttendanceStudentById, requestStatus] = usePatchAttendnceStudentByIdMutation();
 
   const {
     searchLessonId,
@@ -24,16 +24,17 @@ export function EditPostponedAttendance({ attendance }: { attendance: IAttendanc
     editPostponedAttendanceModalOpen,
   } = useAppSelector((state) => state.attendancePageReducer);
 
-  const { lessons } = useFindWithParamsLessonsQuery({
+  const { data: lessons } = useFindWithParamsLessonsQuery({
+    route: `available-for-visit-instead/${searchLessonId}`,
     params: {
+      studentId: editPostponedAttendanceStudentId,
       dateFrom: searchDateTimestamp,
-      dateTo: searchDateTimestamp,
     },
   }, {
-    selectFromResult: ({ data }) => ({
-      lessons: data?.filter((lesson) => lesson._id !== searchLessonId),
-    }),
+    skip: !editPostponedAttendanceStudentId || !searchLessonId,
   });
+
+  if (!lessons) return null;
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     setDateError(false);
@@ -54,22 +55,19 @@ export function EditPostponedAttendance({ attendance }: { attendance: IAttendanc
       return;
     }
 
-    updateLesson({
-      id: formDate.get('lesson') as string,
-      action: 'add',
+    updateAttendanceStudentById({
+      id: attendance._id,
+      path: `student/${editPostponedAttendanceStudentId}/add`,
       newItem: {
-        students: [{
-          student: editPostponedAttendanceStudentId,
-          visitInstead: attendance._id,
-          visitType: VisitType.POSTPONED,
-          date: visiDateUTC,
-        }],
+        visitType: VisitType.POSTPONED,
+        visitInstead: formDate.get('lesson') as string,
+        visitInsteadDate: visiDateUTC,
       },
     });
   };
 
   const selectedWeekdayByDate = parse(date, 'yyyy-MM-dd', new Date()).getDay();
-  const lessonsByWeekday = lessons?.filter((lesson) => lesson.weekday === selectedWeekdayByDate);
+  const lessonsByWeekday = lessons.filter((lesson) => lesson.weekday === selectedWeekdayByDate);
   const studentName = attendance.students
     .find((visitDetails) => visitDetails.student._id === editPostponedAttendanceStudentId)?.student
     .fullname;
@@ -79,6 +77,7 @@ export function EditPostponedAttendance({ attendance }: { attendance: IAttendanc
     clearParams={false}
     isOpen={editPostponedAttendanceModalOpen}
     onSubmit={onSubmit}
+    requestStatus={requestStatus}
     onClose={() => actions.setEditPostponedAttendanceModalOpen(false)}
   >
     <DateField
@@ -92,11 +91,14 @@ export function EditPostponedAttendance({ attendance }: { attendance: IAttendanc
       helperText={isDateError ? 'Дата должна быть больше текущей' : null}
     />
 
-    {lessonsByWeekday && <Select name='lesson' label='Занятие'>
-          { lessonsByWeekday.map((lesson) => <MenuItem key={lesson._id} value={lesson._id}>
-              {lesson.title}
-            </MenuItem>)
-          }
+    {lessonsByWeekday && <Select
+      name='lesson'
+      label='Занятие'
+    >
+      { lessonsByWeekday.map((lesson) => <MenuItem key={lesson._id} value={lesson._id}>
+          {lesson.title}
+        </MenuItem>)
+      }
     </Select>
     }
 

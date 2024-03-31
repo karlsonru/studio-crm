@@ -11,6 +11,8 @@ import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 import { VisitStatusButton } from './VisitStatusButton';
 import { AddStudentsDialog } from './AddStudentDialog';
 import { EditPostponedAttendance } from './EditPostponedAttendance';
+import { ShowPostponedAttendance } from './ShowPostponedAttendance';
+import { ShowPostponedLesson } from './ShowPostponedLesson';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { IStudentModel } from '../../shared/models/IStudentModel';
 import { ILessonModel, VisitType } from '../../shared/models/ILessonModel';
@@ -72,12 +74,14 @@ function StudentsListItem({ student, visitDetails }: IStudentsListItem) {
     visitType,
     visitStatus,
     paymentStatus,
+    visitInstead,
   } = visitDetails;
 
   const { name: paymentStatusName, color } = getBillingStatusNameAndColor(paymentStatus);
   const visitTypeName = getVisitTypeName(visitType);
   const isPostponed = visitStatus === VisitStatus.POSTPONED_FUTURE
                     || visitStatus === VisitStatus.POSTPONED_DONE;
+  const isPostponedVisitArranged = visitInstead ?? false;
 
   return (
     <ListItem divider={true}>
@@ -99,7 +103,17 @@ function StudentsListItem({ student, visitDetails }: IStudentsListItem) {
         }}
       />
       {
-        isPostponed && <IconButton
+        isPostponedVisitArranged && <IconButton
+          onClick={() => {
+            actions.setShowPostponedAttendanceModalOpen(true);
+            actions.setEditPostponedAttendanceStudentId(student._id);
+          }}
+        >
+          <EditCalendarIcon color="primary" />
+        </IconButton>
+      }
+      {
+        isPostponed && !isPostponedVisitArranged && <IconButton
           onClick={() => {
             actions.setEditPostponedAttendanceModalOpen(true);
             actions.setEditPostponedAttendanceStudentId(student._id);
@@ -111,6 +125,8 @@ function StudentsListItem({ student, visitDetails }: IStudentsListItem) {
       <VisitStatusButton
         studentId={student._id}
         visitStatus={visitStatus}
+        visitType={visitType}
+        isLocked={Boolean(visitInstead) && visitType !== VisitType.POSTPONED}
       />
     </ListItem>
   );
@@ -210,6 +226,7 @@ export function StudentsListAttendance({ attendance }: { attendance: IAttendance
       />
 
       <EditPostponedAttendance attendance={attendance} />
+      <ShowPostponedAttendance attendance={attendance} />
     </>
   );
 }
@@ -253,6 +270,8 @@ export function StudentsListLesson({ lesson, studentsFromFutureAttendance }: ISt
   return (
     <FormWrapper submitHandler={submitHandler}>
       <ListStudents students={studentsList} />
+
+      <ShowPostponedLesson lesson={lesson} />
     </FormWrapper>
   );
 }

@@ -52,8 +52,14 @@ export function LessonsContent() {
   const actions = useActionCreators(lessonsPageActions);
 
   const {
-    data, isLoading, isError, error,
-  } = useGetLessonsQuery();
+    data,
+    isLoading,
+    isError,
+    error,
+  } = useGetLessonsQuery(undefined, {
+    refetchOnFocus: true,
+    refetchOnMountOrArgChange: true,
+  });
 
   const deleteLessonHandler = useCallback((currentLesson: ILessonModel) => {
     actions.setCurrentLesson(currentLesson);

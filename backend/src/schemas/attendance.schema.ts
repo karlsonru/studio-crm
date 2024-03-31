@@ -42,6 +42,7 @@ export class VisitedStudentWithVisitDetails {
   subscription: string | null;
   visitType: VisitType;
   visitInstead?: string | null;
+  visitInsteadDate?: number | null;
 }
 
 @Schema({ timestamps: true })
@@ -127,6 +128,10 @@ export class Attendance {
         visitInstead: {
           type: Types.ObjectId,
           ref: 'Attendance',
+          default: null,
+        },
+        visitInsteadDate: {
+          type: Number,
           default: null,
         },
       },

@@ -16,7 +16,7 @@ class BasicApi {
     this.resource = createApi({
       reducerPath: 'api',
       baseQuery: fetchBaseQuery({
-        baseUrl: BASE_URL,
+        baseUrl: url,
         prepareHeaders: (headers, { getState }) => {
           const { token } = (getState() as RootState).authReducer;
 
@@ -77,7 +77,7 @@ class BasicApi {
       endpoints: (build) => ({
         [name]: build.query<Array<T>, Partial<T> | Record<string, unknown>>({
           query: (query) => ({ url: `${route}`, params: { filter: JSON.stringify(query) } }),
-          providesTags: [tag],
+          // providesTags: [tag],
         }),
       }),
     });
@@ -89,7 +89,7 @@ class BasicApi {
       endpoints: (build) => ({
         [name]: build.query<Array<T>, IFindQuery>({
           query: ({ route, params }) => ({ url: route ? `${basicRoute}/${route}` : basicRoute, params }),
-          providesTags: [tag],
+          // providesTags: [tag],
         }),
       }),
     });
@@ -111,8 +111,12 @@ class BasicApi {
   injectPatch<T, K>(name: string, tag: any, route: string) {
     const extendedApi = this.resource.injectEndpoints({
       endpoints: (build) => ({
-        [name]: build.mutation<T, { id: string, newItem: Partial<K> }>({
-          query: ({ id, newItem }) => ({ url: `${route}/${id}`, method: 'PATCH', body: newItem }),
+        [name]: build.mutation<T, { id: string, path?: string, newItem: Partial<K> }>({
+          query: ({ id, path, newItem }) => ({
+            url: path ? `${route}/${id}/${path}` : `${route}/${id}`,
+            method: 'PATCH',
+            body: newItem,
+          }),
           invalidatesTags: [tag],
         }),
       }),

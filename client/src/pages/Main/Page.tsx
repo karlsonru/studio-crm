@@ -204,7 +204,7 @@ export function MainPage() {
 
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
-          <h2>Отработки</h2>
+          <h2>Неназначенные отработки</h2>
           <PostponedAttendancesDisplay />
         </Grid>
         <Grid item xs={12} sm={6}>

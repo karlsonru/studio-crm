@@ -40,6 +40,11 @@ export class VisitingStudent {
   @IsNumber()
   @Min(0)
   date: null | number;
+
+  @IsOptional()
+  @IsString()
+  @IsMongoId()
+  visitInstead?: string | null;
 }
 
 export class CreateLessonDto {

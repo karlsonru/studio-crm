@@ -14,7 +14,11 @@ import {
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
-import { UpdateAttendanceDto, UpdateAttendanceDtoSchemaAdapter } from './dto/update-attendance.dto';
+import {
+  UpdateAttendanceDto,
+  UpdateAttendanceDtoSchemaAdapter,
+  UpdatedVisitedStudent,
+} from './dto/update-attendance.dto';
 import { ValidateIdPipe, ValidateOptionalNumberPipe } from '../shared/validaitonPipe';
 import { PaymentStatus, VisitStatus } from '../schemas/attendance.schema';
 import { CreateAttendanceDtoSchemaAdapter } from './createAttendanceDtoSchemaAdapter';
@@ -100,6 +104,27 @@ export class AttendanceController {
     }
 
     return candidate;
+  }
+
+  @Patch(':id/student/:studentId/:action')
+  async updateAttendnceStudentById(
+    @Param('id', ValidateIdPipe) id: string,
+    @Param('studentId', ValidateIdPipe) studentId: string,
+    @Param('action') action: 'add' | 'remove',
+    @Body() updateAttendanceStudentDto: UpdatedVisitedStudent,
+  ) {
+    const updated = await this.service.updateAttendnedStudentById(
+      id,
+      studentId,
+      updateAttendanceStudentDto,
+      action,
+    );
+
+    if (updated === null) {
+      throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
+    }
+
+    return updated;
   }
 
   @Patch(':id')

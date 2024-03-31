@@ -53,7 +53,7 @@ export class AttendancePaymentService {
 
   getStudentId(student: VisitedStudentWithVisitDetails | UpdatedVisitedStudent) {
     if (typeof student.student === 'string') return student.student;
-    return (student as UpdatedVisitedStudent).student._id.toString();
+    return (student as UpdatedVisitedStudent).student;
   }
 
   setSubscriptionsForStudents(
@@ -147,7 +147,7 @@ export class AttendancePaymentService {
       attendance.lesson._id.toString(),
       updatedStudents
         .filter((student) => student.isVisitPayable(student.visitStatus))
-        .map((student) => student.student._id.toString()),
+        .map((student) => student.student),
       attendance.date,
     );
 
@@ -179,8 +179,7 @@ export class AttendancePaymentService {
     updatedVisitedStudents.forEach((updatedVisitedStudent) => {
       // ищем предыдущий визит для этого студента
       const previousVisit = attendance.students.find(
-        (visitedStudent) =>
-          visitedStudent.student?._id.toString() === updatedVisitedStudent.student._id,
+        (visitedStudent) => visitedStudent.student._id.toString() === updatedVisitedStudent.student,
       );
 
       // ничего не делаем, если статус визита не измениля
@@ -204,7 +203,7 @@ export class AttendancePaymentService {
       });
 
       logger.debug(`
-        Посещённое занятие: ${attendance._id}. Изменился статус студента ${updatedVisitedStudent.student._id} ${updatedVisitedStudent.student.fullname}. 
+        Посещённое занятие: ${attendance._id}. Изменился статус студента ${updatedVisitedStudent.student}. 
         Прошлый статус: ${previousVisit?.visitStatus}. Новый статус: ${updatedVisitedStudent.visitStatus}.        
       `);
     });

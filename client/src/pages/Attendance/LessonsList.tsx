@@ -8,8 +8,11 @@ import Divider from '@mui/material/Divider';
 import { useAppSelector } from 'shared/hooks/useAppSelector';
 import { convertTime } from '../../shared/helpers/convertTime';
 import { ILessonModel } from '../../shared/models/ILessonModel';
+import { useActionCreators } from '../../shared/hooks/useActionCreators';
+import { attendancePageActions } from '../../shared/reducers/attendancePageSlice';
 
 function ListItemLesson({ lesson }: { lesson: ILessonModel }) {
+  const actions = useActionCreators(attendancePageActions);
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedLessonId = searchParams.get('lessonId');
 
@@ -19,6 +22,8 @@ function ListItemLesson({ lesson }: { lesson: ILessonModel }) {
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>, lessonId: string) => {
     const date = new Date(searchDateTimestamp);
+
+    actions.setSearchLessonId(lessonId);
 
     setSearchParams({
       year: date.getFullYear().toString(),

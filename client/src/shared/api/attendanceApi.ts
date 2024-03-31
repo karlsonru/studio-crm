@@ -1,5 +1,5 @@
 import { api } from './basicApi';
-import { IAttendanceModel, IAttendanceModelCreate } from '../models/IAttendanceModel';
+import { IAttendanceModel, IAttendanceModelCreate, IAttendanceDetails } from '../models/IAttendanceModel';
 
 const tag = 'Attendances';
 const route = 'attendances';
@@ -11,6 +11,7 @@ export const { useGetAttendancesQuery } = api.injectGetAll<IAttendanceModel>('ge
 export const { useFindAttendancesQuery } = api.injectFind<IAttendanceModel>('findAttendances', tag, route);
 export const { useFindWithParamsAttendancesQuery } = api.injectFindWithParams<IAttendanceModel>('findWithParamsAttendances', tag, route);
 export const { useCreateAttendanceMutation } = api.injectCreate<IAttendanceModel, IAttendanceModelCreate>('createAttendance', tag, route);
+export const { usePatchAttendnceStudentByIdMutation } = api.injectPatch<IAttendanceModel, Partial<IAttendanceDetails>>('PatchAttendnceStudentById', tag, route);
 export const { usePatchAttendanceMutation } = api.injectPatch<IAttendanceModel, IAttendanceModelCreate>('patchAttendance', tag, route);
 export const { useDeleteAttendanceMutation } = api.injectDelete('deleteAttendance', tag, route);
 

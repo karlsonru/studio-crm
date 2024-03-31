@@ -11,6 +11,7 @@ import {
   Query,
   UseInterceptors,
   HttpCode,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { LessonService, action } from './lesson.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
@@ -18,6 +19,7 @@ import { UpdateLessonDto } from './dto/update-lesson.dto';
 import { ValidateIdPipe, ValidateOptionalNumberPipe } from '../shared/validaitonPipe';
 import { LessonModel } from '../schemas';
 import { MongooseClassSerializerInterceptor } from '../shared/mongooseClassSerializer.interceptor';
+import { Request } from 'express';
 
 @Controller('lesson')
 @UseInterceptors(MongooseClassSerializerInterceptor(LessonModel))
@@ -35,11 +37,27 @@ export class LessonController {
     return created;
   }
 
+  @Get('available-for-visit-instead/:id')
+  async findAvailableForVisitInstead(
+    @Param('id', ValidateIdPipe) id: string,
+    @Query('studentId') studentId: string,
+    @Query('dateFrom', ParseIntPipe) dateFrom: number,
+  ) {
+    const query = {
+      dateFrom: { $lte: dateFrom },
+      dateTo: { $gte: dateFrom },
+      _id: { $ne: id },
+      students: { $not: { $elemMatch: { student: studentId } } },
+    };
+
+    return await this.service.findAll(query);
+  }
+
   @Get()
   async findAll(
-    @Query('weekday', ValidateOptionalNumberPipe) weekday?: number,
-    @Query('dateFrom', ValidateOptionalNumberPipe) dateFrom?: number,
-    @Query('dateTo', ValidateOptionalNumberPipe) dateTo?: number,
+    @Query('weekday') weekday?: number,
+    @Query('dateFrom') dateFrom?: number,
+    @Query('dateTo') dateTo?: number,
     @Query('filter') filter?: string,
   ) {
     const query: Record<string, string | number | Record<string, string | number>> = {};

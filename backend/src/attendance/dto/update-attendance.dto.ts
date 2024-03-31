@@ -1,6 +1,6 @@
 import { OmitType, PartialType } from '@nestjs/mapped-types';
 import { Type } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional, ValidateNested } from 'class-validator';
+import { IsEnum, IsMongoId, IsNumber, IsOptional, IsString } from 'class-validator';
 import { CreateAttendanceDto } from './create-attendance.dto';
 import {
   PaymentStatus,
@@ -11,10 +11,16 @@ import { AttendanceType } from '../../schemas/attendance.schema';
 import { logger } from '../../shared/logger.middleware';
 
 export class UpdatedVisitedStudent extends OmitType(VisitedStudentWithVisitDetails, ['student']) {
-  student: {
-    _id: string;
-    fullname: string;
-  };
+  student: string;
+
+  @IsOptional()
+  @IsString()
+  @IsMongoId()
+  visitInstead?: string | null;
+
+  @IsOptional()
+  @IsNumber()
+  visitInsteadDate?: number | null;
 }
 
 export class UpdateAttendanceDto extends PartialType(OmitType(CreateAttendanceDto, ['students'])) {

@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model, PopulateOptions } from 'mongoose';
-import {
-  UpdateAttendanceDto,
-  // UpdatedVisitedStudent,
-  UpdatedVisitedStudentDtoAdapter,
-} from './dto/update-attendance.dto';
+import { UpdateAttendanceDto, UpdatedVisitedStudent } from './dto/update-attendance.dto';
 import { CreateAttendanceDtoSchemaAdapter } from './createAttendanceDtoSchemaAdapter';
 import { AttendanceModel, AttendanceDocument } from '../schemas';
 import { AttendancePaymentService } from './attendancePayment.service';
@@ -13,7 +9,7 @@ import { IFilterQuery } from '../shared/IFilterQuery';
 import { withTransaction } from '../shared/withTransaction';
 import { logger } from '../shared/logger.middleware';
 import { LessonService } from '../lesson/lesson.service';
-import { AttendanceType, PaymentStatus } from '../schemas/attendance.schema';
+import { AttendanceType, PaymentStatus, VisitType } from '../schemas/attendance.schema';
 
 @Injectable()
 export class AttendanceService {
@@ -128,6 +124,8 @@ export class AttendanceService {
         );
       }
 
+      // ! Если у нас была добавлена отработка у одного из студдентов - она удалится. Возможно нужно делать update в этих случаях, а не удалять
+
       // если уже было занятие из будущего - удалим его сейчас
       if (candidate && candidate.type === AttendanceType.FUTURE) {
         logger.debug(
@@ -138,22 +136,6 @@ export class AttendanceService {
 
       // сохраним само занятие и вернём его
       const created = await this.attendanceModel.create(createAttendanceDto);
-
-      /*
-        7. Сделать линк - для студентов посетивших отработку со статусом POSTPONED_DONE нужно добавить:
-        - в текущее занятие вместо какого занятия он посетил отработку
-        - в занятие которое он пропустил со статусом отработка - ссылку на текущее занятие  
-
-        -> в visitInstead передаётся attendance id в котором назначена отработка
-
-        -> при сабите формы посещения занятия будет происходить передача visitInstead & visitType POSTPONED. VisitStatus будет POSTPONED_DONE
-        -> при создании attendance мы проверяем -> если это всё соблюдается, то при createAttendance сохраняем Attendance как есть
-        -> ищем attendanceId из visitInstead и добавляем в него ID нового созданного attendance
-
-
-        -> если статус посетил или пропустил - линк на занятия остаётся 
-        -> линк на занятие нужно удалить только если ребёнка удаляют из attendance в принципе
-      */
 
       return created;
     };
@@ -172,6 +154,120 @@ export class AttendanceService {
 
   async findOne(id: string): Promise<AttendanceModel | null> {
     return await this.attendanceModel.findById(id).populate(this.populateQueryAttendance);
+  }
+
+  async updateAttendnedStudentById(
+    attendanceId: string,
+    studentId: string,
+    updateAttendanceDto: UpdatedVisitedStudent,
+    action: 'add' | 'remove',
+  ) {
+    logger.debug(`
+      Посещённое занятие: ${attendanceId}. Действие: ${action}. Обновляем студента ${studentId}.
+    `);
+
+    const visitedLesson = await this.findOne(attendanceId);
+
+    if (visitedLesson === null) {
+      logger.debug(`Посещённое занятие ${attendanceId} не найдено`);
+      return null;
+    }
+
+    const candidate = visitedLesson.students.find(
+      (student) => student.student._id.toString() === studentId,
+    );
+
+    if (!candidate) {
+      logger.debug(`Посещённое занятие ${attendanceId} не содержит студента ${studentId}`);
+      return null;
+    }
+
+    // * Кейс - добавляем отработку студенту, раньше отработки не было
+
+    // если у нас передан lessonId, вместо которого нужно сделать занятие
+    if (
+      action === 'add' &&
+      updateAttendanceDto.visitInstead &&
+      updateAttendanceDto.visitInsteadDate
+    ) {
+      const transaction = async (session: ClientSession) => {
+        logger.debug(
+          `Посещённое занятие ${attendanceId}. Обновляем студента ${studentId}. Начинаем выполнять транзакцию.`,
+        );
+        // обновим visitInstead (отработка) у студента в этом attendance
+        const updated = await this.attendanceModel.findOneAndUpdate(
+          { _id: attendanceId, 'students.student': studentId },
+          {
+            $set: {
+              'students.$.visitInstead': updateAttendanceDto.visitInstead,
+              'students.$.visitInsteadDate': updateAttendanceDto.visitInsteadDate,
+            },
+          },
+          { new: true },
+        );
+
+        logger.debug(`
+          Посещённое занятие ${attendanceId}. 
+          Добавляем студента ${studentId} в lesson ${updateAttendanceDto.visitInstead}. 
+          Статус ${VisitType.POSTPONED}, 
+          дата ${new Date(updateAttendanceDto.visitInsteadDate ?? Date.now()).toISOString()}.
+        `);
+
+        // добавим к lesson студента и дату отработки
+        await this.lessonService.updateStudents(
+          updateAttendanceDto.visitInstead as string,
+          {
+            students: [
+              {
+                student: studentId,
+                visitType: VisitType.POSTPONED,
+                visitInstead: attendanceId,
+                date: updateAttendanceDto.visitInsteadDate ?? null,
+              },
+            ],
+          },
+          action,
+        );
+
+        return updated;
+      };
+
+      return await withTransaction<AttendanceDocument>(this.attendanceModel, transaction);
+    }
+
+    if (action === 'remove') {
+      const transaction = async (session: ClientSession) => {
+        logger.debug(
+          `Посещённое занятие ${attendanceId}. Обновляем студента ${studentId}. Начинаем выполнять транзакцию.`,
+        );
+        // обновим visitInstead (отработка) у студента в этом attendance
+        const updated = await this.attendanceModel.findOneAndUpdate(
+          { _id: attendanceId, 'students.student': studentId },
+          {
+            $set: {
+              'students.$.visitInstead': null,
+              'students.$.visitInsteadDate': null,
+            },
+          },
+          { new: true },
+        );
+
+        logger.debug(`
+          Посещённое занятие ${attendanceId}. 
+          Удаляем студента ${studentId} из lesson ${updateAttendanceDto.visitInstead}. 
+        `);
+
+        await this.lessonService.updateStudents(
+          updateAttendanceDto.visitInstead as string,
+          { students: [studentId] },
+          action,
+        );
+
+        return updated;
+      };
+
+      return await withTransaction<AttendanceDocument>(this.attendanceModel, transaction);
+    }
   }
 
   async update(

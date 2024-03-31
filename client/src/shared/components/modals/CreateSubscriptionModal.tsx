@@ -22,10 +22,9 @@ import { useMobile } from '../../hooks/useMobile';
 import { ILessonModel } from '../../models/ILessonModel';
 import { INPUT_DATE_FORMAT } from '../../constants';
 
-/*
-  * TODO ммплементация шаблона с одним занятием
-  * TODO проверка есть ли задолженность у ученика
-*/
+// TODO ммплементация шаблона с одним занятием
+// TODO проверка есть ли задолженность у ученика
+
 function ShowDebt() {
   return <></>;
 }

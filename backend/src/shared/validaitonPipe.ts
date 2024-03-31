@@ -20,9 +20,12 @@ export class ValidateIdPipe implements PipeTransform<string> {
 @Injectable()
 export class ValidateOptionalNumberPipe implements PipeTransform<string> {
   transform(value: string, metadata: ArgumentMetadata): number {
+    // wtf - непонятно для чего я это сделал
+    /*
     if (value === undefined) {
       return 0;
     }
+    */
 
     const candidate = parseInt(value, 10);
     if (isNaN(candidate)) {

@@ -3,7 +3,6 @@ import {
   IsArray,
   IsMongoId,
   IsNumber,
-  IsOptional,
   IsPositive,
   IsString,
   Max,
@@ -22,10 +21,6 @@ export class VisitedStudent {
 
   @IsString()
   visitType: VisitType;
-
-  @IsOptional()
-  @IsString()
-  visitInstead?: string | null;
 }
 
 export class CreateAttendanceDto {

@@ -43,6 +43,10 @@ export function AttendancePage() {
       if (searchDate !== searchDateTimestamp) {
         actions.setSearchDateTimestamp(searchDate);
       }
+
+      if (selectedLessonId) {
+        actions.setSearchLessonId(selectedLessonId);
+      }
     // если даты нет в search params - добавим самостоятельно текущий день в UTC
     } else {
       const today = new Date();
