@@ -1,9 +1,13 @@
 import Stack, { StackProps } from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-export function CardContentItem(
-  { title, value, props }: { title: string, value: string | number, props?: StackProps },
-) {
+interface IConternCardItem {
+  title: string;
+  value: string | number | React.ReactNode;
+  props?: StackProps;
+}
+
+export function CardContentItem({ title, value, props }: IConternCardItem) {
   return (
     <Stack direction="row" justifyContent="space-between" my={1} {...props}>
       <Typography>
