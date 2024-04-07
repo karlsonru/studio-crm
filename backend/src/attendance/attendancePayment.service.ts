@@ -32,7 +32,9 @@ export class AttendancePaymentService {
   ) {}
 
   async findSubscriptionsForAttendance(lessonId: string, studentsIds: string[], date: number) {
-    logger.info(`Занятие ${lessonId}. Ищем абонементы для ${studentsIds.length} студентов.`);
+    logger.info(
+      `Занятие ${lessonId}. Ищем абонементы для списания для ${studentsIds.length} студентов.`,
+    );
 
     return await this.subscriptionService.findAll(
       {
@@ -69,7 +71,8 @@ export class AttendancePaymentService {
 
       if (student.paymentStatus !== PaymentStatus.PAID || student.subscription) {
         logger.debug(`
-          Студент ${studentId}. 
+          Студент ${studentId}.
+          Нет абонемента для добавления. 
           Статус оплаты: ${student.paymentStatus}. 
           Абонемент: ${student.subscription}. 
         `);
@@ -84,6 +87,7 @@ export class AttendancePaymentService {
 
       logger.debug(`
         Студент ${student.student}. 
+        Добавляем абонемент.
         Предварительный статус: ${student.paymentStatus}. 
         Абонемент: ${subscription}. 
         Осталось занятий: ${subscription?.visitsLeft}.
@@ -142,6 +146,8 @@ export class AttendancePaymentService {
     );
     const lessonId = attendance.lesson._id.toString();
 
+    logger.debug(`Посещённое занятие: ${attendance._id}. Ищем абонементы для списания.`);
+
     // найдём абонемент с которого списать
     const subscriptions = await this.findSubscriptionsForAttendance(
       attendance.lesson._id.toString(),
@@ -149,6 +155,10 @@ export class AttendancePaymentService {
         .filter((student) => student.isVisitPayable(student.visitStatus))
         .map((student) => student.student),
       attendance.date,
+    );
+
+    logger.debug(
+      `Посещённое занятие: ${attendance._id}. Устанавливаем найденные абонементы (${subscriptions.length}) студентам.`,
     );
 
     // установим абонементы пользователям
@@ -159,9 +169,17 @@ export class AttendancePaymentService {
       .filter((student) => student.subscription)
       .map((student) => student.subscription) as string[];
 
+    logger.debug(
+      `Посещённое занятие: ${attendance._id}. Списываем занятия из абонементов (${subscriptionIds.length}).`,
+    );
+
     if (subscriptionIds.length) {
       await this.chargeSubscriptions(lessonId, subscriptionIds);
     }
+
+    logger.debug(
+      `Посещённое занятие: ${attendance._id}. Обновим статус оплаты для студентов (${updatedStudents.length}).`,
+    );
 
     // установим статус оплаты
     updatedStudents.forEach((student) => {
@@ -220,6 +238,15 @@ export class AttendancePaymentService {
     studentsWithChangedStatuses.forEach((prevAndUpdatedVisit) => {
       const { prevVisit } = prevAndUpdatedVisit;
 
+      logger.debug(`
+        Студент ${prevVisit?.student._id} (${prevVisit?.student.fullname})
+        Предыдущий статус посещения: ${prevVisit?.visitStatus}
+        Предыдущий статус оплаты: ${prevVisit?.paymentStatus}
+        Предыдущий абонемент: ${prevVisit?.subscription}
+        Новый статус посещения: ${prevAndUpdatedVisit.updatedVisit.visitStatus}
+        Новый статус оплаты: ${prevAndUpdatedVisit.updatedVisit.paymentStatus}
+      `);
+
       // если у нас нет абонемента на предыдущее занятие (не было списания) - то искать разницу не нужно
       if (!prevVisit?.subscription || prevVisit.paymentStatus !== PaymentStatus.PAID) return;
 
@@ -228,6 +255,9 @@ export class AttendancePaymentService {
         // если старый статус ПОСЕТИЛ или ОТРАБОТКА вернём ему списанное занятие
         case VisitStatus.POSTPONED_FUTURE:
         case VisitStatus.VISITED:
+          logger.debug(
+            `Студент ${prevVisit.student._id} вернёл списанное занятие на абонемент ${prevVisit.subscription}`,
+          );
           increaseVisitsLeft.ids.push(prevVisit.subscription);
           break;
 
@@ -235,6 +265,8 @@ export class AttendancePaymentService {
         default:
       }
     });
+
+    logger.debug(`К обновлению ${increaseVisitsLeft.ids.length} абонементов`);
 
     // по полученным спискам ID абонементов где есть вернём списанные занятия
     if (increaseVisitsLeft.ids.length) {

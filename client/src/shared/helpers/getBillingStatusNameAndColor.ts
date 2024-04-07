@@ -12,6 +12,11 @@ export function getBillingStatusNameAndColor(billingStatus?: PaymentStatus) {
         name: 'Неоплачено',
         color: 'error.main',
       };
+    case PaymentStatus.UNCHARGED:
+      return {
+        name: 'Не требуется',
+        color: 'info.main',
+      };
     default:
       return {
         name: 'Нет информации',

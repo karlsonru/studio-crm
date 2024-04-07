@@ -132,6 +132,9 @@ export class AttendanceController {
     @Param('id', ValidateIdPipe) id: string,
     @Body() updateAttendanceDto: UpdateAttendanceDto,
   ) {
+    console.log('updateAttendanceDto');
+    console.log(updateAttendanceDto);
+
     const updated = await this.service.update(
       id,
       new UpdateAttendanceDtoSchemaAdapter(updateAttendanceDto),

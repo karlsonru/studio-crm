@@ -54,9 +54,9 @@ export class LessonService {
 
     if (action === 'remove') {
       logger.debug(`
-        Занятие ${id}. Удаление ${
+        Занятие с ID ${id}. Удаление ${
         updateLessonDto.students.filter((student) => student).length
-      } студентов: ${updateLessonDto.students}
+      } студентов c ID: ${updateLessonDto.students}
       `);
 
       if (!updateLessonDto.students.filter((student) => student).length) return null;

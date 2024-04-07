@@ -3,6 +3,7 @@ import { useGetLessonQuery } from '../../shared/api';
 import { ContentTabDetails } from './ContentTabDetails';
 import { ContentSubscriptions } from './ContentTabSubscriptions';
 import { ContentStudents } from './ContentTabStudents';
+import { ContentAttendance } from './ContentTabAttendance';
 import { CreateSubscriptionModal } from '../../shared/components/modals/CreateSubscriptionModal';
 import { SearchParamsButton } from '../../shared/components/buttons/SearchParamsButton';
 import { useTitle } from '../../shared/hooks/useTitle';
@@ -35,28 +36,33 @@ export function LessonPage() {
 
   return (
     <>
-    <TabsWrapper
-      defaultTab="students"
-      tabsContent={[
-        {
-          label: 'Участники',
-          value: 'students',
-          content: [<ContentStudents key="students" lesson={lesson} />],
-        },
-        {
-          label: 'Детали',
-          value: 'details',
-          content: [<ContentTabDetails key="details" lesson={lesson} />],
-        },
-        {
-          label: 'Абонементы',
-          value: 'subscriptions',
-          content: [<ContentSubscriptions key="subscriptions" lesson={lesson} />],
-          conditionally: [<SearchParamsButton title="Оформить" param="create-subscription" />],
-        },
-      ]}
-    />
-    <CreateSubscriptionModal />
+      <TabsWrapper
+        defaultTab="students"
+        tabsContent={[
+          {
+            label: 'Участники',
+            value: 'students',
+            content: [<ContentStudents key="students" lesson={lesson} />],
+          },
+          {
+            label: 'Проведенные занятия',
+            value: 'attendance',
+            content: [<ContentAttendance key="attendances" lessonId={lesson._id} />],
+          },
+          {
+            label: 'Детали',
+            value: 'details',
+            content: [<ContentTabDetails key="details" lesson={lesson} />],
+          },
+          {
+            label: 'Абонементы',
+            value: 'subscriptions',
+            content: [<ContentSubscriptions key="subscriptions" lesson={lesson} />],
+            conditionally: [<SearchParamsButton title="Оформить" param="create-subscription" />],
+          },
+        ]}
+      />
+      <CreateSubscriptionModal />
     </>
   );
 }

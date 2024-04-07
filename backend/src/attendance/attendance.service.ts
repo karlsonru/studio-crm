@@ -274,8 +274,6 @@ export class AttendanceService {
     id: string,
     updateAttendanceDto: UpdateAttendanceDto,
   ): Promise<AttendanceModel | null> {
-    logger.debug(`Посещённое занятие: ${id}}. Получен запрос на обновление. Ищем занятие`);
-
     // найдём занятие, которое нужно обновить
     const visitedLesson = await this.findOne(id);
 
@@ -286,6 +284,7 @@ export class AttendanceService {
 
     // если массив со студентами не передан - обновим только то что прислали
     if (!updateAttendanceDto.students) {
+      console.log('Не передан массив студентов');
       return await this.attendanceModel.findByIdAndUpdate(
         id,
         { ...visitedLesson, ...updateAttendanceDto },
@@ -297,7 +296,11 @@ export class AttendanceService {
     const transaction = async (session: ClientSession) => {
       await this.attendancePaymentService.changePaymentStatus(visitedLesson, updateAttendanceDto);
 
-      console.log(JSON.stringify(updateAttendanceDto));
+      console.log(`
+        Передан массив студентов. Выполнили смену статуса платежа. Новые статусы: ${JSON.stringify(
+          updateAttendanceDto,
+        )}
+        `);
 
       // обновим занятие и вернём результат
       return await this.attendanceModel.findByIdAndUpdate(id, updateAttendanceDto, {
