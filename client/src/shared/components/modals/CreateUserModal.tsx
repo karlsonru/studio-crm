@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
@@ -38,22 +38,14 @@ function validateForm(formData: { [key: string]: FormDataEntryValue }) {
 
 export function CreateUserModal() {
   const [canAuthorize, setCanAuthorize] = useState(false);
-  const [createUser, isSuccess] = useCreateUserMutation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [createUser, requestStatus] = useCreateUserMutation();
+  const [searchParams] = useSearchParams();
   const [formValidation, setFormValidation] = useState({
     fullname: true,
     phone: true,
     login: true,
     password: true,
   });
-
-  useEffect(() => {
-    if (!isSuccess) return;
-
-    const timerId = setTimeout(() => setSearchParams(undefined), 500);
-
-    return () => clearTimeout(timerId);
-  }, [isSuccess]);
 
   const submitHandler = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -96,6 +88,7 @@ export function CreateUserModal() {
       title="Добавить сотрудника"
       isOpen={searchParams.has('create-user')}
       onSubmit={submitHandler}
+      requestStatus={requestStatus}
     >
       <TextField
         variant="outlined"

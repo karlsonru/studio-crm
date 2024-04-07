@@ -23,8 +23,9 @@ interface IForm {
   isOpen: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onClose?: () => void;
+  closeOnSuccess?: boolean;
   clearParams?: boolean;
-  requestStatus?: {
+  requestStatus: {
     isLoading: boolean;
     isSuccess: boolean;
     isError: boolean;
@@ -40,6 +41,7 @@ export function DialogFormWrapper({
   isOpen,
   onSubmit,
   onClose,
+  closeOnSuccess = true,
   clearParams = true,
   requestStatus,
   dialogProps,
@@ -53,7 +55,7 @@ export function DialogFormWrapper({
     isError,
     error,
     reset,
-  } = requestStatus ?? {};
+  } = requestStatus;
 
   const closeHandler = () => {
     // сбросим кэш запроса перед закрытием
@@ -76,6 +78,12 @@ export function DialogFormWrapper({
     if (!isSuccess) return;
 
     ref.current?.reset();
+
+    if (closeOnSuccess) {
+      const timerId = setTimeout(closeHandler, 500);
+
+      return () => clearTimeout(timerId);
+    }
   }, [isSuccess]);
 
   return (

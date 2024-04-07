@@ -22,7 +22,7 @@ function validateFrom(formData: { [key: string]: FormDataEntryValue }) {
 export function CreateFinanceExpenseModal() {
   const [searchParams] = useSearchParams();
 
-  const [createExpense] = useCreateFinanceMutation();
+  const [createExpense, requestStatus] = useCreateFinanceMutation();
   const { data: locationsData, isSuccess: isLocationsSuccess } = useGetLocationsQuery();
 
   const [formValidation, setFormValidation] = useState({
@@ -65,6 +65,7 @@ export function CreateFinanceExpenseModal() {
       title='Добавить расходы'
       isOpen={searchParams.has('create-expense')}
       onSubmit={handleSubmit}
+      requestStatus={requestStatus}
     >
       <TextField
         name='title'
