@@ -10,8 +10,8 @@ import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Autocomplete from '@mui/material/Autocomplete';
-import { ISubscriptionTemplateModel } from 'shared/models/ISubscriptionModel';
 import { DialogFormWrapper } from '../DialogFormWrapper';
+import { ISubscriptionTemplateModel } from '../../models/ISubscriptionModel';
 import {
   useCreateSubscriptionMutation,
   useGetStudentsQuery,
@@ -21,6 +21,7 @@ import {
 import { useMobile } from '../../hooks/useMobile';
 import { ILessonModel } from '../../models/ILessonModel';
 import { INPUT_DATE_FORMAT } from '../../constants';
+import { getTodayTimestamp } from '../../helpers/getTodayTimestamp';
 
 // TODO ммплементация шаблона с одним занятием
 // TODO проверка есть ли задолженность у ученика
@@ -36,7 +37,7 @@ export function CreateSubscriptionModal() {
   const [price, setPrice] = useState<string | number>('');
   const [visitsTotal, setVisitsTotal] = useState<string | number>('');
   const [selectedLessons, setSelectedLessons] = useState<Array<ILessonModel>>([]);
-  const [dateFrom, setDateFrom] = useState(format(new Date(), INPUT_DATE_FORMAT));
+  const [dateFrom, setDateFrom] = useState(format(getTodayTimestamp(), INPUT_DATE_FORMAT));
   const [selectedTemplate, setSelectedTemplate] = useState<ISubscriptionTemplateModel | null>(null);
 
   const lastDate = lastDayOfMonth(Date.parse(dateFrom));
@@ -133,8 +134,6 @@ export function CreateSubscriptionModal() {
       dateTo: Date.UTC(lastDate.getFullYear(), lastDate.getMonth(), lastDate.getDate() + 1),
       paymentMethod: formData.paymentMethod as string,
     });
-
-    form.reset();
   };
 
   return (

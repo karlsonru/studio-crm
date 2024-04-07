@@ -80,7 +80,7 @@ export function DialogFormWrapper({
     ref.current?.reset();
 
     if (closeOnSuccess) {
-      const timerId = setTimeout(closeHandler, 500);
+      const timerId = setTimeout(closeHandler, 1500);
 
       return () => clearTimeout(timerId);
     }
