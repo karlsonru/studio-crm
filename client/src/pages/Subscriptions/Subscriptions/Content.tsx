@@ -1,4 +1,10 @@
-import { DataGrid, GridColDef, GridValueFormatterParams } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridColDef,
+  GridRowParams,
+  GridValueFormatterParams,
+} from '@mui/x-data-grid';
+import { useNavigate } from 'react-router-dom';
 import { useMobile } from '../../../shared/hooks/useMobile';
 import { useGetSubscriptionsQuery } from '../../../shared/api';
 import { CustomGridToolbar } from '../../../shared/components/CustomGridToolbar';
@@ -16,7 +22,7 @@ const leftAlignNumberColumn: Partial<GridColDef> = {
 };
 
 function getColumns(isMobile: boolean) {
-  const columns: GridColDef[] = [
+  const columns: GridColDef<ISubscriptionModel>[] = [
     {
       field: 'student',
       headerName: 'Ученик',
@@ -67,6 +73,7 @@ function getColumns(isMobile: boolean) {
 
 export function SubscriptionContent() {
   const isMobile = useMobile();
+  const navigate = useNavigate();
 
   const {
     data,
@@ -96,6 +103,7 @@ export function SubscriptionContent() {
     columns={columns}
     rows={data ?? []}
     getRowId={(item) => item._id}
+    onRowDoubleClick={(params: GridRowParams<ISubscriptionModel>) => navigate(`/subscriptions/${params.id}`)}
     disableColumnMenu
     components={{
       Toolbar: ExtendedToolbar,

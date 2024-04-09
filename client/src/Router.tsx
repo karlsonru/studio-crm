@@ -12,7 +12,12 @@ import { StudentsPage } from './pages/Students';
 import { StudentPage } from './pages/Student';
 import { NotFoundPage } from './pages/NotFound';
 import { FinancePage } from './pages/Finance';
-import { SubscriptionsPageLayout, SubscriptionsTemplatePage, SubscriptionsPage } from './pages/Subscriptions';
+import {
+  SubscriptionsPageLayout,
+  SubscriptionsTemplatePage,
+  SubscriptionsPage,
+  SubscriptionPage,
+} from './pages/Subscriptions';
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -39,7 +44,8 @@ export const router = createBrowserRouter(
 
         <Route path='/subscriptions' element={<SubscriptionsPageLayout />} >
           <Route index element={<SubscriptionsPage />} />
-          <Route path=':templates' element={<SubscriptionsTemplatePage />} />
+          <Route path='/subscriptions/templates' element={<SubscriptionsTemplatePage />} />
+          <Route path=':subscriptionId' element={<SubscriptionPage />} />
         </Route>
 
         <Route path='/users'>

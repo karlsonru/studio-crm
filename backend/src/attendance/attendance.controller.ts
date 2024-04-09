@@ -47,12 +47,15 @@ export class AttendanceController {
     @Query('year', ValidateOptionalNumberPipe) year?: number,
     @Query('month', ValidateOptionalNumberPipe) month?: number,
     @Query('day', ValidateOptionalNumberPipe) day?: number,
+    @Query('subscriptionId') subscriptionId?: string,
+    @Query('dateFrom', ValidateOptionalNumberPipe) dateFrom?: number,
+    @Query('dateTo', ValidateOptionalNumberPipe) dateTo?: number,
   ) {
     if (filter) {
       return await this.service.findAll(JSON.parse(filter));
     }
 
-    const query: Record<string, string | number> = {};
+    const query: Record<string, string | number | Record<string, string | number>> = {};
 
     if (lessonId) {
       query['lesson'] = lessonId;
@@ -60,6 +63,18 @@ export class AttendanceController {
 
     if (year && month && day) {
       query.date = Date.UTC(year, month - 1, day);
+    }
+
+    if (subscriptionId) {
+      query['students.subscription'] = subscriptionId;
+    }
+
+    if (dateFrom) {
+      query.date = { $gte: dateFrom };
+    }
+
+    if (dateTo) {
+      query.date = { $lte: dateTo };
     }
 
     return await this.service.findAll(query);

@@ -18,6 +18,7 @@ import { IStudentModel } from '../../shared/models/IStudentModel';
 import { CardContentItem } from '../../shared/components/CardContentItem';
 import { getVisitStatusName } from '../../shared/helpers/getVisitStatusName';
 import { getBillingStatusNameAndColor } from '../../shared/helpers/getBillingStatusNameAndColor';
+import { getYearMonthDay } from '../../shared/helpers/getYearMonthDay';
 
 interface IVisitsStatistic {
   statistic: Record<string, number>;
@@ -161,6 +162,8 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
       } = getBillingStatusNameAndColor(studentVisit.paymentStatus);
       const visitStatusName = getVisitStatusName(studentVisit.visitStatus);
 
+      const { year, month, day } = getYearMonthDay(visitedLesson.date);
+
       return (
         <CreateRows
           key={visitedLesson._id}
@@ -186,7 +189,7 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
               props={{ width: '100%' }}
             />,
           ]}
-          callback={() => navigate(`/attendances?lessonId=${visitedLesson.lesson._id}&year=${new Date(visitedLesson.date).getFullYear()}&month=${new Date(visitedLesson.date).getMonth() + 1}&day=${new Date(visitedLesson.date).getDate()}`)}
+          callback={() => navigate(`/attendances?lessonId=${visitedLesson.lesson._id}&year=${year}&month=${month + 1}&day=${day}`)}
         />
       );
     });

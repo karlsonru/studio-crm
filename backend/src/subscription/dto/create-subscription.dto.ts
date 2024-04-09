@@ -2,7 +2,7 @@ import { Type } from 'class-transformer';
 import {
   ArrayUnique,
   IsMongoId,
-  IsNotEmpty,
+  // IsNotEmpty,
   IsNumber,
   IsOptional,
   IsPositive,

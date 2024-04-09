@@ -10,6 +10,7 @@ import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
 import { useFindWithParamsAttendancesQuery } from '../../shared/api/attendanceApi';
 import { IAttendanceModel, VisitStatus } from '../../shared/models/IAttendanceModel';
+import { getYearMonthDay } from '../../shared/helpers/getYearMonthDay';
 
 export function ContentAttendance({ lessonId }: { lessonId: string }) {
   const navigate = useNavigate();
@@ -68,7 +69,10 @@ export function ContentAttendance({ lessonId }: { lessonId: string }) {
       disableColumnMenu
       density="comfortable"
       pageSizeOptions={[10, 25]}
-      onRowDoubleClick={((params: GridRowParams<IAttendanceModel>) => navigate(`/attendances?year=${new Date(params.row.date).getFullYear()}&month=${new Date(params.row.date).getMonth() + 1}&day=${new Date(params.row.date).getDate()}&lessonId=${lessonId}`))}
+      onRowDoubleClick={((params: GridRowParams<IAttendanceModel>) => {
+        const { year, month, day } = getYearMonthDay(params.row.date);
+        return navigate(`/attendances?year=${year}&month=${month + 1}&day=${day}&lessonId=${lessonId}}`);
+      })}
       localeText={{
         toolbarFilters: 'Фильтры',
       }}
