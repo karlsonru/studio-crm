@@ -4,7 +4,7 @@ export function getVisitTypeName(visitType?: VisitType) {
   switch (visitType) {
     case VisitType.REGULAR:
       return 'Постоянно';
-    case VisitType.MISSED_REGULAR:
+    case VisitType.POSTPONED:
       return 'Отработка';
     case VisitType.NEW:
       return 'Новый';

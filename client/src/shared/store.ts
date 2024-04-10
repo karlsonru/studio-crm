@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import menuReducer from './reducers/appMenuSlice';
+import { appMenuReducer } from './reducers/appMenuSlice';
 import { timetablePageReducer } from './reducers/timetablePageSlice';
 import { lessonsPageReducer } from './reducers/lessonsPageSlice';
 import { studentsPageReducer } from './reducers/studentsPageSlice';
@@ -7,21 +7,23 @@ import { subscriptionsPageReducer } from './reducers/subscriptionsPageSlice';
 import { attendancePageReducer } from './reducers/attendancePageSlice';
 import { authReducer } from './reducers/authSlice';
 import { financeReducer } from './reducers/financeSlice';
-import { basicApi } from './api/basicApi';
+import { api } from './api/basicApi';
+
+const apiResource = api.getResource();
 
 const store = configureStore({
   reducer: {
     authReducer,
+    appMenuReducer,
     attendancePageReducer,
-    menuReducer,
     timetablePageReducer,
     lessonsPageReducer,
     studentsPageReducer,
     subscriptionsPageReducer,
     financeReducer,
-    [basicApi.reducerPath]: basicApi.reducer,
+    [apiResource.reducerPath]: apiResource.reducer,
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(basicApi.middleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(apiResource.middleware),
   devTools: true,
 });
 

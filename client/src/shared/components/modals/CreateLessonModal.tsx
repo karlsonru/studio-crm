@@ -89,7 +89,7 @@ export function CreateLessonModal() {
       title: formData.title as string,
       teacher: formData.teacher as string,
       location: formData.location as string,
-      day: +formData.day,
+      weekday: +formData.weekday,
       timeStart: {
         hh: +timeStart[0],
         min: +timeStart[1],
@@ -139,7 +139,7 @@ export function CreateLessonModal() {
       <FormControl>
         <FormLabel>День недели</FormLabel>
         <Select
-          name='day'
+          name='weekday'
           label='День недели'
           defaultValue={now.getDay()}
           fullWidth
@@ -210,9 +210,10 @@ export function CreateLessonModal() {
         <Select
           name='location'
           label='Помещение'
-          defaultValue=''
+          defaultValue={locationsData?.length === 1 ? locationsData[0]._id : ''}
           fullWidth
           required
+          disabled={locationsData?.length === 1}
         >
           <MenuItem value={''}><em>Выберите помещение</em></MenuItem>
         { isLocationsSuccess

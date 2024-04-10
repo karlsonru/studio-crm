@@ -19,8 +19,9 @@ import { useAppSelector } from '../../shared/hooks/useAppSelector';
 const TIME_STEP: 60 | 30 = 30;
 const TIME_START = 9;
 const TIME_END = 22;
-const FIRST_COLUMN_WIDTH = '4%';
-const COLUMN_WIDTH = '12%';
+const FIRST_COLUMN_WIDTH = '2%';
+const COLUMN_WIDTH = '14%';
+const TABLE_MIN_WIDTH = '1650px';
 
 const CELL_STYLE = {
   position: 'relative',
@@ -66,7 +67,7 @@ function fillRowsWithContent(lessons: Array<ILessonModel>) {
     const time = format(lessonInterval, 'HH:mm');
 
     // добавим к строке с таким же временным интервалом
-    rows[time][lesson.day === 0 ? 6 : lesson.day - 1] = lesson;
+    rows[time][lesson.weekday === 0 ? 6 : lesson.weekday - 1] = lesson;
   });
 
   return rows;
@@ -134,7 +135,7 @@ export function TimetableContent({ lessons }: { lessons: Array<ILessonModel> }) 
     // не проводим фильтрацию если режим отображения Неделя
     if (!isDayView) return [];
 
-    return lessons.filter((lesson) => lesson.day === currentDay);
+    return lessons.filter((lesson) => lesson.weekday === currentDay);
   }, [currentDate, view]);
 
   // запомним дату, с которой нужно рисовать даты в заголовках
@@ -175,13 +176,17 @@ export function TimetableContent({ lessons }: { lessons: Array<ILessonModel> }) 
   }
 
   // поделим все занятия по ячейкам и строкам
-  // const rowsContent = useMemo(() => fillRowsWithContent(lessons), [lessons]);
   const rowsContent = fillRowsWithContent(lessons);
 
   const dateNames = [null, ...dates.map((intervalDate) => format(intervalDate, 'dd EEEE', { locale: ru }))];
 
   return (
-    <Table>
+    <Table
+      sx={{
+        overflowX: 'scroll',
+        minWidth: TABLE_MIN_WIDTH,
+      }}
+    >
       <TableHead>
         <Row content={dateNames} dates={dates} />
       </TableHead>

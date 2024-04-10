@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -15,10 +16,17 @@ import { FinanceModule } from './finance/finance.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '../.env',
+    }),
     MongooseModule.forRootAsync({
-      useFactory: () => ({
-        uri: 'mongodb://127.0.0.1:27017',
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        // uri: 'mongodb://127.0.0.1:27017',
+        uri: `mongodb://${configService.get('DB_HOST')}:${configService.get('DB_PORT')}`,
       }),
+      inject: [ConfigService],
     }),
     UserModule,
     LessonModule,

@@ -1,3 +1,4 @@
 export { SubscriptionsPageLayout } from './PageLayout';
-export { SubscriptionsPage } from './Subscription/Page';
+export { SubscriptionsPage } from './Subscriptions/Page';
 export { SubscriptionsTemplatePage } from './Templates/Page';
+export { SubscriptionPage } from './Subscription/Page';

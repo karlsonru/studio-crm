@@ -1,13 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import TextField from '@mui/material/TextField';
-/*
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import Stack from '@mui/system/Stack';
-*/
 import { NumberField } from '../fields/NumberField';
 import { DialogFormWrapper } from '../DialogFormWrapper';
 import { useCreateSubscriptionTemplateMutation } from '../../api';
@@ -57,22 +50,6 @@ export function CreateSubscriptionTemplateModal() {
       return;
     }
 
-    /*
-    const calculateDuration = () => {
-      const day = 86400000; // длительность дня в милисекундах
-      switch (formData.period) {
-        case 'month':
-          return +formData.duration * day * 30;
-        case 'week':
-          return +formData.duration * day * 7;
-        case 'day':
-          return +formData.duration * day;
-        default:
-          return 0;
-      }
-    };
-    */
-
     createSubscriptionTemplate({
       title: formData.title as string,
       price: +formData.price as number,
@@ -109,31 +86,6 @@ export function CreateSubscriptionTemplateModal() {
         error={!formValidation.visits}
         minValue={1}
       />
-
-      {/*
-      <FormControl>
-        <FormLabel sx={{ mb: 1 }}>Период</FormLabel>
-
-        <Stack direction="row">
-          <NumberField
-            name="duration"
-            label="Длительность"
-            error={!formValidation.duration}
-            minValue={1}
-          />
-
-          <Select
-            name="period"
-            defaultValue="month"
-            sx={{ flexGrow: 1, minWidth: '115px' }}
-          >
-            <MenuItem value="day">Дней</MenuItem>
-            <MenuItem value="week">Недель</MenuItem>
-            <MenuItem value="month">Месяцев</MenuItem>
-          </Select>
-        </Stack>
-      </FormControl>
-      */}
 
     </DialogFormWrapper>
   );

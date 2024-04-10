@@ -10,12 +10,14 @@ export type AttendanceDocument = HydratedDocument<Attendance>;
 export enum VisitStatus {
   UNKNOWN = 'unknown',
   VISITED = 'visited',
-  POSTPONED = 'postponed',
   MISSED = 'missed',
   SICK = 'sick',
+  POSTPONED_FUTURE = 'postponed_future', // К отработке
+  POSTPONED_DONE = 'postponed_done', // Отработано
 }
 
 export enum PaymentStatus {
+  UNKNOWN = 'unknown',
   PAID = 'paid',
   UNPAID = 'unpaid',
   UNCHARGED = 'uncharged',
@@ -28,17 +30,22 @@ export enum VisitType {
   POSTPONED = 'postponed', // ОТРАБОТКА
 }
 
-export class VisitedStudent {
+export enum AttendanceType {
+  DONE = 'done',
+  FUTURE = 'future',
+}
+
+export class VisitedStudentWithVisitDetails {
   student: Student;
   visitStatus: VisitStatus;
   paymentStatus: PaymentStatus;
   subscription: string | null;
   visitType: VisitType;
+  visitInstead?: string | null;
+  visitInsteadDate?: number | null;
 }
 
-@Schema({
-  timestamps: true,
-})
+@Schema({ timestamps: true })
 export class Attendance {
   @Transform(({ value }) => value.toString())
   @Type(() => String)
@@ -54,12 +61,19 @@ export class Attendance {
   lesson: Lesson;
 
   @Prop({
+    type: String,
+    enum: AttendanceType,
+    default: AttendanceType.DONE,
+  })
+  type: AttendanceType;
+
+  @Prop({
     type: Number,
     required: true,
     min: 0,
     max: 6,
   })
-  day: number;
+  weekday: number;
 
   @Prop({
     type: Number,
@@ -111,10 +125,19 @@ export class Attendance {
           trim: true,
           required: true,
         },
+        visitInstead: {
+          type: Types.ObjectId,
+          ref: 'Attendance',
+          default: null,
+        },
+        visitInsteadDate: {
+          type: Number,
+          default: null,
+        },
       },
     ],
   })
-  students: VisitedStudent[];
+  students: VisitedStudentWithVisitDetails[];
 }
 
 export const AttendanceSchema = SchemaFactory.createForClass(Attendance);

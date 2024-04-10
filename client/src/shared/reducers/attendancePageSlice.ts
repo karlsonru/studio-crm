@@ -1,35 +1,49 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getTodayTimestamp } from '../helpers/getTodayTimestamp';
 
-/*
-export interface IVisit {
-  _id?: string;
-  student: string;
-  visitStatus: VisitStatus;
-  visitType: VisitType;
-}
-*/
-
 interface IAttendancePageState {
-  currentLessonId: string,
-  currentDateTimestamp: number;
+  searchLessonId: string,
+  searchDateTimestamp: number;
+  editPostponedAttendanceId: string;
+  editPostponedAttendanceStudentId: string;
+  editPostponedAttendanceModalOpen: boolean;
+  showPostponedAttendanceModalOpen: boolean;
 }
 
 const initialState: IAttendancePageState = {
-  currentLessonId: '',
-  currentDateTimestamp: getTodayTimestamp(),
+  searchLessonId: '',
+  searchDateTimestamp: getTodayTimestamp(),
+  editPostponedAttendanceId: '',
+  editPostponedAttendanceStudentId: '',
+  showPostponedAttendanceModalOpen: false,
+  editPostponedAttendanceModalOpen: false,
 };
 
 const attendancePageState = createSlice({
   name: 'attendancePage',
   initialState,
   reducers: {
-    setCurrentDateTimestamp: (state, action: PayloadAction<number>) => {
-      state.currentDateTimestamp = action.payload;
+    setSearchDateTimestamp: (state, action: PayloadAction<number>) => {
+      state.searchDateTimestamp = action.payload;
     },
 
-    setCurrentLessonId: (state, action: PayloadAction<string>) => {
-      state.currentLessonId = action.payload;
+    setSearchLessonId: (state, action: PayloadAction<string>) => {
+      state.searchLessonId = action.payload;
+    },
+
+    setEditPostonedAttendanceId: (state, action: PayloadAction<string>) => {
+      state.editPostponedAttendanceId = action.payload;
+    },
+
+    setEditPostponedAttendanceStudentId: (state, action: PayloadAction<string>) => {
+      state.editPostponedAttendanceStudentId = action.payload;
+    },
+
+    setEditPostponedAttendanceModalOpen: (state, action: PayloadAction<boolean>) => {
+      state.editPostponedAttendanceModalOpen = action.payload;
+    },
+    setShowPostponedAttendanceModalOpen: (state, action: PayloadAction<boolean>) => {
+      state.showPostponedAttendanceModalOpen = action.payload;
     },
   },
 });

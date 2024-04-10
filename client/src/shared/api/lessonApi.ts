@@ -1,19 +1,18 @@
-import {
-  basicApi, injectGetOne, injectGetAll, injectCreate, injectPatch, injectDelete, injectFind,
-} from './basicApi';
+import { api } from './basicApi';
 import { ILessonModel, ILessonModelCreate, IVisitingStudent } from '../models/ILessonModel';
 
 const tag = 'Lesson';
 const route = 'lesson';
 
-basicApi.enhanceEndpoints({ addTagTypes: [tag] });
+api.addTagTypes(tag);
 
-export const { useGetLessonQuery } = injectGetOne<ILessonModel>('getLesson', tag, route);
-export const { useGetLessonsQuery } = injectGetAll<ILessonModel>('getLessons', tag, route);
-export const { useFindLessonsQuery } = injectFind<ILessonModel>('findLessons', tag, route);
-export const { useCreateLessonMutation } = injectCreate<ILessonModel, ILessonModelCreate>('createLesson', tag, route);
-export const { usePatchLessonMutation } = injectPatch<ILessonModel, ILessonModelCreate>('patchLesson', tag, route);
-export const { useDeleteLessonMutation } = injectDelete('deleteLesson', tag, route);
+export const { useGetLessonQuery } = api.injectGetOne<ILessonModel>('getLesson', tag, route);
+export const { useGetLessonsQuery } = api.injectGetAll<ILessonModel>('getLessons', tag, route);
+export const { useFindLessonsQuery } = api.injectFind<ILessonModel>('findLessons', tag, route);
+export const { useFindWithParamsLessonsQuery } = api.injectFindWithParams<ILessonModel>('findWithParamsLessons', tag, route);
+export const { useCreateLessonMutation } = api.injectCreate<ILessonModel, ILessonModelCreate>('createLesson', tag, route);
+export const { usePatchLessonMutation } = api.injectPatch<ILessonModel, ILessonModelCreate>('patchLesson', tag, route);
+export const { useDeleteLessonMutation } = api.injectDelete('deleteLesson', tag, route);
 
 interface IVisitingStudentUpdate extends Omit<IVisitingStudent, 'student'> {
   student: string;
@@ -23,7 +22,9 @@ interface IUpdateLessonStudents {
   students: Array<IVisitingStudentUpdate | string>;
 }
 
-export const { usePatchLessonStudentsMutation } = basicApi.injectEndpoints({
+const apiResource = api.getResource();
+
+export const { usePatchLessonStudentsMutation } = apiResource.injectEndpoints({
   endpoints: (build) => ({
     patchLessonStudents: build
       .mutation<ILessonModel, { id: string, action: 'add' | 'remove', newItem: IUpdateLessonStudents }>({

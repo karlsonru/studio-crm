@@ -3,18 +3,18 @@ import { useSearchParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Stack from '@mui/system/Stack';
 import { LessonsList } from './LessonsList';
-import { LessonInfo } from './LessonInfo';
+import { Participants } from './Participants';
+import { LessonDetails } from './LessonDetails';
 import { DateSwitcherAttendance } from './DateSwitcherAttendance';
 import { Loading } from '../../shared/components/Loading';
 import { useTitle } from '../../shared/hooks/useTitle';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { attendancePageActions } from '../../shared/reducers/attendancePageSlice';
-import { useFindLessonsQuery } from '../../shared/api';
+import { useFindWithParamsLessonsQuery } from '../../shared/api';
 import { ShowError } from '../../shared/components/ShowError';
 import { useAppSelector } from '../../shared/hooks/useAppSelector';
-import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 
-const Header = React.memo(() => (
+const AttendanceHeader = React.memo(() => (
   <Box component='header' mx='1rem'>
     <DateSwitcherAttendance />
   </Box>
@@ -27,29 +27,53 @@ export function AttendancePage() {
   const selectedLessonId = searchParams.get('lessonId');
 
   const actions = useActionCreators(attendancePageActions);
-  const currentDateTimestamp = useAppSelector(
-    (state) => state.attendancePageReducer.currentDateTimestamp,
+  const searchDateTimestamp = useAppSelector(
+    (state) => state.attendancePageReducer.searchDateTimestamp,
   );
 
   useEffect(() => {
-    const date = searchParams.get('date');
+    const year = searchParams.get('year');
+    const month = searchParams.get('month');
+    const day = searchParams.get('day');
 
+    // если дата в search params - обновим state для соответствия даты в state и params
+    if (year && month && day) {
+      const searchDate = Date.UTC(+year, +month - 1, +day);
+
+      if (searchDate !== searchDateTimestamp) {
+        actions.setSearchDateTimestamp(searchDate);
+      }
+
+      if (selectedLessonId) {
+        actions.setSearchLessonId(selectedLessonId);
+      }
     // если даты нет в search params - добавим самостоятельно текущий день в UTC
-    if (!date) {
-      setSearchParams({ date: getTodayTimestamp().toString() });
-      actions.setCurrentDateTimestamp(getTodayTimestamp());
-    // если есть - обновим state чтобы дата в state соответствовала дате в params
-    } else if (+date !== currentDateTimestamp) {
-      actions.setCurrentDateTimestamp(+date);
+    } else {
+      const today = new Date();
+
+      setSearchParams({
+        year: today.getFullYear().toString(),
+        month: (today.getMonth() + 1).toString(),
+        day: today.getDate().toString(),
+      });
+
+      const todayUTC = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
+
+      actions.setSearchDateTimestamp(todayUTC);
     }
-  });
+  }, [searchParams, actions, searchDateTimestamp]);
 
   const {
-    data: lessons, isLoading, isError, error,
-  } = useFindLessonsQuery({
-    day: new Date(currentDateTimestamp).getDay(),
-    dateTo: { $gte: currentDateTimestamp },
-    dateFrom: { $lte: currentDateTimestamp },
+    data: lessons,
+    isLoading,
+    isError,
+    error,
+  } = useFindWithParamsLessonsQuery({
+    params: {
+      weekday: new Date(searchDateTimestamp).getDay(),
+      dateFrom: searchDateTimestamp,
+      dateTo: searchDateTimestamp,
+    },
   });
 
   const selectedLesson = useMemo(
@@ -71,10 +95,13 @@ export function AttendancePage() {
 
   return (
     <>
-      <Header />
+      <AttendanceHeader />
       <Stack direction="row" flexWrap="wrap" spacing={2}>
         <LessonsList lessons={lessons} />
-        {selectedLesson && <LessonInfo selectedLesson={selectedLesson} />}
+
+        {selectedLesson && <LessonDetails lesson={selectedLesson} />}
+
+        {selectedLesson && <Participants selectedLesson={selectedLesson} />}
       </Stack>
     </>
   );

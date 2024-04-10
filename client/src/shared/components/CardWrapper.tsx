@@ -23,7 +23,7 @@ export function CardWrapper({ children, props, extraStyle }: ICardWrapper) {
     <Card
       variant="outlined"
       sx={{
-        width: isMobile ? 'auto' : '325px',
+        width: isMobile ? '100%' : '325px',
         marginRight: isMobile ? 0 : '0.5rem',
         ...basicStyle,
         ...extraStyle,

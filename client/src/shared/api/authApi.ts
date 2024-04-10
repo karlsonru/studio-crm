@@ -1,6 +1,4 @@
-import {
-  basicApi, injectCreate,
-} from './basicApi';
+import { api } from './basicApi';
 
 interface IAuthLogin {
   login: string;
@@ -14,6 +12,6 @@ interface IAuthToken {
 const tag = 'auth';
 // const route = 'auth';
 
-basicApi.enhanceEndpoints({ addTagTypes: [tag] });
+api.addTagTypes(tag);
 
-export const { useLoginMutation } = injectCreate<IAuthToken, IAuthLogin>('login', tag, 'auth/login');
+export const { useLoginMutation } = api.injectCreate<IAuthToken, IAuthLogin>('login', tag, 'auth/login');

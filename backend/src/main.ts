@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 // import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './shared/all-exceptions.filter';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -10,6 +11,8 @@ async function bootstrap() {
       origin: '*',
     },
   });
+
+  const configService = app.get(ConfigService);
 
   app.setGlobalPrefix('/api');
 
@@ -35,6 +38,9 @@ async function bootstrap() {
   SwaggerModule.setup('open-api', app, document);
   */
 
-  await app.listen(5000);
+  const port = configService.get('APP_PORT') || 5000;
+
+  await app.listen(port);
 }
+
 bootstrap();

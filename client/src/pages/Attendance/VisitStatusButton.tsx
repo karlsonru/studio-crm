@@ -4,42 +4,68 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import CircleIcon from '@mui/icons-material/Circle';
 import { VisitStatus } from '../../shared/models/IAttendanceModel';
+import { VisitType } from '../../shared/models/ILessonModel';
 import { getVisitStatusName } from '../../shared/helpers/getVisitStatusName';
+import { useMobile } from '../../shared/hooks/useMobile';
 
-const VISIT_STATUSES: Array<{
-  action: VisitStatus;
-  color: 'error' | 'disabled' | 'action' | 'inherit' | 'secondary' | 'primary' | 'success' | 'info' | 'warning';
-}> = [
-  { action: VisitStatus.UNKNOWN, color: 'disabled' },
-  { action: VisitStatus.VISITED, color: 'success' },
-  { action: VisitStatus.POSTPONED, color: 'primary' },
-  { action: VisitStatus.MISSED, color: 'error' },
-  { action: VisitStatus.SICK, color: 'warning' },
-];
+// eslint-disable-next-line
+type color = 'error' | 'disabled' | 'action' | 'inherit' | 'secondary' | 'primary' | 'success' | 'info' | 'warning';
+
+const visitStatusWithColor: Record<VisitStatus, color> = {
+  [VisitStatus.UNKNOWN]: 'disabled',
+  [VisitStatus.VISITED]: 'success',
+  [VisitStatus.POSTPONED_FUTURE]: 'primary',
+  [VisitStatus.MISSED]: 'error',
+  [VisitStatus.SICK]: 'warning',
+  [VisitStatus.POSTPONED_DONE]: 'success',
+};
 
 interface IVisitStatusButton {
   studentId: string;
   visitStatus?: VisitStatus;
+  visitType: VisitType;
+  isLocked: boolean;
 }
 
-export function VisitStatusButton({ studentId, visitStatus }: IVisitStatusButton) {
+function getVisitStatusesByVisitType(visitType: VisitType) {
+  if (visitType === VisitType.POSTPONED) {
+    return [VisitStatus.UNKNOWN, VisitStatus.POSTPONED_DONE, VisitStatus.MISSED];
+  }
+
+  return Object.keys(visitStatusWithColor).slice(0, -1) as Array<VisitStatus>;
+}
+
+export function VisitStatusButton({
+  studentId, visitStatus, visitType, isLocked,
+}: IVisitStatusButton) {
+  const isMobile = useMobile();
   const initialStatus = visitStatus ?? VisitStatus.UNKNOWN;
 
+  const keys = getVisitStatusesByVisitType(visitType) as Array<VisitStatus>;
+
   return (
-    <FormControl sx={{ width: '180px' }}>
+    <FormControl sx={{
+      width: isMobile ? '135px' : '180px',
+      flexShrink: 0,
+    }}>
       <InputLabel>Сатус</InputLabel>
       <Select
         name={studentId}
         label="Статус"
         defaultValue={initialStatus}
+        disabled={isLocked}
       >
-      {
-        VISIT_STATUSES.map((status) => (
-          <MenuItem key={status.action} value={status.action}>
-            <CircleIcon color={status.color} fontSize="small" sx={{ marginRight: '0.5rem' }} />
-            { getVisitStatusName(status.action) }
-          </MenuItem>
-        ))
+      { keys.map((status) => <MenuItem
+            key={status}
+            value={status}
+          >
+            <CircleIcon
+              fontSize="small"
+              color={visitStatusWithColor[status]}
+              sx={{ marginRight: '0.5rem' }}
+            />
+            { getVisitStatusName(status) }
+          </MenuItem>)
       }
       </Select>
     </FormControl>

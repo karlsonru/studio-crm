@@ -18,6 +18,6 @@ export class AuthController {
       throw new UnauthorizedException();
     }
 
-    return token;
+    return { token };
   }
 }

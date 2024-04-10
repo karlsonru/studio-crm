@@ -19,11 +19,13 @@ import { getErrorMessage } from '../helpers/getErrorMessage';
 
 interface IForm {
   title: string;
+  children: Array<ReactNode> | ReactNode;
   isOpen: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  children: Array<ReactNode>;
   onClose?: () => void;
-  requestStatus?: {
+  closeOnSuccess?: boolean;
+  clearParams?: boolean;
+  requestStatus: {
     isLoading: boolean;
     isSuccess: boolean;
     isError: boolean;
@@ -34,14 +36,26 @@ interface IForm {
 }
 
 export function DialogFormWrapper({
-  title, isOpen, onSubmit, children, requestStatus, dialogProps, onClose,
+  title,
+  children,
+  isOpen,
+  onSubmit,
+  onClose,
+  closeOnSuccess = true,
+  clearParams = true,
+  requestStatus,
+  dialogProps,
 }: IForm) {
-  const {
-    isSuccess, isError, error, reset, isLoading,
-  } = requestStatus ?? {};
-
   const ref = useRef<HTMLFormElement>();
   const [, setSearchParams] = useSearchParams();
+
+  const {
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+    reset,
+  } = requestStatus;
 
   const closeHandler = () => {
     // сбросим кэш запроса перед закрытием
@@ -54,13 +68,22 @@ export function DialogFormWrapper({
       onClose();
     }
 
-    setSearchParams(undefined);
+    // по умолчанию нужно очистить параметры перед закрытием
+    if (clearParams) {
+      setSearchParams(undefined);
+    }
   };
 
   useEffect(() => {
     if (!isSuccess) return;
 
     ref.current?.reset();
+
+    if (closeOnSuccess) {
+      const timerId = setTimeout(closeHandler, 1500);
+
+      return () => clearTimeout(timerId);
+    }
   }, [isSuccess]);
 
   return (

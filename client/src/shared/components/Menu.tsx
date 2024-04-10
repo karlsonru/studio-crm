@@ -6,6 +6,7 @@ import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Typography from '@mui/material/Typography';
+import HomeIcon from '@mui/icons-material/Home';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import GroupIcon from '@mui/icons-material/Group';
 import ListAltIcon from '@mui/icons-material/ListAlt';
@@ -17,45 +18,36 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import DomainVerificationIcon from '@mui/icons-material/DomainVerification';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import { useMobile } from '../hooks/useMobile';
 import { useAppSelector } from '../hooks/useAppSelector';
-import { useAppDispatch } from '../hooks/useAppDispatch';
-import { setFullWidth, setMobileMenuAnchorEl, setSmallWidth } from '../reducers/appMenuSlice';
-
-interface IMenuItem {
-  icon: ReactNode;
-  title: string;
-}
+import { useActionCreators } from '../hooks/useActionCreators';
+import { MenuWidth, appMenuActions } from '../reducers/appMenuSlice';
 
 interface INavItem {
-  menuItem: ReactNode;
   path: string;
+  title: string;
+  icon: ReactNode;
 }
 
-const NavItem = ({ path, menuItem }: INavItem) => {
-  const activeStyle = {
-    color: 'inherit',
-    textDecoration: 'underline',
-    background: 'lightgrey',
-  };
-
-  const regularStyle = {
-    color: 'inherit',
-    textDecoration: 'none',
-    background: 'inherit',
-  };
-
-  return (
-    <NavLink to={path} style={ ({ isActive }) => (isActive ? activeStyle : regularStyle)} >
-      {menuItem}
-    </NavLink>
-  );
+const navItemActiveStyle = {
+  color: 'inherit',
+  textDecoration: 'underline',
+  background: 'lightgrey',
 };
 
-const AddMenuItem = ({ icon, title }: IMenuItem) => (
-      <MenuItem
-        sx={{
-          background: 'inherit',
-        }}>
+const navItemRegularStyle = {
+  color: 'inherit',
+  textDecoration: 'none',
+  background: 'inherit',
+};
+
+function NavItem({ path, title, icon }: INavItem) {
+  return (
+    <NavLink
+      to={path}
+      style={({ isActive }) => (isActive ? navItemActiveStyle : navItemRegularStyle)}
+    >
+      <MenuItem sx={{ background: 'inherit' }}>
         <ListItemIcon>
           {icon}
         </ListItemIcon>
@@ -63,63 +55,35 @@ const AddMenuItem = ({ icon, title }: IMenuItem) => (
           {title}
         </Typography>
       </MenuItem>
-);
+  </NavLink>
+  );
+}
 
-function createMenuList() {
-  const MenuItemsList = [
-    {
-      path: 'timetable',
-      title: 'Расписание',
-      icon: <CalendarMonthIcon />,
-    },
-    {
-      path: 'attendances',
-      title: 'Посещения',
-      icon: <DomainVerificationIcon />,
-    },
-    {
-      path: 'lessons',
-      title: 'Занятия',
-      icon: <ListAltIcon />,
-    },
-    {
-      path: 'students',
-      title: 'Ученики',
-      icon: <GroupIcon />,
-    },
-    {
-      path: 'subscriptions/templates',
-      title: 'Абонементы',
-      icon: <CardMembershipIcon />,
-    },
-    {
-      path: 'finance',
-      title: 'Финансы',
-      icon: <CurrencyRubleIcon />,
-    },
-    {
-      path: 'users',
-      title: 'Сотрудники',
-      icon: <AccountBoxIcon />,
-    },
-  ];
+function NavMenuList() {
+  const isMobile = useMobile();
+  const width = useAppSelector((state) => state.appMenuReducer.width);
 
   return (
-    MenuItemsList.map((elem) => <NavItem
-        key={elem.path}
-        path={elem.path}
-        menuItem={ <AddMenuItem icon={elem.icon} title={elem.title} /> }
-      />)
+    <MenuList sx={{ width: isMobile ? 'auto' : `${width}px` }}>
+      <NavItem path="/" title="Главная" icon={<HomeIcon />} />
+      <NavItem path="/timetable" title="Расписание" icon={<CalendarMonthIcon />} />
+      <NavItem path="/attendances" title="Посещения" icon={<DomainVerificationIcon />} />
+      <NavItem path='/lessons' title="Занятия" icon={<ListAltIcon />} />
+      <NavItem path='/students' title="Ученики" icon={<GroupIcon />} />
+      <NavItem path='/subscriptions/templates' title="Абонементы" icon={<CardMembershipIcon />} />
+      <NavItem path='/finance' title="Финансы" icon={<CurrencyRubleIcon />} />
+      <NavItem path='/users' title="Сотрудники" icon={<AccountBoxIcon />} />
+    </MenuList>
   );
 }
 
 export function MobileMenuIcon() {
-  const dispatch = useAppDispatch();
+  const actions = useActionCreators(appMenuActions);
 
   return (
     <IconButton
       id="openMenuBtn"
-      onClick={(event) => dispatch(setMobileMenuAnchorEl(event.currentTarget.id))}
+      onClick={(event) => actions.setMobileMenuAnchorEl(event.currentTarget.id)}
       size="large"
       edge="start"
       color="inherit"
@@ -132,41 +96,39 @@ export function MobileMenuIcon() {
 }
 
 export function MobileMenu() {
-  const anchorEl = useAppSelector((state) => state.menuReducer.mobileMenuAnchorEl);
-  const dispatch = useAppDispatch();
+  const anchorEl = useAppSelector((state) => state.appMenuReducer.mobileMenuAnchorEl);
+  const actions = useActionCreators(appMenuActions);
 
   const handleClose = () => {
-    dispatch(setMobileMenuAnchorEl(null));
+    actions.setMobileMenuAnchorEl(null);
   };
 
+  const isOpen = anchorEl !== null;
+
   return (
-    <Menu open={Boolean(anchorEl)} anchorEl={document.querySelector(`#${anchorEl}`)} onClose={handleClose}>
-      <MenuList>
-        { createMenuList() }
-      </MenuList>
+    <Menu open={isOpen} onClose={handleClose} anchorEl={document.querySelector(`#${anchorEl}`)}>
+      <NavMenuList />
     </Menu>
   );
 }
 
 export function DesktopMenuIcon() {
-  const width = useAppSelector((state) => state.menuReducer.width);
-  const dispatch = useAppDispatch();
+  const width = useAppSelector((state) => state.appMenuReducer.width);
+  const actions = useActionCreators(appMenuActions);
+
+  const isSmallWidth = width === MenuWidth.SMALL;
+  const changeWidth = () => (isSmallWidth ? actions.setFullWidth() : actions.setSmallWidth());
 
   return (
-    <Stack width={width} alignItems={width === 200 ? 'end' : 'start'}>
-      <IconButton onClick={ () => { dispatch(width === 200 ? setSmallWidth() : setFullWidth()); }} >
-        {width === 200 ? <ArrowBackIosIcon fontSize='large' htmlColor='#fff' /> : <ArrowForwardIosIcon fontSize='large' htmlColor='#fff' />}
+    <Stack width={width} alignItems={isSmallWidth ? 'start' : 'end'}>
+      <IconButton onClick={changeWidth}>
+        {isSmallWidth && <ArrowForwardIosIcon fontSize='large' htmlColor='#fff' />}
+        {!isSmallWidth && <ArrowBackIosIcon fontSize='large' htmlColor='#fff' />}
       </IconButton>
     </Stack>
   );
 }
 
 export function SideMenu() {
-  const width = useAppSelector((state) => state.menuReducer.width);
-
-  return (
-    <MenuList sx={{ width: `${width}px` }}>
-      { createMenuList() }
-    </MenuList>
-  );
+  return <NavMenuList />;
 }

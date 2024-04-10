@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
@@ -8,45 +8,37 @@ import Avatar from '@mui/material/Avatar';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useLoginMutation } from '../../shared/api';
 import { useMobile } from '../../shared/hooks/useMobile';
-import { useActionCreators } from '../../shared/hooks/useActionCreators';
-import { authActions } from '../../shared/reducers/authSlice';
 import { PasswordField } from '../../shared/components/fields/PasswordField';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { FormContentColumn } from '../../shared/components/FormContentColumn';
+import { useActionCreators } from '../../shared/hooks/useActionCreators';
+import { authActions } from '../../shared/reducers/authSlice';
 
 export default function AuthPage() {
   const isMobile = useMobile();
   const navigate = useNavigate();
   const actions = useActionCreators(authActions);
-  const [hasError, setError] = useState(false);
 
   const [login, {
-    data: responseLogin, isSuccess, isError, error, isLoading,
+    data: auth, isSuccess, isError, error, isLoading,
   }] = useLoginMutation();
 
   useEffect(() => {
-    if (isSuccess && responseLogin?.token) {
-      actions.setToken(responseLogin?.token);
+    if (!isSuccess || !auth?.token) return;
 
-      navigate('/');
-    }
+    actions.setToken(auth.token);
 
-    if (isError) {
-      console.error(error);
-      setError(true);
-    }
-  }, [isSuccess, isError]);
+    navigate('/');
+  }, [isSuccess]);
+
+  if (isError) {
+    console.error(error);
+  }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    setError(false);
-
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
 
-    console.log({
-      login: data.get('login'),
-      password: data.get('password'),
-    });
+    const data = new FormData(event.currentTarget);
 
     login({
       login: data.get('login') as string,
@@ -93,7 +85,7 @@ export default function AuthPage() {
                 fullWidth: true,
               }}
             />
-            {hasError && <FormHelperText error>
+            {isError && <FormHelperText error>
               Не удалось. Проверьте правильность и попробуйте ещё раз.
             </FormHelperText>
             }

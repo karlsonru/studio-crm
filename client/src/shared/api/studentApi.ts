@@ -1,22 +1,15 @@
-import {
-  basicApi,
-  injectGetOne,
-  injectGetAll,
-  injectCreate,
-  injectPatch,
-  injectDelete,
-  injectFind,
-} from './basicApi';
+import { api } from './basicApi';
 import { IStudentModel, IStudentModalCreate } from '../models/IStudentModel';
 
 const tag = 'Student';
 const route = 'student';
 
-basicApi.enhanceEndpoints({ addTagTypes: [tag] });
+api.addTagTypes(tag);
 
-export const { useGetStudentQuery } = injectGetOne<IStudentModel>('getStudent', tag, route);
-export const { useGetStudentsQuery } = injectGetAll<IStudentModel>('getStudents', tag, route);
-export const { useFindStudentsQuery } = injectFind<IStudentModel>('findStudents', tag, route);
-export const { useCreateStudentMutation } = injectCreate<IStudentModel, IStudentModalCreate>('createStudent', tag, route);
-export const { usePatchStudentMutation } = injectPatch<IStudentModel, IStudentModalCreate>('patchStudent', tag, route);
-export const { useDeleteStudentMutation } = injectDelete('deleteStudent', tag, route);
+export const { useGetStudentQuery } = api.injectGetOne<IStudentModel>('getStudent', tag, route);
+export const { useGetStudentsQuery } = api.injectGetAll<IStudentModel>('getStudents', tag, route);
+export const { useFindStudentsQuery } = api.injectFind<IStudentModel>('findStudents', tag, route);
+export const { useFindWithParamsStudentsQuery } = api.injectFindWithParams<IStudentModel>('findWithParamsStudents', tag, route);
+export const { useCreateStudentMutation } = api.injectCreate<IStudentModel, IStudentModalCreate>('createStudent', tag, route);
+export const { usePatchStudentMutation } = api.injectPatch<IStudentModel, IStudentModalCreate>('patchStudent', tag, route);
+export const { useDeleteStudentMutation } = api.injectDelete('deleteStudent', tag, route);

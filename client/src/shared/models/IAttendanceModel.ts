@@ -2,7 +2,7 @@ import { IUserModel } from './IUserModel';
 import { ILessonModel, VisitType } from './ILessonModel';
 import { IStudentModel } from './IStudentModel';
 
-export enum BillingStatus {
+export enum PaymentStatus {
   PAID = 'paid',
   UNPAID = 'unpaid',
   UNCHARGED = 'uncharged',
@@ -11,20 +11,28 @@ export enum BillingStatus {
 export enum VisitStatus {
   UNKNOWN = 'unknown',
   VISITED = 'visited',
-  POSTPONED = 'postponed',
   MISSED = 'missed',
   SICK = 'sick',
+  POSTPONED_FUTURE = 'postponed_future',
+  POSTPONED_DONE = 'postponed_done',
 }
 
-interface IVisit {
+export enum AttendanceType {
+  DONE = 'done',
+  FUTURE = 'future',
+}
+
+export interface IAttendanceDetails {
   student: IStudentModel;
   visitStatus: VisitStatus;
-  billingStatus: BillingStatus;
+  paymentStatus: PaymentStatus;
   visitType: VisitType;
   subscription: string;
+  visitInstead?: string;
+  visitInsteadDate?: number;
 }
 
-interface IVisitCreate extends Omit<IVisit, 'student' | 'subscription' | 'billingStatus'> {
+interface IAttendanceDetailsCreate extends Omit<IAttendanceDetails, 'student' | 'subscription' | 'paymentStatus'> {
   student: string;
 }
 
@@ -32,16 +40,18 @@ export interface IAttendanceModel {
   _id: string;
   lesson: ILessonModel;
   teacher: IUserModel;
-  day: number;
+  type: AttendanceType;
+  weekday: number;
   date: number; // UTC Timestamp
-  students: Array<IVisit>,
+  students: Array<IAttendanceDetails>,
 }
 
-export interface IAttendanceModelCreate extends Omit<IAttendanceModel, '_id' | 'lesson' | 'teacher' | 'students' | 'date'> {
+export interface IAttendanceModelCreate extends Omit<IAttendanceModel, '_id' | 'lesson' | 'teacher' | 'students' | 'date' | 'type'> {
   lesson: string;
   teacher: string;
-  students: Array<IVisitCreate>
+  students: Array<IAttendanceDetailsCreate>
   year: number;
   month: number;
+  day: number;
   weekday: number;
 }

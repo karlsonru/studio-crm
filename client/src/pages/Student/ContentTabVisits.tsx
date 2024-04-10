@@ -7,6 +7,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useNavigate } from 'react-router-dom';
 import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
 import { useFindSubscriptionsQuery, useGetVisitedLessonsStatisticByStudentQuery } from '../../shared/api';
 import { BasicTableWithTitleAndButton, CreateRow, CreateRowWithCollapse } from '../../shared/components/BasicTable';
@@ -17,6 +18,7 @@ import { IStudentModel } from '../../shared/models/IStudentModel';
 import { CardContentItem } from '../../shared/components/CardContentItem';
 import { getVisitStatusName } from '../../shared/helpers/getVisitStatusName';
 import { getBillingStatusNameAndColor } from '../../shared/helpers/getBillingStatusNameAndColor';
+import { getYearMonthDay } from '../../shared/helpers/getYearMonthDay';
 
 interface IVisitsStatistic {
   statistic: Record<string, number>;
@@ -66,13 +68,14 @@ function VisitsStatistic({ statistic, startPeriod }: IVisitsStatistic) {
 
 interface ICreateRows {
   key: string;
-  contentDesktop: Array<string | number>;
+  contentDesktop: Array<string | number | React.ReactNode>;
   contentMobile: Array<string | number>;
   contentCollapsed: Array<React.ReactNode>;
+  callback?: () => void;
 }
 
 function CreateRows({
-  key, contentDesktop, contentMobile, contentCollapsed,
+  key, contentDesktop, contentMobile, contentCollapsed, callback,
 }: ICreateRows) {
   const isMobile = useMobile();
 
@@ -90,6 +93,9 @@ function CreateRows({
     <CreateRow
       key={key}
       content={contentDesktop}
+      props={{
+        onDoubleClick: callback,
+      }}
     />
   );
 }
@@ -99,6 +105,7 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
   const today = getTodayTimestamp();
   const [showMoreVisits, setShowMoreVisits] = useState(false);
   const [showMoreSubscriptions, setShowMoreSubscriptions] = useState(false);
+  const navigate = useNavigate();
 
   const startPeriodLessons = showMoreVisits ? 0 : subMonths(today, 3).getTime();
 
@@ -149,8 +156,13 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
       // с backend'а всегда возвращается массив с 1 студентом по которому делали запрос
       const studentVisit = visitedLesson.students[0];
 
-      const billingStatusName = getBillingStatusNameAndColor(studentVisit.billingStatus).name;
+      const {
+        name: billingStatusName,
+        color: billigStatusColor,
+      } = getBillingStatusNameAndColor(studentVisit.paymentStatus);
       const visitStatusName = getVisitStatusName(studentVisit.visitStatus);
+
+      const { year, month, day } = getYearMonthDay(visitedLesson.date);
 
       return (
         <CreateRows
@@ -159,16 +171,25 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
             visitedLesson.lesson.title,
             format(visitedLesson.date, 'EEEE, dd-MM-YYY', { locale: ru }),
             visitStatusName,
-            billingStatusName,
+            <Typography sx={{ color: billigStatusColor }}>{billingStatusName}</Typography>,
           ]}
           contentMobile={[
             visitedLesson.lesson.title,
             format(visitedLesson.date, 'EEEE, dd-MM-YYY', { locale: ru }),
           ]}
           contentCollapsed={[
-            <CardContentItem title={'Посещение'} value={visitStatusName} props={{ width: '100%' }} />,
-            <CardContentItem title={'Оплата'} value={billingStatusName} props={{ width: '100%' }} />,
+            <CardContentItem
+              title={'Посещение'}
+              value={visitStatusName}
+              props={{ width: '100%' }}
+            />,
+            <CardContentItem
+              title={'Оплата'}
+              value={<Typography sx={{ color: billigStatusColor }}>{billingStatusName}</Typography>}
+              props={{ width: '100%' }}
+            />,
           ]}
+          callback={() => navigate(`/attendances?lessonId=${visitedLesson.lesson._id}&year=${year}&month=${month + 1}&day=${day}`)}
         />
       );
     });

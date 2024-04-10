@@ -4,7 +4,7 @@ import { Toolbar, Typography } from '@mui/material';
 import { useAppSelector } from '../hooks/useAppSelector';
 
 export function AppHeader({ menuIcon }: { menuIcon: ReactNode }) {
-  const title = useAppSelector((state) => state.menuReducer.title);
+  const title = useAppSelector((state) => state.appMenuReducer.title);
 
   return (
     <AppBar position="static">

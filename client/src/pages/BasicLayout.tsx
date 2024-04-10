@@ -1,14 +1,17 @@
+import { useEffect } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Stack from '@mui/material/Stack';
 import { Outlet, Navigate } from 'react-router-dom';
-import { AppHeader } from 'shared/components/AppHeader';
-import { useAppSelector } from 'shared/hooks/useAppSelector';
+import { AppHeader } from '../shared/components/AppHeader';
 import {
   SideMenu,
   MobileMenu,
   MobileMenuIcon,
   DesktopMenuIcon,
 } from '../shared/components/Menu';
+import { useAppSelector } from '../shared/hooks/useAppSelector';
+import { useActionCreators } from '../shared/hooks/useActionCreators';
+import { authActions } from '../shared/reducers/authSlice';
 // import { StickyFooter } from '../components/StickyFooter';
 
 export function Layout() {
@@ -20,7 +23,7 @@ export function Layout() {
       <Stack direction={isMobile ? 'column' : 'row'} spacing={1} >
         {isMobile && <MobileMenu />}
         {!isMobile && <SideMenu />}
-        <Stack direction='column' p={isMobile ? 1 : 2} overflow='hidden' width={isMobile ? 'auto' : '100%'}>
+        <Stack direction='column' p={isMobile ? 1 : 2} overflow='auto' width={isMobile ? 'auto' : '100%'}>
           <Outlet />
         </Stack>
       </Stack>
@@ -29,7 +32,15 @@ export function Layout() {
 }
 
 export function ProtectedLayout() {
-  const token = useAppSelector((state) => state.authReducer.token) ?? true;
+  const token = useAppSelector((state) => state.authReducer.token);
+  const actions = useActionCreators(authActions);
+
+  useEffect(() => {
+    const removeToken = () => actions.setToken(null);
+
+    window.addEventListener('remove-token', removeToken);
+    return () => window.removeEventListener('remove-token', removeToken);
+  }, []);
 
   if (!token) {
     return <Navigate to='/auth' replace={true} />;

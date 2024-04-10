@@ -11,13 +11,15 @@ import {
   Query,
   UseInterceptors,
   HttpCode,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { LessonService, action } from './lesson.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
-import { ValidateIdPipe } from '../shared/validaitonPipe';
+import { ValidateIdPipe, ValidateOptionalNumberPipe } from '../shared/validaitonPipe';
 import { LessonModel } from '../schemas';
 import { MongooseClassSerializerInterceptor } from '../shared/mongooseClassSerializer.interceptor';
+import { Request } from 'express';
 
 @Controller('lesson')
 @UseInterceptors(MongooseClassSerializerInterceptor(LessonModel))
@@ -26,8 +28,6 @@ export class LessonController {
 
   @Post()
   async create(@Body() createLessonDto: CreateLessonDto) {
-    console.log('Create lesson dto');
-    console.log(createLessonDto);
     const created = await this.service.create(createLessonDto);
 
     if (created === null) {
@@ -37,9 +37,44 @@ export class LessonController {
     return created;
   }
 
+  @Get('available-for-visit-instead/:id')
+  async findAvailableForVisitInstead(
+    @Param('id', ValidateIdPipe) id: string,
+    @Query('studentId') studentId: string,
+    @Query('dateFrom', ParseIntPipe) dateFrom: number,
+  ) {
+    const query = {
+      dateFrom: { $lte: dateFrom },
+      dateTo: { $gte: dateFrom },
+      _id: { $ne: id },
+      students: { $not: { $elemMatch: { student: studentId } } },
+    };
+
+    return await this.service.findAll(query);
+  }
+
   @Get()
-  async findAll(@Query('filter') filter?: string) {
-    return await this.service.findAll(filter ? JSON.parse(filter) : {});
+  async findAll(
+    @Query('weekday') weekday?: number,
+    @Query('dateFrom') dateFrom?: number,
+    @Query('dateTo') dateTo?: number,
+    @Query('filter') filter?: string,
+  ) {
+    const query: Record<string, string | number | Record<string, string | number>> = {};
+
+    if (weekday) {
+      query.weekday = weekday;
+    }
+
+    if (dateFrom) {
+      query.dateFrom = { $lte: dateFrom };
+    }
+
+    if (dateTo) {
+      query.dateTo = { $gte: dateTo };
+    }
+
+    return await this.service.findAll(filter ? JSON.parse(filter) : query);
   }
 
   @Get(':id')

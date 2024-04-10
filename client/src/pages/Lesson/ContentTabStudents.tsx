@@ -8,19 +8,33 @@ import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import SyncIcon from '@mui/icons-material/Sync';
-import { ChangeTeacherDialog } from './ChangeTeacherDialog';
 import { usePatchLessonStudentsMutation } from '../../shared/api';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
 import { AddStudentButton, AddStudentsDialog } from './AddStudentDialog';
-import { ILessonModel, IVisitingStudent } from '../../shared/models/ILessonModel';
+import { ILessonModel, IVisitingStudent, VisitType } from '../../shared/models/ILessonModel';
 import { CardWrapper } from '../../shared/components/CardWrapper';
 import { CardContentItem } from '../../shared/components/CardContentItem';
 import { getVisitTypeName } from '../../shared/helpers/getVisitTypeName';
 import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
+import { ChangeTeacherDialog } from '../../shared/components/ChangeTeacherDialog';
 
 interface IStudentCard {
   lessonId: string;
   visiting: IVisitingStudent;
+}
+
+function getBorderStyle(visitType: VisitType, isOutdated: boolean) {
+  const borderStyle = {
+    outdated: { borderColor: 'error.main', opacity: 0.5 },
+    single: { borderColor: 'warning.main', opacity: 0.75 },
+    default: { borderColor: 'rgba(0, 0, 0, 0.12)', opacity: 1 },
+  };
+
+  if (visitType === VisitType.REGULAR) return borderStyle.default;
+
+  if (isOutdated) return borderStyle.outdated;
+
+  return borderStyle.single;
 }
 
 function StudentCard({ lessonId, visiting }: IStudentCard) {
@@ -42,15 +56,11 @@ function StudentCard({ lessonId, visiting }: IStudentCard) {
     : `${getVisitTypeName(visiting.visitType)} ${format(visiting.date, 'dd.MM')}`;
 
   const isOutdated = visiting.date !== null && visiting.date < getTodayTimestamp();
+  const borderStyle = getBorderStyle(visiting.visitType, isOutdated);
 
   return (
     <>
-      <CardWrapper
-        extraStyle={{
-          borderColor: isOutdated ? 'error.main' : 'rgba(0, 0, 0, 0.12)',
-          opacity: isOutdated ? 0.5 : 1,
-        }}
-      >
+      <CardWrapper extraStyle={borderStyle}>
         <CardHeader
           title={visiting.student.fullname}
           action={

@@ -1,11 +1,18 @@
-import { DataGrid, GridColDef, GridValueFormatterParams } from '@mui/x-data-grid';
+import {
+  DataGrid,
+  GridColDef,
+  GridRowParams,
+  GridValueFormatterParams,
+} from '@mui/x-data-grid';
+import { useNavigate } from 'react-router-dom';
 import { useMobile } from '../../../shared/hooks/useMobile';
 import { useGetSubscriptionsQuery } from '../../../shared/api';
 import { CustomGridToolbar } from '../../../shared/components/CustomGridToolbar';
 import { dateValueFormatter } from '../../../shared/helpers/dateValueFormatter';
 import { SearchParamsButton } from '../../../shared/components/buttons/SearchParamsButton';
-import { CreateSubscriptionModal } from '../../../shared/components/modals/CreateSubscriptionModal';
 import { ISubscriptionModel } from '../../../shared/models/ISubscriptionModel';
+import { Loading } from '../../../shared/components/Loading';
+import { ShowError } from '../../../shared/components/ShowError';
 
 const leftAlignNumberColumn: Partial<GridColDef> = {
   type: 'number',
@@ -15,7 +22,7 @@ const leftAlignNumberColumn: Partial<GridColDef> = {
 };
 
 function getColumns(isMobile: boolean) {
-  const columns: GridColDef[] = [
+  const columns: GridColDef<ISubscriptionModel>[] = [
     {
       field: 'student',
       headerName: 'Ученик',
@@ -24,17 +31,14 @@ function getColumns(isMobile: boolean) {
         params.value.fullname
       ),
     },
-    // eslint-disable-next-line max-len
-    // Посещено занятий по абонементу? Запрос к другой коллекции базы с фильтрацией? Доп.поле к этому абонементу?
     {
-      field: 'visits',
+      field: 'visitsTotal',
       headerName: 'Занятий',
       ...leftAlignNumberColumn,
     },
     {
-      field: 'duration',
-      headerName: 'Длительность',
-      valueFormatter: (params) => Math.floor(params.value / 86_400_000),
+      field: 'visitsLeft',
+      headerName: 'Осталось',
       ...leftAlignNumberColumn,
     },
     {
@@ -69,25 +73,37 @@ function getColumns(isMobile: boolean) {
 
 export function SubscriptionContent() {
   const isMobile = useMobile();
+  const navigate = useNavigate();
 
-  const { data } = useGetSubscriptionsQuery();
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+  } = useGetSubscriptionsQuery();
 
-  if (!data) return <h1>Is loading ...</h1>;
+  if (isLoading) {
+    return <Loading />;
+  }
+
+  if (isError) {
+    return <ShowError details={error} />;
+  }
 
   const columns = getColumns(isMobile);
 
   const ExtendedToolbar = () => (
     CustomGridToolbar([
       <SearchParamsButton title="Оформить" param="create-subscription" />,
-      <CreateSubscriptionModal />,
     ])
   );
 
   return <DataGrid
     autoHeight
     columns={columns}
-    rows={data}
+    rows={data ?? []}
     getRowId={(item) => item._id}
+    onRowDoubleClick={(params: GridRowParams<ISubscriptionModel>) => navigate(`/subscriptions/${params.id}`)}
     disableColumnMenu
     components={{
       Toolbar: ExtendedToolbar,

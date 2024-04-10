@@ -1,11 +1,11 @@
 import Button, { ButtonProps } from '@mui/material/Button';
 
-interface IPrimaryButton {
+interface IButton {
   content: string;
   props?: ButtonProps;
 }
 
-export function PrimaryButton({ content, props }: IPrimaryButton) {
+export function PrimaryButton({ content, props }: IButton) {
   return (
     <Button
       variant='contained'

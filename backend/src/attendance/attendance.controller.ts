@@ -10,29 +10,18 @@ import {
   HttpStatus,
   Query,
   HttpCode,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { CreateAttendanceDto } from './dto/create-attendance.dto';
-import { UpdateAttendanceDto } from './dto/update-attendance.dto';
-import { ValidateIdPipe } from '../shared/validaitonPipe';
-
-/** 
-TODO: перенести логику списания абонемента в контроллер. 
-AttendanceService отвечает за создание занятие 
-SubscriptionCharge (AttendanceCharge, AttendancePaymentService ?) отвечает за списание абонементов по посещению
-
-Транзакция --> 
-
-То есть:
-- поиск абонементов подходящих для занятия   
-- добавление абонемента к студенту
-- списание занятия с абонемента
-- добавление статуса оплаты студента
-- удаление студента из lesson в случае если занятие однократное
-
-<-- 
-
-*/
+import {
+  UpdateAttendanceDto,
+  UpdateAttendanceDtoSchemaAdapter,
+  UpdatedVisitedStudent,
+} from './dto/update-attendance.dto';
+import { ValidateIdPipe, ValidateOptionalNumberPipe } from '../shared/validaitonPipe';
+import { PaymentStatus, VisitStatus } from '../schemas/attendance.schema';
+import { CreateAttendanceDtoSchemaAdapter } from './createAttendanceDtoSchemaAdapter';
 
 @Controller('attendances')
 export class AttendanceController {
@@ -40,18 +29,9 @@ export class AttendanceController {
 
   @Post()
   async create(@Body() createAttendanceDto: CreateAttendanceDto) {
-    // время занятия сохраняем в UTC
-    const timestamp = Date.UTC(
-      createAttendanceDto.year,
-      createAttendanceDto.month - 1,
-      createAttendanceDto.day,
+    const created = await this.service.create(
+      new CreateAttendanceDtoSchemaAdapter(createAttendanceDto),
     );
-
-    const created = await this.service.create({
-      ...createAttendanceDto,
-      date: timestamp,
-      day: createAttendanceDto.weekday,
-    });
 
     if (created === null) {
       throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
@@ -63,18 +43,71 @@ export class AttendanceController {
   @Get()
   async findAll(
     @Query('filter') filter: string,
-    @Param('year') year?: number,
-    @Param('month') month?: number,
-    @Param('day') day?: number,
+    @Query('lessonId') lessonId?: string,
+    @Query('year', ValidateOptionalNumberPipe) year?: number,
+    @Query('month', ValidateOptionalNumberPipe) month?: number,
+    @Query('day', ValidateOptionalNumberPipe) day?: number,
+    @Query('subscriptionId') subscriptionId?: string,
+    @Query('dateFrom', ValidateOptionalNumberPipe) dateFrom?: number,
+    @Query('dateTo', ValidateOptionalNumberPipe) dateTo?: number,
   ) {
-    const parsedQuery = JSON.parse(filter);
-
-    // если в запросе переаны параметры даты, то узнаём UTC timestamp занятия и добавляем его к запросу
-    if (year && month && day) {
-      parsedQuery.date = Date.UTC(year, month, day);
+    if (filter) {
+      return await this.service.findAll(JSON.parse(filter));
     }
 
-    return await this.service.findAll(parsedQuery);
+    const query: Record<string, string | number | Record<string, string | number>> = {};
+
+    if (lessonId) {
+      query['lesson'] = lessonId;
+    }
+
+    if (year && month && day) {
+      query.date = Date.UTC(year, month - 1, day);
+    }
+
+    if (subscriptionId) {
+      query['students.subscription'] = subscriptionId;
+    }
+
+    if (dateFrom) {
+      query.date = { $gte: dateFrom };
+    }
+
+    if (dateTo) {
+      query.date = { $lte: dateTo };
+    }
+
+    return await this.service.findAll(query);
+  }
+
+  @Get('/unpaid')
+  async findAllUnpaid(@Query('days', ParseIntPipe) days: number) {
+    const today = new Date();
+    const searchDate = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() - days);
+
+    return await this.service.findAll({
+      date: { $gte: searchDate, $lte: today.getTime() },
+      students: {
+        $elemMatch: {
+          paymentStatus: PaymentStatus.UNPAID,
+        },
+      },
+    });
+  }
+
+  @Get('/postponed')
+  async findAllPostponed(@Query('days', ParseIntPipe) days: number) {
+    const today = new Date();
+    const searchDate = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() - days);
+
+    return await this.service.findAll({
+      date: { $gte: searchDate, $lte: today.getTime() },
+      students: {
+        $elemMatch: {
+          visitStatus: VisitStatus.POSTPONED_FUTURE,
+        },
+      },
+    });
   }
 
   @Get(':id')
@@ -88,12 +121,39 @@ export class AttendanceController {
     return candidate;
   }
 
+  @Patch(':id/student/:studentId/:action')
+  async updateAttendnceStudentById(
+    @Param('id', ValidateIdPipe) id: string,
+    @Param('studentId', ValidateIdPipe) studentId: string,
+    @Param('action') action: 'add' | 'remove',
+    @Body() updateAttendanceStudentDto: UpdatedVisitedStudent,
+  ) {
+    const updated = await this.service.updateAttendnedStudentById(
+      id,
+      studentId,
+      updateAttendanceStudentDto,
+      action,
+    );
+
+    if (updated === null) {
+      throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
+    }
+
+    return updated;
+  }
+
   @Patch(':id')
   async update(
     @Param('id', ValidateIdPipe) id: string,
     @Body() updateAttendanceDto: UpdateAttendanceDto,
   ) {
-    const updated = await this.service.update(id, updateAttendanceDto);
+    console.log('updateAttendanceDto');
+    console.log(updateAttendanceDto);
+
+    const updated = await this.service.update(
+      id,
+      new UpdateAttendanceDtoSchemaAdapter(updateAttendanceDto),
+    );
 
     if (updated === null) {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);

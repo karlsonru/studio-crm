@@ -17,7 +17,7 @@ import { VisitType } from '../../schemas/attendance.schema';
 class Time implements ITime {
   @IsNumber()
   @Min(0)
-  @Max(59)
+  @Max(24)
   hh: number;
 
   @IsNumber()
@@ -40,6 +40,11 @@ export class VisitingStudent {
   @IsNumber()
   @Min(0)
   date: null | number;
+
+  @IsOptional()
+  @IsString()
+  @IsMongoId()
+  visitInstead?: string | null;
 }
 
 export class CreateLessonDto {
@@ -59,7 +64,7 @@ export class CreateLessonDto {
   location: string;
 
   @IsNumber()
-  day: number;
+  weekday: number;
 
   @ValidateNested()
   @Type(() => Time)

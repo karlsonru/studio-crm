@@ -1,5 +1,6 @@
 import { createBrowserRouter, createRoutesFromElements, Route } from 'react-router-dom';
 import { ProtectedLayout } from './pages/BasicLayout';
+import { MainPage } from './pages/Main';
 import { AuthPage } from './pages/Auth';
 import { UsersPage } from './pages/Users';
 import { UserPage } from './pages/User';
@@ -11,7 +12,12 @@ import { StudentsPage } from './pages/Students';
 import { StudentPage } from './pages/Student';
 import { NotFoundPage } from './pages/NotFound';
 import { FinancePage } from './pages/Finance';
-import { SubscriptionsPageLayout, SubscriptionsTemplatePage, SubscriptionsPage } from './pages/Subscriptions';
+import {
+  SubscriptionsPageLayout,
+  SubscriptionsTemplatePage,
+  SubscriptionsPage,
+  SubscriptionPage,
+} from './pages/Subscriptions';
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -19,6 +25,8 @@ export const router = createBrowserRouter(
       <Route path='/auth' element={<AuthPage />} />
 
       <Route path='/' element={<ProtectedLayout />} >
+
+        <Route path='/' element={<MainPage />} />
 
         <Route path='/timetable' element={<TimetablePage />} />
 
@@ -36,7 +44,8 @@ export const router = createBrowserRouter(
 
         <Route path='/subscriptions' element={<SubscriptionsPageLayout />} >
           <Route index element={<SubscriptionsPage />} />
-          <Route path=':templates' element={<SubscriptionsTemplatePage />} />
+          <Route path='/subscriptions/templates' element={<SubscriptionsTemplatePage />} />
+          <Route path=':subscriptionId' element={<SubscriptionPage />} />
         </Route>
 
         <Route path='/users'>

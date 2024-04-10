@@ -1,14 +1,14 @@
 import { useEffect } from 'react';
-import { useAppDispatch } from './useAppDispatch';
-import { setPageTitle } from '../reducers/appMenuSlice';
+import { useActionCreators } from './useActionCreators';
+import { appMenuActions } from '../reducers/appMenuSlice';
 
 export function useTitle(title?: string) {
-  const dispatch = useAppDispatch();
+  const actions = useActionCreators(appMenuActions);
 
   useEffect(() => {
     if (!title) return;
 
     document.title = title;
-    dispatch(setPageTitle(title));
+    actions.setPageTitle(title);
   }, [title]);
 }

@@ -54,9 +54,9 @@ export class LessonService {
 
     if (action === 'remove') {
       logger.debug(`
-        Занятие ${id}. Удаление ${
+        Занятие с ID ${id}. Удаление ${
         updateLessonDto.students.filter((student) => student).length
-      } студентов: ${updateLessonDto.students}
+      } студентов c ID: ${updateLessonDto.students}
       `);
 
       if (!updateLessonDto.students.filter((student) => student).length) return null;
@@ -75,14 +75,16 @@ export class LessonService {
     // в случае добавления нужно убедиться что не добавляем уже имеющихся в занятии студентов
     const lesson = await this.findOne(id);
 
+    if (!lesson) return null;
+
     // соберём ID текущих студентов
-    const actualStudentsIds = lesson?.students.map((visitinStudent) =>
+    const actualStudentsIds = lesson.students.map((visitinStudent) =>
       visitinStudent.student._id.toString(),
     );
 
     // проверим ID каждого будущего студента чтобы его не было в занятии
     const futureStudents = (updateLessonDto.students as Array<VisitingStudent>).filter(
-      (candidate) => !actualStudentsIds?.includes(candidate.student),
+      (candidate) => !actualStudentsIds.includes(candidate.student),
     );
 
     // добавим только отфильтрованных студентов

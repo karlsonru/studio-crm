@@ -32,7 +32,10 @@ interface IAddStudentsDialog {
 }
 
 export function AddStudentsDialog({
-  lesson, isOpen, setModalOpen, date,
+  lesson,
+  isOpen,
+  setModalOpen,
+  date,
 }: IAddStudentsDialog) {
   const [visitType, setVisitType] = useState<VisitType>(VisitType.REGULAR);
   const [visitDate, setVisitDate] = useState(format(date ?? getTodayTimestamp(), 'yyyy-MM-dd'));
@@ -135,9 +138,8 @@ export function AddStudentsDialog({
               fullWidth
             >
               <MenuItem value={VisitType.REGULAR}>Постоянное</MenuItem>
-              <MenuItem value={VisitType.MISSED_REGULAR}>Отработка</MenuItem>
-              <MenuItem value={VisitType.NEW}>Новое</MenuItem>
               <MenuItem value={VisitType.SINGLE}>Однократное</MenuItem>
+              <MenuItem value={VisitType.NEW}>Новое</MenuItem>
             </Select>
         </FormControl>
 

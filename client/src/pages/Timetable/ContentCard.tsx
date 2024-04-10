@@ -29,10 +29,6 @@ const CARD_STYLE_MOBILE = {
 };
 
 const CARD_HEADER_PROPS: CardHeaderProps = {
-  sx: {
-    padding: '0.25rem',
-    backgroundColor: 'lightyellow',
-  },
   titleTypographyProps: {
     fontWeight: 'bold',
     align: 'left',
@@ -51,7 +47,7 @@ const CARD_HEADER_PROPS: CardHeaderProps = {
 const STACK_PROPS: StackProps = {
   direction: 'row',
   alignItems: 'center',
-  spacing: 1,
+  spacing: 0.5,
 };
 
 function calculateDuration(timeStart: ITime, timeEnd: ITime) {
@@ -87,7 +83,6 @@ function formatCardContent(lesson: ILessonModel, step: number, view: 'day' | 'we
     title: lesson.title,
     timeStart: convertTime(lesson.timeStart),
     timeEnd: convertTime(lesson.timeEnd),
-    students: lesson.students.length,
   };
 
   // для размещения в виде Дня подходят авто настройки для стилей
@@ -137,13 +132,18 @@ export function ContentCard({ lesson, step, date }: IContentCard) {
     setAnchorEl(null);
   };
 
+  // отфильтруем только студентов, которые посещают постоянно или посетят в указанную дату
+  const todayStudents = lesson.students.filter(
+    (student) => student.visitType === VisitType.REGULAR || student.date === date,
+  );
+
   const formattedContent = useMemo(
     () => formatCardContent(lesson, step ?? 0, view),
     [view, lesson._id, step],
   );
 
   const {
-    title, timeStart, timeEnd, students,
+    title, timeStart, timeEnd,
   } = formattedContent.content;
 
   const showDetails = () => {
@@ -164,7 +164,7 @@ export function ContentCard({ lesson, step, date }: IContentCard) {
       >
         <CardHeader
           title={
-            <TitleWithIcon title={title} amount={students} />
+            <TitleWithIcon title={title} amount={todayStudents.length} />
           }
           subheader={
             `${timeStart} - ${timeEnd} ${lesson.teacher.fullname}`
@@ -172,6 +172,7 @@ export function ContentCard({ lesson, step, date }: IContentCard) {
           {...CARD_HEADER_PROPS}
           sx={{
             backgroundColor: lesson.color,
+            padding: '0.25rem',
           }}
         />
         <CardContent sx={{ padding: '0.25rem' }} />
@@ -179,13 +180,7 @@ export function ContentCard({ lesson, step, date }: IContentCard) {
 
       <ContentCardPreview
         anchorEl={anchorEl}
-        content={lesson.students.map((visiting) => {
-          // если визит не постоянный, то покажем студента только если это дата визита
-          if (visiting.visitType !== VisitType.REGULAR) {
-            return visiting.date === date ? visiting.student.fullname : null;
-          }
-          return visiting.student.fullname;
-        })}
+        content={todayStudents.map((visiting) => visiting.student.fullname)}
       />
     </>
   );
