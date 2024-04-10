@@ -7,7 +7,7 @@ Features:
   - [x] edit & update lesson info
   - [x] change lesson teacher & add / remove students from lesson
   - [x] see all active and past subscriptions for this lesson
-  - [ ] support students with single-visit in specific date
+  - [x] support students with single-visit in specific date
 - [x] Students list. View all students, create new one: 
   - [x] edit & update student info
   - [x] see all active and past subscriptions for this student 
@@ -16,10 +16,10 @@ Features:
 - [x] Billing service. Change / return visits from subscriptions based on students visit status.
 - [x] Subscription templates. Template with fixed price and amount of visits. Based on template can checkout new subscription for specific student & lesson. 
 - [x] Subsciptions list. View all subscriptions, create new one.
-  - [ ] edit & update subscription info
+  - [x] edit & update subscription info
 - [x] Employee list. Ability to create & edit employee. History of lessons done by empolyee. History of income done by empolyee. Salary rate. Est. month salary.
 - [ ] Authorization with roles. Currently planned roles for using app: ['owner', 'administrator']
-- [ ] Financial analytics. Income statistics. 
+- [x] Financial analytics. Income statistics. 
 - [ ] Translation & localization.
 
 Instructions:
@@ -27,16 +27,18 @@ Instructions:
 - [ ] Swagger documentation
 
 
-Install dependencies: 
-```npm install```
-```cd backend & npm install```
-```cd client & npm install```
-
-Development mode:
-```npm run dev```
-
 Development instruction:
 * Database: 
   1. Install MongoDB
   2. Create roles in database
   3. Create users with roles
+* Clone repo to working dir
+  1. Install dependencies: 
+    ```npm install```
+    ```cd backend & npm install```
+    ```cd client & npm install```
+  2. Make build 
+  3. Set nginx as proxy 
+
+Development mode:
+```npm run dev```
