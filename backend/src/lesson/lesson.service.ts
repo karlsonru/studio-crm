@@ -100,10 +100,14 @@ export class LessonService {
   }
 
   async update(id: string, updateLessonDto: UpdateLessonDto): Promise<LessonModel | null> {
-    logger.info(`Получен запрос на обновление занятия с ID ${id}`);
-    const updated = await this.lessonModel.findByIdAndUpdate(id, updateLessonDto, {
-      new: true,
-    });
+    logger.info(`
+      Получен запрос на обновление занятия с ID ${id}. 
+      Обновлённые данные ${JSON.stringify(updateLessonDto)}.
+    `);
+
+    const updated = await this.lessonModel.findByIdAndUpdate(id, updateLessonDto, { new: true });
+
+    logger.info(`Занятие с ID ${id} обновлено. Возвращаем обновленные данные: ${updated}`);
 
     return updated;
   }
