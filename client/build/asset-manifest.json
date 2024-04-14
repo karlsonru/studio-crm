@@ -1,0 +1,11 @@
+{
+  "files": {
+    "main.js": "/static/js/main.aa2dc06d.js",
+    "static/media/notFoundPageBackground.webp": "/static/media/notFoundPageBackground.97b4ad2b81f7d3066574.webp",
+    "index.html": "/index.html",
+    "main.aa2dc06d.js.map": "/static/js/main.aa2dc06d.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.aa2dc06d.js"
+  ]
+}

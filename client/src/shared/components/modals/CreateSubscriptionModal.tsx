@@ -26,9 +26,11 @@ import { getTodayTimestamp } from '../../helpers/getTodayTimestamp';
 // TODO ммплементация шаблона с одним занятием
 // TODO проверка есть ли задолженность у ученика
 
+/*
 function ShowDebt() {
   return <></>;
 }
+*/
 
 export function CreateSubscriptionModal() {
   const isMobile = useMobile();
