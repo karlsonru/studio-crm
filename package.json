@@ -5,6 +5,7 @@
   "description": "",
   "scripts": {
     "build": "tsc",
+    "build_client": "npm run build --prefix client",
     "start": "node -r dotenv/config --experimental-specifier-resolution=node .",
     "prestart": "npm run build",
     "server": "npm run start:dev --prefix backend",
