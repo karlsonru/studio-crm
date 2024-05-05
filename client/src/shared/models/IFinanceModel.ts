@@ -5,7 +5,7 @@ export interface IFinanceModel {
   title: string;
   date: number;
   amount: number;
-  type?: string;
+  categoryName?: string;
   location?: Pick<ILocationModel, '_id' | 'title'>;
   comment?: string;
 }

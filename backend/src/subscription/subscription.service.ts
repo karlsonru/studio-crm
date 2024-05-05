@@ -26,9 +26,8 @@ export class SubscriptionService {
     // сначала создадим абонемент
     const created = await this.create(createSubscriptionDto);
 
-    /*
     // ищем неоплаченные занятия по этому студенту
-    const unpaidAttendances = await this.attendancesServices.findUnpiadAttendances(
+    const unpaidAttendances = await this.attendanceService.findUnpiadAttendances(
       createSubscriptionDto.dateFrom,
       createSubscriptionDto.dateTo,
       createSubscriptionDto.student,
@@ -42,7 +41,31 @@ export class SubscriptionService {
       createSubscriptionDto.lessons.includes(attendance.lesson._id.toString()),
     );
 
-    if (!unpaidLessons.length) return created;
+    // TODO транзакция которая:
+    // 1. списывает занятия
+    // 2. находит неоплаченные занятия
+    // 3. помечает занятия как оплаченные
+    // 4. обновляет количество занятий в абоенементе
+
+    /*
+    const transaction = async (session: ClientSession) => {
+      // списываем занятия
+      await Promise.all(
+        unpaidLessons.map((attendance) =>
+          this.attendanceService.updateAttendnedStudentById(
+            attendance._id.toString(),
+            createSubscriptionDto.student,
+            {
+              student: createSubscriptionDto.student,
+              visitStatus: VisitStatus.VISITED,
+              paymentStatus: PaymentStatus.PAID,
+              subscription: created._id.toString(),
+            },
+            'add',
+          ),
+        ),
+      );
+    };
     */
 
     /*

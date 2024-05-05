@@ -9,6 +9,12 @@ export { Location as LocationModel, LocationSchema, LocationDocument } from './l
 export { Finance as FinanceModel, FinanceSchema, FinanceDocument } from './finance.schema';
 
 export {
+  FinanceCategory as FinanceCategoryModel,
+  FinanceCategorySchema,
+  FinanceCategoryDocument,
+} from './finance-category.schema';
+
+export {
   Subscription as SubscriptionModel,
   SubscriptionSchema,
   SubscriptionDocument,

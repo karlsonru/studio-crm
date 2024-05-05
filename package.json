@@ -5,6 +5,7 @@
   "description": "",
   "scripts": {
     "build": "tsc",
+    "build_client": "npm run build --prefix client",
     "start": "node -r dotenv/config --experimental-specifier-resolution=node .",
     "prestart": "npm run build",
     "server": "npm run start:dev --prefix backend",
@@ -28,7 +29,6 @@
     "ts-node": "^10.9.1"
   },
   "dependencies": {
-    "@nestjs/mapped-types": "*",
-    "dotenv": "^16.0.3"
+    "@nestjs/mapped-types": "*"
   }
 }

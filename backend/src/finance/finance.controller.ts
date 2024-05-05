@@ -12,7 +12,7 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { FinanceService } from './finance.service';
-import { CreateFinanceDto } from './dto/create-finance.dto';
+import { CreateFinanceDto, CreateFinanceCategoryDto } from './dto/create-finance.dto';
 import { UpdateFinanceDto } from './dto/update-finance.dto';
 import { ValidateIdPipe } from '../shared/validaitonPipe';
 import { isMongoId } from 'class-validator';
@@ -20,6 +20,28 @@ import { isMongoId } from 'class-validator';
 @Controller('finance')
 export class FinanceController {
   constructor(private readonly financeService: FinanceService) {}
+
+  @Get('/categories')
+  async findAllCategories() {
+    return await this.financeService.findAllCategories();
+  }
+
+  @Post('/categories')
+  async createCategory(@Body() createFinanceCategoryDto: CreateFinanceCategoryDto) {
+    const created = await this.financeService.createCategory(createFinanceCategoryDto);
+
+    return created;
+  }
+
+  @HttpCode(204)
+  @Delete('/categories/:id')
+  async removeCategory(@Param('id', ValidateIdPipe) id: string) {
+    const deleted = await this.financeService.removeCategory(id);
+
+    if (!deleted) {
+      throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);
+    }
+  }
 
   @Post()
   async create(@Body() createFinanceDto: CreateFinanceDto) {
@@ -34,8 +56,17 @@ export class FinanceController {
   }
 
   @Get()
-  async findAll(@Query('filter') filter?: string) {
+  async findAll(
+    @Query('filter') filter?: string,
+    @Query('locationId') locationId?: string,
+    @Query('month') month?: number,
+  ) {
     const query = filter ? JSON.parse(filter) : {};
+
+    if (month) {
+      const year = new Date().getFullYear();
+      query.date = { $gte: Date.UTC(year, month, 1), $lte: Date.UTC(year, month + 1, 1) };
+    }
 
     return await this.financeService.findAll(query);
   }

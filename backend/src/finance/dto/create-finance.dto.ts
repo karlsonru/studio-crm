@@ -1,7 +1,14 @@
-import { IsMongoId, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+
+export class CreateFinanceCategoryDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+}
 
 export class CreateFinanceDto {
   @IsString()
+  @IsNotEmpty()
   title: string;
 
   @IsNumber()
@@ -10,9 +17,8 @@ export class CreateFinanceDto {
   @IsNumber()
   amount: number;
 
-  @IsOptional()
   @IsString()
-  type?: string;
+  categoryName: string;
 
   @IsOptional()
   @IsString()

@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import Table from '@mui/material/Table';
+import Table, { TableProps } from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import TableRow, { TableRowProps } from '@mui/material/TableRow';
@@ -14,7 +14,8 @@ import { PrimaryButton } from './buttons/PrimaryButton';
 
 interface IBasicTable {
   headers: string[],
-  rows: ReactNode[]
+  rows: ReactNode[],
+  props?: TableProps,
 }
 
 interface ICreateRow {
@@ -57,10 +58,10 @@ export function CreateRow({ content, props }: ICreateRow) {
   );
 }
 
-export function BasicTable({ headers, rows }: IBasicTable) {
+export function BasicTable({ headers, rows, props }: IBasicTable) {
   return (
     <TableContainer component={Paper}>
-      <Table>
+      <Table {...props} >
         <TableHead>
           <TableRow>
             { headers.map((header) => <TableCell key={header}>{header}</TableCell>) }

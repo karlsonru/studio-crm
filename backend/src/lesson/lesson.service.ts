@@ -50,7 +50,10 @@ export class LessonService {
     updateLessonDto: UpdateLessonDto,
     action: action,
   ): Promise<LessonModel | null> {
-    logger.info(`Запрос на изменение студентов ${action} занятия с ID ${id}`);
+    logger.info(`
+      Запрос на изменение студентов ${action} занятия с ID ${id}.
+      Полученные данные: ${JSON.stringify(updateLessonDto)}
+    `);
 
     if (action === 'remove') {
       logger.debug(`
@@ -68,6 +71,8 @@ export class LessonService {
       };
 
       const updated = await this.lessonModel.findByIdAndUpdate(id, removeQuery, { new: true });
+
+      logger.info(`Занятие с ID ${id} обновлено. Возвращаем обновленные данные: ${updated}`);
 
       return updated;
     }
@@ -95,6 +100,8 @@ export class LessonService {
     };
 
     const updated = await this.lessonModel.findByIdAndUpdate(id, addQuery, { new: true });
+
+    logger.info(`Занятие с ID ${id} обновлено. Возвращаем обновленные данные: ${updated}`);
 
     return updated;
   }

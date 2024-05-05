@@ -8,3 +8,4 @@ export * from './subscriptionTemplatesApi';
 export * from './attendanceApi';
 export * from './statisticApi';
 export * from './financeApi';
+export * from './financeCategoryApi';
