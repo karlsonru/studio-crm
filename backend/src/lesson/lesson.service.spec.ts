@@ -8,11 +8,7 @@ describe('LessonService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        MongooseModule.forFeature([
-          { name: Lesson.name, schema: LessonSchema },
-        ]),
-      ],
+      imports: [MongooseModule.forFeature([{ name: Lesson.name, schema: LessonSchema }])],
       providers: [LessonService],
     }).compile();
 

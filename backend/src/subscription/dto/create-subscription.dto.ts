@@ -2,7 +2,6 @@ import { Type } from 'class-transformer';
 import {
   ArrayUnique,
   IsMongoId,
-  // IsNotEmpty,
   IsNumber,
   IsOptional,
   IsPositive,
@@ -14,12 +13,6 @@ export class CreateSubscriptionDto {
   @IsString()
   @IsMongoId()
   student: string;
-
-  /*
-  @IsString()
-  @IsNotEmpty()
-  template: string;
-  */
 
   @Type(() => String)
   @IsMongoId({ each: true })

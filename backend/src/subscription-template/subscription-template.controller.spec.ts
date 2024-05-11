@@ -11,9 +11,7 @@ describe('SubscriptionTemplateController', () => {
       providers: [SubscriptionTemplateService],
     }).compile();
 
-    controller = module.get<SubscriptionTemplateController>(
-      SubscriptionTemplateController,
-    );
+    controller = module.get<SubscriptionTemplateController>(SubscriptionTemplateController);
   });
 
   it('should be defined', () => {

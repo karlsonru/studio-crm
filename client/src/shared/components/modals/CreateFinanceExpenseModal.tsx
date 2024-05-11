@@ -152,7 +152,13 @@ export function CreateFinanceExpenseModal() {
 
             <Button
               variant="outlined"
-              onClick={() => setIsDeleteCategoryOpen(true)}
+              onClick={() => {
+                if (!categoryNameId) {
+                  return;
+                }
+
+                setIsDeleteCategoryOpen(true);
+              }}
             >
               <RemoveCircleOutlineIcon />
             </Button>
@@ -206,7 +212,7 @@ export function CreateFinanceExpenseModal() {
       <ConfirmationDialog
         title="Удалить категорию"
         contentEl={<DeleteDialogText name={categoryName ?? ''} />}
-        isOpen={isDeleteCategoryOpen && categoryNameId !== ''}
+        isOpen={isDeleteCategoryOpen}
         setModalOpen={() => setIsDeleteCategoryOpen(false)}
         callback={() => deleteCaregory(categoryNameId)}
       />

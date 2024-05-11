@@ -29,7 +29,10 @@ export class SubscriptionController {
     const created = await this.service.create(createSubscriptionDto);
 
     if (created === null) {
-      throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        { message: 'Уже существует' },
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     return created;
@@ -44,7 +47,11 @@ export class SubscriptionController {
   @Get('/expiring')
   async findAllExpiring(@Query('days') days: number) {
     const today = new Date();
-    const searchDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + days);
+    const searchDate = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() + days,
+    );
 
     return await this.service.findAll({
       dateTo: { $gte: today.getTime(), $lte: searchDate.getTime() },
