@@ -4,7 +4,6 @@ import {
   GridRowParams,
   GridValueFormatterParams,
 } from '@mui/x-data-grid';
-import Typography from '@mui/material/Typography';
 import { useNavigate } from 'react-router-dom';
 import { useMobile } from '../../../shared/hooks/useMobile';
 import { useGetSubscriptionsQuery } from '../../../shared/api';
@@ -14,6 +13,7 @@ import { SearchParamsButton } from '../../../shared/components/buttons/SearchPar
 import { ISubscriptionModel } from '../../../shared/models/ISubscriptionModel';
 import { Loading } from '../../../shared/components/Loading';
 import { ShowError } from '../../../shared/components/ShowError';
+import './subscription.css';
 
 const leftAlignNumberColumn: Partial<GridColDef> = {
   type: 'number',
@@ -22,22 +22,17 @@ const leftAlignNumberColumn: Partial<GridColDef> = {
   headerAlign: 'left',
 };
 
-function formattedDateTo(dateTo: number, color: string) {
-  return <Typography component="span" color={color}>{dateValueFormatter(dateTo)}</Typography>;
-}
-
-function formattedDateToWithColor(today: Date, dateTo: number) {
-  if (dateTo < today.getTime()) {
-    return formattedDateTo(dateTo, 'error');
+function getClassNameByExpireDate(today: Date, dateTo: number) {
+  const differenceInDays = Math.floor((dateTo - today.getTime()) / (1000 * 3600 * 24));
+  if (differenceInDays > 7) {
+    return '';
   }
 
-  const differenceInDays = Math.floor(dateTo - (today.getTime()) / (1000 * 3600 * 24));
-
-  if (differenceInDays < 7) {
-    return formattedDateTo(dateTo, 'warning');
+  if (differenceInDays < 0) {
+    return 'custom-error-color';
   }
 
-  return formattedDateTo(dateTo, 'success');
+  return 'custom-warning-color';
 }
 
 function getColumns(isMobile: boolean) {
@@ -77,8 +72,7 @@ function getColumns(isMobile: boolean) {
       flex: 1,
       valueFormatter:
         (params: GridValueFormatterParams<ISubscriptionModel['dateTo']>) => dateValueFormatter(params.value),
-      cellClassName: (params) => 'error.main',
-      // renderCell: (params) => formattedDateToWithColor(today, params.value),
+      cellClassName: (params) => getClassNameByExpireDate(today, params.value),
     },
     {
       field: 'price',
