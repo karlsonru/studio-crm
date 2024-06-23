@@ -1,0 +1,1 @@
+export { PostponedAttendancesPage } from './Page';

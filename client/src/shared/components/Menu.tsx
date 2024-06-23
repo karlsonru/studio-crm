@@ -18,6 +18,7 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import DomainVerificationIcon from '@mui/icons-material/DomainVerification';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import MoveUpIcon from '@mui/icons-material/MoveUp';
 import { useMobile } from '../hooks/useMobile';
 import { useAppSelector } from '../hooks/useAppSelector';
 import { useActionCreators } from '../hooks/useActionCreators';
@@ -68,6 +69,7 @@ function NavMenuList() {
       <NavItem path="/" title="Главная" icon={<HomeIcon />} />
       <NavItem path="/timetable" title="Расписание" icon={<CalendarMonthIcon />} />
       <NavItem path="/attendances" title="Посещения" icon={<DomainVerificationIcon />} />
+      <NavItem path="/attendancespostponed" title="Отработки" icon={<MoveUpIcon />} />
       <NavItem path='/lessons' title="Занятия" icon={<ListAltIcon />} />
       <NavItem path='/students' title="Ученики" icon={<GroupIcon />} />
       <NavItem path='/subscriptions/templates' title="Абонементы" icon={<CardMembershipIcon />} />

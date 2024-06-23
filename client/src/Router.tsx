@@ -12,6 +12,7 @@ import { StudentsPage } from './pages/Students';
 import { StudentPage } from './pages/Student';
 import { NotFoundPage } from './pages/NotFound';
 import { FinancePage } from './pages/Finance';
+import { PostponedAttendancesPage } from './pages/PostponedAttendances';
 import {
   SubscriptionsPageLayout,
   SubscriptionsTemplatePage,
@@ -31,6 +32,8 @@ export const router = createBrowserRouter(
         <Route path='/timetable' element={<TimetablePage />} />
 
         <Route path='/attendances' element={<AttendancePage />} />
+
+        <Route path='/attendancespostponed' element={<PostponedAttendancesPage />} />
 
         <Route path='/students'>
           <Route index element={<StudentsPage />} />

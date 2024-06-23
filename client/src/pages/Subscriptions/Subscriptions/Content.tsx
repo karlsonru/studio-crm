@@ -4,6 +4,7 @@ import {
   GridRowParams,
   GridValueFormatterParams,
 } from '@mui/x-data-grid';
+import Typography from '@mui/material/Typography';
 import { useNavigate } from 'react-router-dom';
 import { useMobile } from '../../../shared/hooks/useMobile';
 import { useGetSubscriptionsQuery } from '../../../shared/api';
@@ -21,7 +22,27 @@ const leftAlignNumberColumn: Partial<GridColDef> = {
   headerAlign: 'left',
 };
 
+function formattedDateTo(dateTo: number, color: string) {
+  return <Typography component="span" color={color}>{dateValueFormatter(dateTo)}</Typography>;
+}
+
+function formattedDateToWithColor(today: Date, dateTo: number) {
+  if (dateTo < today.getTime()) {
+    return formattedDateTo(dateTo, 'error');
+  }
+
+  const differenceInDays = Math.floor(dateTo - (today.getTime()) / (1000 * 3600 * 24));
+
+  if (differenceInDays < 7) {
+    return formattedDateTo(dateTo, 'warning');
+  }
+
+  return formattedDateTo(dateTo, 'success');
+}
+
 function getColumns(isMobile: boolean) {
+  const today = new Date();
+
   const columns: GridColDef<ISubscriptionModel>[] = [
     {
       field: 'student',
@@ -56,6 +77,8 @@ function getColumns(isMobile: boolean) {
       flex: 1,
       valueFormatter:
         (params: GridValueFormatterParams<ISubscriptionModel['dateTo']>) => dateValueFormatter(params.value),
+      cellClassName: (params) => 'error.main',
+      // renderCell: (params) => formattedDateToWithColor(today, params.value),
     },
     {
       field: 'price',

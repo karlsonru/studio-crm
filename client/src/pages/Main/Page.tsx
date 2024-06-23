@@ -1,4 +1,6 @@
 import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
+import Button from '@mui/material/Button';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
@@ -11,52 +13,9 @@ import {
 } from '../../shared/api';
 import { Loading } from '../../shared/components/Loading';
 import { ShowError } from '../../shared/components/ShowError';
-import { PaymentStatus, VisitStatus } from '../../shared/models/IAttendanceModel';
+import { PaymentStatus } from '../../shared/models/IAttendanceModel';
 import { getYearMonthDay } from '../../shared/helpers/getYearMonthDay';
-
-function ExpiringSubscriptionsDisplay() {
-  const navigate = useNavigate();
-
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-  } = useFindWithParamsSubscriptionsQuery({
-    route: 'expiring',
-    params: { days: 7 },
-  });
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (isError) {
-    return <ShowError details={error} />;
-  }
-
-  const subscriptions = data ?? [];
-  const rows = subscriptions.map((subscription) => {
-    const expiringSubscriptions: Array<React.ReactNode> = [];
-
-    subscription.lessons.forEach((lesson) => {
-      expiringSubscriptions.push(
-        CreateRow({
-          content: [lesson.title, subscription.student.fullname, format(subscription.dateTo, 'dd.MM.yyyy'), subscription.visitsLeft],
-          props: {
-            onDoubleClick: () => navigate(`/lessons/${lesson._id}`),
-          },
-        }),
-      );
-    });
-    return expiringSubscriptions;
-  }).flat();
-
-  return <BasicTable
-    headers={['Занятие', 'Ученик', 'Действует до', 'Осталось занятий']}
-    rows={rows}
-  />;
-}
+import mainPageLogo from '../../assets/images/mainPageLogo.png';
 
 function UnpaidAttendancesDisplay() {
   const navigate = useNavigate();
@@ -106,54 +65,6 @@ function UnpaidAttendancesDisplay() {
   />;
 }
 
-function PostponedAttendancesDisplay() {
-  const navigate = useNavigate();
-
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-  } = useFindWithParamsAttendancesQuery({
-    route: 'postponed',
-    params: { days: 30 },
-  });
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (isError) {
-    return <ShowError details={error} />;
-  }
-
-  const attendances = data ?? [];
-  const rows = attendances.map((attendance) => {
-    const studentsWithPostponedVisits: Array<React.ReactNode> = [];
-
-    attendance.students.forEach((student) => {
-      if (student.visitStatus !== VisitStatus.POSTPONED_FUTURE) return;
-
-      const { year, month, day } = getYearMonthDay(attendance.date);
-
-      const row = CreateRow({
-        content: [attendance.lesson.title, format(attendance.date, 'dd.MM.yyyy'), student.student.fullname],
-        props: {
-          onDoubleClick: () => navigate(`/attendances?lessonId=${attendance.lesson._id}&year=${year}&month=${month + 1}&day=${day}`),
-        },
-      });
-      studentsWithPostponedVisits.push(row);
-    });
-
-    return [...studentsWithPostponedVisits];
-  }).flat();
-
-  return <BasicTable
-    headers={['Пропущенное занятие', 'Дата', 'Ученик']}
-    rows={rows}
-  />;
-}
-
 function BirthdayDisplay() {
   const {
     data,
@@ -186,32 +97,58 @@ function BirthdayDisplay() {
     />;
 }
 
+function GoToButton({ route, label }: { route: string, label: string }) {
+  const navigate = useNavigate();
+  return <Button
+    variant='outlined'
+    size='large'
+    onClick={() => navigate(route)}
+    sx={{
+      marginY: '1rem',
+      width: '100%',
+      fontSize: '1.2rem',
+    }}
+  >
+    {label}
+  </Button>;
+}
+
 export function MainPage() {
   useTitle('Главная');
 
   return (
     <>
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
-          <h2>Неоплаченные посещения</h2>
-          <UnpaidAttendancesDisplay />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <h2>Истекающие абонементы</h2>
-          <ExpiringSubscriptionsDisplay />
-        </Grid>
+      <Paper sx={{
+        width: '100%',
+        minHeight: '50vh',
+
+        backgroundImage: `url(${mainPageLogo})`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'right',
+        backgroundSize: 'cover',
+      }}
+      >
+      </Paper>
+
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={6}>
+        <GoToButton route='/attendancespostponed' label='Отработки' />
       </Grid>
 
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
-          <h2>Неназначенные отработки</h2>
-          <PostponedAttendancesDisplay />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <h2>Дни рождения</h2>
-          <BirthdayDisplay />
-        </Grid>
+      <Grid item xs={12} sm={6}>
+        <GoToButton route='/subscriptions' label='Истекающие абонементы' />
       </Grid>
+    </Grid>
+
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={6}>
+        <GoToButton route='/fake' label='Неоплаченные посещения' />
+      </Grid>
+
+      <Grid item xs={12} sm={6}>
+        <GoToButton route='/fake' label='Дни рождения' />
+      </Grid>
+    </Grid>
     </>
   );
 }
