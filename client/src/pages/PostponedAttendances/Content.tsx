@@ -122,7 +122,7 @@ export function PostponedAttendancesContent() {
           onClick={() => {
             const { year, month, day } = getYearMonthDay(params.row.date);
 
-            navigate(`/attendances?lessonId=${params.row.lesson._id}&year=${year}&month=${month + 1}&day=${day}`);
+            navigate(`/attendances/history?lessonId=${params.row.lesson._id}&year=${year}&month=${month + 1}&day=${day}`);
           }}
         />,
       ],

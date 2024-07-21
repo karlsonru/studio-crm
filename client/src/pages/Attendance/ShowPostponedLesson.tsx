@@ -46,7 +46,7 @@ export function ShowPostponedLesson({ lesson }: { lesson: ILessonModel }) {
   // идем к занятию которое пропустил ученик
   const goToPostponedLesson = () => {
     closeHandler();
-    navigate(`/attendances?year=${attendanceDate.getFullYear()}&month=${attendanceDate.getMonth() + 1}&day=${attendanceDate.getDate()}&lessonId=${attendance.lesson._id}`);
+    navigate(`/attendances/history?year=${attendanceDate.getFullYear()}&month=${attendanceDate.getMonth() + 1}&day=${attendanceDate.getDate()}&lessonId=${attendance.lesson._id}`);
   };
 
   return (

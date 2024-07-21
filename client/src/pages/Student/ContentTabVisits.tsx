@@ -185,7 +185,7 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
               props={{ width: '100%' }}
             />,
           ]}
-          callback={() => navigate(`/attendances?lessonId=${visitedLesson.lesson._id}&year=${year}&month=${month + 1}&day=${day}`)}
+          callback={() => navigate(`/attendances/history?lessonId=${visitedLesson.lesson._id}&year=${year}&month=${month + 1}&day=${day}`)}
         />
       );
     });

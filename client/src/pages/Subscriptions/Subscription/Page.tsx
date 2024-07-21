@@ -95,7 +95,7 @@ export function SubscriptionPage() {
     return CreateRow({
       content: [attendance.date, attendance.lesson.title],
       props: {
-        onDoubleClick: () => navigate(`/attendances?lessonId=${attendance.lesson._id}&year=${year}&month=${month + 1}&day=${day}`),
+        onDoubleClick: () => navigate(`/attendances/history?lessonId=${attendance.lesson._id}&year=${year}&month=${month + 1}&day=${day}`),
       },
     });
   });

@@ -1,8 +1,8 @@
 import { useTitle } from '../../shared/hooks/useTitle';
-import { PostponedAttendancesContent } from './Content';
+import { UnpaidAttendancesContent } from './Content';
 
-export function PostponedAttendancesPage() {
-  useTitle('Отработки');
+export function UnpaidAttendancesPage() {
+  useTitle('Неоплаченные занятия');
 
-  return <PostponedAttendancesContent />;
+  return <UnpaidAttendancesContent />;
 }

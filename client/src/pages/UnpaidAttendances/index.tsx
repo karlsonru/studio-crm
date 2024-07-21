@@ -1,1 +1,1 @@
-export { PostponedAttendancesPage } from './Page';
+export { UnpaidAttendancesPage } from './Page';

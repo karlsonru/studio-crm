@@ -151,7 +151,7 @@ export class SubscriptionService {
   async create(
     createSubscriptionDto: CreateSubscriptionDto,
   ): Promise<SubscriptionModel> {
-    // можно ли как-то проверить на повтор? Как? Имя & дата начала & ID занятие && кол-во
+    // ! можно ли как-то проверить на повтор? Как? Имя & дата начала & ID занятие && кол-во
     const created = await this.subscriptionModel.create(createSubscriptionDto);
 
     return created;

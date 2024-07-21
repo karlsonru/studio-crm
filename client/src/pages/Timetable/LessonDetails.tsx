@@ -156,7 +156,7 @@ export const LessonDetails = React.memo(() => {
   const goAttendancePage = () => {
     closeHandler();
     const { year, month, day } = getYearMonthDay(date);
-    navigate(`/attendances?lessonId=${lesson._id}&year=${year}&month=${month + 1}&day=${day}`);
+    navigate(`/attendances/history?lessonId=${lesson._id}&year=${year}&month=${month + 1}&day=${day}`);
   };
 
   const isAttendanceDone = isSuccess && attendance.length > 0;

@@ -40,7 +40,7 @@ export function MainPage() {
 
     <Grid container spacing={2}>
       <Grid item xs={12} sm={6}>
-        <GoToButton route='/attendancespostponed' label='Отработки' />
+        <GoToButton route='/attendances/postponed' label='Отработки' />
       </Grid>
 
       <Grid item xs={12} sm={6}>
@@ -50,7 +50,7 @@ export function MainPage() {
 
     <Grid container spacing={2}>
       <Grid item xs={12} sm={6}>
-        <GoToButton route='/fake' label='Неоплаченные посещения' />
+        <GoToButton route='/attendances/unpaid' label='Неоплаченные посещения' />
       </Grid>
 
       <Grid item xs={12} sm={6}>

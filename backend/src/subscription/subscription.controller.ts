@@ -26,7 +26,9 @@ export class SubscriptionController {
 
   @Post()
   async create(@Body() createSubscriptionDto: CreateSubscriptionDto) {
-    const created = await this.service.create(createSubscriptionDto);
+    const created = await this.service.createAndChargeUnpaid(
+      createSubscriptionDto,
+    );
 
     if (created === null) {
       throw new HttpException(
@@ -47,14 +49,15 @@ export class SubscriptionController {
   @Get('/expiring')
   async findAllExpiring(@Query('days') days: number) {
     const today = new Date();
-    const searchDate = new Date(
+
+    const searchDate = Date.UTC(
       today.getFullYear(),
       today.getMonth(),
       today.getDate() + days,
     );
 
     return await this.service.findAll({
-      dateTo: { $gte: today.getTime(), $lte: searchDate.getTime() },
+      dateTo: { $gte: today.getTime(), $lte: searchDate },
     });
   }
 
