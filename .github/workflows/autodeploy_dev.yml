@@ -42,5 +42,4 @@ jobs:
       - name: Send build files to server
         run: |
           ls;
-          apt install sshpass;
-          sshpass -p ${{ secrets.PASSWORD }} scp -r ./* ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}};
+          scp -i ${{ secrets.SSH_KEY }} -r ./* ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}};
