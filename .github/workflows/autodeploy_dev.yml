@@ -12,6 +12,12 @@ jobs:
       - name: Get repository code
         uses: actions/checkout@v4.1.3
 
+      - name: Show working directory
+        run: pwd
+
+      - name: Show working files
+        run: ls
+
       - name: Install backend dependencies
         run: cd backend && npm ci
 
