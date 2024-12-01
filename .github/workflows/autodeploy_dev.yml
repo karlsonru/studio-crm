@@ -38,36 +38,40 @@ jobs:
         run: npm run build
         env:
           CI: ""
-        
-  upload:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Debug
-        run: |
-          pwd
-          ls
-
+  
       - name: Upload a client Build Artifact
         uses: actions/upload-artifact@v4.3.2
         with:
           name: client_build_files
           path: client/build/
-
+  
       - name: Upload a backend Build Artifact
         uses: actions/upload-artifact@v4.3.2
         with:
           name: server_build_files
           path: backend/dist/
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run command on remote server
+        uses: D3rHase/ssh-command-action@latest
+        with:
+          host: ${{secrets.SSH_HOST}}
+          user: ${{secrets.SSH_USER}}
+          password: ${{secrets.PASSWORD}}
+          command: |
+            cd ${{ secrets.PROJECT_FOLDER }};
+            git checkout develop;
+            git pull;
+
   download:
     runs-on: ubuntu-latest
-    needs: upload
+    needs: build
     steps:
       - name: Debug
-        run: |
-          pwd
-          ls
+        run: ls
 
       - uses: actions/download-artifact@v4
         with:
