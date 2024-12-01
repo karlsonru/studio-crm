@@ -40,4 +40,7 @@ jobs:
           CI: ""
   
       - name: Send build files to server
-        run: scp -r ./* ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
+        run: |
+          ls;
+          apt install sshpass;
+          sshpass -p ${{ secrets.PASSWORD }} scp -r ./* ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}};
