@@ -42,5 +42,9 @@ jobs:
       - name: Send build files to server
         run: |
           ls;
-           ${{ secrets.SSH_KEY }} > ~/key.pub;
-          scp -i ~/key.pub -r ./* ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}};
+          ${{ secrets.SSH_KEY }} > ~/key.pub;
+          echo "key added";
+          ls ~/;
+          pwd;
+          ls;
+          scp -vvvv -i ~/key.pub -r ./* ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}};
