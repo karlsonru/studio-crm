@@ -12,6 +12,19 @@ jobs:
       - name: Get repository code
         uses: actions/checkout@v4.1.3
 
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
       - name: Install backend dependencies
         run: cd backend && npm ci
 
@@ -30,6 +43,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Debug
+        run: |
+          pwd
+          ls
+
       - name: Upload a client Build Artifact
         uses: actions/upload-artifact@v4.3.2
         with:
