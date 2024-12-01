@@ -1,6 +1,16 @@
-CRM for school / studio management. Work in progress. 
+# CRM for school / studio management. Work in progress. 
 
-### Features:
+Hello! Here is a CRM for studios (like drawing, dancing, etc) - any that needs:
+- groups / individual lessons
+- timetable
+- payment system (monthly based subscriptions for visiting lessons)
+- attendance history
+- info about each student / client
+- employments
+- possibility to list all your expenses & income
+- self hosting
+
+## Features:
 - [x] Timetable. Look through all lessons planned for any week. Available views - ['week', 'day].
   - [ ] separated timetable for different locations
 - [x] Lessons list. View all lessons, create new one. By double click can view specific lesson:
@@ -26,42 +36,66 @@ Instructions:
 - [ ] Development instruction
 - [ ] Swagger documentation
 
+This is a v1 pet project that started for practice, mainly react & nest. And because my wife needed such crm :) 
+No warranity. Some bugs can still persist.
+Feel free to ask anything. 
 
-### Development instruction:
-* Database: 
+## Future plans (2025+):
+- move frontend to React admin (MUI & Next.js & SSR)
+- payment system refactoring (now it's locked with a specific of a drawing studio & monthly paid subscriptions, want to make to more universal)
+- tests
+- translation
+- branding settings
+
+## Development instruction:
+### Database: 
+  MongoDB is used as database on backend. Following example will be for Ubuntu. 
+  Full instruction can you can find here: https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/
+
   1. Install MongoDB
-  2. Create roles in database
-  3. Create users with roles
-* Clone repo to working dir
-  1. Install dependencies: 
-    ```npm install```
-    ```cd backend & npm install```
-    ```cd client & npm install```
-  2. Make build 
-  3. Set nginx as proxy 
+  ```shell
+  sudo apt update
+  sudo apt install -y mongodb-org
+  ```
+  2. Run database as service
+  ```shell
+  sudo systemctl start mongod
+  ```
+  3. Make database start on system start:
+  ```shell
+  sudo systemctl enable mongod
+  ```
+### Getting repo & installation
+Clone repo into working dir & make build.
+  1. Clone repo: 
+  ```shell
+  git clone https://github.com/karlsonru/studio-crm.git
+  ```
+  2. Install dependencies: 
+  ```shell
+  npm ci
+  cd backend && npm ci
+  cd client && npm ci
+  ```
+  3. Run build
+  ```shell
+  npm run build
+  ```
 
-Development mode:
-```npm run dev```
-
-
-#### Know issues: 
-1. Error message when running dev version or building app:
+### Running
+To run locally in development mode use:
+```shell
+npm run dev
 ```
-BREAKING CHANGE: webpack < 5 used to include polyfills for node.js core modules by default.
-This is no longer the case. Verify if you need this module and configure a polyfill for it.
+
+To run in production:
+1. Run backend 
+```shell
+cd backend && npm start
 ```
+(better as service)
 
-To fix it update your webpack configuration to include the NodePolyfillPlugin:
-Webpack configuration path is ```node_modules/react-scripts/config/webpack.config.js```
+2. Run web server as proxy
+You can use nginx as proxy to return frontend code & use as proxy for backend API calls.
+Nginx example config in current directory
 
-```javascript
-const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
-
-module.exports = {
-  // Your existing webpack configuration
-  
-  plugins: [
-    new NodePolyfillPlugin()
-  ]
-};
-```
