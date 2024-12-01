@@ -176,7 +176,7 @@ export function ContentTabDetails({ student }: { student: IStudentModel }) {
         <DateField
           name="birthday"
           label="Дата рождения"
-          defaultValue={format(student.birthday, INPUT_DATE_FORMAT)}
+          defaultValue={format(student.birthday ?? 0, INPUT_DATE_FORMAT)}
           disabled={!isEdit}
         />
 

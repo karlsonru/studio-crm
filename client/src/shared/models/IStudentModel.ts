@@ -17,7 +17,7 @@ export interface IStudentModel {
   _id: string;
   fullname: string;
   sex: string;
-  birthday: number;
+  birthday: number | null;
   balance: number;
   contacts: Array<IStudentModelContact>;
   knowledgeSource?: KnowledgeSource,

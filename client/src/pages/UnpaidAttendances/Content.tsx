@@ -114,7 +114,7 @@ export function UnpaidAttendancesContent() {
       disableColumnMenu
       columns={columns}
       rows={studentsWithUnpaidStatus}
-      getRowId={(item) => item._id}
+      getRowId={(item) => item._id + item.studentFullname}
       localeText={{
         toolbarFilters: 'Фильтры',
       }}
