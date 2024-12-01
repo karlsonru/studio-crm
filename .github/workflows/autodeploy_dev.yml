@@ -42,4 +42,5 @@ jobs:
       - name: Send build files to server
         run: |
           ls;
-          scp -i ${{ secrets.SSH_KEY }} -r ./* ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}};
+           ${{ secrets.SSH_KEY }} > ~/key.pub
+          scp -i ~/key.pub -r ./* ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}};
