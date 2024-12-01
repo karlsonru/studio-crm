@@ -25,26 +25,12 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      - name: Install backend dependencies
-        run: cd backend && npm ci
-
-      - name: Install frontend dependencies
-        run: cd client && npm ci
-
-      - name: Install global dependencies
-        run: npm ci
-
-      - name: Build project
-        run: npm run build
-        env:
-          CI: ""
-  
-      - name: Send build files to server
-        run: |
-          ls;
-          ${{ secrets.SSH_KEY }} > ~/key.pub;
-          echo "key added";
-          ls ~/;
-          pwd;
-          ls;
-          scp -vvvv -i ~/key.pub -r ./* ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}};
+      - name: copy file via ssh password
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          source: "./"
+          target: ${{ secrets.PROJECT_FOLDER}}
+        
