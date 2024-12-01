@@ -20,26 +20,25 @@ jobs:
 
       - name: Build project
         run: npm run build
+        
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Upload a client Build Artifact
+        uses: actions/upload-artifact@v4.3.2
+        with:
+          server: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          passowrd: ${{ secrets.PASSWORD }}
+          name: client_build_files
+          path: client/build
 
-deploy:
-  runs-on: ubuntu-latest
-  needs: build
-  steps:
-    - name: Upload a client Build Artifact
-      uses: actions/upload-artifact@v4.3.2
-      with:
-        server: ${{ secrets.ADDRESS }}
-        username: ${{ secrets.USERNAME }}
-        passowrd: ${{ secrets.PASSWORD }}
-        name: client_build_files
-        path: client/build
-
-    - name: Upload a backend Build Artifact
-      uses: actions/upload-artifact@v4.3.2
-      with:
-        server: ${{ secrets.ADDRESS }}
-        username: ${{ secrets.USERNAME }}
-        passowrd: ${{ secrets.PASSWORD }}
-        name: server_build_files
-        path: backend/dist
-
+      - name: Upload a backend Build Artifact
+        uses: actions/upload-artifact@v4.3.2
+        with:
+          server: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          passowrd: ${{ secrets.PASSWORD }}
+          name: server_build_files
+          path: backend/dist
