@@ -21,18 +21,11 @@ jobs:
       - name: Install backend dependencies
         run: cd backend && npm ci
 
-      - name: Show working directory & files
-        run: |
-          pwd
-          ls
-
       - name: Install frontend dependencies
         run: cd client && npm ci
 
-      - name: Show working directory & files
-        run: |
-          pwd
-          ls
+      - name: Install global dependencies
+        run: npm ci
 
       - name: Build project
         run: npm run build
