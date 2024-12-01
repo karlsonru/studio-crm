@@ -1,12 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getTodayTimestamp } from '../helpers/getTodayTimestamp';
-import { FINANCE_PERIOD_DEFAULT } from '../constants';
 import { IFinanceModel } from '../models/IFinanceModel';
 
 interface IFinanceFilters {
-  period: number;
-  dateFrom: number;
+  month: number;
   location: string;
+  userId: string;
 }
 
 interface IFinanceState {
@@ -16,21 +15,18 @@ interface IFinanceState {
   currentFinanceRecord: IFinanceModel | null;
 }
 
-const today = new Date(getTodayTimestamp());
-today.setMonth(today.getMonth() - FINANCE_PERIOD_DEFAULT + 1);
-today.setDate(1);
-const dateFrom = today.getTime();
+const currentMonth = new Date(getTodayTimestamp()).getMonth();
 
 const initialState: IFinanceState = {
   income: {
-    period: FINANCE_PERIOD_DEFAULT,
-    dateFrom,
+    month: currentMonth,
     location: 'common',
+    userId: 'all',
   },
   expenses: {
-    period: FINANCE_PERIOD_DEFAULT,
-    dateFrom,
+    month: currentMonth,
     location: 'common',
+    userId: 'all',
   },
   isConfirmationDialog: false,
   currentFinanceRecord: null,

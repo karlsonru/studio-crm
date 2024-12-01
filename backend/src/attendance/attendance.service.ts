@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ClientSession, Model, PopulateOptions } from 'mongoose';
-import { UpdateAttendanceDto, UpdatedVisitedStudent } from './dto/update-attendance.dto';
+import {
+  UpdateAttendanceDto,
+  UpdatedVisitedStudent,
+} from './dto/update-attendance.dto';
 import { CreateAttendanceDtoSchemaAdapter } from './createAttendanceDtoSchemaAdapter';
 import { AttendanceModel, AttendanceDocument } from '../schemas';
 import { AttendancePaymentService } from './attendancePayment.service';
@@ -9,7 +12,11 @@ import { IFilterQuery } from '../shared/IFilterQuery';
 import { withTransaction } from '../shared/withTransaction';
 import { logger } from '../shared/logger.middleware';
 import { LessonService } from '../lesson/lesson.service';
-import { AttendanceType, PaymentStatus, VisitType } from '../schemas/attendance.schema';
+import {
+  AttendanceType,
+  PaymentStatus,
+  VisitType,
+} from '../schemas/attendance.schema';
 
 @Injectable()
 export class AttendanceService {
@@ -31,9 +38,16 @@ export class AttendanceService {
     ];
   }
 
-  async findUnpiadAttendances(dateFrom: number, dateTo: number, studentId?: string) {
+  async findUnpiadAttendances(
+    dateFrom: number,
+    dateTo: number,
+    studentId?: string,
+  ) {
     const queryTemplates = {
-      withStudentId: { student: studentId, paymentStatus: PaymentStatus.UNPAID },
+      withStudentId: {
+        student: studentId,
+        paymentStatus: PaymentStatus.UNPAID,
+      },
       withoutStudentId: { paymentStatus: PaymentStatus.UNPAID },
     };
 
@@ -67,17 +81,20 @@ export class AttendanceService {
     });
 
     if (candidate && candidate.type === AttendanceType.DONE) {
-      logger.debug(`Занятие ${createAttendanceDto.lesson}. Занятие уже существует`);
+      logger.debug(`
+        Занятие ${createAttendanceDto.lesson}. Занятие уже существует
+      `);
       return null;
     }
 
     const transaction = async (session: ClientSession) => {
       // Найдем абонементы для студентов, которым нужно списать занятия
-      const subscriptions = await this.attendancePaymentService.findSubscriptionsForAttendance(
-        createAttendanceDto.lesson,
-        createAttendanceDto.students.map((student) => student.student),
-        createAttendanceDto.date,
-      );
+      const subscriptions =
+        await this.attendancePaymentService.findSubscriptionsForAttendance(
+          createAttendanceDto.lesson,
+          createAttendanceDto.students.map((student) => student.student),
+          createAttendanceDto.date,
+        );
 
       // Добавим абонемент для студентов
       this.attendancePaymentService.setSubscriptionsForStudents(
@@ -110,7 +127,9 @@ export class AttendanceService {
       `);
 
       if (oneTimeStudents.length) {
-        const oneTimeStudentsIds = oneTimeStudents.map((student) => student.student);
+        const oneTimeStudentsIds = oneTimeStudents.map(
+          (student) => student.student,
+        );
 
         logger.debug(
           `Студенты с однократным посещением: ${oneTimeStudentsIds}. Удаляем из основного занятия.`,
@@ -140,12 +159,17 @@ export class AttendanceService {
       return created;
     };
 
-    const created = await withTransaction<AttendanceDocument>(this.attendanceModel, transaction);
+    const created = await withTransaction<AttendanceDocument>(
+      this.attendanceModel,
+      transaction,
+    );
 
     return created;
   }
 
-  async findAll(query: IFilterQuery<AttendanceModel>): Promise<Array<AttendanceModel>> {
+  async findAll(
+    query: IFilterQuery<AttendanceModel>,
+  ): Promise<Array<AttendanceModel>> {
     return await this.attendanceModel
       .find(query)
       .populate(this.populateQueryAttendance)
@@ -153,23 +177,26 @@ export class AttendanceService {
   }
 
   async findOne(id: string): Promise<AttendanceModel | null> {
-    return await this.attendanceModel.findById(id).populate(this.populateQueryAttendance);
+    return await this.attendanceModel
+      .findById(id)
+      .populate(this.populateQueryAttendance);
   }
 
-  async updateAttendnedStudentById(
+  async updateAttenendStudentById(
     attendanceId: string,
     studentId: string,
-    updateAttendanceDto: UpdatedVisitedStudent,
-    action: 'add' | 'remove',
+    updateValue: Record<string, unknown>,
   ) {
     logger.debug(`
-      Посещённое занятие: ${attendanceId}. Действие: ${action}. Обновляем студента ${studentId}.
+      Посещённое занятие: ${attendanceId}. \
+      Обновляем студента ${studentId}. \
+      Новые данные ${JSON.stringify(updateValue)}
     `);
 
     const visitedLesson = await this.findOne(attendanceId);
 
     if (visitedLesson === null) {
-      logger.debug(`Посещённое занятие ${attendanceId} не найдено`);
+      logger.debug(`Посещённое занятие c ID ${attendanceId} не найдено`);
       return null;
     }
 
@@ -178,96 +205,141 @@ export class AttendanceService {
     );
 
     if (!candidate) {
-      logger.debug(`Посещённое занятие ${attendanceId} не содержит студента ${studentId}`);
+      logger.debug(`
+        Посещённое занятие ${attendanceId} \
+        не содержит студента ${studentId}
+      `);
       return null;
     }
 
-    // * Кейс - добавляем отработку студенту, раньше отработки не было
+    const updated = await this.attendanceModel.findOneAndUpdate(
+      { _id: attendanceId, 'students.student': studentId },
+      { $set: { ...updateValue } },
+      { new: true },
+    );
 
-    // если у нас передан lessonId, вместо которого нужно сделать занятие
+    logger.debug(`
+      Посещённое занятие ${attendanceId}. \
+      Обновили студента ${studentId}. \
+      Новые данные ${JSON.stringify(updated)}
+    `);
+    return updated;
+  }
+
+  async updateAttendedStudentPaymentStatusById(
+    attendanceId: string,
+    studentId: string,
+    subscriptionId: string,
+  ) {
+    return await this.updateAttenendStudentById(attendanceId, studentId, {
+      'students.$.subscription': subscriptionId,
+      'students.$.paymentStatus': PaymentStatus.PAID,
+    });
+  }
+
+  async addStudentToAttendance(
+    attendanceId: string,
+    studentId: string,
+    updateAttendanceDto: UpdatedVisitedStudent,
+  ) {
     if (
-      action === 'add' &&
-      updateAttendanceDto.visitInstead &&
-      updateAttendanceDto.visitInsteadDate
+      !updateAttendanceDto.visitInstead ||
+      !updateAttendanceDto.visitInsteadDate
     ) {
-      const transaction = async (session: ClientSession) => {
-        logger.debug(
-          `Посещённое занятие ${attendanceId}. Обновляем студента ${studentId}. Начинаем выполнять транзакцию.`,
-        );
-        // обновим visitInstead (отработка) у студента в этом attendance
-        const updated = await this.attendanceModel.findOneAndUpdate(
-          { _id: attendanceId, 'students.student': studentId },
-          {
-            $set: {
-              'students.$.visitInstead': updateAttendanceDto.visitInstead,
-              'students.$.visitInsteadDate': updateAttendanceDto.visitInsteadDate,
-            },
-          },
-          { new: true },
-        );
-
-        logger.debug(`
-          Посещённое занятие ${attendanceId}. 
-          Добавляем студента ${studentId} в lesson ${updateAttendanceDto.visitInstead}. 
-          Статус ${VisitType.POSTPONED}, 
-          дата ${new Date(updateAttendanceDto.visitInsteadDate ?? Date.now()).toISOString()}.
-        `);
-
-        // добавим к lesson студента и дату отработки
-        await this.lessonService.updateStudents(
-          updateAttendanceDto.visitInstead as string,
-          {
-            students: [
-              {
-                student: studentId,
-                visitType: VisitType.POSTPONED,
-                visitInstead: attendanceId,
-                date: updateAttendanceDto.visitInsteadDate ?? null,
-              },
-            ],
-          },
-          action,
-        );
-
-        return updated;
-      };
-
-      return await withTransaction<AttendanceDocument>(this.attendanceModel, transaction);
+      logger.debug(
+        `Посещённое занятие ${attendanceId}. Не указали дату отработки. Ничего не делаем.`,
+      );
+      return;
     }
 
-    if (action === 'remove') {
-      const transaction = async (session: ClientSession) => {
-        logger.debug(
-          `Посещённое занятие ${attendanceId}. Обновляем студента ${studentId}. Начинаем выполнять транзакцию.`,
-        );
-        // обновим visitInstead (отработка) у студента в этом attendance
-        const updated = await this.attendanceModel.findOneAndUpdate(
-          { _id: attendanceId, 'students.student': studentId },
-          {
-            $set: {
-              'students.$.visitInstead': null,
-              'students.$.visitInsteadDate': null,
+    const transaction = async (session: ClientSession) => {
+      logger.debug(
+        `Посещённое занятие ${attendanceId}. Добавляем студента ${studentId}. \
+        Добавляем информацию об отработке: ${JSON.stringify(updateAttendanceDto)}`,
+      );
+
+      const updated = await this.updateAttenendStudentById(
+        attendanceId,
+        studentId,
+        {
+          'students.$.visitInstead': updateAttendanceDto.visitInstead,
+          'students.$.visitInsteadDate': updateAttendanceDto.visitInsteadDate,
+        },
+      );
+
+      const date = new Date(
+        updateAttendanceDto.visitInsteadDate ?? Date.now(),
+      ).toISOString();
+      logger.debug(`
+        Посещённое занятие ${attendanceId}. Добавляем студента ${studentId} \
+        в lesson ${updateAttendanceDto.visitInstead}. \
+        Статус ${VisitType.POSTPONED}, дата ${date}.
+      `);
+
+      // добавим к lesson студента и дату отработки
+      await this.lessonService.updateStudents(
+        updateAttendanceDto.visitInstead as string,
+        {
+          students: [
+            {
+              student: studentId,
+              visitType: VisitType.POSTPONED,
+              visitInstead: attendanceId,
+              date: updateAttendanceDto.visitInsteadDate ?? null,
             },
-          },
-          { new: true },
-        );
+          ],
+        },
+        'add',
+      );
 
-        logger.debug(`
-          Посещённое занятие ${attendanceId}. 
-          Удаляем студента ${studentId} из lesson ${updateAttendanceDto.visitInstead}. 
-        `);
+      return updated;
+    };
 
-        await this.lessonService.updateStudents(
-          updateAttendanceDto.visitInstead as string,
-          { students: [studentId] },
-          action,
-        );
+    return await withTransaction<AttendanceDocument>(
+      this.attendanceModel,
+      transaction,
+    );
+  }
 
-        return updated;
-      };
+  async removeStudentFromAttendance(
+    attendanceId: string,
+    studentId: string,
+    updateAttendanceDto: UpdatedVisitedStudent,
+  ) {
+    const transaction = async (session: ClientSession) => {
+      logger.debug(`
+        Посещённое занятие ${attendanceId}. \
+        Удалим дату и время отработки у студента ${studentId}.
+      `);
 
-      return await withTransaction<AttendanceDocument>(this.attendanceModel, transaction);
-    }
+      const updated = await this.updateAttenendStudentById(
+        attendanceId,
+        studentId,
+        {
+          'students.$.visitInstead': null,
+          'students.$.visitInsteadDate': null,
+        },
+      );
+
+      logger.debug(`
+        Посещённое занятие ${attendanceId}. \
+        Удаляем отработку студента ${studentId} \
+        из lesson ${updateAttendanceDto.visitInstead}.
+      `);
+
+      await this.lessonService.updateStudents(
+        updateAttendanceDto.visitInstead as string,
+        { students: [studentId] },
+        'remove',
+      );
+
+      return updated;
+    };
+
+    return await withTransaction<AttendanceDocument>(
+      this.attendanceModel,
+      transaction,
+    );
   }
 
   async update(
@@ -294,7 +366,10 @@ export class AttendanceService {
 
     // добавлям транзакцию для сравнения и обновления различных статусов посещения студентов
     const transaction = async (session: ClientSession) => {
-      await this.attendancePaymentService.changePaymentStatus(visitedLesson, updateAttendanceDto);
+      await this.attendancePaymentService.changePaymentStatus(
+        visitedLesson,
+        updateAttendanceDto,
+      );
 
       console.log(`
         Передан массив студентов. Выполнили смену статуса платежа. Новые статусы: ${JSON.stringify(
@@ -303,12 +378,17 @@ export class AttendanceService {
         `);
 
       // обновим занятие и вернём результат
-      return await this.attendanceModel.findByIdAndUpdate(id, updateAttendanceDto, {
-        new: true,
-      });
+      return await this.attendanceModel.findByIdAndUpdate(
+        id,
+        updateAttendanceDto,
+        { new: true },
+      );
     };
 
-    const updated = await withTransaction<AttendanceDocument>(this.attendanceModel, transaction);
+    const updated = await withTransaction<AttendanceDocument>(
+      this.attendanceModel,
+      transaction,
+    );
 
     return updated;
   }

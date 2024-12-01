@@ -1,6 +1,7 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { StatisticService } from './statistic.service';
 import { ValidateIdPipe } from '../shared/validaitonPipe';
+import { logger } from '../shared/logger.middleware';
 
 @Controller('statistic')
 export class StatisticController {
@@ -8,24 +9,49 @@ export class StatisticController {
 
   @Get('/visited-lessons/:studentId')
   async statVisitedLessonsByStudent(
-    @Query('filter') filter: string,
     @Param('studentId', ValidateIdPipe) studentId: string,
+    @Query('monthes') monthes?: number,
   ) {
-    const query = JSON.parse(filter);
+    logger.info(
+      `Получен запрос на статистику. ID студента: ${studentId}. Период в месяцах: ${monthes}.`,
+    );
+    const query = {
+      dateFrom: 0,
+    };
 
-    const statistic = await this.statisticService.calcVisitedLessonsByStudent(query, studentId);
+    if (monthes) {
+      const today = new Date();
+      query.dateFrom = Date.UTC(today.getFullYear(), today.getMonth() - monthes, 1);
+    }
+
+    const statistic = await this.statisticService.calcVisitedLessonsByStudent(
+      studentId,
+      query.dateFrom,
+    );
 
     return statistic;
   }
 
-  @Get('/finance/income/:locationId')
-  async statFinanceIncome(
-    @Query('filter') filter: string,
+  @Get('/finance/statistic/location/:locationId')
+  async statFinanceCommon(
     @Param('locationId') locationId: string,
+    @Query('month', ParseIntPipe) month: number,
+    @Query('userId') userId: string,
   ) {
-    const query = JSON.parse(filter);
+    logger.info(
+      `Получен запрос на статистику. ID локации: ${locationId} месяц: ${month}. ID пользователя: ${userId}.`,
+    );
 
-    const statistic = await this.statisticService.calcIncome(query, locationId);
+    const today = new Date();
+
+    const query = {
+      locationId,
+      userId,
+      dateFrom: Date.UTC(today.getFullYear(), month, 1),
+      dateTo: Date.UTC(today.getFullYear(), month + 1, 1),
+    };
+
+    const statistic = await this.statisticService.calcIncomeByLocationAndUser(query);
 
     return statistic;
   }

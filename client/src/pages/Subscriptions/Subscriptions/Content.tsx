@@ -13,6 +13,7 @@ import { SearchParamsButton } from '../../../shared/components/buttons/SearchPar
 import { ISubscriptionModel } from '../../../shared/models/ISubscriptionModel';
 import { Loading } from '../../../shared/components/Loading';
 import { ShowError } from '../../../shared/components/ShowError';
+import './subscription.css';
 
 const leftAlignNumberColumn: Partial<GridColDef> = {
   type: 'number',
@@ -21,7 +22,22 @@ const leftAlignNumberColumn: Partial<GridColDef> = {
   headerAlign: 'left',
 };
 
+function getClassNameByExpireDate(today: Date, dateTo: number) {
+  const differenceInDays = Math.floor((dateTo - today.getTime()) / (1000 * 3600 * 24));
+  if (differenceInDays > 7) {
+    return '';
+  }
+
+  if (differenceInDays < 0) {
+    return 'custom-error-color';
+  }
+
+  return 'custom-warning-color';
+}
+
 function getColumns(isMobile: boolean) {
+  const today = new Date();
+
   const columns: GridColDef<ISubscriptionModel>[] = [
     {
       field: 'student',
@@ -56,6 +72,7 @@ function getColumns(isMobile: boolean) {
       flex: 1,
       valueFormatter:
         (params: GridValueFormatterParams<ISubscriptionModel['dateTo']>) => dateValueFormatter(params.value),
+      cellClassName: (params) => getClassNameByExpireDate(today, params.value),
     },
     {
       field: 'price',

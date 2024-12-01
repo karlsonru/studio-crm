@@ -111,7 +111,7 @@ describe('LessonController', () => {
     it('should return a lesson with the given id', async () => {
       jest.spyOn(service, 'findOne').mockResolvedValueOnce(mockEntity);
 
-      expect((await controller.findOne(mockEntity._id.toString()))).toEqual(mockEntity);
+      expect(await controller.findOne(mockEntity._id.toString())).toEqual(mockEntity);
     });
 
     it('should raise HttpException with NOT FOUND HttpStatus if no lesson is found with the given id', async () => {
@@ -141,9 +141,9 @@ describe('LessonController', () => {
 
       jest.spyOn(service, 'update').mockResolvedValueOnce(updatedLesson);
 
-      expect(
-        (await controller.update(mockEntity._id.toString(), updatedMockEntity)),
-      ).toEqual(updatedLesson);
+      expect(await controller.update(mockEntity._id.toString(), updatedMockEntity)).toEqual(
+        updatedLesson,
+      );
     });
 
     it('should return a 404 error if no lesson is found with the given id', async () => {

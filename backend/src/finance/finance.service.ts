@@ -1,9 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, PopulateOptions } from 'mongoose';
-import { CreateFinanceDto } from './dto/create-finance.dto';
+import {
+  CreateFinanceDto,
+  CreateFinanceCategoryDto,
+} from './dto/create-finance.dto';
 import { UpdateFinanceDto } from './dto/update-finance.dto';
-import { FinanceDocument, FinanceModel } from '../schemas';
+import {
+  FinanceCategoryDocument,
+  FinanceCategoryModel,
+  FinanceDocument,
+  FinanceModel,
+} from '../schemas';
 import { IFilterQuery } from '../shared/IFilterQuery';
 import { logger } from '../shared/logger.middleware';
 import { isMongoId } from 'class-validator';
@@ -15,6 +23,8 @@ export class FinanceService {
   constructor(
     @InjectModel(FinanceModel.name)
     private readonly financeModel: Model<FinanceDocument>,
+    @InjectModel(FinanceCategoryModel.name)
+    private readonly financeCategoryModel: Model<FinanceCategoryDocument>,
   ) {
     this.populateQuery = [{ path: 'location', select: '_id title' }];
   }
@@ -23,8 +33,9 @@ export class FinanceService {
     const record = await this.financeModel.create(createFinanceDto);
 
     logger.info(
-      `Финансы. Добавлена запись ${createFinanceDto.title} на сумму ${createFinanceDto.amount}
-       за дату ${new Date(createFinanceDto.date).toLocaleDateString('ru-RU')}}`,
+      `Финансы. Добавлена запись ${JSON.stringify(createFinanceDto)} за дату ${new Date(
+        createFinanceDto.date,
+      ).toLocaleDateString('ru-RU')}`,
     );
 
     return record;
@@ -35,7 +46,9 @@ export class FinanceService {
       delete query.location;
     }
 
-    return await this.financeModel.find(query ?? {}).populate(this.populateQuery);
+    return await this.financeModel
+      .find(query ?? {})
+      .populate(this.populateQuery);
   }
 
   async findOne(query: IFilterQuery<FinanceModel>) {
@@ -43,16 +56,40 @@ export class FinanceService {
   }
 
   async update(id: string, updateFinanceDto: UpdateFinanceDto) {
-    const updated = await this.financeModel.findByIdAndUpdate(id, updateFinanceDto, { new: true });
+    const updated = await this.financeModel.findByIdAndUpdate(
+      id,
+      updateFinanceDto,
+      { new: true },
+    );
 
-    logger.info(`Финансы. Обновлена запись ${updated?.title} с ID: ${updated?._id}`);
+    logger.info(`
+      Финансы. Обновлена запись ${updated?.title} \
+      с ID: ${updated?._id}
+    `);
 
     return updated;
   }
 
   async remove(id: string) {
     const deleted = await this.financeModel.findByIdAndDelete(id);
-    logger.info(`Финансы. Удалена запись ${deleted?.title} с ID: ${deleted?._id}`);
+    logger.info(`
+      Финансы. Удалена запись ${deleted?.title} \
+      с ID: ${deleted?._id}
+    `);
     return deleted;
+  }
+
+  async createCategory(createFinanceCategoryDto: CreateFinanceCategoryDto) {
+    logger.info(`Финансы. Добавлен категория ${createFinanceCategoryDto.name}`);
+    return await this.financeCategoryModel.create(createFinanceCategoryDto);
+  }
+
+  async findAllCategories() {
+    return await this.financeCategoryModel.find({});
+  }
+
+  async removeCategory(id: string) {
+    logger.info(`Финансы. Удалена категория с ID ${id}`);
+    return await this.financeCategoryModel.findByIdAndDelete(id);
   }
 }

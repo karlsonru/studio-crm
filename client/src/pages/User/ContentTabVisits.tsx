@@ -58,7 +58,7 @@ export function ContentTabVisits({ userId }: { userId: string }) {
       props={{
         onDoubleClick: () => {
           const { year, month, day } = getYearMonthDay(visit.date);
-          navigate(`/attendances?lessonId=${visit.lesson._id}&year=${year}&month=${month + 1}&day=${day}`);
+          navigate(`/attendances/history?lessonId=${visit.lesson._id}&year=${year}&month=${month + 1}&day=${day}`);
         },
       }}
     />);

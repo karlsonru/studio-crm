@@ -108,7 +108,6 @@ export function ContentTabDetails({ lesson }: { lesson: ILessonModel }) {
           hh: +timeEnd[0],
           min: +timeEnd[1],
         },
-        students: [],
         dateFrom: +Date.parse(formData.dateFrom as string),
         dateTo: +Date.parse(formData.dateTo as string),
         color,

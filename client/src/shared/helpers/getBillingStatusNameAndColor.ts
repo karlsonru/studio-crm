@@ -9,7 +9,7 @@ export function getBillingStatusNameAndColor(billingStatus?: PaymentStatus) {
       };
     case PaymentStatus.UNPAID:
       return {
-        name: 'Неоплачено',
+        name: 'Не оплачено',
         color: 'error.main',
       };
     case PaymentStatus.UNCHARGED:

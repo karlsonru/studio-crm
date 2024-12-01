@@ -19,6 +19,7 @@ export class CreateStudentDto {
   @IsNotEmpty()
   sex: string;
 
+  @IsOptional()
   @IsNumber()
   birthday: number;
 

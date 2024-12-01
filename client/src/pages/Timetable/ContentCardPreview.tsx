@@ -8,7 +8,10 @@ function ContentListItem({ item }: { item: string | null }) {
   if (item === null) return null;
 
   return (
-    <ListItem divider={true}>
+    <ListItem
+      divider={true}
+      secondaryAction={null}
+    >
       <ListItemText primary={item} />
     </ListItem>
   );

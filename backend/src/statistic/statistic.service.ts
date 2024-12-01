@@ -21,14 +21,11 @@ export class StatisticService {
   ) {}
 
   async calcVisitedLessonsByStudent(
-    query: IFilterQuery<AttendanceModel>,
     studentId: string,
+    dateFrom: number,
   ): Promise<IFindVisitedByStudentWithStatistic> {
     const attendances = await this.attendanceService.findAll({
-      $and: [
-        { date: { $gte: query.startPeriod } },
-        { students: { $elemMatch: { student: studentId } } },
-      ],
+      $and: [{ date: { $gte: dateFrom } }, { students: { $elemMatch: { student: studentId } } }],
     });
 
     const statistic = {
@@ -72,19 +69,34 @@ export class StatisticService {
     };
   }
 
-  async calcIncome(filter: IFilterQuery<SubscriptionModel>, locationId?: string) {
+  async calcIncomeByLocationAndUser({
+    dateFrom,
+    dateTo,
+    locationId,
+    userId,
+  }: {
+    dateFrom: number;
+    dateTo: number;
+    locationId: string;
+    userId: string;
+  }) {
     const subscriptions = await this.subscribtionService.findAll({
-      dateFrom: { $gte: filter.dateFrom },
-    });
-    const expenses = await this.financeService.findAll({
-      date: { $gte: filter.dateFrom },
+      dateFrom: { $gte: dateFrom },
+      dateTo: { $lte: dateTo },
     });
 
-    const incomeByMonth: Array<number> = Array(12).fill(0);
-    const amountByMonth: Array<number> = Array(12).fill(0);
-    const expensesByMonth: Array<number> = Array(12).fill(0);
+    const expenses = await this.financeService.findAll({
+      date: { $gte: dateFrom, $lte: dateTo },
+    });
+
+    const statistic = {
+      income: 0,
+      subscriptionsAmount: 0,
+      expenses: 0,
+    };
 
     const isCheckLocation = isMongoId(locationId);
+    const isFilterByUserId = isMongoId(userId);
 
     // найдём общий доход и кол-во абонементов по каждому месяцу
     subscriptions.forEach((subscription) => {
@@ -94,25 +106,24 @@ export class StatisticService {
       )
         return;
 
-      const month = new Date(subscription.dateFrom).getMonth();
+      if (
+        isFilterByUserId &&
+        // @ts-ignore
+        !subscription.lessons.some((lesson) => lesson.teacher === userId)
+      )
+        return;
 
-      incomeByMonth[month] += subscription.price;
-      amountByMonth[month] += 1;
+      statistic.income += subscription.price;
+      statistic.subscriptionsAmount += 1;
     });
 
     expenses.forEach((expense) => {
       if (isCheckLocation && locationId !== expense.location?._id.toString()) return;
 
-      const month = new Date(expense.date).getMonth();
-
-      expensesByMonth[month] += expense.amount;
+      statistic.expenses += expense.amount;
     });
 
-    return {
-      income: incomeByMonth,
-      amount: amountByMonth,
-      expenses: expensesByMonth,
-    };
+    return statistic;
   }
 
   async calcIncomeByUser(filter: IFilterQuery<SubscriptionModel>, userId: string) {

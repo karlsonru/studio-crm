@@ -1,6 +1,6 @@
 CRM for school / studio management. Work in progress. 
 
-Features:
+### Features:
 - [x] Timetable. Look through all lessons planned for any week. Available views - ['week', 'day].
   - [ ] separated timetable for different locations
 - [x] Lessons list. View all lessons, create new one. By double click can view specific lesson:
@@ -27,7 +27,7 @@ Instructions:
 - [ ] Swagger documentation
 
 
-Development instruction:
+### Development instruction:
 * Database: 
   1. Install MongoDB
   2. Create roles in database
@@ -42,3 +42,26 @@ Development instruction:
 
 Development mode:
 ```npm run dev```
+
+
+#### Know issues: 
+1. Error message when running dev version or building app:
+```
+BREAKING CHANGE: webpack < 5 used to include polyfills for node.js core modules by default.
+This is no longer the case. Verify if you need this module and configure a polyfill for it.
+```
+
+To fix it update your webpack configuration to include the NodePolyfillPlugin:
+Webpack configuration path is ```node_modules/react-scripts/config/webpack.config.js```
+
+```javascript
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
+
+module.exports = {
+  // Your existing webpack configuration
+  
+  plugins: [
+    new NodePolyfillPlugin()
+  ]
+};
+```

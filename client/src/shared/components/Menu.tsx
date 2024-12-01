@@ -18,6 +18,8 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import DomainVerificationIcon from '@mui/icons-material/DomainVerification';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import MoveUpIcon from '@mui/icons-material/MoveUp';
+import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 import { useMobile } from '../hooks/useMobile';
 import { useAppSelector } from '../hooks/useAppSelector';
 import { useActionCreators } from '../hooks/useActionCreators';
@@ -67,7 +69,9 @@ function NavMenuList() {
     <MenuList sx={{ width: isMobile ? 'auto' : `${width}px` }}>
       <NavItem path="/" title="Главная" icon={<HomeIcon />} />
       <NavItem path="/timetable" title="Расписание" icon={<CalendarMonthIcon />} />
-      <NavItem path="/attendances" title="Посещения" icon={<DomainVerificationIcon />} />
+      <NavItem path="/attendances/history" title="Посещения" icon={<DomainVerificationIcon />} />
+      <NavItem path="/attendances/postponed" title="Отработки" icon={<MoveUpIcon />} />
+      <NavItem path="/attendances/unpaid" title="Неоплаченные" icon={<ReportGmailerrorredIcon />} />
       <NavItem path='/lessons' title="Занятия" icon={<ListAltIcon />} />
       <NavItem path='/students' title="Ученики" icon={<GroupIcon />} />
       <NavItem path='/subscriptions/templates' title="Абонементы" icon={<CardMembershipIcon />} />

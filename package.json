@@ -4,13 +4,12 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "tsc",
+    "build": "concurrently \"npm run build --prefix client\" \"npm run build --prefix backend\"",
     "build_client": "npm run build --prefix client",
-    "start": "node -r dotenv/config --experimental-specifier-resolution=node .",
-    "prestart": "npm run build",
+    "build_backend": "npm run build --prefix backend",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "npm run start:dev --prefix backend",
-    "client": "npm run start --prefix client",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "client": "npm run start --prefix client"
   },
   "repository": {
     "type": "git",
@@ -24,12 +23,6 @@
   },
   "homepage": "https://github.com/karlsonru/studio-app#readme",
   "devDependencies": {
-    "concurrently": "^7.6.0",
-    "nodemon": "^2.0.20",
-    "ts-node": "^10.9.1"
-  },
-  "dependencies": {
-    "@nestjs/mapped-types": "*",
-    "dotenv": "^16.0.3"
+    "concurrently": "^7.6.0"
   }
 }

@@ -1,0 +1,1 @@
+{"version":3,"file":"static/css/main.de220e38.css","mappings":"AAAA,sBACE,aACF,CAEA,oBACE,aACF","sources":["pages/Subscriptions/Subscriptions/subscription.css"],"sourcesContent":[".custom-warning-color {\r\n  color: #ed6c02;\r\n}\r\n\r\n.custom-error-color {\r\n  color: #d32f2f;\r\n}\r\n"],"names":[],"sourceRoot":""}

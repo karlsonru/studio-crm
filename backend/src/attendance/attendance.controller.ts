@@ -19,7 +19,10 @@ import {
   UpdateAttendanceDtoSchemaAdapter,
   UpdatedVisitedStudent,
 } from './dto/update-attendance.dto';
-import { ValidateIdPipe, ValidateOptionalNumberPipe } from '../shared/validaitonPipe';
+import {
+  ValidateIdPipe,
+  ValidateOptionalNumberPipe,
+} from '../shared/validaitonPipe';
 import { PaymentStatus, VisitStatus } from '../schemas/attendance.schema';
 import { CreateAttendanceDtoSchemaAdapter } from './createAttendanceDtoSchemaAdapter';
 
@@ -34,7 +37,10 @@ export class AttendanceController {
     );
 
     if (created === null) {
-      throw new HttpException({ message: 'Уже существует' }, HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        { message: 'Уже существует' },
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     return created;
@@ -55,7 +61,10 @@ export class AttendanceController {
       return await this.service.findAll(JSON.parse(filter));
     }
 
-    const query: Record<string, string | number | Record<string, string | number>> = {};
+    const query: Record<
+      string,
+      string | number | Record<string, string | number>
+    > = {};
 
     if (lessonId) {
       query['lesson'] = lessonId;
@@ -83,7 +92,11 @@ export class AttendanceController {
   @Get('/unpaid')
   async findAllUnpaid(@Query('days', ParseIntPipe) days: number) {
     const today = new Date();
-    const searchDate = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() - days);
+    const searchDate = Date.UTC(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() - days,
+    );
 
     return await this.service.findAll({
       date: { $gte: searchDate, $lte: today.getTime() },
@@ -98,7 +111,11 @@ export class AttendanceController {
   @Get('/postponed')
   async findAllPostponed(@Query('days', ParseIntPipe) days: number) {
     const today = new Date();
-    const searchDate = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate() - days);
+    const searchDate = Date.UTC(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() - days,
+    );
 
     return await this.service.findAll({
       date: { $gte: searchDate, $lte: today.getTime() },
@@ -128,12 +145,23 @@ export class AttendanceController {
     @Param('action') action: 'add' | 'remove',
     @Body() updateAttendanceStudentDto: UpdatedVisitedStudent,
   ) {
-    const updated = await this.service.updateAttendnedStudentById(
-      id,
-      studentId,
-      updateAttendanceStudentDto,
-      action,
-    );
+    let updated = null;
+
+    if (action === 'add') {
+      updated = await this.service.addStudentToAttendance(
+        id,
+        studentId,
+        updateAttendanceStudentDto,
+      );
+    }
+
+    if (action === 'remove') {
+      updated = await this.service.removeStudentFromAttendance(
+        id,
+        studentId,
+        updateAttendanceStudentDto,
+      );
+    }
 
     if (updated === null) {
       throw new HttpException({ message: 'Не найдено' }, HttpStatus.NOT_FOUND);

@@ -1,22 +1,25 @@
 import { FormEvent } from 'react';
-import { startOfMonth, subMonths } from 'date-fns';
 import Box from '@mui/material/Box';
 import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import MenuItem from '@mui/material/MenuItem';
 import { useMobile } from '../../shared/hooks/useMobile';
-import { useGetLocationsQuery } from '../../shared/api';
+import { useGetLocationsQuery, useGetUsersQuery } from '../../shared/api';
 import { SubmitButton } from '../../shared/components/buttons/SubmitButton';
 import { FormContentColumn } from '../../shared/components/FormContentColumn';
 import { useActionCreators } from '../../shared/hooks/useActionCreators';
 import { financeActions } from '../../shared/reducers/financeSlice';
-import { getTodayTimestamp } from '../../shared/helpers/getTodayTimestamp';
-import { FINANCE_PERIOD_DEFAULT } from '../../shared/constants';
+import { getMonthName } from '../../shared/helpers/getMonthName';
+
+const MONTHES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 
 export function FinanceFilters({ tabName }: { tabName: string }) {
   const isMobile = useMobile();
-  const { data: responseLocations, isLoading } = useGetLocationsQuery();
+  const { data: responseLocations, isLoading: isLoadingLocations } = useGetLocationsQuery();
+  const { data: responseUsers, isLoading: isLoadingUsers } = useGetUsersQuery();
+
+  const currentMonth = new Date().getMonth();
 
   const actions = useActionCreators(financeActions);
 
@@ -24,17 +27,11 @@ export function FinanceFilters({ tabName }: { tabName: string }) {
     event.preventDefault();
     const form = new FormData(event.currentTarget as HTMLFormElement);
 
-    const period = (form.get('period') ?? FINANCE_PERIOD_DEFAULT) as number;
+    const month = (form.get('month') ?? currentMonth) as number;
+    const userId = (form.get('teacher') ?? 'all') as string;
     const location = (form.get('location') ?? 'common') as string;
 
-    // узнаем первый день месяца за период
-    const dateFrom = startOfMonth(subMonths(getTodayTimestamp(), period + 1)).getTime();
-
-    const filters = {
-      dateFrom,
-      period,
-      location,
-    };
+    const filters = { month, location, userId };
 
     if (tabName === 'expenses') {
       actions.setExpensesFilters(filters);
@@ -45,22 +42,32 @@ export function FinanceFilters({ tabName }: { tabName: string }) {
 
   return (
     <Box component="form" noValidate onSubmit={handleSubmit}>
-      <FormContentColumn props={{ direction: 'row', flexWrap: 'wrap', alignItems: 'center' }}>
+      <FormContentColumn
+        props={{
+          direction: isMobile ? 'column' : 'row',
+          alignItems: isMobile ? 'left' : 'center',
+          width: '100%',
+        }}>
         <FormControl>
           <FormLabel>Период</FormLabel>
             <Select
-              labelId="period"
-              name="period"
-              defaultValue={FINANCE_PERIOD_DEFAULT}
-              label="period"
-              disabled={isMobile}
+              labelId="month"
+              name="month"
+              defaultValue={currentMonth}
+              label="month"
               sx={{
                 minWidth: '135px',
               }}
             >
-              <MenuItem value={3}>3 месяца</MenuItem>
-              <MenuItem value={6}>6 месяцев</MenuItem>
-              <MenuItem value={12}>12 месяцев</MenuItem>
+              {
+                MONTHES.map((month) => (
+                  <MenuItem
+                    key={month}
+                    value={month}>{ getMonthName(month) }
+                  </MenuItem>
+                ))
+
+              }
             </Select>
         </FormControl>
 
@@ -71,7 +78,7 @@ export function FinanceFilters({ tabName }: { tabName: string }) {
               name="location"
               defaultValue={'common'}
               label="location"
-              disabled={isLoading}
+              disabled={isLoadingLocations}
               sx={{
                 minWidth: '135px',
               }}
@@ -82,6 +89,26 @@ export function FinanceFilters({ tabName }: { tabName: string }) {
               )) }
             </Select>
         </FormControl>
+
+        {tabName === 'income' && <FormControl>
+          <FormLabel>Сотрудник</FormLabel>
+              <Select
+                labelId="teacher"
+                name="teacher"
+                defaultValue={'all'}
+                label="teacher"
+                disabled={isLoadingUsers}
+                sx={{
+                  minWidth: '135px',
+                }}
+              >
+                <MenuItem value={'all'}>Все</MenuItem>
+                { responseUsers?.map((user) => (
+                  <MenuItem key={user._id} value={user._id}>{ user.fullname }</MenuItem>
+                ))}
+              </Select>
+          </FormControl>
+        }
 
         <SubmitButton
           content='Показать'

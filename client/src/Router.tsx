@@ -12,6 +12,8 @@ import { StudentsPage } from './pages/Students';
 import { StudentPage } from './pages/Student';
 import { NotFoundPage } from './pages/NotFound';
 import { FinancePage } from './pages/Finance';
+import { PostponedAttendancesPage } from './pages/PostponedAttendances';
+import { UnpaidAttendancesPage } from './pages/UnpaidAttendances';
 import {
   SubscriptionsPageLayout,
   SubscriptionsTemplatePage,
@@ -30,7 +32,11 @@ export const router = createBrowserRouter(
 
         <Route path='/timetable' element={<TimetablePage />} />
 
-        <Route path='/attendances' element={<AttendancePage />} />
+        <Route path='/attendances' >
+          <Route path="history" element={<AttendancePage />} />
+          <Route path='postponed' element={<PostponedAttendancesPage />} />
+          <Route path='unpaid' element={<UnpaidAttendancesPage />} />
+        </Route>
 
         <Route path='/students'>
           <Route index element={<StudentsPage />} />

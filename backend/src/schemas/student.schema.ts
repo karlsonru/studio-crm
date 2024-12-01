@@ -45,6 +45,7 @@ export class Student {
   @Prop({
     type: Number,
     required: true,
+    default: null,
   })
   birthday: number;
 

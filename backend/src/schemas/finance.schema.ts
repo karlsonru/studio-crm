@@ -36,9 +36,9 @@ export class Finance {
 
   @Prop({
     type: String,
-    default: 'expenses',
+    trim: true,
   })
-  type: string;
+  categoryName: string;
 
   @Prop({
     type: Types.ObjectId,

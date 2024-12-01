@@ -213,9 +213,9 @@ export function CreateLessonModal() {
           defaultValue={locationsData?.length === 1 ? locationsData[0]._id : ''}
           fullWidth
           required
-          disabled={locationsData?.length === 1}
+          // disabled={locationsData?.length === 1}
         >
-          <MenuItem value={''}><em>Выберите помещение</em></MenuItem>
+          {locationsData && locationsData.length > 1 && <MenuItem value={''}><em>Выберите помещение</em></MenuItem>}
         { isLocationsSuccess
             && locationsData.map((location) => (
               <MenuItem key={location._id} value={location._id}>{location.title}</MenuItem>

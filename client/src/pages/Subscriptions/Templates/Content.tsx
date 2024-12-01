@@ -38,7 +38,8 @@ function AddCard({ cardDetails }: { cardDetails: ISubscriptionTemplateModel }) {
           <CardContent>
             <CardContentItem title="Занятий" value={cardDetails.visits} />
             <Divider />
-            <CardContentItem title="Стоимость P" value={cardDetails.price} />
+            <CardContentItem title="Стоимость, ₽" value={cardDetails.price} />
+            <CardContentItem title="Одно занятие, ₽" value={(cardDetails.price / cardDetails.visits).toFixed(2)} />
           </CardContent>
         </CardActionArea>
       </CardWrapper>

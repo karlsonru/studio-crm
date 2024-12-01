@@ -22,10 +22,10 @@ import { getYearMonthDay } from '../../shared/helpers/getYearMonthDay';
 
 interface IVisitsStatistic {
   statistic: Record<string, number>;
-  startPeriod: number;
+  period: number;
 }
 
-function VisitsStatistic({ statistic, startPeriod }: IVisitsStatistic) {
+function VisitsStatistic({ statistic, period }: IVisitsStatistic) {
   const isMobile = useMobile();
   const [isExpanded, setExpanded] = useState(false);
 
@@ -46,7 +46,7 @@ function VisitsStatistic({ statistic, startPeriod }: IVisitsStatistic) {
         <Typography>Показать статистику</Typography>
       </AccordionSummary>
       <AccordionDetails>
-        <Typography>{`${startPeriod === 0 ? 'Всё время' : 'Последние 3 месяца'}`}</Typography>
+        <Typography>{`${period ? 'Всё время' : `Последние ${period} месяца`}`}</Typography>
         <List dense>
             {Object.entries(statisticFieldsName)
               .map((parameters) => (
@@ -107,8 +107,6 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
   const [showMoreSubscriptions, setShowMoreSubscriptions] = useState(false);
   const navigate = useNavigate();
 
-  const startPeriodLessons = showMoreVisits ? 0 : subMonths(today, 3).getTime();
-
   // отправляем запрос к статистике на список посещённых занятий по студенту
   const {
     data: responseVisitedLessonsStatisticByStudent,
@@ -116,10 +114,8 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
     isError: isErrorVisitedLessons,
     error: errorVisitedLessons,
   } = useGetVisitedLessonsStatisticByStudentQuery({
-    query: {
-      startPeriod: startPeriodLessons,
-    },
     id: student._id,
+    monthes: showMoreVisits ? undefined : 3,
   });
 
   // найдём все абонементы студента за последние 3 мес
@@ -189,7 +185,7 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
               props={{ width: '100%' }}
             />,
           ]}
-          callback={() => navigate(`/attendances?lessonId=${visitedLesson.lesson._id}&year=${year}&month=${month + 1}&day=${day}`)}
+          callback={() => navigate(`/attendances/history?lessonId=${visitedLesson.lesson._id}&year=${year}&month=${month + 1}&day=${day}`)}
         />
       );
     });
@@ -218,7 +214,7 @@ export function ContentTabVisits({ student }: { student: IStudentModel }) {
     <>
       <VisitsStatistic
         statistic={responseVisitedLessonsStatisticByStudent.statistic}
-        startPeriod={startPeriodLessons}
+        period={showMoreVisits ? 3 : 0}
       />
 
       <BasicTableWithTitleAndButton

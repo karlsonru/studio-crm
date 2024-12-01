@@ -9,9 +9,7 @@ describe('SubscriptionTemplateService', () => {
       providers: [SubscriptionTemplateService],
     }).compile();
 
-    service = module.get<SubscriptionTemplateService>(
-      SubscriptionTemplateService,
-    );
+    service = module.get<SubscriptionTemplateService>(SubscriptionTemplateService);
   });
 
   it('should be defined', () => {

@@ -1,1 +1,1 @@
-export { FinancePage } from './Finance';
+export { FinancePage } from './Page';

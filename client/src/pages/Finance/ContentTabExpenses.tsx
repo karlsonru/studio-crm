@@ -8,7 +8,8 @@ import {
   GridValueFormatterParams,
 } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useDeleteFinanceMutation, useFindFinancesQuery } from '../../shared/api';
+import { FinanceFilters } from './FinanceFilters';
+import { useDeleteFinanceMutation, useFindWithParamsFinancesQuery } from '../../shared/api';
 import { useMobile } from '../../shared/hooks/useMobile';
 import { IFinanceModel } from '../../shared/models/IFinanceModel';
 import { ConfirmationDialog, DeleteDialogText } from '../../shared/components/ConfirmationDialog';
@@ -53,13 +54,26 @@ export function ContentTabExpenses() {
   }, []);
 
   const {
-    data, isLoading, isError, error,
-  } = useFindFinancesQuery({
-    date: { $gte: filters.dateFrom },
-    location: filters.location,
+    data,
+    isLoading,
+    isError,
+    error,
+  } = useFindWithParamsFinancesQuery({
+    params: {
+      month: filters.month,
+      locationId: filters.location,
+    },
   });
 
   const columns: GridColDef<IFinanceModel>[] = useMemo(() => [
+    {
+      field: 'date',
+      headerName: 'Дата',
+      flex: 1,
+      valueFormatter: (params: GridValueFormatterParams<IFinanceModel['date']>) => (
+        format(params.value, 'dd-MM-yyyy')
+      ),
+    },
     {
       field: 'title',
       headerName: 'Название',
@@ -71,12 +85,10 @@ export function ContentTabExpenses() {
       flex: 1,
     },
     {
-      field: 'date',
-      headerName: 'Дата',
+      field: 'categoryName',
+      headerName: 'Категория',
       flex: 1,
-      valueFormatter: (params: GridValueFormatterParams<IFinanceModel['date']>) => (
-        format(params.value, 'dd-MM-yyyy')
-      ),
+      valueFormatter: (params: GridValueFormatterParams<IFinanceModel['categoryName']>) => (params.value === 'noCategory' ? 'Без категории' : params.value),
     },
     {
       field: 'location',
@@ -112,28 +124,31 @@ export function ContentTabExpenses() {
   }
 
   return (
-    <DataGrid
-      autoHeight
-      columns={isMobile ? columns.slice(0, 3) : columns}
-      rows={data}
-      getRowId={(item) => item._id}
-      disableColumnMenu
-      density="comfortable"
-      pageSizeOptions={[25, 50]}
-      components={{
-        Toolbar: ExtendedToolbar,
-      }}
-      localeText={{
-        toolbarFilters: 'Фильтры',
-      }}
-      initialState={{
-        sorting: {
-          sortModel: [{ field: 'date', sort: 'desc' }],
-        },
-        pagination: {
-          paginationModel: { pageSize: 25 },
-        },
-      }}
-    />
+    <>
+      <FinanceFilters tabName='expenses' />
+      <DataGrid
+        autoHeight
+        columns={isMobile ? columns.slice(0, 3) : columns}
+        rows={data}
+        getRowId={(item) => item._id}
+        disableColumnMenu
+        density="comfortable"
+        pageSizeOptions={[25, 50]}
+        components={{
+          Toolbar: ExtendedToolbar,
+        }}
+        localeText={{
+          toolbarFilters: 'Фильтры',
+        }}
+        initialState={{
+          sorting: {
+            sortModel: [{ field: 'date', sort: 'desc' }],
+          },
+          pagination: {
+            paginationModel: { pageSize: 25 },
+          },
+        }}
+      />
+    </>
   );
 }

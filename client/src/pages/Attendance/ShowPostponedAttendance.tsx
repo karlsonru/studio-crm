@@ -61,7 +61,7 @@ export function ShowPostponedAttendance({ attendance }: { attendance: IAttendanc
 
   const goToPostponedLesson = () => {
     closeHandler();
-    navigate(`/attendances?year=${visitInsteadDate.getFullYear()}&month=${visitInsteadDate.getMonth() + 1}&day=${visitInsteadDate.getDate()}&lessonId=${lessonId}`);
+    navigate(`/attendances/history?year=${visitInsteadDate.getFullYear()}&month=${visitInsteadDate.getMonth() + 1}&day=${visitInsteadDate.getDate()}&lessonId=${lessonId}`);
   };
 
   return (

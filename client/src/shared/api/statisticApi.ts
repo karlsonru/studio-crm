@@ -6,28 +6,34 @@ const route = 'statistic';
 
 api.addTagTypes(tag);
 
+export interface IStatisticArgs {
+  locationId: string;
+  userId: string;
+  month: number;
+}
+
 interface IAttendancesWithStatistic {
   attendances: Array<IAttendanceModel>;
   statistic: Record<string, number>;
 }
 
-export interface IStatisticArgs {
-  query: Record<string, unknown>;
-  id?: string;
-}
-
 const apiResource = api.getResource();
+
+interface IVisitedLessonsByStudentArgs {
+  id: string;
+  monthes?: number;
+}
 
 export const { useGetVisitedLessonsStatisticByStudentQuery } = apiResource.injectEndpoints({
   endpoints: (build) => ({
     getVisitedLessonsStatisticByStudent:
       build
-        .query<IAttendancesWithStatistic, IStatisticArgs>(
+        .query<IAttendancesWithStatistic, IVisitedLessonsByStudentArgs>(
         {
-          query: ({ query, id }) => (
+          query: ({ id, monthes }) => (
             {
               url: `${route}/visited-lessons/${id}`,
-              params: { filter: JSON.stringify(query) },
+              params: { monthes },
             }
           ),
           providesTags: [tag as any],
@@ -36,22 +42,28 @@ export const { useGetVisitedLessonsStatisticByStudentQuery } = apiResource.injec
   }),
 });
 
-interface IIncomeStatistic {
+export interface IFinanceStatisticArgs {
+  locationId: string;
+  userId: string;
+  month: number;
+}
+
+interface IFinanceStatistic {
   income: Array<number>;
-  amount: Array<number>;
+  subscriptionsAmount: Array<number>;
   expenses: Array<number>;
 }
 
-export const { useGetIncomeStatisticQuery } = apiResource.injectEndpoints({
+export const { useGetFinanceStatisticQuery } = apiResource.injectEndpoints({
   endpoints: (build) => ({
-    getIncomeStatistic:
+    getFinanceStatistic:
       build
-        .query<IIncomeStatistic, IStatisticArgs>(
+        .query<IFinanceStatistic, IFinanceStatisticArgs>(
         {
-          query: ({ query, id }) => (
+          query: ({ locationId, month, userId }) => (
             {
-              url: `${route}/finance/income/${id}`,
-              params: { filter: JSON.stringify(query) },
+              url: `${route}/finance/statistic/location/${locationId}`,
+              params: { month, userId },
             }
           ),
           providesTags: [tag as any],
@@ -59,17 +71,22 @@ export const { useGetIncomeStatisticQuery } = apiResource.injectEndpoints({
       ),
   }),
 });
+
+interface IIncomeByUserArgs {
+  month: number;
+  userId: string;
+}
 
 export const { useGetIncomeByUserQuery } = apiResource.injectEndpoints({
   endpoints: (build) => ({
     getIncomeByUser:
       build
-        .query<number, IStatisticArgs>(
+        .query<number, IIncomeByUserArgs>(
         {
-          query: ({ query, id }) => (
+          query: ({ month, userId }) => (
             {
-              url: `${route}/finance/income/user/${id}`,
-              params: { filter: JSON.stringify(query) },
+              url: `${route}/finance/income/user/${userId}`,
+              params: { month },
             }
           ),
           providesTags: [tag as any],

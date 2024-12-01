@@ -71,7 +71,7 @@ export function ContentAttendance({ lessonId }: { lessonId: string }) {
       pageSizeOptions={[10, 25]}
       onRowDoubleClick={((params: GridRowParams<IAttendanceModel>) => {
         const { year, month, day } = getYearMonthDay(params.row.date);
-        return navigate(`/attendances?year=${year}&month=${month + 1}&day=${day}&lessonId=${lessonId}}`);
+        return navigate(`/attendances/history?year=${year}&month=${month + 1}&day=${day}&lessonId=${lessonId}}`);
       })}
       localeText={{
         toolbarFilters: 'Фильтры',

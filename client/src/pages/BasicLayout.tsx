@@ -23,7 +23,12 @@ export function Layout() {
       <Stack direction={isMobile ? 'column' : 'row'} spacing={1} >
         {isMobile && <MobileMenu />}
         {!isMobile && <SideMenu />}
-        <Stack direction='column' p={isMobile ? 1 : 2} overflow='auto' width={isMobile ? 'auto' : '100%'}>
+        <Stack
+          direction='column'
+          padding={isMobile ? 1 : 2}
+          overflow='auto'
+          width={isMobile ? 'auto' : '100%'}
+        >
           <Outlet />
         </Stack>
       </Stack>

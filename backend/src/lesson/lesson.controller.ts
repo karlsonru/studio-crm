@@ -16,10 +16,9 @@ import {
 import { LessonService, action } from './lesson.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
-import { ValidateIdPipe, ValidateOptionalNumberPipe } from '../shared/validaitonPipe';
+import { ValidateIdPipe } from '../shared/validaitonPipe';
 import { LessonModel } from '../schemas';
 import { MongooseClassSerializerInterceptor } from '../shared/mongooseClassSerializer.interceptor';
-import { Request } from 'express';
 
 @Controller('lesson')
 @UseInterceptors(MongooseClassSerializerInterceptor(LessonModel))
