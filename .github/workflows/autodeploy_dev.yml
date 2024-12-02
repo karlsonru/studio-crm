@@ -39,27 +39,15 @@ jobs:
         env:
           CI: ""
 
-      - name: Copy files with scp
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key : ${{ secrets.SSH_KEY }}
-          source: "./*"
-          target: ${{ secrets.PROJECT_FOLDER}}
-          overwrite: true
-          debug: true
-          
+      - name: Write key to file
+        run: echo ${{ secrets.SSH_KEY }} > /tmp/key
 
-  restart:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-    - name: Restart service remotly over ssh
-      uses: cross-the-world/ssh-pipeline@master
-      with:
-        host: ${{ secrets.HOST }}
-        user: ${{ secrets.USERNAME }}
-        key: ${{ secrets.SSH_KEY }}
-        script: sudo systemctl restart crm-backend
+      - name: Transfer files with scp
+        run: scp -r -i /tmp/key ./ ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
 
+      - name: Restart backend service
+        run: ssh -i /tmp/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'sudo systemctl restart crm-backend'
+
+      - name: Remove key
+        run: rm /tmp/key
+        
