@@ -33,4 +33,5 @@ jobs:
           key : ${{ secrets.SSH_KEY }}
           source: "./*"
           target: ${{ secrets.PROJECT_FOLDER}}
+          overwrite: true
         
