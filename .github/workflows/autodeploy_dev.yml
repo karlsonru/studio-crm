@@ -45,11 +45,10 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key : ${{ secrets.SSH_KEY }}
-          source: "./*"
-          tar_tmp_path: '/tmp'
+          source: "studio-crm/*"
           target: ${{ secrets.PROJECT_FOLDER}}
-          rm: true
           overwrite: true
+          debug: true
           
 
   restart:
