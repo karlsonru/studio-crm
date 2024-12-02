@@ -45,7 +45,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key : ${{ secrets.SSH_KEY }}
-          source: "studio-crm/*"
+          source: "./*"
           target: ${{ secrets.PROJECT_FOLDER}}
           overwrite: true
           debug: true
