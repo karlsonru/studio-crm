@@ -21,7 +21,7 @@ jobs:
           ls
 
       - name: Transfer files with scp
-        run: scp -rBC -i ~/key -o StrictHostKeyChecking=no studio-crm ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
+        run: scp -rBC -i ~/key -o StrictHostKeyChecking=no $(pwd) ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
 
       - name: Restart backend service
         run: ssh -i ~/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'sudo systemctl restart crm-backend'
