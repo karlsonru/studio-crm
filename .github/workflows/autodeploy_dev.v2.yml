@@ -15,7 +15,7 @@ jobs:
       - name: Write key to file
         run: | 
           echo "${{ secrets.SSH_KEY }}" > ~/key
-          ls /tmp
+          chmod 400 ~/key
 
       - name: Transfer files with scp
         run: scp -rBC -i ~/key -o StrictHostKeyChecking=no ./ ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
