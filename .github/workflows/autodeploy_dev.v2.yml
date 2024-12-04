@@ -14,14 +14,14 @@ jobs:
 
       - name: Write key to file
         run: | 
-          echo "${{ secrets.SSH_KEY }}" > /tmp/key
+          echo "${{ secrets.SSH_KEY }}" > ~/key
           ls /tmp
 
       - name: Transfer files with scp
-        run: scp -rBC -i /tmp/key -o StrictHostKeyChecking=no ./ ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
+        run: scp -rBC -i ~/key -o StrictHostKeyChecking=no ./ ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
 
       - name: Restart backend service
-        run: ssh -i /tmp/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'sudo systemctl restart crm-backend'
+        run: ssh -i ~/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'sudo systemctl restart crm-backend'
 
       - name: Remove key
-        run: rm /tmp/key
+        run: rm ~/key
