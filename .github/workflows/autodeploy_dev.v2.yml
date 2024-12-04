@@ -3,7 +3,7 @@ name: Deploy develop
 on: 
   push:
     branches:
-      - develop
+      - deploy
 
 jobs:
   build:
@@ -40,14 +40,15 @@ jobs:
           CI: ""
 
       - name: Write key to file
-        run: echo "${{ secrets.SSH_KEY }}" > /tmp/key
+        run: | 
+          echo "${{ secrets.SSH_KEY }}" > /tmp/key
+          ls /tmp
 
       - name: Transfer files with scp
-        run: scp -r -i /tmp/key ./ ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
+        run: scp -rBC -i /tmp/key ./ ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
 
       - name: Restart backend service
         run: ssh -i /tmp/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'sudo systemctl restart crm-backend'
 
       - name: Remove key
         run: rm /tmp/key
-        
