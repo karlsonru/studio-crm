@@ -12,40 +12,13 @@ jobs:
       - name: Get repository code
         uses: actions/checkout@v4.1.3
 
-      - name: Cache node modules
-        id: cache-npm
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
-      - name: Install backend dependencies
-        run: cd backend && npm ci
-
-      - name: Install frontend dependencies
-        run: cd client && npm ci
-
-      - name: Install global dependencies
-        run: npm ci
-
-      - name: Build project
-        run: npm run build
-        env:
-          CI: ""
-
       - name: Write key to file
         run: | 
           echo "${{ secrets.SSH_KEY }}" > /tmp/key
           ls /tmp
 
       - name: Transfer files with scp
-        run: scp -rBC -o StrictHostKeyChecking=no -i /tmp/key ./ ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
+        run: scp -rBC -i /tmp/key -o StrictHostKeyChecking=no ./ ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
 
       - name: Restart backend service
         run: ssh -i /tmp/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'sudo systemctl restart crm-backend'
