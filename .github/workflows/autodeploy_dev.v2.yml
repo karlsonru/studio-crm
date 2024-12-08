@@ -40,7 +40,7 @@ jobs:
         run: npm ci
 
       - name: Set variables for frontend
-        run: echo ${{ vars.API_URL }} > client/.env
+        run: echo API_URL=${{ vars.API_URL }} > client/.env
 
       - name: Build project
         run: npm run build
