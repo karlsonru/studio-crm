@@ -5,6 +5,7 @@ on:
     branches:
       - develop
 
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,20 +35,40 @@ jobs:
       - name: Install global dependencies
         run: npm ci
 
+      - name: Set variables for frontend
+        run: echo API_URL=${{ vars.API_URL }} > client/.env
+
       - name: Build project
         run: npm run build
         env:
           CI: ""
+  
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4.3.2
+        with:
+          name: build_files
+          path: ./*
 
-      - name: Write key to file
-        run: echo "${{ secrets.SSH_KEY }}" > /tmp/key
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Artifact
+      uses: actions/download-artifact@v3.0.2
+      with:
+        name: build_files
+        path: ./
 
-      - name: Transfer files with scp
-        run: scp -r -i /tmp/key ./ ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
+    - name: Write key to file
+      run: | 
+        echo "${{ secrets.SSH_KEY }}" > ~/key
+        chmod 400 ~/key
 
-      - name: Restart backend service
-        run: ssh -i /tmp/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'sudo systemctl restart crm-backend'
+    - name: Transfer files with scp
+      run: scp -rBC -i ~/key ./ ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
 
-      - name: Remove key
-        run: rm /tmp/key
-        
+    - name: Restart backend service
+      run: ssh -i ~/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'sudo systemctl restart crm-backend'
+
+    - name: Remove key
+      run: rm ~/key
