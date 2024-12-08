@@ -10,9 +10,6 @@ on:
     types:
       - closed
 
-env:
-  API_URL: ${{ vars.API_URL }}
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -42,12 +39,16 @@ jobs:
       - name: Install global dependencies
         run: npm ci
 
+      - name: Set variables for frontend
+        run: echo ${{ vars.API_URL }} > client/.env
+
       - name: Build project
-        run: |
-          echo ${{ env.API_URL }}
-          npm run build
+        run: npm run build
         env:
           CI: ""
+
+      - name: Remove node modules
+        run: rm -r node_modules client/node_modules backend/node_modules
 
       - name: Make tar archive
         run: tar -cf studio-crm.tar.gz ./
@@ -63,8 +64,8 @@ jobs:
       - name: Unzip archive & remove archive
         run: ssh -i ~/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'tar -xf ${{ secrets.PROJECT_FOLDER }}/studio-crm.tar.gz -C ${{ secrets.PROJECT_FOLDER }}/ && rm ${{ secrets.PROJECT_FOLDER }}/studio-crm.tar.gz'
 
-      - name: Restart backend service
-        run: ssh -i ~/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'sudo systemctl restart crm-backend'
+      - name: Run after deploy srcipt
+        run: ssh -i ~/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'sudo /bin/bash after_deploy.sh'
 
       - name: Remove key
         run: rm ~/key
