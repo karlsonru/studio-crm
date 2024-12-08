@@ -45,7 +45,7 @@ jobs:
       - name: Remove node modules
         run: rm -r node_modules client/node_modules
 
-      - name: Make tar archive
+      - name: Create tar archive
         run: tar -cf studio-crm.tar.gz ./
 
       - name: Write key to file
@@ -56,7 +56,7 @@ jobs:
       - name: Transfer files with scp
         run: scp -rBC -i ~/key -o StrictHostKeyChecking=no $(pwd)/studio-crm.tar.gz ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
 
-      - name: Unpack archive & remove archive
+      - name: Extract archive & remove archive
         run: ssh -i ~/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'tar -xf ${{ secrets.PROJECT_FOLDER }}/studio-crm.tar.gz -C ${{ secrets.PROJECT_FOLDER }}/ && rm ${{ secrets.PROJECT_FOLDER }}/studio-crm.tar.gz'
 
       - name: Run after deploy srcipt (restart service & change permissions)
