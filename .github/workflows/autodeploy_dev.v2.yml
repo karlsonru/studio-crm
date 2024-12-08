@@ -10,6 +10,9 @@ on:
     types:
       - closed
 
+env:
+  API_URL: ${{ env.API_URL }}
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -40,15 +43,14 @@ jobs:
         run: npm ci
 
       - name: Build project
-        run: npm run build
+        run: |
+          echo ${{ env.API_URL }}
+          npm run build
         env:
           CI: ""
-          API_URL: ${{ env.API_URL }}
 
       - name: Make tar archive
-        run: |
-            ls -l
-            tar -cf studio-crm.tar.gz ./
+        run: tar -cf studio-crm.tar.gz ./
 
       - name: Write key to file
         run: | 
