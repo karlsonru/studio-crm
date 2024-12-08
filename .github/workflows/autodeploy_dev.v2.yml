@@ -4,27 +4,35 @@ on:
   push:
     branches:
       - deploy
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Get repository code
         uses: actions/checkout@v4.1.3
 
+      - name: Make tar archive
+        run: |
+            ls -l
+            tar -cf studio-crm.tar.gz studio-crm
+
       - name: Write key to file
         run: | 
           echo "${{ secrets.SSH_KEY }}" > ~/key
           chmod 400 ~/key
-          ls -l ~/
-          pwd
-          ls
 
       - name: Transfer files with scp
-        run: scp -rBC -i ~/key -o StrictHostKeyChecking=no $(pwd) ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
+        run: scp -rBC -i ~/key -o StrictHostKeyChecking=no $(pwd)/studio-crm.tar.gz ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
 
       - name: Restart backend service
         run: ssh -i ~/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'sudo systemctl restart crm-backend'
 
       - name: Remove key
         run: rm ~/key
+  
