@@ -31,7 +31,7 @@ jobs:
         run: scp -rBC -i ~/key -o StrictHostKeyChecking=no $(pwd)/studio-crm.tar.gz ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
 
       - name: Unzip archive & remove archive
-        run: ssh -i ~/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'tar -xf ${{ secrets.PROJECT_FOLDER }}/studio-crm.tar.gz ${{ secrets.PROJECT_FOLDER }}/ && rm tar -xf ${{ secrets.PROJECT_FOLDER }}/studio-crm.tar.gz'
+        run: ssh -i ~/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'tar -xf ${{ secrets.PROJECT_FOLDER }}/studio-crm.tar.gz -C ${{ secrets.PROJECT_FOLDER }}/ && rm tar -xf ${{ secrets.PROJECT_FOLDER }}/studio-crm.tar.gz'
 
       - name: Restart backend service
         run: ssh -i ~/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'sudo systemctl restart crm-backend'
