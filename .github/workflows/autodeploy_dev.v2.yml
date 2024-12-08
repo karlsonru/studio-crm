@@ -20,7 +20,7 @@ jobs:
       - name: Make tar archive
         run: |
             ls -l
-            tar -cf studio-crm.tar.gz studio-crm
+            tar -cf studio-crm.tar.gz ./
 
       - name: Write key to file
         run: | 
