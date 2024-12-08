@@ -43,6 +43,7 @@ jobs:
         run: npm run build
         env:
           CI: ""
+          API_URL: ${{ env.API_URL }}
 
       - name: Make tar archive
         run: |
