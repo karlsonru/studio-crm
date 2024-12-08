@@ -3,7 +3,8 @@ name: Deploy develop
 on: 
   push:
     branches:
-      - deploy
+      - develop
+
 
 jobs:
   build:
@@ -33,6 +34,9 @@ jobs:
 
       - name: Install global dependencies
         run: npm ci
+
+      - name: Set variables for frontend
+        run: echo API_URL=${{ vars.API_URL }} > client/.env
 
       - name: Build project
         run: npm run build
