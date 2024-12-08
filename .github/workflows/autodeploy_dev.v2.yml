@@ -11,7 +11,7 @@ on:
       - closed
 
 env:
-  API_URL: ${{ env.API_URL }}
+  API_URL: ${{ vars.API_URL }}
 
 jobs:
   deploy:
