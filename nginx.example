@@ -1,0 +1,56 @@
+server {
+    # redirect http to https
+    listen 80;
+    listen [::]:80;
+
+    server_name domain_example.com www.domain_example.com;
+
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+
+    server_name domain_example.com www.domain_example.com;
+
+    # Path to certificates, Lets Encrypt as example
+    # ssl_certificate /etc/letsencrypt/live/domain_example.com/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/domain_example.com/privkey.pem;
+
+    # rest https configs
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 10m;
+    keepalive_timeout 70;
+    ssl_stapling on;
+    ssl_trusted_certificate /etc/letsencrypt/live/domain_example.com/cert.pem;
+    resolver 8.8.8.8;
+
+    # gzip sending data
+    gzip on;
+    gzip_types application/javascript image/* text/css;
+    gunzip on;
+
+    # set path to your build with frontend
+    root /path/to/your/frontend/build/;
+
+    # Add index.php to the list if you are using PHP
+    index index.html index.htm index.nginx-debian.html;
+
+    location / {
+        try_files $uri /index.html;
+    }
+
+    # certbot for ssl certificate (auto-update) 
+    # location ~ /.well-known {
+    #    root /path/to/your/frontend/build/;
+    #    allow all;
+    #}
+
+    # send api requests to your backend 
+    # backend is running on same host & port 5000
+    location /api {
+        include proxy_params;
+        proxy_pass http://0.0.0.0:5000;
+    }
+}

@@ -1,0 +1,67 @@
+name: Deploy develop
+
+on: 
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get repository code
+        uses: actions/checkout@v4.1.3
+
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Install backend dependencies
+        run: cd backend && npm ci
+
+      - name: Install frontend dependencies
+        run: cd client && npm ci
+
+      - name: Install global dependencies
+        run: npm ci
+
+      - name: Set variables for frontend
+        run: echo API_URL=${{ vars.API_URL }} > client/.env
+
+      - name: Build project
+        run: npm run build
+        env:
+          CI: ""
+
+      - name: Remove node modules
+        run: rm -r node_modules client/node_modules
+
+      - name: Make tar archive
+        run: tar -cf studio-crm.tar.gz ./
+
+      - name: Write key to file
+        run: | 
+          echo "${{ secrets.SSH_KEY }}" > ~/key
+          chmod 400 ~/key
+
+      - name: Transfer files with scp
+        run: scp -rBC -i ~/key -o StrictHostKeyChecking=no $(pwd)/studio-crm.tar.gz ${{ secrets.USERNAME }}@${{ secrets.HOST }}:${{ secrets.PROJECT_FOLDER}}
+
+      - name: Unpack archive & remove archive
+        run: ssh -i ~/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'tar -xf ${{ secrets.PROJECT_FOLDER }}/studio-crm.tar.gz -C ${{ secrets.PROJECT_FOLDER }}/ && rm ${{ secrets.PROJECT_FOLDER }}/studio-crm.tar.gz'
+
+      - name: Run after deploy srcipt (restart service & change permissions)
+        run: ssh -i ~/key ${{ secrets.USERNAME }}@${{ secrets.HOST }} 'sudo /bin/bash after_deploy.sh'
+
+      - name: Remove key
+        run: rm ~/key
+  
