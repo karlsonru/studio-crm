@@ -41,6 +41,7 @@ jobs:
         run: npm run build
         env:
           CI: ""
+          REACT_APP_API_URL: ${{ vars.API_URL }}
 
       - name: Remove node modules
         run: rm -r node_modules client/node_modules
@@ -64,4 +65,3 @@ jobs:
 
       - name: Remove key
         run: rm ~/key
-  

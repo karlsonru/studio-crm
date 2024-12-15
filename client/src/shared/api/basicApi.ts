@@ -1,9 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { RootState } from '../store';
-import 'dotenv/config';
 
-// eslint-disable-next-line @typescript-eslint/dot-notation
-const BASE_URL = process.env['API_URL'] || 'http://localhost:5000/api/';
+const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api/';
 const UNATHORIZED_STATUS = 401;
 
 interface IFindQuery {
