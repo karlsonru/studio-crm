@@ -7,7 +7,7 @@ export function AppHeader({ menuIcon }: { menuIcon: ReactNode }) {
   const title = useAppSelector((state) => state.appMenuReducer.title);
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#4cbb17' }}>
+    <AppBar position="static" sx={{ backgroundColor: '#7da69e' }}>
       <Toolbar>
           { menuIcon }
         <Typography variant="h6" noWrap component="div">
