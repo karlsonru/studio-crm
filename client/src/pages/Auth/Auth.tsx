@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
@@ -18,6 +18,7 @@ export default function AuthPage() {
   const isMobile = useMobile();
   const navigate = useNavigate();
   const actions = useActionCreators(authActions);
+  const [loginName, setLoginName] = useState<string | null>(null);
 
   const [login, {
     data: auth, isSuccess, isError, error, isLoading,
@@ -26,6 +27,7 @@ export default function AuthPage() {
   useEffect(() => {
     if (!isSuccess || !auth?.token) return;
 
+    actions.setLogin(loginName);
     actions.setToken(auth.token);
 
     navigate('/');
@@ -39,6 +41,8 @@ export default function AuthPage() {
     event.preventDefault();
 
     const data = new FormData(event.currentTarget);
+
+    setLoginName(data.get('login') as string);
 
     login({
       login: data.get('login') as string,
