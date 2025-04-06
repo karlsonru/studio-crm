@@ -12,6 +12,9 @@ import {
   UseInterceptors,
   HttpCode,
   ParseIntPipe,
+  Header,
+  Headers,
+  Res,
 } from '@nestjs/common';
 import { LessonService, action } from './lesson.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
@@ -19,6 +22,7 @@ import { UpdateLessonDto } from './dto/update-lesson.dto';
 import { ValidateIdPipe } from '../shared/validaitonPipe';
 import { LessonModel } from '../schemas';
 import { MongooseClassSerializerInterceptor } from '../shared/mongooseClassSerializer.interceptor';
+import { Response } from 'express';
 
 @Controller('lesson')
 @UseInterceptors(MongooseClassSerializerInterceptor(LessonModel))
@@ -49,11 +53,14 @@ export class LessonController {
       students: { $not: { $elemMatch: { student: studentId } } },
     };
 
-    return await this.service.findAll(query);
+    const result = await this.service.findAll(query);
+
+    return result;
   }
 
   @Get()
   async findAll(
+    @Res({ passthrough: true }) res: Response,
     @Query('weekday') weekday?: number,
     @Query('dateFrom') dateFrom?: number,
     @Query('dateTo') dateTo?: number,
@@ -73,7 +80,9 @@ export class LessonController {
       query.dateTo = { $gte: dateTo };
     }
 
-    return await this.service.findAll(filter ? JSON.parse(filter) : query);
+    const result = await this.service.findAll(filter ? JSON.parse(filter) : query);
+    res.header('X-Total-Count', result.length.toString());
+    return result;
   }
 
   @Get(':id')

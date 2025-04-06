@@ -91,7 +91,7 @@ export function EditPostponedAttendance({ attendance }: { attendance: IAttendanc
       helperText={isDateError ? 'Дата должна быть больше текущей' : null}
     />
 
-    {lessonsByWeekday && <Select
+    {lessonsByWeekday.length > 0 && <Select
       name='lesson'
       label='Занятие'
     >
