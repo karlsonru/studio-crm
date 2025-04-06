@@ -45,7 +45,6 @@ export class CreateAttendanceDto {
   day: number;
 
   @IsNumber()
-  @IsPositive()
   @Min(0)
   @Max(6)
   weekday: number;
